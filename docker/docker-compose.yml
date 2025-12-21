@@ -1,0 +1,52 @@
+services:
+  mysql-server:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      - MYSQL_DATABASE=zabbix
+      - MYSQL_USER=zabbix
+      - MYSQL_PASSWORD=zabbix_pwd
+      - MYSQL_ROOT_PASSWORD=root_pwd
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  zabbix-server:
+    image: zabbix/zabbix-server-mysql:ubuntu-7.2-latest
+    ports:
+      - "10051:10051"
+    environment:
+      - DB_SERVER_HOST=mysql-server
+      - MYSQL_DATABASE=zabbix
+      - MYSQL_USER=zabbix
+      - MYSQL_PASSWORD=zabbix_pwd
+      - MYSQL_ROOT_PASSWORD=root_pwd
+    depends_on:
+      - mysql-server
+
+  zabbix-web:
+    image: zabbix/zabbix-web-nginx-mysql:ubuntu-7.2-latest
+    ports:
+      - "8080:8080"
+    environment:
+      - ZBX_SERVER_HOST=zabbix-server
+      - DB_SERVER_HOST=mysql-server
+      - MYSQL_DATABASE=zabbix
+      - MYSQL_USER=zabbix
+      - MYSQL_PASSWORD=zabbix_pwd
+      - MYSQL_ROOT_PASSWORD=root_pwd
+      - PHP_TZ=Europe/Warsaw
+    depends_on:
+      - zabbix-server
+
+  test-linux-node:
+    image: zabbix/zabbix-agent:ubuntu-7.2-latest
+    hostname: test-node
+    privileged: true
+    environment:
+      - ZBX_HOSTNAME=test-node
+      - ZBX_SERVER_HOST=zabbix-server
+    volumes:
+       - ./dummy_data:/tmp/dummy_data
+
+volumes:
+  mysql_data:
