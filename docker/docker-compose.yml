@@ -9,6 +9,7 @@ services:
       - MYSQL_ROOT_PASSWORD=root_pwd
     volumes:
       - mysql_data:/var/lib/mysql
+    stop_grace_period: 1m
 
   zabbix-server:
     image: zabbix/zabbix-server-mysql:ubuntu-7.2-latest
@@ -22,11 +23,14 @@ services:
       - MYSQL_ROOT_PASSWORD=root_pwd
     depends_on:
       - mysql-server
+    volumes:
+      - ./zabbix_data/alertscripts:/usr/lib/zabbix/alertscripts
+      - ./zabbix_data/externalscripts:/usr/lib/zabbix/externalscripts
 
   zabbix-web:
     image: zabbix/zabbix-web-nginx-mysql:ubuntu-7.2-latest
     ports:
-      - "8080:8080"
+      - "9999:8080"
     environment:
       - ZBX_SERVER_HOST=zabbix-server
       - DB_SERVER_HOST=mysql-server

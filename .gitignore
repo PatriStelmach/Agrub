@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.py[cod]
+venv/
+
+# IDE
+.idea/
+.vscode/
+
+# Docker - Zabbix
+dummy_data/
+zabbix_data/
+mysql_data/
+
+.env
