@@ -11,8 +11,8 @@ public class PythonScriptService {
         try {
             // Przygotowanie komendy
             String[] command = new String[args.length + 2];
-            command[0] = "python3";
-            command[1] = "scripts/" + scriptName;
+            command[0] = "python";
+            command[1] = "../AlertWIP/backend/scheduler/scripts/" + scriptName;
             System.arraycopy(args, 0, command, 2, args.length);
 
             ProcessBuilder pb = new ProcessBuilder(command);
