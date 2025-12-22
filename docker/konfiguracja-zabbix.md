@@ -34,21 +34,25 @@ Aby nie katować komputera obniżamy próg wywołania alertu na obciażenie CPU,
 3. Wybierz `Triggers` dla Template `Linux by Zabbix agent`.
 4. W name wpisz: `CPU` i kliknij w ten `Apply`.
 5. Kliknij w `Linux: High CPU utilization`.
-6. W polu `Expression`.
+6. W polu `Expression` zamień:
 ```text
-- min(/Linux by Zabbix agent/system.cpu.util,5m)>{$CPU.UTIL.CRIT}
-
-+ last(/Linux by Zabbix agent/system.cpu.util)>{$CPU.UTIL.CRIT}
+min(/Linux by Zabbix agent/system.cpu.util,5m)>{$CPU.UTIL.CRIT}
+```
+na:
+```
+last(/Linux by Zabbix agent/system.cpu.util)>{$CPU.UTIL.CRIT}
 ```
 
 7. `Update`.
 8. W name wpisz: `memory` i kliknij w ten `Apply`.
 9. Kliknij w `Linux: High memory utilization`.
-10. W polu `Expression`.
+10. W polu `Expression` zamień:
 ```text
-- min(/Linux by Zabbix agent/vm.memory.utilization,5m)>{$MEMORY.UTIL.MAX}
-
-+ last(/Linux by Zabbix agent/vm.memory.utilization)>{$MEMORY.UTIL.MAX}
+min(/Linux by Zabbix agent/vm.memory.utilization,5m)>{$MEMORY.UTIL.MAX}
+```
+na:
+```
+last(/Linux by Zabbix agent/vm.memory.utilization)>{$MEMORY.UTIL.MAX}
 ```
 
 11. `Update`.
@@ -63,8 +67,14 @@ docker compose exec --user root -it test-linux-node bash
 2. Aktualizacja i pobranie pakietu stress.
 ```bash 
 apt-get update && apt-get install -y stress 
-stress --cpu 2 --timeout 300 # Obciażenie 2 watkow na 5 minut
 ```
 
-3.  W ciagu minuty powinien pojawić się alert (zabbix agent jest odpytywany co minutę).
+3. Wywołanie alertu o obciążeniu procesora
+
+```bash
+stress --cpu 2 --timeout 300
+```
+**obciążenie 2 wątków na 5 minut**
+
+4. W ciagu minuty powinien pojawić się alert (zabbix agent jest odpytywany co minutę).
 
