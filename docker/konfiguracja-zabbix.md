@@ -1,6 +1,6 @@
 ### 1. Uruchomienie zabbix 
 1. docker compose up -d
-2. Po odczekaniu kilku minut (za pierwszym razem baza danych się długo wczytuje) odpalamy `http://localhost:8080`.
+2. Po odczekaniu kilku minut (za pierwszym razem baza danych się długo wczytuje) odpalamy `http://localhost:9999`.
 3. Login: `Admin` Hasło: `zabbix`
 
 ## 2. Dodanie hosta do zabbix
