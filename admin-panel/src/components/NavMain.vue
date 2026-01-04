@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { Component } from "vue"
-import { IconCirclePlusFilled, IconMail } from "@tabler/icons-vue"
+import { IconCirclePlusFilled } from "@tabler/icons-vue"
 
-import { Button } from '@/components/ui/button'
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -10,6 +9,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
+import {Button} from "@/components/ui/button";
 
 interface NavItem {
   title: string
@@ -28,20 +28,11 @@ defineProps<{
       <SidebarMenu>
         <SidebarMenuItem class="flex items-center gap-2">
           <SidebarMenuButton
-            tooltip="Send notificatons"
-            class="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
-          >
-            <IconCirclePlusFilled />
-            <span>Send notificaton</span>
+            tooltip="Send notificatons">
+
+            <Button variant="destructive" class="w-full"><IconCirclePlusFilled />Send notificaton</Button>
           </SidebarMenuButton>
-          <Button
-            size="icon"
-            class="size-8 group-data-[collapsible=icon]:opacity-0"
-            variant="outline"
-          >
-            <IconMail />
-            <span class="sr-only">Inbox</span>
-          </Button>
+
         </SidebarMenuItem>
       </SidebarMenu>
       <SidebarMenu>

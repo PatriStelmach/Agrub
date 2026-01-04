@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import {
-  IconCreditCard,
   IconDotsVertical,
   IconLogout,
   IconNotification,
@@ -92,10 +91,6 @@ const { isMobile } = useSidebar()
             <DropdownMenuItem>
               <IconUserCircle />
               Account
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <IconCreditCard />
-              Billing
             </DropdownMenuItem>
             <DropdownMenuItem>
               <IconNotification />

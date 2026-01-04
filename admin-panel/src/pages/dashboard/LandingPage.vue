@@ -54,30 +54,57 @@ const data = [
     target: "low",
     reviewer: "Lara Croft",
   },
+  {
+    id: 6,
+    header: "CPU usage over 80%",
+    type: "Zabbix",
+    status: "In Process",
+    target: "high",
+    reviewer: "Morgan Freeman",
+  },
+  {
+    id: 7,
+    header: "Server is down",
+    type: "Wazuh",
+    status: "Done",
+    target: "extreme",
+    reviewer: "Wily Wonka",
+  },
+  {
+    id: 8,
+    header: "HDD usage over 60%",
+    type: "Zabbix",
+    status: "Done",
+    target: "medium",
+    reviewer: "Eren Jaeger",
+  },
+  {
+    id: 9,
+    header: "LAN connection interrupted",
+    type: "Custom_plugin_v1",
+    status: "Done",
+    target: "low",
+    reviewer: "Donald Duck",
+  },
+  {
+    id: 10,
+    header: "No free ports on switch",
+    type: "My_switch_plugin",
+    status: "In Process",
+    target: "low",
+    reviewer: "Lara Croft",
+  },
 ]
 </script>
 
 <template>
-  <SidebarProvider
-    :style=" {
-      '--sidebar-width': 'calc(var(--spacing) * 72)',
-      '--header-height': 'calc(var(--spacing) * 12)',
-    }"
-  >
-    <AppSidebar variant="inset" />
-    <SidebarInset class=" my-4!">
-      <SiteHeader />
-      <div class="flex flex-1 flex-col  my-4!">
-        <div class="@container/main flex flex-1 flex-col gap-2">
-          <div class="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
 
+  <div>
+      <SiteHeader class="py-2" />
+      <div class="flex flex-col  my-4">
             <div class="px-4 lg:px-6">
               <DataTable :data="data" />
-
-            </div>
-          </div>
         </div>
       </div>
-    </SidebarInset>
-  </SidebarProvider>
+  </div>
 </template>

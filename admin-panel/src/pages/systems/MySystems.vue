@@ -14,14 +14,8 @@ import AppSidebar from "@/components/AppSidebar.vue";
 </script>
 
 <template>
-  <SidebarProvider
-    :style=" {
-      '--sidebar-width': 'calc(var(--spacing) * 72)',
-      '--header-height': 'calc(var(--spacing) * 12)',
-    }"
-  >
-    <AppSidebar variant="inset" />
-    <Empty class="bg-background my-4">
+
+    <Empty>
     <EmptyHeader>
       <EmptyMedia variant="icon">
         <FolderCode />
@@ -34,7 +28,7 @@ import AppSidebar from "@/components/AppSidebar.vue";
     </EmptyHeader>
     <EmptyContent>
       <div class="flex gap-2">
-        <RouterLink to="/add_system"><Button class="cursor-pointer">Add System</Button></RouterLink>
+        <RouterLink to="/systems_library"><Button class="cursor-pointer">Add System</Button></RouterLink>
         <Button class="cursor-pointer" variant="outline">
           Add plugin
         </Button>
@@ -46,5 +40,5 @@ import AppSidebar from "@/components/AppSidebar.vue";
       </a>
     </Button>
   </Empty>
-  </SidebarProvider>
+
 </template>

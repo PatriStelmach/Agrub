@@ -4,9 +4,9 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/systems',
+      path: '/my_systems',
       name: 'systems',
-      component: () => import('../pages/dashboard/MySystems.vue'),
+      component: () => import('../pages/systems/MySystems.vue'),
     },
     {
       path: '/',
@@ -14,10 +14,21 @@ const router = createRouter({
       component: () => import('../pages/dashboard/LandingPage.vue'),
     },
     {
-      path: '/add_system',
-      name: 'add_system',
-      component: () => import('../pages/dashboard/AddSystem.vue'),
+      path: '/systems_library',
+      name: 'systems_library',
+      component: () => import('../pages/systems/SystemsLibrary.vue'),
+    },
+    {
+      path: '/plugins_library',
+      name: 'plugins_library',
+      component: () => import('../pages/plugins/PluginLibrary.vue'),
+    },
+    {
+      path: '/my_plugins',
+      name: 'my_plugins',
+      component: () => import('../pages/plugins/MyPlugins.vue'),
     }
+
   ],
 })
 

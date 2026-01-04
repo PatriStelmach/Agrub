@@ -10,7 +10,6 @@ import {
   IconHelp,
   IconInnerShadowTop,
   IconCategory,
-  IconSearch,
   IconSettings,
   IconUsers,
   IconClipboardText, IconTerminal2, IconFileImport
@@ -44,7 +43,7 @@ const data = {
     },
     {
       title: "Connected systems",
-      url: "/systems",
+      url: "/my_systems",
       icon: IconCategory,
     },
     {
@@ -122,21 +121,16 @@ const data = {
       url: "#",
       icon: IconHelp,
     },
-    {
-      title: "Search",
-      url: "#",
-      icon: IconSearch,
-    },
   ],
   documents: [
     {
       name: "Plugins library",
-      url: "#",
+      url: "/plugins_library",
       icon: IconDatabase,
     },
     {
       name: "My plugins",
-      url: "#",
+      url: "/my_plugins",
       icon: IconFolder,
     },
     {
@@ -145,7 +139,7 @@ const data = {
       icon: IconTerminal2,
     },
     {
-      name: "Import plugins",
+      name: "Import plugin",
       url: "#",
       icon: IconFileImport,
     },
@@ -154,18 +148,18 @@ const data = {
 </script>
 
 <template>
-  <Sidebar collapsible="offcanvas">
+  <Sidebar class="z-100">
     <SidebarHeader>
       <SidebarMenu>
         <SidebarMenuItem>
           <SidebarMenuButton
             as-child
-            class="data-[slot=sidebar-menu-button]:!p-1.5"
+            class="data-[slot=sidebar-menu-button]:p-1.5!"
           >
-            <a href="/">
-              <IconInnerShadowTop class="!size-5" />
+            <router-link to="/">
+              <IconInnerShadowTop class="size-5!" />
               <span class="text-base font-semibold">ALERT</span>
-            </a>
+            </router-link>
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>

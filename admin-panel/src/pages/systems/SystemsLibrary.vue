@@ -28,82 +28,60 @@ const systems =
     {
       name: "Zabbix",
       img: zabbix_logo,
-      isAdded: true,
       openSource: true,
       description: "Open-source software tool to monitor IT infrastructure such as networks, servers, virtual machines, and cloud services."
     },
     {
       name: "Wazuh",
       img: wazuh_logo,
-      isAdded: false,
       openSource: true,
       description: "Analyzes security data across endpoints, clouds, and networks to detect threats, respond to incidents, and ensure compliance."
     },
     {
       name: "Nagios",
       img: nagios_logo,
-      isAdded: false,
       openSource: false,
       description: "Event monitoring system that offers monitoring and alerting services for servers, switches, applications and services."
-    }
-  ]
-
-const lol =
-  [
-    {
-      id: 1,
-      name: "lol"
-    },
-    {
-      id: 2,
-      name: "belosan"
     }
   ]
 </script>
 
 
 <template>
-  <SidebarProvider
-    :style=" {
-      '--sidebar-width': 'calc(var(--spacing) * 72)',
-      '--header-height': 'calc(var(--spacing) * 12)',
-    }"
-  >
-    <AppSidebar variant="inset"/>
-    <div class="bg-background rounded-xl w-full my-4 p-4 flex">
-      <div v-for="system in systems" class="w-6/7 center">
-        <Card class="m-4 h-1/2">
+    <div class="pt-4 grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 ">
+      <div v-for="system in systems" class=" mx-6 center">
+        <Card
+          class="m-4 h-4/5 lg:h-3/8 xl:h-1/3 2xl:h-3/11 hover:shadow-[0_0_20px_1px] transition-all hover:transition-duration-100"
+          :class="{' hover:shadow-green-900 hover:border-green-900': !system.openSource,
+           ' hover:shadow-blue-900 hover:border-blue-900': system.openSource}">
           <div class="flex justify-between items-center">
-            <CardHeader class="text-2xl">{{system.name}}</CardHeader>
+            <CardHeader class="text-3xl xl:text-4xl 2xl:text-6xl text-shadow-sky-800 text-shadow-sm font-bold ">
+              {{system.name}}</CardHeader>
             <img alt="system_image" :src="system.img" width="60" height="60" class="rounded-4xl mr-4">
           </div>
           <CardDescription class="h-1/3 mb-4">
-            <Item variant="outline" class="m-4">
-              <ItemContent class="h-full!">
+            <Item variant="outline" class="m-4 bg-slate-800">
+              <ItemContent class="h-full text-lg xl:text-2xl 2xl:text-3xl">
              {{system.description}}
               </ItemContent>
             </Item>
           </CardDescription>
-          <CardAction class="mx-4 text-sm flex items-center gap-1"
+          <CardAction class="mx-4 mt-[2vh] text-md xl:text-xl 2xl:text-4xl flex items-center gap-2"
           v-if="system.openSource">
-            <component class="text-green-600" :is="IconBrandOpenSource"></component>
+            <component class="text-blue-500  size-8 xl:size-12 2xl:size-16" :is="IconBrandOpenSource"></component>
             Open Source
           </CardAction>
-          <CardAction v-else class="mx-4 text-sm flex items-center gap-1">
-            <component class="text-red-600" :is="IconCurrencyDollar"></component>
+          <CardAction v-else class="mx-4 mt-[2vh] text-md xl:text-xl 2xl:text-4xl flex items-center gap-1">
+            <component class="text-green-500 size-8 xl:size-12 2xl:size-16" :is="IconCurrencyDollar"></component>
             Commercial
           </CardAction>
-          <CardFooter class="flex justify-end">
-            <Button class="cursor-pointer">
-              <component v-if="system.isAdded" :is="IconPlus" ></component>
-              <component v-else>Open</component>
+          <CardFooter class="flex justify-end relative bottom-5 xl:bottom-10 2xl:bottom-15">
+            <Button class="cursor-pointer hover:shadow-[0_0_10px_3px] w-12 xl:size-16 2xl:size-24 text-sm xl:text-xl 2xl:text-4xl ">
+              <component :is="IconPlus" class="size-6 xl:size-8 2xl:size-12"></component>
             </Button>
           </CardFooter>
         </Card>
       </div>
-
     </div>
-
-    </SidebarProvider>
 </template>
 

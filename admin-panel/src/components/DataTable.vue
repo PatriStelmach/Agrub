@@ -1,6 +1,5 @@
 <script lang="ts">
 import { z } from "zod"
-import DraggableRow from "./DraggableRow.vue"
 import DragHandle from "./DragHandle.vue"
 import {ref} from "vue"
 
@@ -80,6 +79,7 @@ import {
   TabsTrigger,
 } from '@/components/ui/tabs'
 import {h} from "vue";
+import DraggableRow from "@/components/DraggableRow.vue";
 
 const props = defineProps<{
   data: TableData[]
@@ -161,7 +161,7 @@ const columns: ColumnDef<TableData>[] = [
         case "low":
           return "bg-green-500"
         case "medium":
-          return "bg-yellow-300"
+          return "bg-yellow-500"
         case "high":
           return "bg-orange-500"
         case "extreme":
