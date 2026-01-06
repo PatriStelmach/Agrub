@@ -1,0 +1,138 @@
+import type {MyPlugin} from "@/types/my.plugin.ts"
+export const myPluginsData: MyPlugin[] = [
+  {
+    id: 1,
+    name: "bash script",
+    creator: "John Doe",
+    language: "bash",
+    runningIntervals: "10 seconds",
+    addedAt: new Date(2025, 1, 7, 15, 30),
+    updatedAt: new Date(2025, 12, 22, 12, 20),
+    on: true,
+    weight: 5,
+    tags: ["shell", "scripting"]
+  },
+  {
+    id: 2,
+    name: "python monitor",
+    creator: "Jane Smith",
+    language: "python",
+    runningIntervals: "30 seconds",
+    addedAt: new Date(2025, 2, 15, 9, 45),
+    updatedAt: new Date(2025, 11, 10, 14, 30),
+    on: true,
+    weight: 8,
+    tags: ["python", "monitoring", "performance"]
+  },
+  {
+    id: 3,
+    name: "node service",
+    creator: "Bob Johnson",
+    language: "javascript",
+    runningIntervals: "5 minutes",
+    addedAt: new Date(2025, 3, 20, 11, 20),
+    updatedAt: new Date(2025, 10, 5, 16, 45),
+    on: true,
+    weight: 7,
+    tags: ["nodejs", "service", "api", "web"]
+  },
+  {
+    id: 4,
+    name: "docker watcher",
+    creator: "Alice Brown",
+    language: "go",
+    runningIntervals: "2 minutes",
+    addedAt: new Date(2025, 4, 8, 13, 10),
+    updatedAt: new Date(2025, 9, 18, 10, 25),
+    on: false,
+    weight: 9,
+    tags: ["docker", "containers", "orchestration", "devops", "monitoring"]
+  },
+  {
+    id: 5,
+    name: "log analyzer",
+    creator: "Charlie Wilson",
+    language: "python",
+    runningIntervals: "1 hour",
+    addedAt: new Date(2025, 5, 12, 8, 0),
+    updatedAt: new Date(2025, 8, 25, 15, 50),
+    on: true,
+    weight: 6,
+    description: "Analyzes system logs for patterns and anomalies",
+    tags: ["logs", "analytics", "monitoring", "elasticsearch", "kibana"]
+  },
+  {
+    id: 6,
+    name: "cpu monitor",
+    creator: "David Lee",
+    language: "c++",
+    runningIntervals: "15 seconds",
+    addedAt: new Date(2025, 6, 3, 16, 30),
+    updatedAt: new Date(2025, 7, 14, 9, 15),
+    on: false,
+    weight: 4,
+    tags: ["cpu", "performance", "monitoring", "metrics"]
+  },
+  {
+    id: 7,
+    name: "memory checker",
+    creator: "Eva Martinez",
+    language: "rust",
+    runningIntervals: "45 seconds",
+    addedAt: new Date(2025, 1, 28, 12, 45),
+    updatedAt: new Date(2025, 6, 30, 11, 40),
+    on: true,
+    weight: 5,
+    tags: ["memory", "ram", "monitoring", "performance", "metrics"]
+  },
+  {
+    id: 8,
+    name: "network scanner",
+    creator: "Frank Garcia",
+    language: "python",
+    runningIntervals: "10 minutes",
+    addedAt: new Date(2025, 7, 22, 14, 20),
+    updatedAt: new Date(2025, 12, 1, 8, 30),
+    on: true,
+    weight: 7,
+    tags: ["network", "security", "scanning", "ports"]
+  },
+  {
+    id: 9,
+    name: "disk monitor",
+    creator: "Grace Chen",
+    language: "java",
+    runningIntervals: "30 minutes",
+    addedAt: new Date(2025, 8, 10, 7, 15),
+    updatedAt: new Date(2025, 11, 20, 17, 25),
+    on: true,
+    weight: 6,
+    description: "Monitors disk usage and alerts on low space",
+    tags: ["disk", "storage", "monitoring", "performance", "filesystem"]
+  },
+  {
+    id: 10,
+    name: "process watcher",
+    creator: "Henry Taylor",
+    language: "c",
+    runningIntervals: "20 seconds",
+    addedAt: new Date(2025, 9, 5, 10, 30),
+    updatedAt: new Date(2025, 12, 15, 13, 10),
+    on: false,
+    weight: 3,
+    tags: ["process", "system", "monitoring", "performance", "psutil"]
+  },
+  {
+    id: 11,
+    name: "file auditor",
+    creator: "Isabella White",
+    language: "go",
+    runningIntervals: "4 hours",
+    addedAt: new Date(2025, 2, 14, 9, 0),
+    updatedAt: new Date(2025, 10, 12, 14, 45),
+    on: false,
+    weight: 8,
+    description: "Audits file changes for security compliance",
+    tags: ["security", "audit", "filesystem", "compliance", "integrity"]
+  }
+]

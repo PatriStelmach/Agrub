@@ -21,12 +21,17 @@ const router = createRouter({
     {
       path: '/plugins_library',
       name: 'plugins_library',
-      component: () => import('../pages/plugins/PluginLibrary.vue'),
+      component: () => import('../pages/plugins/PluginsLibrary.vue'),
     },
     {
       path: '/my_plugins',
       name: 'my_plugins',
       component: () => import('../pages/plugins/MyPlugins.vue'),
+    },
+    {
+      path: '/add_new',
+      name: 'add_new',
+      component: () => import('../pages/systems/AddNew.vue'),
     }
 
   ],

@@ -1,26 +1,22 @@
-<script lang="ts">
+<script setup lang="ts">
 import { z } from "zod"
-import DragHandle from "./DragHandle.vue"
 import {ref} from "vue"
 
-export const schema = z.object({
+const schema = z.object({
   id: z.number(),
   header: z.string(),
-  type: z.string(),
+  source: z.string(),
   status: z.string(),
-  target: z.string(),
-  reviewer: z.string(),
-})
-</script>
+  level: z.string(),
+  technician: z.string(),
 
-<script setup lang="ts">
+})
 import type {
   ColumnDef,
   ColumnFiltersState,
   SortingState,
   VisibilityState,
 } from "@tanstack/vue-table"
-import { RestrictToVerticalAxis } from "@dnd-kit/abstract/modifiers"
 import {
   IconChevronDown,
   IconChevronLeft,
@@ -41,7 +37,6 @@ import {
   getSortedRowModel,
   useVueTable,
 } from "@tanstack/vue-table"
-import { DragDropProvider } from "dnd-kit-vue"
 import { Badge } from '@/components/ui/badge'
 
 import { Button } from '@/components/ui/button'
@@ -79,7 +74,7 @@ import {
   TabsTrigger,
 } from '@/components/ui/tabs'
 import {h} from "vue";
-import DraggableRow from "@/components/DraggableRow.vue";
+import DateCell from "@/helpers/DateCell.vue";
 
 const props = defineProps<{
   data: TableData[]
@@ -88,10 +83,12 @@ const props = defineProps<{
 interface TableData {
   id: number
   header: string
-  type: string
+  source: string
   status: string
-  target: string
-  reviewer: string
+  level: string
+  technician: string,
+  createdAt: Date,
+  closedAt: Date,
 }
 
 const sorting = ref<SortingState>([])
@@ -100,11 +97,6 @@ const columnVisibility = ref<VisibilityState>({})
 const rowSelection = ref({})
 
 const columns: ColumnDef<TableData>[] = [
-  {
-    id: "drag",
-    header: () => null,
-    cell: ({ row }) => h(DragHandle),
-  },
   {
     id: "select",
     header: ({ table }) => h(Checkbox, {
@@ -127,11 +119,11 @@ const columns: ColumnDef<TableData>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "type",
-    header: "System / Plugin",
+    accessorKey: "source",
+    header: "Source",
     cell: ({ row }) => h(Badge, {
       variant: "outline",
-    }, () => String(row.getValue("type"))),
+    }, () => String(row.getValue("source"))),
   },
   {
     accessorKey: "status",
@@ -147,7 +139,7 @@ const columns: ColumnDef<TableData>[] = [
     },
   },
   {
-    accessorKey: "target",
+    accessorKey: "level",
     header: () => h("div", { class: "flex items-center gap-1" }, [
       "Level",
     ]),
@@ -155,8 +147,8 @@ const columns: ColumnDef<TableData>[] = [
     {
       const level = () =>
     {
-      const target = row.getValue("target") as string
-      switch (target)
+      const level = row.getValue("level") as string
+      switch (level)
       {
         case "low":
           return "bg-green-500"
@@ -173,30 +165,29 @@ const columns: ColumnDef<TableData>[] = [
       size: "sm",
       class: "h-auto p-1 text-xs font-mono",
     }, () => [
-      h("span", { class: `${level()} rounded-md p-1 font-semibold` }, String(row.getValue("target"))),
+      h("span", { class: `${level()} rounded-md p-1 font-semibold` }, String(row.getValue("level"))),
     ])
     }
   },
   {
-    accessorKey: "reviewer",
+    accessorKey: "technician",
     header: "Technician",
     cell: ({ row }) => {
-      const reviewer = row.getValue("reviewer") as string
-      const isAssigned = reviewer !== "Assign reviewer"
+      const technician = row.getValue("technician") as string
+      const isAssigned = technician !== "Assign technician"
 
       if (isAssigned) {
-        return h("span", {}, reviewer)
+        return h("span", {}, technician)
       }
 
       return h(Select, {}, {
         default: () => [
           h(SelectTrigger, { class: "w-full" }, {
-            default: () => h(SelectValue, { placeholder: "Assign reviewer" }),
+            default: () => h(SelectValue, { placeholder: "Assign technician" }),
           }),
           h(SelectContent, {}, {
             default: () => [
               h(SelectItem, { value: "eddie" }, () => "Eddie Lake"),
-              h(SelectItem, { value: "jamik" }, () => "Jamik Tashpulatov"),
             ],
           }),
         ],
@@ -204,32 +195,30 @@ const columns: ColumnDef<TableData>[] = [
     },
   },
   {
-    id: "actions",
-    cell: () => h(DropdownMenu, {}, {
-      default: () => [
-        h(DropdownMenuTrigger, { asChild: true }, {
-          default: () => h(Button, {
-            variant: "ghost",
-            class: "h-8 w-8 p-0",
-          }, {
-            default: () => [
-              h("span", { class: "sr-only" }, "Open menu"),
-              h(IconDotsVertical, { class: "h-4 w-4" }),
-            ],
-          }),
-        }),
-        h(DropdownMenuContent, { align: "end" }, {
-          default: () => [
-            h(DropdownMenuItem, {}, () => "Edit"),
-            h(DropdownMenuItem, {}, () => "Make a copy"),
-            h(DropdownMenuItem, {}, () => "Favorite"),
-            h(DropdownMenuSeparator, {}),
-            h(DropdownMenuItem, {}, () => "Delete"),
-          ],
-        }),
-      ],
-    }),
+    accessorKey: "createdAt",
+    header: "Created at",
+    cell: ({ row }) =>
+    {
+      const date = row.getValue("date") as Date
+
+      return h(date, {} )
+    }
   },
+  {
+    accessorKey: "closedAt",
+    header: "Closed at",
+
+    cell: ({ row }) =>
+    {
+      const date = row.getValue("date") as Date
+      return h("span", {},
+        [
+          date == null
+          ? h("span", {}, String("- - - - - - - - - -"))
+            : h("span", {}, String(date)),
+        ])
+    }
+  }
 ]
 
 const table = useVueTable({
@@ -312,38 +301,33 @@ const table = useVueTable({
       class="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6"
     >
       <div class="overflow-hidden rounded-lg border">
-        <DragDropProvider :modifiers="[RestrictToVerticalAxis]">
-          <Table>
-            <TableHeader class="bg-muted sticky top-0 z-10">
-              <TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
-                <TableHead v-for="header in headerGroup.headers" :key="header.id" :col-span="header.colSpan">
-                  <FlexRender v-if="!header.isPlaceholder" :render="header.column.columnDef.header" :props="header.getContext()" />
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody class="**:data-[slot=table-cell]:first:w-8">
-              <template v-if="table.getRowModel().rows.length">
-                <DraggableRow v-for="row in table.getRowModel().rows" :key="row.id" :row="row" :index="row.index" />
-              </template>
-              <TableRow v-else>
-                <TableCell
-                  :col-span="columns.length"
-                  class="h-24 text-center"
-                >
-                  No results.
+        <Table>
+          <TableHeader class="bg-muted sticky top-0 z-10">
+            <TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
+              <TableHead v-for="header in headerGroup.headers" :key="header.id" :col-span="header.colSpan">
+                <FlexRender v-if="!header.isPlaceholder" :render="header.column.columnDef.header" :props="header.getContext()" />
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody class="**:data-[slot=table-cell]:first:w-8">
+            <template v-if="table.getRowModel().rows.length">
+              <TableRow class="duration-0" v-for="row in table.getRowModel().rows" :key="row.id">
+                <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id">
+                  <DateCell v-if="cell.getValue() instanceof Date" :date="cell.getValue() as Date"></DateCell>
+                  <FlexRender v-else :render="cell.column.columnDef.cell" :props="cell.getContext()" />
                 </TableCell>
               </TableRow>
-            </TableBody>
-          </Table>
-        </DragDropProvider>
-        <!-- <DndContext
-            collisionDetection={closestCenter}
-            modifiers={[restrictToVerticalAxis]}
-            onDragEnd={handleDragEnd}
-            sensors={sensors}
-            id={sortableId}
-          > -->
-        <!-- </DndContext> -->
+            </template>
+            <TableRow v-else>
+              <TableCell
+                :col-span="columns.length"
+                class="h-24 text-center"
+              >
+                No results.
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
       </div>
       <div class="flex items-center justify-between px-4">
         <div class="text-muted-foreground hidden flex-1 text-sm lg:flex">
@@ -418,21 +402,6 @@ const table = useVueTable({
           </div>
         </div>
       </div>
-    </TabsContent>
-    <TabsContent
-      value="past-performance"
-      class="flex flex-col px-4 lg:px-6"
-    >
-      <div class="aspect-video w-full flex-1 rounded-lg border border-dashed" />
-    </TabsContent>
-    <TabsContent value="key-personnel" class="flex flex-col px-4 lg:px-6">
-      <div class="aspect-video w-full flex-1 rounded-lg border border-dashed" />
-    </TabsContent>
-    <TabsContent
-      value="focus-documents"
-      class="flex flex-col px-4 lg:px-6"
-    >
-      <div class="aspect-video w-full flex-1 rounded-lg border border-dashed" />
     </TabsContent>
   </Tabs>
 </template>

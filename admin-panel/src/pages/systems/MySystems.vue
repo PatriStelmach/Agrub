@@ -10,7 +10,7 @@ import {
   EmptyTitle,
 } from '@/components/ui/empty'
 import {SidebarProvider} from "@/components/ui/sidebar";
-import AppSidebar from "@/components/AppSidebar.vue";
+import AppSidebar from "@/pages/navbar/AppSidebar.vue";
 </script>
 
 <template>
@@ -29,9 +29,11 @@ import AppSidebar from "@/components/AppSidebar.vue";
     <EmptyContent>
       <div class="flex gap-2">
         <RouterLink to="/systems_library"><Button class="cursor-pointer">Add System</Button></RouterLink>
-        <Button class="cursor-pointer" variant="outline">
-          Add plugin
-        </Button>
+        <RouterLink to="/plugins_library">
+          <Button class="cursor-pointer" variant="outline">
+            Add plugin
+          </Button>
+        </RouterLink>
       </div>
     </EmptyContent>
     <Button variant="link" as-child class="text-muted-foreground" size="sm">

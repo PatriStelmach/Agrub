@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant white (&:is(.white *));
+@custom-variant light (&:where([data-theme="light"]), [data-theme="light"]) ;
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
@@ -75,16 +75,17 @@
   --sidebar-ring: oklch(0.551 0.027 264.364);
 }
 
-.white {
+.light {
   --background: oklch(1 0 0);
   --foreground: oklch(0.13 0.028 261.692);
-  --card: oklch(1 0 0);
+  --card: oklch(0.98 0.00 248);
+  --navbar: oklch(0.577 0.245 27.325);
   --card-foreground: oklch(0.13 0.028 261.692);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.13 0.028 261.692);
   --primary: oklch(0.21 0.034 264.665);
   --primary-foreground: oklch(0.985 0.002 247.839);
-  --secondary: oklch(0.967 0.003 264.542);
+  --secondary: oklch(0.957 0.003 264.542);
   --secondary-foreground: oklch(0.21 0.034 264.665);
   --muted: oklch(0.967 0.003 264.542);
   --muted-foreground: oklch(0.551 0.027 264.364);

@@ -12,7 +12,7 @@ const minutes = props.date.getMinutes() == 0 ? '00' : props.date.getMinutes()
 </script>
 
 <template>
-  <TableCell>{{props.date.getDate()}} / {{props.date.getMonth()+1}} / {{props.date.getFullYear()}}  -  {{hours + ":" + minutes}}</TableCell>
+  <TableCell class="p-0">{{props.date.getDate()}} / {{props.date.getMonth()+1}} / {{props.date.getFullYear()}}  -  {{hours + ":" + minutes}}</TableCell>
 </template>
 
 
