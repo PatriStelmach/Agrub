@@ -27,9 +27,9 @@ const props = defineProps<{
 
   <Table
     class="w-9/10 mx-auto my-[2vh]">
-    <TableCaption class="border-b border-t py-4">List of plugins made by users</TableCaption>
+    <TableCaption class="border-b border-t py-[1vh]">List of plugins made by users</TableCaption>
     <TableHeader>
-      <TableRow>
+      <TableRow class="bg-secondary hover:bg-secondary">
         <TableHead></TableHead>
         <TableHead class="p-4">Name</TableHead>
         <TableHead class="p-4">Creator</TableHead>

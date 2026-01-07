@@ -32,10 +32,9 @@ const filteredData = computed(() =>
   {
     return rowsData.value
   }
+
   return pluginLibraryData.filter((item) =>
-  {
-    item.name.toLowerCase().includes(searchFilter.value.toLowerCase())
-  })
+    item.name.toLowerCase().includes(searchFilter.value.toLowerCase()))
 })
 
 const sort = ref<'id' | 'name' | 'creator' | 'createdAt' | 'language' | 'weight' | 'tags'>('id');

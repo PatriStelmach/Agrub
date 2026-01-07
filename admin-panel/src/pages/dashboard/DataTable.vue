@@ -18,16 +18,15 @@ import type {
   VisibilityState,
 } from "@tanstack/vue-table"
 import {
+  IconLock,
   IconChevronDown,
-  IconChevronLeft,
-  IconChevronRight,
-  IconChevronsLeft,
-  IconChevronsRight,
+  IconStatusChange,
   IconCircleCheckFilled,
-  IconDotsVertical,
+  IconUser,
   IconLayoutColumns,
   IconLoader,
-  IconPlus,
+  IconEyeCog,
+  IconBellCog
 } from "@tabler/icons-vue"
 import {
   FlexRender,
@@ -60,7 +59,7 @@ import {
 } from '@/components/ui/select'
 import {
   Table,
-  TableBody,
+  TableBody, TableCaption,
   TableCell, TableFooter,
   TableHead,
   TableHeader,
@@ -80,6 +79,7 @@ import {pluginLibraryData} from "@/data/pluginLibrary.ts";
 import {ButtonGroup} from "@/components/ui/button-group";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
 import {ArrowLeftIcon, Search} from "lucide-vue-next";
+import IconTooling from "@/components/icons/IconTooling.vue";
 
 const props = defineProps<{
   data: TableData[]
@@ -161,8 +161,6 @@ const columns: ColumnDef<TableData>[] = [
         case "medium":
           return "bg-yellow-500"
         case "high":
-          return "bg-orange-500"
-        case "extreme":
           return "bg-red-500"
       }
     }
@@ -280,12 +278,11 @@ const table = useVueTable({
           <DropdownMenuTrigger as-child>
             <Button class="text-chart-2 hover:bg-chart-2/70!" variant="outline">
               <IconLayoutColumns />
-              <span class="hidden lg:inline">Customize Columns</span>
-              <span class="lg:hidden">Columns</span>
+              Customize Columns
               <IconChevronDown />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" class="w-56">
+          <DropdownMenuContent align="end" class="w-[10vw]">
             <template v-for="column in table.getAllColumns().filter((column) => typeof column.accessorFn !== 'undefined' && column.getCanHide())" :key="column.id">
               <DropdownMenuCheckboxItem
                 class="capitalize"
@@ -300,11 +297,35 @@ const table = useVueTable({
             </template>
           </DropdownMenuContent>
         </DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger as-child>
+              <Button variant="outline" class="text-chart-3 hover:bg-chart-3/80!">
+                <IconBellCog/>
+                Alert actions
+                <IconChevronDown/>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" class="w-[10vw]">
+              <DropdownMenuItem>
+                <IconEyeCog/>Change level
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <IconUser/>Change technician
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <IconStatusChange/>Change status
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <IconLock/>Close
+              </DropdownMenuItem>
+
+            </DropdownMenuContent>
+          </DropdownMenu>
         <InputGroup class="relative l-[30vw] w-[20vw]  " >
           <InputGroupInput
             v-model="searchFilter"
             type="search"
-            placeholder="Search for plugin"/>
+            placeholder="Search for alert"/>
           <InputGroupAddon>
             <Search/>
           </InputGroupAddon>
@@ -318,6 +339,9 @@ const table = useVueTable({
     >
       <div class="overflow-hidden rounded-lg border">
         <Table>
+          <TableCaption class="p-[1vh] border-y">
+            {{ table.getFilteredSelectedRowModel().rows.length }} of
+            {{ table.getFilteredRowModel().rows.length }} row(s) selected.</TableCaption>
           <TableHeader class="bg-muted sticky top-0 z-10">
             <TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
               <TableHead v-for="header in headerGroup.headers" :key="header.id" :col-span="header.colSpan">
@@ -345,13 +369,6 @@ const table = useVueTable({
 
           </TableBody>
         </Table>
-      </div>
-      <div class="flex items-center justify-between px-4">
-        <div class="text-muted-foreground hidden flex-1 text-sm lg:flex">
-          {{ table.getFilteredSelectedRowModel().rows.length }} of
-          {{ table.getFilteredRowModel().rows.length }} row(s) selected.
-        </div>
-
       </div>
     </TabsContent>
   </Tabs>

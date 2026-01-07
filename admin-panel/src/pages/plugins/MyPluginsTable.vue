@@ -25,9 +25,9 @@ const props = defineProps<{
 <template>
   <div class=" mt-[2vh] flex mx-auto w-full">
     <Table class="w-9/10 mx-auto my-[1vh]">
-      <TableCaption class="border-b border-t py-4">List of your plugins</TableCaption>
+      <TableCaption class="border-b border-t py-[1vh]">List of your plugins</TableCaption>
         <TableHeader>
-          <TableRow>
+          <TableRow class="bg-secondary hover:bg-secondary">
             <TableHead></TableHead>
             <TableHead class="p-4">Id</TableHead>
             <TableHead class="p-4">Name</TableHead>

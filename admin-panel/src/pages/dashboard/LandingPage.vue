@@ -4,6 +4,7 @@ import SiteHeader from "@/pages/navbar/SiteHeader.vue"
 import {dashboardData} from "@/data/dashboardData.ts"
 import {computed, ref} from "vue";
 import MyPagination from "@/helpers/MyPagination.vue";
+import StatsChart from "@/pages/dashboard/StatsChart.vue";
 
 const currentPage = ref(1)
 
@@ -44,5 +45,6 @@ const filteredData = computed(() =>
                 @update:paginated-data="update"/>
         </div>
       </div>
+    <StatsChart class="my-[4vh] mx-auto w-[60vw] h-[50vh]"/>
   </div>
 </template>

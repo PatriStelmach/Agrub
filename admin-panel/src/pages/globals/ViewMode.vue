@@ -14,8 +14,8 @@ const mode = useColorMode()
   <div class="fixed top-4 right-4 z-9999">
     <DropdownMenu>
       <DropdownMenuTrigger as-child>
-        <Button class="cursor-pointer relative">
-          <component :is="mode === 'light' ? IconSunFilled :IconMoonFilled" class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all" />
+        <Button class="cursor-pointer relative size-[3vh]">
+          <component :is="mode === 'light' ? IconSunFilled :IconMoonFilled" class="size-[1vw] rotate-0 scale-100 transition-all" />
           <span class="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
