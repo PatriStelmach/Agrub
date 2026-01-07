@@ -11,7 +11,7 @@ import ViewMode from "@/pages/globals/ViewMode.vue";
   <div class="h-screen flex flex-col">
     <header>
 
-      <nav class="flex h-[6vh] bg-card justify-center items-center">
+      <nav class="flex h-[5vh] bg-card justify-center items-center">
         <SearchBar/>
         <ViewMode/>
       </nav>

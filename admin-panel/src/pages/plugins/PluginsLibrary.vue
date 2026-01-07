@@ -9,13 +9,13 @@ import {
 
 } from "@tabler/icons-vue";
 
-import {ArrowLeftIcon, MoreHorizontalIcon} from "lucide-vue-next";
+import {ArrowLeftIcon, MoreHorizontalIcon, Search} from "lucide-vue-next";
 import {ButtonGroup} from "@/components/ui/button-group";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import type {MyPlugin} from "@/types/my.plugin.ts";
+import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
 
-const itemsPerPage = 10;
 const currentPage = ref(1)
 const searchFilter = ref()
 
@@ -32,16 +32,22 @@ const filteredData = computed(() =>
   {
     return rowsData.value
   }
-  return rowsData.value
-    .filter((item:MyPlugin) => item.name.toLowerCase().includes(searchFilter.value.toLowerCase()))
+  return pluginLibraryData.filter((item) =>
+  {
+    item.name.toLowerCase().includes(searchFilter.value.toLowerCase())
+  })
 })
+
+const sort = ref<'id' | 'name' | 'creator' | 'createdAt' | 'language' | 'weight' | 'tags'>('id');
+
+
 
 </script>
 
 <template>
   <div class="  mx-auto w-full">
     <div class="flex ml-[2vw] my-[2vh] ">
-    <ButtonGroup>
+
 
       <ButtonGroup class="hidden sm:flex">
         <Button variant="outline" size="icon" aria-label="Go Back">
@@ -51,18 +57,22 @@ const filteredData = computed(() =>
           Add to your plugins
           <component :is="IconFileImport"/>
         </Button>
-      </ButtonGroup>
-    </ButtonGroup>
 
-    <Input
-      v-model="searchFilter"
-      class="absolute left-[40vw] w-[20vw]" type="search"></Input>
+      <InputGroup class="relative l-[30vw] w-[20vw]  " >
+        <InputGroupInput
+          v-model="searchFilter"
+          type="search"
+          placeholder="Search for plugin"/>
+        <InputGroupAddon>
+          <Search/>
+        </InputGroupAddon>
+      </InputGroup>
+    </ButtonGroup>
 
     </div>
 <PluginsLibraryTable :data="filteredData" />
 
     <MyPagination
-      :items-per-page="itemsPerPage"
       :data="pluginLibraryData"
       :current-page="currentPage"
       @update:paginated-data="update"/>

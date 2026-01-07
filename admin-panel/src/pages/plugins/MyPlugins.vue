@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import MyPluginsTable from "@/pages/plugins/MyPluginsTable.vue";
 import {myPluginsData} from "@/data/myPlugins.ts";
-import { ArrowLeftIcon, MoreHorizontalIcon } from 'lucide-vue-next'
+import {ArrowLeftIcon, MoreHorizontalIcon, Search} from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { ButtonGroup } from '@/components/ui/button-group'
 import {
@@ -20,11 +20,12 @@ import
   IconDatabase,
   IconTerminal2,
   IconPencilCode,
-  IconPlayerPause, IconTrash
+  IconPlayerPause, IconTrash, IconPlus
 } from "@tabler/icons-vue";
 import { ref} from "vue";
 import {Badge} from "@/components/ui/badge";
 import MyPagination from "@/helpers/MyPagination.vue";
+import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
 
 const currentPage = ref(1)
 const itemsPerPage = 10
@@ -58,12 +59,21 @@ const update = (data:any[]) =>
           Delete
         <component :is="IconTrash"/>
         </Button>
+        <InputGroup class="relative l-[30vw] w-[20vw]  " >
+          <InputGroupInput
+            v-model="searchFilter"
+            type="search"
+            placeholder="Search for plugin"/>
+          <InputGroupAddon>
+            <Search/>
+          </InputGroupAddon>
+        </InputGroup>
       </ButtonGroup>
       <ButtonGroup>
-        <Badge>Add</Badge>
+
         <DropdownMenu>
           <DropdownMenuTrigger as-child>
-            <Button variant="outline" size="icon" aria-label="More Options"><MoreHorizontalIcon/></Button>
+            <Button variant="outline" size="icon" aria-label="More Options"><component :is="IconPlus"/></Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" class="w-52">
             <DropdownMenuLabel class="border-b">Plugins</DropdownMenuLabel>
@@ -83,6 +93,7 @@ const update = (data:any[]) =>
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
+        <Badge>Add</Badge>
       </ButtonGroup>
     </ButtonGroup>
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { z } from "zod"
-import {ref} from "vue"
+import {computed, ref} from "vue"
 
 const schema = z.object({
   id: z.number(),
@@ -61,7 +61,7 @@ import {
 import {
   Table,
   TableBody,
-  TableCell,
+  TableCell, TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -75,6 +75,11 @@ import {
 } from '@/components/ui/tabs'
 import {h} from "vue";
 import DateCell from "@/helpers/DateCell.vue";
+import MyPagination from "@/helpers/MyPagination.vue";
+import {pluginLibraryData} from "@/data/pluginLibrary.ts";
+import {ButtonGroup} from "@/components/ui/button-group";
+import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
+import {ArrowLeftIcon, Search} from "lucide-vue-next";
 
 const props = defineProps<{
   data: TableData[]
@@ -95,6 +100,7 @@ const sorting = ref<SortingState>([])
 const columnFilters = ref<ColumnFiltersState>([])
 const columnVisibility = ref<VisibilityState>({})
 const rowSelection = ref({})
+
 
 const columns: ColumnDef<TableData>[] = [
   {
@@ -199,7 +205,7 @@ const columns: ColumnDef<TableData>[] = [
     header: "Created at",
     cell: ({ row }) =>
     {
-      const date = row.getValue("date") as Date
+      const date = row.getValue("createdAt") as Date
 
       return h(date, {} )
     }
@@ -210,7 +216,7 @@ const columns: ColumnDef<TableData>[] = [
 
     cell: ({ row }) =>
     {
-      const date = row.getValue("date") as Date
+      const date = row.getValue("closedAt") as Date
       return h("span", {},
         [
           date == null
@@ -266,9 +272,13 @@ const table = useVueTable({
   >
     <div class="flex items-center justify-between px-4 lg:px-6">
       <div class="flex items-center gap-2">
+        <ButtonGroup>
+          <Button variant="outline" size="icon" aria-label="Go Back">
+            <ArrowLeftIcon />
+          </Button>
         <DropdownMenu>
           <DropdownMenuTrigger as-child>
-            <Button variant="outline" size="sm">
+            <Button class="text-chart-2 hover:bg-chart-2/70!" variant="outline">
               <IconLayoutColumns />
               <span class="hidden lg:inline">Customize Columns</span>
               <span class="lg:hidden">Columns</span>
@@ -290,10 +300,16 @@ const table = useVueTable({
             </template>
           </DropdownMenuContent>
         </DropdownMenu>
-        <Button variant="outline" size="sm">
-          <IconPlus />
-          <span class="hidden lg:inline">Add Section</span>
-        </Button>
+        <InputGroup class="relative l-[30vw] w-[20vw]  " >
+          <InputGroupInput
+            v-model="searchFilter"
+            type="search"
+            placeholder="Search for plugin"/>
+          <InputGroupAddon>
+            <Search/>
+          </InputGroupAddon>
+        </InputGroup>
+        </ButtonGroup>
       </div>
     </div>
     <TabsContent
@@ -326,6 +342,7 @@ const table = useVueTable({
                 No results.
               </TableCell>
             </TableRow>
+
           </TableBody>
         </Table>
       </div>
@@ -334,73 +351,7 @@ const table = useVueTable({
           {{ table.getFilteredSelectedRowModel().rows.length }} of
           {{ table.getFilteredRowModel().rows.length }} row(s) selected.
         </div>
-        <div class="flex w-full items-center gap-8 lg:w-fit">
-          <div class="hidden items-center gap-2 lg:flex">
-            <Label for="rows-per-page" class="text-sm font-medium">
-              Rows per page
-            </Label>
-            <Select
-              :model-value="table.getState().pagination.pageSize"
-              @update:model-value="(value) => {
-                table.setPageSize(Number(value))
-              }"
-            >
-              <SelectTrigger id="rows-per-page" size="sm" class="w-20">
-                <SelectValue :placeholder="`${table.getState().pagination.pageSize}`" />
-              </SelectTrigger>
-              <SelectContent side="top">
-                <SelectItem v-for="pageSize in [10, 20, 30, 40, 50]" :key="pageSize" :value="`${pageSize}`">
-                  {{ pageSize }}
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div class="flex w-fit items-center justify-center text-sm font-medium">
-            Page {{ table.getState().pagination.pageIndex + 1 }} of
-            {{ table.getPageCount() }}
-          </div>
-          <div class="ml-auto flex items-center gap-2 lg:ml-0">
-            <Button
-              variant="outline"
-              class="hidden h-8 w-8 p-0 lg:flex"
-              :disabled="!table.getCanPreviousPage()"
-              @click="table.setPageIndex(0)"
-            >
-              <span class="sr-only">Go to first page</span>
-              <IconChevronsLeft />
-            </Button>
-            <Button
-              variant="outline"
-              class="size-8"
-              size="icon"
-              :disabled="!table.getCanPreviousPage()"
-              @click="table.previousPage()"
-            >
-              <span class="sr-only">Go to previous page</span>
-              <IconChevronLeft />
-            </Button>
-            <Button
-              variant="outline"
-              class="size-8"
-              size="icon"
-              :disabled="!table.getCanNextPage()"
-              @click="table.nextPage()"
-            >
-              <span class="sr-only">Go to next page</span>
-              <IconChevronRight />
-            </Button>
-            <Button
-              variant="outline"
-              class="hidden size-8 lg:flex"
-              size="icon"
-              :disabled="!table.getCanNextPage()"
-              @click="table.setPageIndex(table.getPageCount() - 1)"
-            >
-              <span class="sr-only">Go to last page</span>
-              <IconChevronsRight />
-            </Button>
-          </div>
-        </div>
+
       </div>
     </TabsContent>
   </Tabs>

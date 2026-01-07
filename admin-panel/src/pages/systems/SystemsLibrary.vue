@@ -40,7 +40,7 @@ const popUp = (id: number) =>
       <div v-for="system in systemsLibraryData" class=" transition-all duration-300 mx-6 center"
       :class="{'blur-3xl' : isOpen}">
         <Card
-          class=" m-4 gap-2 h-4/5 lg:h-3/8 xl:h-3/8 2xl:h-3/10 hover:shadow-[0_0_20px_1px] border-2 transition-all transition-duration-50 hover:transition-duration-50"
+          class=" m-4 gap-2 h-[40vh] xl:h-[35vh] hover:shadow-[0_0_20px_1px] border-2 transition-all transition-duration-50 hover:transition-duration-50"
           :class="{' hover:shadow-green-900 hover:border-green-900': !system.openSource,
            ' hover:shadow-blue-900 hover:border-blue-900': system.openSource}">
           <div class=" flex justify-between items-center">
@@ -59,15 +59,15 @@ const popUp = (id: number) =>
           </CardAction>
           <CardDescription class="h-1/3">
             <Item variant="outline" class="m-4 bg-secondary">
-              <ItemContent class="h-full text-lg xl:text-2xl 2xl:text-3xl">
+              <ItemContent class="h-full text-xl xl:text-2xl 2xl:text-4xl">
              {{system.description}}
               </ItemContent>
             </Item>
           </CardDescription>
 
-          <CardFooter class="flex mt-[6vh] justify-end relative bottom-5 xl:bottom-10 2xl:bottom-15">
+          <CardFooter class="flex mb-0 mt-[8vh] justify-end relative bottom-5 xl:bottom-10 2xl:bottom-15">
             <Button
-              class="cursor-pointer hover:shadow-[0_0_10px_3px] size-[4vh] text-sm xl:text-xl 2xl:text-4xl "
+              class="cursor-pointer hover:shadow-[0_0_10px_3px] size-[5vh]  text-sm xl:text-xl 2xl:text-4xl "
               @click="openSystemId=system.id; isOpen = !isOpen"
             >
               <component :is="IconPlus" class="size-6 xl:size-8 2xl:size-12"></component>
