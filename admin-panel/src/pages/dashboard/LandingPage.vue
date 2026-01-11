@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import DataTable from "@/pages/dashboard/DataTable.vue"
-import SiteHeader from "@/pages/navbar/SiteHeader.vue"
+import SiteHeader from "@/pages/dashboard/SiteHeader.vue"
 import {dashboardData} from "@/data/dashboardData.ts"
 import {computed, ref} from "vue";
 import MyPagination from "@/helpers/MyPagination.vue";

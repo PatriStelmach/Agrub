@@ -44,6 +44,9 @@ const sort = ref<'id' | 'name' | 'creator' | 'createdAt' | 'language' | 'weight'
 </script>
 
 <template>
+  <div>
+    <h1 class="text-center my-[2vh] text-[3vh] border-b pb-[2vh] font-mono md ">Plugins library</h1>
+
   <div class="  mx-auto w-full">
     <div class="flex ml-[2vw] my-[2vh] ">
 
@@ -75,6 +78,7 @@ const sort = ref<'id' | 'name' | 'creator' | 'createdAt' | 'language' | 'weight'
       :data="pluginLibraryData"
       :current-page="currentPage"
       @update:paginated-data="update"/>
+  </div>
   </div>
 </template>
 

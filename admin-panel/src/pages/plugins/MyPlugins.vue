@@ -40,6 +40,8 @@ const update = (data:any[]) =>
 
 <template>
   <div>
+    <h1 class="text-center my-[2vh] text-[3vh] border-b pb-[2vh] font-mono ">Your plugins</h1>
+  <div>
     <ButtonGroup class="ml-[2vw] mt-[2vh] ">
       <ButtonGroup class="hidden sm:flex">
         <Button variant="outline" size="icon" aria-label="Go Back">
@@ -100,10 +102,9 @@ const update = (data:any[]) =>
     <MyPluginsTable :data="updatedData"/>
 
     <MyPagination
-      :items-per-page="itemsPerPage"
       :data="myPluginsData"
       :current-page="currentPage"
       @update:paginated-data="update"/>
   </div>
-
+</div>
 </template>

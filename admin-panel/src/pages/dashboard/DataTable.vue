@@ -7,7 +7,7 @@ const schema = z.object({
   header: z.string(),
   source: z.string(),
   status: z.string(),
-  level: z.string(),
+  priority: z.string(),
   technician: z.string(),
 
 })
@@ -90,7 +90,7 @@ interface TableData {
   header: string
   source: string
   status: string
-  level: string
+  priority: string
   technician: string,
   createdAt: Date,
   closedAt: Date,
@@ -145,16 +145,16 @@ const columns: ColumnDef<TableData>[] = [
     },
   },
   {
-    accessorKey: "level",
+    accessorKey: "priority",
     header: () => h("div", { class: "flex items-center gap-1" }, [
-      "Level",
+      "priority",
     ]),
     cell: ({ row }) =>
     {
-      const level = () =>
+      const priority = () =>
     {
-      const level = row.getValue("level") as string
-      switch (level)
+      const priority = row.getValue("priority") as string
+      switch (priority)
       {
         case "low":
           return "bg-green-500"
@@ -164,12 +164,12 @@ const columns: ColumnDef<TableData>[] = [
           return "bg-red-500"
       }
     }
-      return h(Button, {
+      return h(Badge, {
       variant: "ghost",
       size: "sm",
-      class: "h-auto p-1 text-xs font-mono",
+      class: `${priority()} h-full  rounded-md p-2 font-semibold`,
     }, () => [
-      h("span", { class: `${level()} rounded-md p-1 font-semibold` }, String(row.getValue("level"))),
+      h("span", {  }, String(row.getValue("priority"))),
     ])
     }
   },
@@ -307,7 +307,7 @@ const table = useVueTable({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" class="w-[10vw]">
               <DropdownMenuItem>
-                <IconEyeCog/>Change level
+                <IconEyeCog/>Change priority
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <IconUser/>Change technician

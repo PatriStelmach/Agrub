@@ -36,6 +36,8 @@ const popUp = (id: number) =>
 
 
 <template>
+  <div>
+  <h1 class="text-center my-[2vh] text-[3vh] border-b pb-[2vh] font-mono  ">Available systems</h1>
     <div class="pt-4 grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 ">
       <div v-for="system in systemsLibraryData" class=" transition-all duration-300 mx-6 center"
       :class="{'blur-3xl' : isOpen}">
@@ -83,6 +85,6 @@ const popUp = (id: number) =>
           :system="popUp(openSystemId as number) as System"></AddNew>
       </div>
     </div>
-
+  </div>
 </template>
 
