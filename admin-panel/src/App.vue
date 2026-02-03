@@ -18,7 +18,7 @@ import ViewMode from "@/pages/globals/ViewMode.vue";
     </header>
 
     <main class="bg-card flex flex-1 min-h-0">
-      <SidebarProvider class="w-auto min-h-0!">
+      <SidebarProvider class="w-auto min-h-0">
         <AppSidebar class="bg-card" variant="inset" />
       </SidebarProvider>
       <RouterView class="bg-background  border rounded-2xl flex-1 overflow-auto" />

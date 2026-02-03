@@ -7,22 +7,24 @@ import {
   PaginationNext,
   PaginationPrevious
 } from "@/components/ui/pagination";
-import {pluginLibraryData} from "@/data/pluginLibrary.ts";
+import {Label} from "@/components/ui/label";
 import {computed, ref, watch} from "vue";
 import {Button} from "@/components/ui/button";
 import {DropdownMenu, DropdownMenuTrigger, DropdownMenuItem, DropdownMenuContent, DropdownMenuGroup} from "@/components/ui/dropdown-menu";
+import type {Plugin} from "@/types/plugin.ts";
 
 const props = defineProps<{
-  data: any[]
-  currentPage: number
-
+  data: Plugin[]
+  page: number
 }>()
-const currentPage = ref(1)
-const itemsPerPage = ref(10)
+const currentPage = ref<number>(1)
+const itemsPerPage = ref<number>(10)
+
 const emit = defineEmits<{
-  'update:paginated-data': [data: any[]]
-
+  'update:paginated-data': [data: Plugin[]],
+  'update:pages': [page: number]
 }>()
+
 const updatedData = computed(() =>
 {
   const start = (currentPage.value -1 ) * itemsPerPage.value
@@ -31,11 +33,22 @@ const updatedData = computed(() =>
   return props.data.slice(start, end)
 })
 
-
-watch(updatedData, (newValue) =>
+const updatedPage = computed(() =>
 {
-  emit('update:paginated-data', newValue)
+  return currentPage.value
+})
+
+watch(() => props.page, () =>
+{
+  currentPage.value = props.page;
+})
+
+watch([updatedPage, updatedData], ([newPage, newData]) =>
+{
+  emit("update:pages", newPage);
+  emit('update:paginated-data', newData)
 }, {immediate: true})
+
 </script>
 
 <template>

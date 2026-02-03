@@ -26,12 +26,13 @@ import { ref} from "vue";
 import {Badge} from "@/components/ui/badge";
 import MyPagination from "@/helpers/MyPagination.vue";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
+import type { Plugin } from "@/types/plugin.ts";
 
 const currentPage = ref(1)
 const itemsPerPage = 10
 
 const updatedData = ref()
-const update = (data:any[]) =>
+const updateData = (data:Plugin[]) =>
 {
   updatedData.value = data
 }
@@ -103,7 +104,7 @@ const update = (data:any[]) =>
 
     <MyPagination
       :data="myPluginsData"
-      :current-page="currentPage"
+      :page="currentPage"
       @update:paginated-data="update"/>
   </div>
 </div>

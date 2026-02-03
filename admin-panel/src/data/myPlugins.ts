@@ -1,5 +1,5 @@
-import type {MyPlugin} from "@/types/my.plugin.ts"
-export const myPluginsData: MyPlugin[] = [
+import type {Plugin} from "@/types/plugin.ts"
+export const myPluginsData: Plugin[] = [
   {
     id: 1,
     name: "bash script",

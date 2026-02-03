@@ -2,15 +2,6 @@
 import { z } from "zod"
 import {computed, ref} from "vue"
 
-const schema = z.object({
-  id: z.number(),
-  header: z.string(),
-  source: z.string(),
-  status: z.string(),
-  priority: z.string(),
-  technician: z.string(),
-
-})
 import type {
   ColumnDef,
   ColumnFiltersState,
@@ -80,6 +71,18 @@ import {ButtonGroup} from "@/components/ui/button-group";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
 import {ArrowLeftIcon, Search} from "lucide-vue-next";
 import IconTooling from "@/components/icons/IconTooling.vue";
+
+const schema = z.object({
+  id: z.number(),
+  header: z.string(),
+  source: z.string(),
+  status: z.string(),
+  priority: z.string(),
+  technician: z.string(),
+  createdAt: z.date(),
+  closedAt: z.date(),
+
+})
 
 const props = defineProps<{
   data: TableData[]
@@ -165,7 +168,7 @@ const columns: ColumnDef<TableData>[] = [
       }
     }
       return h(Badge, {
-      variant: "ghost",
+      variant: "secondary",
       size: "sm",
       class: `${priority()} h-full  rounded-md p-2 font-semibold`,
     }, () => [

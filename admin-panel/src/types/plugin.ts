@@ -8,4 +8,8 @@ export interface Plugin
   weight: number,
   createdAt?: Date,
   tags: string[]
+  runningIntervals?: string,
+  addedAt?: Date,
+  updatedAt?: Date,
+  on?: boolean,
 }

@@ -14,10 +14,10 @@ import DateCell from "@/helpers/DateCell.vue";
 import {Checkbox} from "@/components/ui/checkbox";
 import {cn} from "@/lib/utils.ts";
 import {Badge} from "@/components/ui/badge";
-import type {MyPlugin} from "@/types/my.plugin.ts";
+import type {Plugin} from "@/types/plugin.ts"
 
 const props = defineProps<{
-  data: MyPlugin[]
+  data: Plugin[]
 }>()
 
 </script>
@@ -53,12 +53,17 @@ const props = defineProps<{
             <TableCell class="p-4">{{plugin.name}}</TableCell>
             <TableCell class="p-4">{{plugin.creator}}</TableCell>
             <TableCell class="p-4">
-              <Badge  v-for="tag in plugin.tags" class="cursor-pointer hover:bg-chart-1 mx-1" variant="secondary">{{tag}}</Badge>
+              <Badge
+                v-for="(tag, index) in plugin.tags"
+                class="cursor-pointer hover:bg-chart-1 mx-1"
+                variant="secondary"
+                :key="index"
+              >{{tag}}</Badge>
             </TableCell>
             <TableCell class="p-4">{{plugin.runningIntervals}}</TableCell>
             <TableCell class="p-4">{{plugin.language}}</TableCell>
-            <DateCell class="p-4" :date="plugin.addedAt"></DateCell>
-            <DateCell class="p-4" :date="plugin.updatedAt"></DateCell>
+            <DateCell v-if="plugin.addedAt" class="p-4" :date="plugin.addedAt "></DateCell>
+            <DateCell v-if="plugin.updatedAt" class="p-4" :date="plugin.updatedAt"></DateCell>
             <TableCell v-if="plugin.on" class="p-4 text-green-500">On</TableCell>
             <TableCell v-else class="p-4 text-red-500">Off</TableCell>
             <TableCell class="p-4">{{plugin.weight}} KB</TableCell>

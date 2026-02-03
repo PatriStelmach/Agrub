@@ -13,21 +13,6 @@ const searchFilter = ref()
 
 const rowsData = ref(dashboardData)
 
-const update = (data:any[]) =>
-{
-  rowsData.value = data
-}
-const filteredData = computed(() =>
-{
-  if(!searchFilter.value)
-  {
-    return rowsData.value
-  }
-  return dashboardData.filter((item) =>
-  {
-    item.technician.toLowerCase().includes(searchFilter.value.toLowerCase())
-  })
-})
 </script>
 
 <template>
@@ -41,7 +26,7 @@ const filteredData = computed(() =>
 
               <MyPagination
                 :data="dashboardData"
-                :current-page="currentPage"
+                :page="currentPage"
                 @update:paginated-data="update"/>
         </div>
       </div>

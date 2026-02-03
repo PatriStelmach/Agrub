@@ -66,7 +66,7 @@ docker compose exec --user root -it test-linux-node bash
 
 2. Aktualizacja i pobranie pakietu stress.
 ```bash 
-apt-get update && apt-get install -y stress 
+apt-get updateData && apt-get install -y stress 
 ```
 
 3. Wywołanie alertu o obciążeniu procesora

@@ -5,37 +5,43 @@ import MyPagination from "@/helpers/MyPagination.vue";
 import PluginsLibraryTable from "@/pages/plugins/PluginsLibraryTable.vue";
 import {
   IconFileImport,
-  IconPencilCode,
-
 } from "@tabler/icons-vue";
 
-import {ArrowLeftIcon, MoreHorizontalIcon, Search} from "lucide-vue-next";
+import {ArrowLeftIcon, Search} from "lucide-vue-next";
 import {ButtonGroup} from "@/components/ui/button-group";
 import {Button} from "@/components/ui/button";
-import {Input} from "@/components/ui/input";
-import type {MyPlugin} from "@/types/my.plugin.ts";
+import type {Plugin} from "@/types/plugin.ts"
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
 
-const currentPage = ref(1)
-const searchFilter = ref()
+const currentPage = ref<number>(1)
+const searchFilter = ref('')
+const rowsData = ref<Plugin[]>(pluginLibraryData)
 
+watch(searchFilter, () =>
+{
+  currentPage.value = 1
+})
 
-const rowsData = ref()
-
-const update = (data:any[]) =>
+const updateData = (data:Plugin[]) =>
 {
   rowsData.value = data
 }
+
+const updatePage = (page: number) =>
+{
+  currentPage.value = page
+}
+
 const filteredData = computed(() =>
 {
   if(!searchFilter.value)
   {
-    return rowsData.value
+    return pluginLibraryData
   }
-
   return pluginLibraryData.filter((item) =>
     item.name.toLowerCase().includes(searchFilter.value.toLowerCase()))
 })
+
 
 const sort = ref<'id' | 'name' | 'creator' | 'createdAt' | 'language' | 'weight' | 'tags'>('id');
 
@@ -47,7 +53,7 @@ const sort = ref<'id' | 'name' | 'creator' | 'createdAt' | 'language' | 'weight'
   <div>
     <h1 class="text-center my-[2vh] text-[3vh] border-b pb-[2vh] font-mono md ">Plugins library</h1>
 
-  <div class="  mx-auto w-full">
+  <div class="mx-auto w-full">
     <div class="flex ml-[2vw] my-[2vh] ">
 
 
@@ -72,12 +78,14 @@ const sort = ref<'id' | 'name' | 'creator' | 'createdAt' | 'language' | 'weight'
     </ButtonGroup>
 
     </div>
-<PluginsLibraryTable :data="filteredData" />
+<PluginsLibraryTable :data="rowsData" />
 
     <MyPagination
-      :data="pluginLibraryData"
-      :current-page="currentPage"
-      @update:paginated-data="update"/>
+      :data="filteredData"
+      :page="currentPage"
+      @update:paginated-data="updateData"
+      @update:pages="updatePage"
+      />
   </div>
   </div>
 </template>
