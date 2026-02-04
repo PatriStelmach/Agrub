@@ -17,6 +17,7 @@ const currentPage = ref<number>(1)
 const searchFilter = ref('')
 const rowsData = ref<Plugin[]>(pluginLibraryData)
 
+
 watch(searchFilter, () =>
 {
   currentPage.value = 1

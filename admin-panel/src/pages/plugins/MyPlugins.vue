@@ -22,20 +22,41 @@ import
   IconPencilCode,
   IconPlayerPause, IconTrash, IconPlus
 } from "@tabler/icons-vue";
-import { ref} from "vue";
+import {computed, ref, watch} from "vue";
 import {Badge} from "@/components/ui/badge";
 import MyPagination from "@/helpers/MyPagination.vue";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
 import type { Plugin } from "@/types/plugin.ts";
 
-const currentPage = ref(1)
-const itemsPerPage = 10
+const currentPage = ref<number>(1)
+const searchFilter = ref('')
+const rowsData = ref<Plugin[]>(myPluginsData)
 
-const updatedData = ref()
+
+watch(searchFilter, () =>
+{
+  currentPage.value = 1
+})
+
 const updateData = (data:Plugin[]) =>
 {
-  updatedData.value = data
+  rowsData.value = data
 }
+
+const updatePage = (page: number) =>
+{
+  currentPage.value = page
+}
+
+const filteredData = computed(() =>
+{
+  if(!searchFilter.value)
+  {
+    return myPluginsData
+  }
+  return myPluginsData.filter((item) =>
+    item.name.toLowerCase().includes(searchFilter.value.toLowerCase()))
+})
 
 </script>
 
@@ -100,12 +121,14 @@ const updateData = (data:Plugin[]) =>
       </ButtonGroup>
     </ButtonGroup>
 
-    <MyPluginsTable :data="updatedData"/>
+    <MyPluginsTable :data="rowsData"/>
 
     <MyPagination
-      :data="myPluginsData"
+      :data="filteredData"
       :page="currentPage"
-      @update:paginated-data="update"/>
+      @update:paginated-data="updateData"
+      @update:pages="updatePage"
+    />
   </div>
 </div>
 </template>
