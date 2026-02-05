@@ -29,9 +29,14 @@ const router = createRouter({
       component: () => import('../pages/plugins/MyPlugins.vue'),
     },
     {
-      path: '/add_new',
-      name: 'add_new',
+      path: '/add_new_system',
+      name: 'add_new_system',
       component: () => import('../pages/systems/AddNew.vue'),
+    },
+    {
+      path: '/import_plugin',
+      name: 'import_plugin',
+      component: () => import('../pages/plugins/ImportPlugin.vue')
     }
 
   ],

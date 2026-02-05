@@ -79,7 +79,7 @@ export const sidebarData = {
     },
     {
       name: "Import plugin",
-      url: "#",
+      url: "/import_plugin",
       icon: IconFileImport,
     },
   ],

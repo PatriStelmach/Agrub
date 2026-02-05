@@ -9,8 +9,6 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '@/components/ui/empty'
-import {SidebarProvider} from "@/components/ui/sidebar";
-import AppSidebar from "@/pages/navbar/AppSidebar.vue";
 </script>
 
 <template>
