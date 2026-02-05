@@ -11,7 +11,7 @@ const mode = useColorMode()
 </script>
 
 <template>
-  <div class="fixed top-4 right-4 z-9999">
+  <div class="absolute top-[1vh] right-[1vh] z-9999">
     <DropdownMenu>
       <DropdownMenuTrigger as-child>
         <Button class="cursor-pointer relative size-[3vh]">

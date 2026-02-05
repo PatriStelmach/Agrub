@@ -11,17 +11,17 @@ import {Label} from "@/components/ui/label";
 import {computed, ref, watch} from "vue";
 import {Button} from "@/components/ui/button";
 import {DropdownMenu, DropdownMenuTrigger, DropdownMenuItem, DropdownMenuContent, DropdownMenuGroup} from "@/components/ui/dropdown-menu";
-import type {Plugin} from "@/types/plugin.ts";
+import type {Paginable} from "@/types/paginable.ts";
 
 const props = defineProps<{
-  data: Plugin[]
+  data: Paginable[]
   page: number
 }>()
 const currentPage = ref<number>(1)
 const itemsPerPage = ref<number>(10)
 
 const emit = defineEmits<{
-  'update:paginated-data': [data: Plugin[]],
+  'update:paginated-data': [data: Paginable[]],
   'update:pages': [page: number]
 }>()
 

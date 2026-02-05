@@ -43,8 +43,8 @@ const popUp = (id: number) =>
       :class="{'blur-3xl' : isOpen}">
         <Card
           class=" m-4 gap-2 h-[40vh] xl:h-[35vh] hover:shadow-[0_0_20px_1px] border-2 transition-all transition-duration-50 hover:transition-duration-50"
-          :class="{' hover:shadow-green-900 hover:border-green-900': !system.openSource,
-           ' hover:shadow-blue-900 hover:border-blue-900': system.openSource}">
+          :class="{' hover:shadow-blue-900 hover:border-blue-900': !system.openSource,
+           ' hover:shadow-green-900 hover:border-green-900': system.openSource}">
           <div class=" flex justify-between items-center">
             <CardHeader class=" text-3xl xl:text-4xl 2xl:text-6xl text-shadow-sky-800 text-shadow-sm font-bold ">
               {{system.name}}</CardHeader>
@@ -52,11 +52,11 @@ const popUp = (id: number) =>
           </div>
           <CardAction class="mx-4 text-md xl:text-xl 2xl:text-4xl flex items-center gap-2"
                       v-if="system.openSource">
-            <component class="text-blue-500  size-8 xl:size-12 2xl:size-16" :is="IconBrandOpenSource"></component>
+            <component class="text-green-500  size-8 xl:size-12 2xl:size-16" :is="IconBrandOpenSource"></component>
             Open Source
           </CardAction>
           <CardAction v-else class="mx-4 text-md xl:text-xl 2xl:text-4xl flex items-center gap-1">
-            <component class="text-green-500 size-8 xl:size-12 2xl:size-16" :is="IconCurrencyDollar"></component>
+            <component class="text-blue-500 size-8 xl:size-12 2xl:size-16" :is="IconCurrencyDollar"></component>
             Commercial
           </CardAction>
           <CardDescription class="h-1/3">

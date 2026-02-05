@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { z } from "zod"
 import {computed, ref} from "vue"
+import type {Alert} from "@/types/alert.ts";
 
 import type {
   ColumnDef,
@@ -85,19 +86,8 @@ const schema = z.object({
 })
 
 const props = defineProps<{
-  data: TableData[]
+  data: Alert[]
 }>()
-
-interface TableData {
-  id: number
-  header: string
-  source: string
-  status: string
-  priority: string
-  technician: string,
-  createdAt: Date,
-  closedAt: Date,
-}
 
 const sorting = ref<SortingState>([])
 const columnFilters = ref<ColumnFiltersState>([])
@@ -105,7 +95,7 @@ const columnVisibility = ref<VisibilityState>({})
 const rowSelection = ref({})
 
 
-const columns: ColumnDef<TableData>[] = [
+const columns: ColumnDef<Alert>[] = [
   {
     id: "select",
     header: ({ table }) => h(Checkbox, {
@@ -271,71 +261,7 @@ const table = useVueTable({
     default-value="outline"
     class="w-full flex-col justify-start gap-6"
   >
-    <div class="flex items-center justify-between px-4 lg:px-6">
-      <div class="flex items-center gap-2">
-        <ButtonGroup>
-          <Button variant="outline" size="icon" aria-label="Go Back">
-            <ArrowLeftIcon />
-          </Button>
-        <DropdownMenu>
-          <DropdownMenuTrigger as-child>
-            <Button class="text-chart-2 hover:bg-chart-2/70!" variant="outline">
-              <IconLayoutColumns />
-              Customize Columns
-              <IconChevronDown />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" class="w-[10vw]">
-            <template v-for="column in table.getAllColumns().filter((column) => typeof column.accessorFn !== 'undefined' && column.getCanHide())" :key="column.id">
-              <DropdownMenuCheckboxItem
-                class="capitalize"
-                :model-value="column.getIsVisible()"
-                @update:model-value="(value) => {
 
-                  column.toggleVisibility(value)
-                }"
-              >
-                {{ column.id }}
-              </DropdownMenuCheckboxItem>
-            </template>
-          </DropdownMenuContent>
-        </DropdownMenu>
-          <DropdownMenu>
-            <DropdownMenuTrigger as-child>
-              <Button variant="outline" class="text-chart-3 hover:bg-chart-3/80!">
-                <IconBellCog/>
-                Alert actions
-                <IconChevronDown/>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" class="w-[10vw]">
-              <DropdownMenuItem>
-                <IconEyeCog/>Change priority
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <IconUser/>Change technician
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <IconStatusChange/>Change status
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <IconLock/>Close
-              </DropdownMenuItem>
-
-            </DropdownMenuContent>
-          </DropdownMenu>
-        <InputGroup class="relative l-[30vw] w-[20vw]  " >
-          <InputGroupInput
-            v-model="searchFilter"
-            type="search"
-            placeholder="Search for alert"/>
-          <InputGroupAddon>
-            <Search/>
-          </InputGroupAddon>
-        </InputGroup>
-        </ButtonGroup>
-      </div>
-    </div>
     <TabsContent
       value="outline"
       class="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6"

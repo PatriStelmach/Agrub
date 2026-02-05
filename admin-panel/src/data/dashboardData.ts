@@ -1,4 +1,5 @@
-export const dashboardData = [
+import type {Alert} from "@/types/alert.ts";
+export const dashboardData: Alert[] = [
   {
     id: 1,
     header: "CPU usage over 80%",
@@ -7,7 +8,6 @@ export const dashboardData = [
     priority: "high",
     technician: "Morgan Freeman",
     createdAt: new Date("2025-01-05T10:30:00"),
-    closedAt: null,
   },
   {
     id: 2,
@@ -47,7 +47,6 @@ export const dashboardData = [
     priority: "low",
     technician: "Lara Croft",
     createdAt: new Date("2025-01-01T08:00:00"),
-    closedAt: null,
   },
   {
     id: 6,
@@ -57,7 +56,6 @@ export const dashboardData = [
     priority: "high",
     technician: "Morgan Freeman",
     createdAt: new Date("2024-12-31T22:10:00"),
-    closedAt: null,
   },
   {
     id: 7,
@@ -97,6 +95,5 @@ export const dashboardData = [
     priority: "low",
     technician: "Lara Croft",
     createdAt: new Date("2024-12-27T14:15:00"),
-    closedAt: null,
   },
 ]

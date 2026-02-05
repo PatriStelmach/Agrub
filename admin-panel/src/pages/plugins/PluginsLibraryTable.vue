@@ -26,7 +26,7 @@ const props = defineProps<{
 <template>
 
   <Table
-    class="w-9/10 mx-auto my-[2vh]">
+    class="w-9/10 mx-auto my-[1vh]">
     <TableCaption class="border-b border-t py-[1vh]">List of plugins made by users</TableCaption>
     <TableHeader>
       <TableRow class="bg-secondary hover:bg-secondary">

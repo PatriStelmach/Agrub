@@ -44,10 +44,10 @@ const props = defineProps<{
         <TableBody >
           <TableRow
             onclick=""
-            class="cursor-grab duration-0 hover:bg-green-400/10"
+            class="cursor-grab duration-0 hover:bg-green-400/30"
             v-for="plugin in props.data"
             :key="plugin.id"
-            :class="{'hover:bg-red-400/10': !plugin.on}">
+            :class="{'hover:bg-red-400/30': !plugin.on}">
             <TableCell><Checkbox :id="cn('my-plugin-no-'+plugin.id)" class="size-[1vw] cursor-pointer"></Checkbox></TableCell>
             <TableCell class="p-4">{{plugin.id}}</TableCell>
             <TableCell class="p-4">{{plugin.name}}</TableCell>

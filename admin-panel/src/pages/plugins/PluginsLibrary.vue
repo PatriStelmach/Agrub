@@ -12,6 +12,7 @@ import {ButtonGroup} from "@/components/ui/button-group";
 import {Button} from "@/components/ui/button";
 import type {Plugin} from "@/types/plugin.ts"
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
+import type {Paginable} from "@/types/paginable.ts";
 
 const currentPage = ref<number>(1)
 const searchFilter = ref('')
@@ -23,9 +24,9 @@ watch(searchFilter, () =>
   currentPage.value = 1
 })
 
-const updateData = (data:Plugin[]) =>
+const updateData = (data:Paginable[]) =>
 {
-  rowsData.value = data
+  rowsData.value = data as Plugin[]
 }
 
 const updatePage = (page: number) =>
@@ -44,19 +45,14 @@ const filteredData = computed(() =>
 })
 
 
-const sort = ref<'id' | 'name' | 'creator' | 'createdAt' | 'language' | 'weight' | 'tags'>('id');
-
-
-
 </script>
 
 <template>
   <div>
     <h1 class="text-center my-[2vh] text-[3vh] border-b pb-[2vh] font-mono md ">Plugins library</h1>
-
   <div class="mx-auto w-full">
-    <div class="flex ml-[2vw] my-[2vh] ">
 
+    <div class="flex ml-[2vw] my-[2vh] ">
 
       <ButtonGroup class="hidden sm:flex">
         <Button variant="outline" size="icon" aria-label="Go Back">

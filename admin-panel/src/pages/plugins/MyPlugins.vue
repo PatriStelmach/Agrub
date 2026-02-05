@@ -27,10 +27,11 @@ import {Badge} from "@/components/ui/badge";
 import MyPagination from "@/helpers/MyPagination.vue";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
 import type { Plugin } from "@/types/plugin.ts";
+import type {Paginable} from "@/types/paginable.ts";
 
 const currentPage = ref<number>(1)
 const searchFilter = ref('')
-const rowsData = ref<Plugin[]>(myPluginsData)
+const rowsData = ref(myPluginsData)
 
 
 watch(searchFilter, () =>
@@ -38,9 +39,9 @@ watch(searchFilter, () =>
   currentPage.value = 1
 })
 
-const updateData = (data:Plugin[]) =>
+const updateData = (data:Paginable[]) =>
 {
-  rowsData.value = data
+  rowsData.value = data as Plugin[]
 }
 
 const updatePage = (page: number) =>
@@ -52,10 +53,10 @@ const filteredData = computed(() =>
 {
   if(!searchFilter.value)
   {
-    return myPluginsData
+    return myPluginsData;
   }
   return myPluginsData.filter((item) =>
-    item.name.toLowerCase().includes(searchFilter.value.toLowerCase()))
+    item.name.toLowerCase().includes(searchFilter.value.toLowerCase())) ;
 })
 
 </script>
@@ -64,7 +65,8 @@ const filteredData = computed(() =>
   <div>
     <h1 class="text-center my-[2vh] text-[3vh] border-b pb-[2vh] font-mono ">Your plugins</h1>
   <div>
-    <ButtonGroup class="ml-[2vw] mt-[2vh] ">
+    <div class="flex ml-[2vw] my-[2vh] ">
+    <ButtonGroup>
       <ButtonGroup class="hidden sm:flex">
         <Button variant="outline" size="icon" aria-label="Go Back">
           <ArrowLeftIcon />
@@ -120,7 +122,7 @@ const filteredData = computed(() =>
         <Badge>Add</Badge>
       </ButtonGroup>
     </ButtonGroup>
-
+  </div>
     <MyPluginsTable :data="rowsData"/>
 
     <MyPagination

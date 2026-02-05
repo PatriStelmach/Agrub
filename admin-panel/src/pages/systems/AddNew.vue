@@ -18,8 +18,8 @@ const data = defineProps<{
 <template class="flex w-full mx-auto bg-background ">
   <div class="flex mx-auto items-center  ">
 <form class="bg-background flex mx-auto p-[2vw] items-center justify-center shadow-[0px_0px_150px_1px] rounded-xl w-1/3 border "
-      :class="{' shadow-green-900 border-green-900': !data.system.openSource,
-           ' shadow-blue-900 border-blue-900': data.system.openSource}">
+      :class="{' shadow-blue-900 border-blue-900': !data.system.openSource,
+           ' shadow-green-900 border-green-900': data.system.openSource}">
   <FieldGroup>
       <FieldLabel class="flex w-full text-4xl justify-between">{{data.system.name}}
       <img :alt="data.system.name+'_image'" :src="data.system.img" class=" rounded-full size-[6vh]"/>
