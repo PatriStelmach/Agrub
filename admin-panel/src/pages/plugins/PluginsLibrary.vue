@@ -58,7 +58,7 @@ const filteredData = computed(() =>
         <Button variant="outline" size="icon" aria-label="Go Back">
           <ArrowLeftIcon />
         </Button>
-        <Button class="text-green-600 hover:bg-green-700!" variant="outline">
+        <Button class="" variant="green_inside">
           Add to your plugins
           <component :is="IconFileImport"/>
         </Button>

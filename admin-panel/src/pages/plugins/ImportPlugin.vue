@@ -14,6 +14,7 @@ import {ref} from "vue";
 import {
   IconUpload
 } from "@tabler/icons-vue";
+import {ButtonGroup} from "@/components/ui/button-group";
 
 const files = ref<File[]>([]);
 
@@ -62,13 +63,15 @@ function removeFile(index:number)
         hidden
       />
       <ul>
-        <li class="list-none my-[1vh] items-center flex justify-between border-b border-sky-800 p-2"
+        <li class="list-none my-[1vh] items-center flex justify-between border-b border-blue-200 p-2"
             v-for="(file, index) in files"
             :key="file.name">
           <span class="flex justify-start w-[15vw]">{{file.name}} </span>
           <span class="lex justify-start  w-[5vw]">{{file.size}} KB</span>
-          <Button @click="removeFile(index)" variant="destructive" class="h-[3vh] ml-[1vw]">Remove</Button>
-          <Button variant="green" class="h-[3vh] ml-[1vw]">Add</Button>
+          <ButtonGroup>
+            <Button @click="removeFile(index)" variant="destructive" class="h-[3vh] ml-[1vw]">Remove</Button>
+            <Button variant="green_outline" class="h-[3vh]">Add</Button>
+          </ButtonGroup>
         </li>
       </ul>
     </EmptyContent>
