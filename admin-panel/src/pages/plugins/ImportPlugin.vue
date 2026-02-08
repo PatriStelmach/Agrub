@@ -123,7 +123,7 @@ function toggleAllChecked()
       <Label for="uploadedPlugin"
              class="text-[2vh] flex justify-between py-[1vh] px-[2vw] items-center
               cursor-pointer border-2 border-green-500 rounded-lg text-green-500
-              hover:shadow-[0_0_20px_2px] hover:shadow-green-500 transition-all duration-100  mb-[2vh]"
+              hover:shadow-[0_0_20px_5px] hover:shadow-green-500 transition-all duration-100  mb-[2vh]"
       >
         Upload
         <IconUpload class="ml-[1vh]" size="1vw"/>
