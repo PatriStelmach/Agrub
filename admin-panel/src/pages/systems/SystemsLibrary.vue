@@ -53,16 +53,16 @@ const popUp = (id: number) =>
           </div>
           <CardAction class="mx-4 text-md xl:text-xl 2xl:text-4xl flex items-center gap-2"
                       v-if="system.openSource">
-            <component class="text-green-500  size-8 xl:size-12 2xl:size-16" :is="IconBrandOpenSource"></component>
+            <IconBrandOpenSource class="text-green-500  size-8 xl:size-12 2xl:size-16"/>
             Open Source
           </CardAction>
           <CardAction v-else class="mx-4 text-md xl:text-xl 2xl:text-4xl flex items-center gap-1">
-            <component class="text-blue-500 size-8 xl:size-12 2xl:size-16" :is="IconCurrencyDollar"></component>
+            <IconCurrencyDollar class="text-blue-500 size-8 xl:size-12 2xl:size-16"/>
             Commercial
           </CardAction>
           <CardDescription class="h-1/3">
             <Item variant="outline" class="m-4 bg-secondary">
-              <ItemContent class="h-full text-xl xl:text-2xl 2xl:text-4xl">
+              <ItemContent class="h-full text-lg xl:text-xl 2xl:text-4xl">
              {{system.description}}
               </ItemContent>
             </Item>
@@ -70,7 +70,7 @@ const popUp = (id: number) =>
 
           <CardFooter class="flex mb-0 mt-[8vh] justify-end relative bottom-5 xl:bottom-10 2xl:bottom-15">
             <Button
-              class="cursor-pointer hover:shadow-[0_0_10px_3px] size-[5vh]  text-sm xl:text-xl 2xl:text-4xl "
+              class="cursor-pointer hover:shadow-[0_0_10px_3px] size-[4vh]  text-sm xl:text-xl 2xl:text-4xl "
               @click="openSystemId=system.id; isOpen = !isOpen"
             >
               <component :is="IconPlus" class="size-6 xl:size-8 2xl:size-12"></component>

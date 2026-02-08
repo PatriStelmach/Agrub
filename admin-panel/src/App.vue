@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterView } from 'vue-router'
 import SearchBar from "@/pages/globals/SearchBar.vue";
 import {SidebarProvider} from "@/components/ui/sidebar";
 import AppSidebar from "@/pages/navbar/AppSidebar.vue";
