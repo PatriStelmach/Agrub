@@ -10,7 +10,7 @@ import {
   EmptyTitle,
 } from '@/components/ui/empty'
 import {Input} from "@/components/ui/input";
-import {computed, ref} from "vue";
+import {computed, ref, watch} from "vue";
 import {
   IconUpload
 } from "@tabler/icons-vue";
@@ -26,7 +26,6 @@ const idCounter = ref(0);
 const files = ref<{ id:number, file:File }[]>([]);
 const checkedFiles = ref<number[]>([]);
 const checkText = ref<'Check all' | 'Uncheck all'>('Check all');
-
 
 function handleFileUpload(e: Event)
 {
@@ -53,6 +52,12 @@ function removeFiles(ids:number[])
 const isAllChecked = computed(() =>
 {
   return files.value.length > 0 && checkedFiles.value.length === files.value.length
+})
+
+
+watch(isAllChecked, () =>
+{
+  return isAllChecked.value ? checkText.value= 'Uncheck all' : checkText.value= 'Check all'
 })
 
 function toggleAllChecked()
@@ -117,8 +122,8 @@ function toggleAllChecked()
     <EmptyContent>
       <Label for="uploadedPlugin"
              class="text-[2vh] flex justify-between py-[1vh] px-[2vw] items-center
-              cursor-pointer border-2 border-teal-500 rounded-lg text-teal-500
-              hover:shadow-[0_0_20px_2px] hover:shadow-teal-500 transition-all duration-100  mb-[2vh]"
+              cursor-pointer border-2 border-green-500 rounded-lg text-green-500
+              hover:shadow-[0_0_20px_2px] hover:shadow-green-500 transition-all duration-100  mb-[2vh]"
       >
         Upload
         <IconUpload class="ml-[1vh]" size="1vw"/>
