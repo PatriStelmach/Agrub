@@ -63,7 +63,7 @@ const filteredData = computed(() =>
 
 <template>
   <div>
-    <h1 class="text-center my-[2vh] text-[3vh] border-b pb-[2vh] font-mono ">Your plugins</h1>
+    <h1 class="text-center my-[2vh] text-[3vh] border-b pb-[2vh]   ">Your plugins</h1>
   <div>
     <div class="flex ml-[2vw] my-[2vh] ">
     <ButtonGroup>
@@ -73,15 +73,15 @@ const filteredData = computed(() =>
         </Button>
       </ButtonGroup>
       <ButtonGroup>
-        <Button class="text-green-500 hover:bg-green-600!" variant="outline">
+        <Button variant="green_outline">
           Edit
           <component :is="IconPencilCode"/>
         </Button>
-        <Button class="text-yellow-500 hover:bg-yellow-600!" variant="outline">
+        <Button variant="yellow_outline">
           Turn off
           <component :is="IconPlayerPause"/>
         </Button>
-        <Button class="text-destructive hover:bg-destructive/70!" variant="outline">
+        <Button variant="red_outline">
           Delete
         <component :is="IconTrash"/>
         </Button>
@@ -105,11 +105,15 @@ const filteredData = computed(() =>
             <DropdownMenuLabel class="border-b">Plugins</DropdownMenuLabel>
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <component :is="IconFileImport"/>Import</DropdownMenuItem>
+                <RouterLink class="flex w-full gap-x-2" to="/import_plugins">
+                <IconFileImport/>Import
+                </RouterLink>
+              </DropdownMenuItem>
               <DropdownMenuItem>
-                <component :is="IconTerminal2"/>Create</DropdownMenuItem>
+                <IconTerminal2/>Create</DropdownMenuItem>
               <DropdownMenuItem>
-                <component :is="IconDatabase"/>Search for plugins</DropdownMenuItem>
+                  <IconDatabase/>Search for plugins
+              </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator/>
             <DropdownMenuGroup>

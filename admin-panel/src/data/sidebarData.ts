@@ -78,8 +78,8 @@ export const sidebarData = {
       icon: IconTerminal2,
     },
     {
-      name: "Import plugin",
-      url: "/import_plugin",
+      name: "Import plugins",
+      url: "/import_plugins",
       icon: IconFileImport,
     },
   ],

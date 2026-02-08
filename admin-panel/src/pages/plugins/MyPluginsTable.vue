@@ -48,7 +48,11 @@ const props = defineProps<{
             v-for="plugin in props.data"
             :key="plugin.id"
             :class="{'hover:bg-red-400/30': !plugin.on}">
-            <TableCell><Checkbox :id="cn('my-plugin-no-'+plugin.id)" class="size-[1vw] cursor-pointer"></Checkbox></TableCell>
+            <TableCell>
+              <input
+                type="checkbox"
+                :id="cn('my-plugin-no-'+plugin.id)" class="size-[1vw] cursor-pointer"/>
+            </TableCell>
             <TableCell class="p-4">{{plugin.id}}</TableCell>
             <TableCell class="p-4">{{plugin.name}}</TableCell>
             <TableCell class="p-4">{{plugin.creator}}</TableCell>
@@ -61,7 +65,26 @@ const props = defineProps<{
               >{{tag}}</Badge>
             </TableCell>
             <TableCell class="p-4">{{plugin.runningIntervals}}</TableCell>
-            <TableCell class="p-4">{{plugin.language}}</TableCell>
+            <TableCell class="p-4">
+              <img
+                v-if="plugin.language === 'python'"
+                alt="python_icon"
+                src="@/components/icons/python_icon.png"
+                class="size-6 lg:size-7 xl:size-8 2x:size-9"
+              />
+              <img
+                v-if="plugin.language === 'bash'"
+                alt="bash_icon"
+                src="@/components/icons/bash_icon.png"
+                class="size-6 lg:size-7 xl:size-8 2x:size-9"
+              />
+              <img
+                v-if="plugin.language === 'PowerShell'"
+                alt="powershell_icon"
+                src="@/components/icons/powershell_icon.png"
+                class="size-6 lg:size-7 xl:size-8 2x:size-9"
+              />
+            </TableCell>
             <DateCell v-if="plugin.addedAt" class="p-4" :date="plugin.addedAt "></DateCell>
             <DateCell v-if="plugin.updatedAt" class="p-4" :date="plugin.updatedAt"></DateCell>
             <TableCell v-if="plugin.on" class="p-4 text-green-500">On</TableCell>

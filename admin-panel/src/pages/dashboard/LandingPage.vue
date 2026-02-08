@@ -93,7 +93,7 @@ const filteredData = computed(() =>
               </template>
             </DropdownMenuContent>
           </DropdownMenu>
-          <DropdownMenu>
+          <DropdownMenu class="z-9999">
             <DropdownMenuTrigger as-child>
               <Button variant="outline" class="text-chart-3 hover:bg-chart-3/80!">
                 <IconBellCog/>
@@ -101,7 +101,7 @@ const filteredData = computed(() =>
                 <IconChevronDown/>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent class="w-[10vw] z-9999">
+            <DropdownMenuContent class="w-[10vw] z-99999">
               <DropdownMenuItem>
                 <IconEyeCog/>Change priority
               </DropdownMenuItem>
@@ -131,7 +131,7 @@ const filteredData = computed(() =>
     </div>
       <div class="flex flex-col  my-4">
             <div class="px-4 lg:px-6">
-              <DataTable :data="rowsData" />
+              <DataTable :data="rowsData" class="z-0"/>
 
 
               <MyPagination

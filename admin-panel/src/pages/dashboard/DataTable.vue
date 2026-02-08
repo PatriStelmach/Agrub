@@ -160,7 +160,7 @@ const columns: ColumnDef<Alert>[] = [
       return h(Badge, {
       variant: "secondary",
       size: "sm",
-      class: `${priority()} h-full  rounded-md p-2 font-semibold`,
+      class: `${priority()} h-full p-1.5 rounded-md`,
     }, () => [
       h("span", {  }, String(row.getValue("priority"))),
     ])

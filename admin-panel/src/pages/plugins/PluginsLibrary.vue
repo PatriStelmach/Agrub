@@ -49,18 +49,22 @@ const filteredData = computed(() =>
 
 <template>
   <div>
-    <h1 class="text-center my-[2vh] text-[3vh] border-b pb-[2vh] font-mono md ">Plugins library</h1>
+    <h1 class="text-center my-[2vh] text-[3vh] border-b pb-[2vh]   md ">Plugins library</h1>
   <div class="mx-auto w-full">
 
     <div class="flex ml-[2vw] my-[2vh] ">
 
       <ButtonGroup class="hidden sm:flex">
-        <Button variant="outline" size="icon" aria-label="Go Back">
-          <ArrowLeftIcon />
-        </Button>
-        <Button class="" variant="green_inside">
+        <ButtonGroup>
+          <Button variant="outline" size="icon" aria-label="Go Back">
+            <ArrowLeftIcon />
+          </Button>
+        </ButtonGroup>
+
+        <ButtonGroup>
+        <Button variant="green_outline">
           Add to your plugins
-          <component :is="IconFileImport"/>
+          <IconFileImport/>
         </Button>
 
       <InputGroup class="relative l-[30vw] w-[20vw]  " >
@@ -72,6 +76,7 @@ const filteredData = computed(() =>
           <Search/>
         </InputGroupAddon>
       </InputGroup>
+        </ButtonGroup>
     </ButtonGroup>
 
     </div>

@@ -3,7 +3,7 @@ export interface Plugin
   id: number,
   name: string,
   creator: string,
-  language: string,
+  language: "python" | "bash" | "PowerShell",
   description?: string,
   weight: number,
   createdAt?: Date,

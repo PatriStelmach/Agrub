@@ -13,7 +13,7 @@ export const buttonVariants = cva(
         destructive:
           " bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
         outline:
-          " border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
+          " border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input",
         secondary:
           " bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost:
@@ -22,9 +22,15 @@ export const buttonVariants = cva(
         green:
         " bg-green-600 hover:bg-green-500 text-white ",
         green_outline:
-        " border-2 border-green-600 text-foreground hover:bg-green-600 hover:text-background",
+        "bg-background border dark:border-input  dark:bg-input/30 text-green-500 hover:bg-green-600 hover:text-background",
+        yellow_outline:
+          "bg-background border dark:border-input  dark:bg-input/30 text-yellow-500 hover:bg-yellow-500/90 hover:text-background",
+        red_outline:
+          "bg-background border dark:border-input  dark:bg-input/30 text-red-500 hover:bg-red-500/80 hover:text-background",
         green_inside:
-        "text-green-500 hover:bg-green-500 border hover:text-foreground focus:shadow-[0_0_5px_1px dark:hover:bg-green-500/60"
+        "bg-background dark:bg-input/30 dark:border-input text-green-500 focus:bg-green-500 border focus:text-foreground hover:shadow-[0_0_1px_1px] hover:shadow-green-500 dark:focus:bg-green-500/60",
+        red_inside:
+          "bg-background dark:bg-input/30 dark:border-input text-red-500 focus:bg-red-500 border focus:text-foreground hover:shadow-[0_0_1px_1px] hover:border-red-500 dark:focus:bg-red-500/60"
       },
       size: {
         "default": "h-9 px-4 py-2 has-[>svg]:px-3",

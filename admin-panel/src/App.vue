@@ -8,7 +8,7 @@ import ViewMode from "@/pages/globals/ViewMode.vue";
 
 <template>
 
-  <div class="h-screen flex flex-col">
+  <div class="h-screen flex flex-col font-mono font-thin">
     <header>
 
       <nav class="flex h-[5vh] bg-card justify-center items-center">

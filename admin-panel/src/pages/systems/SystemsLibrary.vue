@@ -4,9 +4,7 @@ import {systemsLibraryData} from "@/data/systemsLibraryData.ts"
 import
 {
   CardHeader,
-  CardContent,
   Card,
-  CardTitle,
   CardFooter,
   CardAction,
   CardDescription
@@ -17,9 +15,9 @@ import
   IconPlus
 } from "@tabler/icons-vue";
 import {Button} from "@/components/ui/button";
-import {Item, ItemContent, ItemDescription} from "@/components/ui/item";
+import {Item, ItemContent} from "@/components/ui/item";
 import AddNew from "@/pages/systems/AddNew.vue";
-import {computed, ref} from "vue";
+import {ref} from "vue";
 import type {System} from "@/types/system.ts";
 
 const isOpen = ref(false);
@@ -37,10 +35,13 @@ const popUp = (id: number) =>
 
 <template>
   <div>
-  <h1 class="text-center my-[2vh] text-[3vh] border-b pb-[2vh] font-mono  ">Available systems</h1>
+  <h1 class="text-center my-[2vh] text-[3vh] border-b pb-[2vh]    ">Available systems</h1>
     <div class="pt-4 grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 ">
-      <div v-for="system in systemsLibraryData" class=" transition-all duration-300 mx-6 center"
-      :class="{'blur-3xl' : isOpen}">
+      <div
+        v-for="system in systemsLibraryData"
+        :key="system.id"
+        class=" transition-all duration-300 mx-6 center"
+        :class="{'blur-3xl' : isOpen}">
         <Card
           class=" m-4 gap-2 h-[40vh] xl:h-[35vh] hover:shadow-[0_0_20px_1px] border-2 transition-all transition-duration-50 hover:transition-duration-50"
           :class="{' hover:shadow-blue-900 hover:border-blue-900': !system.openSource,
