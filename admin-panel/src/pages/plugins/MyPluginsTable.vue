@@ -11,14 +11,42 @@ import
   TableCaption
 } from "@/components/ui/table";
 import DateCell from "@/helpers/DateCell.vue";
-import {Checkbox} from "@/components/ui/checkbox";
 import {cn} from "@/lib/utils.ts";
 import {Badge} from "@/components/ui/badge";
 import type {Plugin} from "@/types/plugin.ts"
+import {
+  IconListCheck
+} from "@tabler/icons-vue"
+import {computed, ref, watch} from "vue";
 
 const props = defineProps<{
-  data: Plugin[]
+  data: Plugin[];
 }>()
+
+const emit = defineEmits<{
+  'update:checked': [plugins:number[]];
+}>()
+
+const checkedPlugins = ref<number[]>([])
+const allChecked = computed(() =>
+{
+  return props.data.length > 0 && checkedPlugins.value.length === props.data.length
+})
+
+const checkAll = () =>
+{
+  if(!allChecked.value)
+  {
+    checkedPlugins.value = props.data.map(plugin => plugin.id);
+  }
+  else
+    checkedPlugins.value = [] ;
+}
+
+watch(checkedPlugins, (newChecked) =>
+{
+  emit('update:checked', newChecked);
+})
 
 </script>
 
@@ -28,8 +56,13 @@ const props = defineProps<{
       <TableCaption class="border-b border-t py-[1vh]">List of your plugins</TableCaption>
         <TableHeader>
           <TableRow class="bg-secondary hover:bg-secondary">
-            <TableHead></TableHead>
-            <TableHead class="p-4">Id</TableHead>
+            <TableHead class="p-4">
+                <IconListCheck
+                  class="size-[2vh] hover:text-chart-3 hover:border-chart-3/60 hover:border
+                  hover:shadow-[0_0_10px_1px] hover:shadow-chart-3 cursor-pointer transition duration-150"
+                  @click="checkAll"
+                />
+            </TableHead>
             <TableHead class="p-4">Name</TableHead>
             <TableHead class="p-4">Creator</TableHead>
             <TableHead class="p-4">Tags</TableHead>
@@ -51,9 +84,11 @@ const props = defineProps<{
             <TableCell>
               <input
                 type="checkbox"
-                :id="cn('my-plugin-no-'+plugin.id)" class="size-[1vw] cursor-pointer"/>
+                :id="cn('my-plugin-no-'+plugin.id)" class="size-[1vw] cursor-pointer"
+                :value="plugin.id"
+                v-model="checkedPlugins"
+              />
             </TableCell>
-            <TableCell class="p-4">{{plugin.id}}</TableCell>
             <TableCell class="p-4">{{plugin.name}}</TableCell>
             <TableCell class="p-4">{{plugin.creator}}</TableCell>
             <TableCell class="p-4">

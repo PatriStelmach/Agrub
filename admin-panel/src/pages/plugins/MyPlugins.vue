@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import MyPluginsTable from "@/pages/plugins/MyPluginsTable.vue";
 import {myPluginsData} from "@/data/myPlugins.ts";
-import {ArrowLeftIcon, MoreHorizontalIcon, Search} from 'lucide-vue-next'
+import {ArrowLeftIcon, Search} from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { ButtonGroup } from '@/components/ui/button-group'
 import {
@@ -32,7 +32,7 @@ import type {Paginable} from "@/types/paginable.ts";
 const currentPage = ref<number>(1)
 const searchFilter = ref('')
 const rowsData = ref(myPluginsData)
-
+const checkedPluginsIds = ref<number[]>()
 
 watch(searchFilter, () =>
 {
@@ -57,6 +57,11 @@ const filteredData = computed(() =>
   }
   return myPluginsData.filter((item) =>
     item.name.toLowerCase().includes(searchFilter.value.toLowerCase())) ;
+})
+
+const checkedPlugins = computed(() =>
+{
+  return rowsData.value.filter((item) => checkedPluginsIds.value?.includes(item.id));
 })
 
 </script>
@@ -127,7 +132,10 @@ const filteredData = computed(() =>
       </ButtonGroup>
     </ButtonGroup>
   </div>
-    <MyPluginsTable :data="rowsData"/>
+    <MyPluginsTable
+      :data="rowsData"
+      @update:checked="checkedPlugins"
+    />
 
     <MyPagination
       :data="filteredData"

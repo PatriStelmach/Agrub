@@ -72,7 +72,6 @@ function toggleAllChecked()
     checkedFiles.value = []
     checkText.value = 'Check all'
   }
-  console.log(checkedFiles.value)
 }
 
 </script>
