@@ -39,13 +39,12 @@ const props = defineProps<{
         <TableHead class="p-4">Weight</TableHead>
       </TableRow>
     </TableHeader>
-    <TableBody >
+    <TableBody>
       <TableRow
-        onclick=""
-        class="cursor-grab duration-0 hover:bg-blue-700/30"
+        class=" cursor-grab duration-0 hover:bg-blue-700/30"
         v-for="plugin in data"
         :key="plugin.id">
-        <TableCell class="p-4">
+        <TableCell class="px-4">
           <input
             type="checkbox"
             :id="cn('plugin-no-'+plugin.id)" class="size-[1vw] cursor-pointer"/>

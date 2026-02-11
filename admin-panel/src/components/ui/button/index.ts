@@ -27,8 +27,8 @@ export const buttonVariants = cva(
           "bg-background border font-bold dark:border-input  dark:bg-input/30 text-yellow-500 hover:bg-yellow-500/90 hover:text-background",
         red_outline:
           "bg-background border font-bold dark:border-input  dark:bg-input/30 text-red-500 hover:bg-red-500/80 hover:text-background",
-        blue_outline:
-          "bg-background border font-bold dark:border-input  dark:bg-input/30 text-blue-500 hover:bg-blue-500/80 hover:text-background",
+        cyan_outline:
+          "bg-background border font-bold dark:border-input  dark:bg-input/30 text-cyan-500 hover:bg-cyan-500/90 hover:text-background",
         green_inside:
         "bg-background dark:bg-input/30 dark:border-input text-green-500 focus:bg-green-500 border focus:text-foreground hover:shadow-[0_0_1px_1px] hover:shadow-green-500 dark:focus:bg-green-500/60",
         red_inside:

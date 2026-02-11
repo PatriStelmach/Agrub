@@ -68,7 +68,7 @@ const popUp = (id: number) =>
             </Item>
           </CardDescription>
 
-          <CardFooter class="flex mb-0 mt-[8vh] justify-end relative bottom-5 xl:bottom-10 2xl:bottom-15">
+          <CardFooter class="flex mb-0 mt-[9vh] xl:mt-[7vh] 2xl:mt-[10vh] justify-end relative bottom-5 xl:bottom-10 2xl:bottom-15">
             <Button
               class="cursor-pointer hover:shadow-[0_0_10px_3px] size-[4vh]  text-sm xl:text-xl 2xl:text-4xl "
               @click="openSystemId=system.id; isOpen = !isOpen"

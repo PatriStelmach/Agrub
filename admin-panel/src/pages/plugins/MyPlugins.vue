@@ -59,10 +59,10 @@ const filteredData = computed(() =>
     item.name.toLowerCase().includes(searchFilter.value.toLowerCase())) ;
 })
 
-const checkedPlugins = computed(() =>
+const checkedPlugins = (plugins:number[]) =>
 {
-  return rowsData.value.filter((item) => checkedPluginsIds.value?.includes(item.id));
-})
+  checkedPluginsIds.value = plugins
+}
 
 </script>
 
@@ -78,7 +78,7 @@ const checkedPlugins = computed(() =>
         </Button>
       </ButtonGroup>
       <ButtonGroup>
-        <Button variant="green_outline">
+        <Button variant="cyan_outline">
           Edit
           <component :is="IconPencilCode"/>
         </Button>

@@ -56,10 +56,12 @@ watch(checkedPlugins, (newChecked) =>
       <TableCaption class="border-b border-t py-[1vh]">List of your plugins</TableCaption>
         <TableHeader>
           <TableRow class="bg-secondary hover:bg-secondary">
-            <TableHead class="p-4">
+            <TableHead class="p-2">
                 <IconListCheck
-                  class="size-[2vh] hover:text-chart-3 hover:border-chart-3/60 hover:border
-                  hover:shadow-[0_0_10px_1px] hover:shadow-chart-3 cursor-pointer transition duration-150"
+                  class="h-full mx-3 hover:text-green-500 hover:border-green-500 hover:border rounded-sm
+                  hover:shadow-[0_0_10px_1px] hover:shadow-green-500-3 hover:scale-115 cursor-pointer transition duration-100"
+                  :class="{'text-green-500': allChecked }"
+
                   @click="checkAll"
                 />
             </TableHead>
@@ -76,12 +78,11 @@ watch(checkedPlugins, (newChecked) =>
         </TableHeader>
         <TableBody >
           <TableRow
-            onclick=""
             class="cursor-grab duration-0 hover:bg-green-400/30"
             v-for="plugin in props.data"
             :key="plugin.id"
             :class="{'hover:bg-red-400/30': !plugin.on}">
-            <TableCell>
+            <TableCell class="px-4">
               <input
                 type="checkbox"
                 :id="cn('my-plugin-no-'+plugin.id)" class="size-[1vw] cursor-pointer"
