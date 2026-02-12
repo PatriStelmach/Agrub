@@ -23,7 +23,7 @@ defineProps<{
 </script>
 
 <template>
-  <SidebarGroup class="group-data-[collapsible=icon]:hidden">
+  <SidebarGroup class="group-data-[collapsible=icon]:hidden h-[25vh]">
     <SidebarGroupLabel>Plugins</SidebarGroupLabel>
     <SidebarMenu>
       <SidebarMenuItem v-for="item in items" :key="item.name">
