@@ -70,7 +70,7 @@ const checkedPlugins = (plugins:number[]) =>
   <div>
     <h1 class="text-center my-[2vh] text-[3vh] border-b pb-[2vh]   ">Your plugins</h1>
   <div>
-    <div class="flex ml-[2vw] my-[2vh] ">
+    <div class="flex ml-[1vw] my-[2vh] ">
     <ButtonGroup>
       <ButtonGroup class="hidden sm:flex">
         <Button variant="outline" size="icon" aria-label="Go Back">

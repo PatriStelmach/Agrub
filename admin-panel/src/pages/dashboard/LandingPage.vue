@@ -63,13 +63,17 @@ const filteredData = computed(() =>
 <template>
 
   <div>
-      <SiteHeader class="py-2" />
-    <div class="flex items-center justify-between px-4 lg:px-6">
-      <div class="flex items-center gap-2">
+    <h1 class="text-center my-[2vh] text-[3vh] border-b pb-[2vh]   ">Dashboard</h1>
+    <div>
+      <div class="flex ml-[1vw] my-[2vh] ">
         <ButtonGroup>
-          <Button variant="outline" size="icon" aria-label="Go Back">
-            <ArrowLeftIcon />
-          </Button>
+          <ButtonGroup>
+            <Button variant="outline" size="icon" aria-label="Go Back">
+              <ArrowLeftIcon />
+            </Button>
+          </ButtonGroup>
+
+          <ButtonGroup>
           <DropdownMenu>
             <DropdownMenuTrigger as-child>
               <Button class="text-chart-2 hover:bg-chart-2/70!" variant="outline">
@@ -101,7 +105,7 @@ const filteredData = computed(() =>
                 <IconChevronDown/>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent class="w-[10vw] z-99999">
+            <DropdownMenuContent class="w-full z-99999">
               <DropdownMenuItem>
                 <IconEyeCog/>Change priority
               </DropdownMenuItem>
@@ -126,11 +130,11 @@ const filteredData = computed(() =>
               <Search/>
             </InputGroupAddon>
           </InputGroup>
+
+          </ButtonGroup>
         </ButtonGroup>
       </div>
     </div>
-      <div class="flex flex-col  my-4">
-            <div class="px-4 lg:px-6">
               <DataTable :data="rowsData" class="z-0"/>
 
 
@@ -140,8 +144,7 @@ const filteredData = computed(() =>
                 @update:paginated-data="updateData"
                 @update:pages="updatePage"
               />
-        </div>
-      </div>
+
     <StatsChart class="my-[4vh] mx-auto w-[60vw] h-[50vh]"/>
   </div>
 </template>

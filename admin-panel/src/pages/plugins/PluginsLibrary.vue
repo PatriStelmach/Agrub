@@ -52,7 +52,7 @@ const filteredData = computed(() =>
     <h1 class="text-center my-[2vh] text-[3vh] border-b pb-[2vh]   md ">Plugins library</h1>
   <div class="mx-auto w-full">
 
-    <div class="flex ml-[2vw] my-[2vh] ">
+    <div class="flex ml-[1vw] my-[2vh] ">
 
       <ButtonGroup class="hidden sm:flex">
         <ButtonGroup>

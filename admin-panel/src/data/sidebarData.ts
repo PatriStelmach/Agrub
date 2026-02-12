@@ -49,18 +49,6 @@ export const sidebarData = {
       icon: IconUsers,
     },
   ],
-  navSecondary: [
-    {
-      title: "Settings",
-      url: "#",
-      icon: IconSettings,
-    },
-    {
-      title: "Get Help",
-      url: "#",
-      icon: IconHelp,
-    },
-  ],
   documents: [
     {
       name: "Plugins library",

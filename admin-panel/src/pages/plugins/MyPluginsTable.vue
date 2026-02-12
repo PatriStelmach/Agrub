@@ -51,8 +51,8 @@ watch(checkedPlugins, (newChecked) =>
 </script>
 
 <template>
-  <div class=" mt-[2vh] flex mx-auto w-full">
-    <Table class="w-9/10 mx-auto my-[1vh]">
+  <div class=" mt-[2vh] flex  mx-[2%] w-96/100">
+    <Table class="w-full mx-auto my-[1vh]">
       <TableCaption class="border-b border-t py-[1vh]">List of your plugins</TableCaption>
         <TableHeader>
           <TableRow class="bg-secondary hover:bg-secondary">

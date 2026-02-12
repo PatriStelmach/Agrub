@@ -26,7 +26,7 @@ const props = defineProps<{
 <template>
 
   <Table
-    class="w-9/10 mx-auto my-[1vh]">
+    class="mx-[2%] w-96/100 my-[1vh]">
     <TableCaption class="border-b border-t py-[1vh]">List of plugins made by users</TableCaption>
     <TableHeader>
       <TableRow class="bg-secondary hover:bg-secondary">
@@ -44,7 +44,7 @@ const props = defineProps<{
         class=" cursor-grab duration-0 hover:bg-blue-700/30"
         v-for="plugin in data"
         :key="plugin.id">
-        <TableCell class="px-4">
+        <TableCell class="px-4 ">
           <input
             type="checkbox"
             :id="cn('plugin-no-'+plugin.id)" class="size-[1vw] cursor-pointer"/>

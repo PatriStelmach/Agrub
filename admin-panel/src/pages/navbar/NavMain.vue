@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Component } from "vue"
-import { IconCirclePlusFilled } from "@tabler/icons-vue"
+import { IconSend } from "@tabler/icons-vue"
 
 import {
   SidebarGroup,
@@ -30,7 +30,7 @@ defineProps<{
           <SidebarMenuButton
             tooltip="Send notificatons">
 
-            <Button variant="destructive" class="w-full"><IconCirclePlusFilled />Send notificaton</Button>
+            <Button variant="destructive" class="w-full">Send notificaton <IconSend/></Button>
           </SidebarMenuButton>
 
         </SidebarMenuItem>

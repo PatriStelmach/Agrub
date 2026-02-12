@@ -3,7 +3,7 @@ import { RouterView } from 'vue-router'
 import SearchBar from "@/pages/globals/SearchBar.vue";
 import {SidebarProvider} from "@/components/ui/sidebar";
 import AppSidebar from "@/pages/navbar/AppSidebar.vue";
-import ViewMode from "@/pages/globals/ViewMode.vue";
+import TopRightButtons from "@/pages/globals/topRightButtons.vue";
 </script>
 
 <template>
@@ -13,7 +13,7 @@ import ViewMode from "@/pages/globals/ViewMode.vue";
 
       <nav class="flex h-[5vh] bg-card justify-center items-center">
         <SearchBar/>
-        <ViewMode/>
+        <TopRightButtons/>
       </nav>
     </header>
 
