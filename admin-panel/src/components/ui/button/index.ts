@@ -22,15 +22,17 @@ export const buttonVariants = cva(
         green:
         " bg-green-600 hover:bg-green-500 text-white ",
         green_outline:
-        "bg-background border font-bold dark:border-input  dark:bg-input/30 text-green-500 hover:bg-green-600 hover:text-background",
+        "bg-background border font-bold dark:border-input  dark:bg-input/30 text-green-500/90 hover:bg-green-500/70 hover:text-primary",
         yellow_outline:
-          "bg-background border font-bold dark:border-input  dark:bg-input/30 text-yellow-500 hover:bg-yellow-500/90 hover:text-background",
+          "bg-background border font-bold dark:border-input  dark:bg-input/30 text-yellow-500/90 hover:bg-yellow-500/80 hover:text-primary",
         red_outline:
-          "bg-background border font-bold dark:border-input  dark:bg-input/30 text-red-500 hover:bg-red-500/80 hover:text-background",
+          "bg-background border font-bold dark:border-input  dark:bg-input/30 text-red-500/90 hover:bg-red-500/80 hover:text-primary",
         cyan_outline:
-          "bg-background border font-bold dark:border-input  dark:bg-input/30 text-cyan-500 hover:bg-cyan-500/90 hover:text-background",
+          "bg-background border font-bold dark:border-input  dark:bg-input/30 text-cyan-500/90 hover:bg-cyan-500/80 hover:text-primary",
+        orange_outline:
+          "bg-background border font-bold dark:border-input  dark:bg-input/30 text-amber-500/90 hover:bg-amber-500/80 hover:text-primary",
         green_inside:
-        "bg-background dark:bg-input/30 dark:border-input text-green-500 focus:bg-green-500 border focus:text-foreground hover:shadow-[0_0_1px_1px] hover:shadow-green-500 dark:focus:bg-green-500/60",
+        "bg-background dark:bg-input/30 dark:border-input text-green-500 focus:bg-green-500 hover:border-x-3 hover:border-green-500 focus:text-foreground dark:focus:bg-green-500/60",
         red_inside:
           "bg-background dark:bg-input/30 dark:border-input text-red-500 focus:bg-red-500 border focus:text-foreground hover:shadow-[0_0_1px_1px] hover:border-red-500 dark:focus:bg-red-500/60"
       },

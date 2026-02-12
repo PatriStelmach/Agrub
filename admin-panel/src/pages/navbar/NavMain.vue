@@ -28,9 +28,8 @@ defineProps<{
       <SidebarMenu>
         <SidebarMenuItem class="flex items-center gap-2">
           <SidebarMenuButton
-            tooltip="Send notificatons">
-
-            <Button variant="destructive" class="w-full">Send notificaton <IconSend/></Button>
+            tooltip="Send notificatons" class="p-0">
+            <Button variant="green_inside" class="w-full">Send notificaton <IconSend/></Button>
           </SidebarMenuButton>
 
         </SidebarMenuItem>

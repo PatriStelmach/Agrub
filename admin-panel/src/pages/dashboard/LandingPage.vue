@@ -76,7 +76,7 @@ const filteredData = computed(() =>
           <ButtonGroup>
           <DropdownMenu>
             <DropdownMenuTrigger as-child>
-              <Button class="text-chart-2 hover:bg-chart-2/70!" variant="outline">
+              <Button variant="green_outline">
                 <IconLayoutColumns />
                 Customize Columns
                 <IconChevronDown />
@@ -99,7 +99,7 @@ const filteredData = computed(() =>
           </DropdownMenu>
           <DropdownMenu class="z-9999">
             <DropdownMenuTrigger as-child>
-              <Button variant="outline" class="text-chart-3 hover:bg-chart-3/80!">
+              <Button variant="orange_outline">
                 <IconBellCog/>
                 Alert actions
                 <IconChevronDown/>
