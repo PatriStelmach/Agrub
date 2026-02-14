@@ -17,11 +17,12 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
 import TeamBar from "@/pages/navbar/TeamBar.vue";
+import { usersData } from "@/data/usersData.ts";
 </script>
 
 <template>
   <Sidebar class="bg-card z-100">
-    <SidebarHeader class="bg-card h-1/14">
+    <SidebarHeader class="bg-card h-[5vh]">
       <SidebarMenu>
         <SidebarMenuItem>
           <SidebarMenuButton
@@ -36,13 +37,13 @@ import TeamBar from "@/pages/navbar/TeamBar.vue";
         </SidebarMenuItem>
       </SidebarMenu>
     </SidebarHeader>
-    <SidebarContent class="bg-card h-6/7">
+    <SidebarContent class="bg-card h-[50vh]">
       <NavMain :items="sidebarData.navMain" />
       <NavDocuments :items="sidebarData.documents" />
-      <TeamBar class="h-3/7"/>
     </SidebarContent>
-    <SidebarFooter class="bg-card h-1/14">
-      <NavUser :user="sidebarData.user" />
+    <SidebarFooter class="bg-card h-[45vh]">
+      <NavUser :user="sidebarData.loggedUser" />
+      <TeamBar :data="usersData" class="h-6/7"/>
     </SidebarFooter>
   </Sidebar>
 </template>

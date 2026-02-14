@@ -24,20 +24,14 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
 } from '@/components/ui/sidebar'
+import type {User} from "@/types/user.ts";
 
-interface User {
-  name: string
-  email: string
-  avatar: string
-}
 
 defineProps<{
   user: User
 }>()
 
-const { isMobile } = useSidebar()
 </script>
 
 <template>
@@ -49,14 +43,16 @@ const { isMobile } = useSidebar()
             size="lg"
             class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
           >
-            <Avatar class="h-8 w-8 rounded-lg grayscale">
-              <AvatarImage :src="user.avatar" :alt="user.name" />
-              <AvatarFallback class="rounded-lg">
-                CN
+            <Avatar class="size-9 rounded-lg relative ">
+              <AvatarFallback class="rounded-full grayscale">
+                {{user.firstname.slice(0,1) + user.surname.slice(0,1)}}
               </AvatarFallback>
+              <span
+                class="absolute bottom-1 right-1 size-1.5 rounded-full  bg-green-500"
+              ></span>
             </Avatar>
             <div class="grid flex-1 text-left text-sm leading-tight">
-              <span class="truncate font-medium">{{ user.name }}</span>
+              <span class="truncate font-medium">{{ user.firstname + ' ' + user.surname }}</span>
               <span class="text-muted-foreground truncate text-xs">
                 {{ user.email }}
               </span>
@@ -65,21 +61,21 @@ const { isMobile } = useSidebar()
           </SidebarMenuButton>
         </DropdownMenuTrigger>
         <DropdownMenuContent
-          class="w-(--reka-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-          :side="isMobile ? 'bottom' : 'right'"
+          class="w-(--reka-dropdown-menu-trigger-width) min-w-56 rounded-lg z-120"
+          :side="'right'"
           :side-offset="4"
           align="end"
         >
           <DropdownMenuLabel class="p-0 font-normal">
             <div class="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
               <Avatar class="h-8 w-8 rounded-lg">
-                <AvatarImage :src="user.avatar" :alt="user.name" />
+                <AvatarImage :src="user.avatar as string" :alt="user.firstname + '_' + user.surname + '_avatar'"  />
                 <AvatarFallback class="rounded-lg">
                   CN
                 </AvatarFallback>
               </Avatar>
               <div class="grid flex-1 text-left text-sm leading-tight">
-                <span class="truncate font-medium">{{ user.name }}</span>
+                <span class="truncate font-medium">{{ user.firstname + ' ' + user.surname }}</span>
                 <span class="text-muted-foreground truncate text-xs">
                   {{ user.email }}
                 </span>

@@ -3,19 +3,22 @@ import {
   IconDashboard,
   IconDatabase,
   IconFolder,
-  IconHelp,
   IconLayoutGridAdd,
   IconLayoutGridFilled,
-  IconSettings,
   IconUsers,
   IconClipboardText, IconTerminal2, IconFileImport
 } from "@tabler/icons-vue"
-
+import type {User} from "@/types/user.ts";
 export const sidebarData = {
-  user: {
-    name: "admin",
+  loggedUser: {
+    id: 40,
+    firstname: "admin",
+    surname: "pjatk",
     email: "admin@pjatk",
+    role: "admin" as User["role"],
+    groups: ["Administration"],
     avatar: "/avatars/shadcn.jpg",
+    active: true
   },
   navMain: [
     {

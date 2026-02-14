@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import DataTable from "@/pages/dashboard/DataTable.vue"
-import SiteHeader from "@/pages/dashboard/SiteHeader.vue"
 import {dashboardData} from "@/data/dashboardData.ts"
 import {computed, ref, watch} from "vue";
 import MyPagination from "@/helpers/MyPagination.vue";
 import StatsChart from "@/pages/dashboard/StatsChart.vue";
-import type {Plugin} from "@/types/plugin.ts";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
 import {ArrowLeftIcon, Search} from "lucide-vue-next";
 import {

@@ -1,8 +1,11 @@
 export interface User
 {
   id: number,
-  name: string,
+  firstname: string,
+  surname: string,
+  active: boolean,
+  email?: string,
   role: "admin" | "technician"
   groups: string[]
-  avatar: string | File
+  avatar?: string | File
 }
