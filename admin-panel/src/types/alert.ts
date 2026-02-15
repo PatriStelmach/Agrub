@@ -5,7 +5,7 @@ export interface Alert
   source: string,
   status: "In Process" | "Done",
   priority: "low" | "medium" | "high",
-  technician?: string,
+  technicianGroups?: string[],
   createdAt: Date,
   closedAt?: Date,
 }

@@ -37,11 +37,11 @@ import { usersData } from "@/data/usersData.ts";
         </SidebarMenuItem>
       </SidebarMenu>
     </SidebarHeader>
-    <SidebarContent class="bg-card h-[50vh]">
+    <SidebarContent class="bg-card h-[40vh]">
       <NavMain :items="sidebarData.navMain" />
       <NavDocuments :items="sidebarData.documents" />
     </SidebarContent>
-    <SidebarFooter class="bg-card h-[45vh]">
+    <SidebarFooter class="bg-card h-[50vh]">
       <NavUser :user="sidebarData.loggedUser" />
       <TeamBar :data="usersData" class="h-6/7"/>
     </SidebarFooter>

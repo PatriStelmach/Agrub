@@ -351,7 +351,7 @@ watch(checkedAlerts, (newChecked) =>
             'text-red-500': alert.priority === 'high'}"
           >{{alert.priority}}
           </TableCell>
-          <TableCell class="p-4">{{alert.technician}}</TableCell>
+          <TableCell class="p-4">{{ alert.technicianGroups }}</TableCell>
           <DateCell v-if="alert.createdAt" class="p-4" :date="alert.createdAt "></DateCell>
           <DateCell v-if="alert.closedAt" class="p-4" :date="alert.closedAt"></DateCell>
           <TableCell v-else class="p-4">- - - - - - - - -</TableCell>

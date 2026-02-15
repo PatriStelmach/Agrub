@@ -37,6 +37,11 @@ const router = createRouter({
       path: '/import_plugins',
       name: 'import_plugins',
       component: () => import('../pages/plugins/ImportPlugin.vue')
+    },
+    {
+      path: '/team',
+      name: 'team',
+      component: () => import('../pages/users/TeamMembers.vue')
     }
 
   ],

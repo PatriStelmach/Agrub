@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
 import type {User} from "@/types/user.ts";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {SidebarMenu, SidebarMenuButton, SidebarMenuItem} from "@/components/ui/sidebar";
@@ -10,7 +9,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator, DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import {IconDotsVertical, IconLogout, IconNotification, IconUserCircle} from "@tabler/icons-vue";
+import {IconUser , IconNotification, IconUserCircle} from "@tabler/icons-vue";
 
 defineProps<{
   data: User[]
@@ -19,6 +18,7 @@ defineProps<{
 
 <template>
 <ScrollArea class=" border-t-4 pt-4">
+
       <SidebarMenu>
         <SidebarMenuItem
           v-for="user in data"

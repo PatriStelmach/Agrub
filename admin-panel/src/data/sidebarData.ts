@@ -45,12 +45,7 @@ export const sidebarData = {
       title: "Log files",
       url: "#",
       icon: IconClipboardText,
-    },
-    {
-      title: "Team",
-      url: "#",
-      icon: IconUsers,
-    },
+    }
   ],
   documents: [
     {

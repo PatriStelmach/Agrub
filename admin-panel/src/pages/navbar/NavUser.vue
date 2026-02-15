@@ -2,7 +2,7 @@
 import {
   IconDotsVertical,
   IconLogout,
-  IconNotification,
+  IconNotification, IconUsers,
   IconUserCircle,
 } from "@tabler/icons-vue"
 
@@ -36,7 +36,15 @@ defineProps<{
 
 <template>
   <SidebarMenu>
-    <SidebarMenuItem>
+    <SidebarMenuItem class="border-b-4">
+      <SidebarMenuButton class="flex items-center justify-center mb-4 text-lg">
+        <IconUsers class="size-5!"/>
+        <RouterLink to="/team">
+          <span>Team</span>
+        </RouterLink>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
+    <SidebarMenuItem class="py-2">
       <DropdownMenu>
         <DropdownMenuTrigger as-child>
           <SidebarMenuButton
