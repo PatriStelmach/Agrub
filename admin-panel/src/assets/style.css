@@ -1,6 +1,5 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-
 @custom-variant light (&:where([data-theme="light"]), [data-theme="light"]) ;
 
 @theme inline {
@@ -39,6 +38,7 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-selected: var(--selected);
 }
 :root {
   --checkbox-border-color: #8b8c89;
@@ -47,6 +47,7 @@
   --radius: 0.625rem;
   --background: oklch(0.13 0.028 261.692);
   --foreground: oklch(0.985 0.002 247.839);
+  --selected: oklch(21% 0.034 264.665);
   --card: oklch(0.21 0.034 264.665);
   --card-foreground: oklch(0.985 0.002 247.839);
   --popover: oklch(0.21 0.034 264.665);
@@ -80,6 +81,7 @@
 
 .light {
   --background: oklch(1 0 0);
+  --selected: oklch(92.8% 0.006 264.531);
   --foreground: oklch(0.13 0.028 261.692);
   --card: oklch(0.98 0.00 248);
   --navbar: oklch(0.577 0.245 27.325);
@@ -180,3 +182,20 @@ input[type="checkbox"]:focus-visible
   transform: scale(1.08);
 }
 
+.scroll-style::-webkit-scrollbar {
+  background: var(--background);
+  scrollbar-width: thin;
+  scroll-behavior: smooth;
+}
+
+.scroll-style::-webkit-scrollbar-corner {
+  background: var(--secondary);
+}
+.scroll-style::-webkit-scrollbar-thumb {
+  background: var(--sidebar-ring);
+}
+
+tr:has(.unwrapped) td {
+  position: absolute;
+  top:0.5rem;
+}

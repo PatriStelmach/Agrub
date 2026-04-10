@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type {System} from "@/types/system.ts";
+import type {System} from "@/types/types.ts";
 import { Button } from '@/components/ui/button'
 import {
   Field,

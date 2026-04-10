@@ -1,4 +1,4 @@
-import type {Plugin} from "@/types/plugin.ts"
+import type {Plugin} from "@/types/types"
 export const pluginLibraryData: Plugin[] = [
   {
     id: 1,

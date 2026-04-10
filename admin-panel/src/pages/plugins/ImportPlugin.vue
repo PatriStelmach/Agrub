@@ -21,56 +21,84 @@ import {
   IconListCheck
 } from "@tabler/icons-vue";
 import {ArrowLeftIcon} from "lucide-vue-next";
+import type {fileType} from "@/types/types.ts";
+import { Label } from "@/components/ui/label"
+import {Progress} from "@/components/ui/progress";
 
-const idCounter = ref(0);
-const files = ref<{ id:number, file:File }[]>([]);
-const checkedFiles = ref<number[]>([]);
-const checkText = ref<'Check all' | 'Uncheck all'>('Check all');
+const idCounter = ref(0)
+const files = ref<fileType[]>()
+const checkedFiles = ref<number[]>([])
+const checkText = ref<'Check all' | 'Uncheck all'>('Check all')
 
-function handleFileUpload(e: Event)
-{
+const blockedAddRemove = computed(() => {
+  return !checkedFiles?.value.length
+})
+const blockedAdd = computed(() => {
+  return !files?.value?.length
+})
+const isAllChecked = computed(() => {
+    return files.value?.length ? checkedFiles.value.length === files.value.length : false
+})
+
+watch(isAllChecked, () => {
+  return isAllChecked.value ? checkText.value= 'Uncheck all' : checkText.value= 'Check all'
+})
+
+function handleFileUpload(e: Event) {
   const input = e.target as HTMLInputElement;
   const filesArray= Array.from(input?.files || []);
 
   const newFiles = filesArray
-    .filter(file => !files.value.some(item => item.file.name === file.name))
+    .filter(file => {
+      return files.value ? !files.value.some(item => item.file.name === file.name) : file})
     .map( file => ({
       file: file,
-        id: idCounter.value++
+      id: idCounter.value++,
+      progress: 0,
     }));
 
-  files.value = files.value.concat(newFiles);
+  if (files.value)
+    files.value = files.value.concat(newFiles)
+  else
+    files.value = newFiles;
   input.value = '';
 }
 
-function removeFiles(ids:number[])
-{
-  files.value = files.value.filter(item => !ids.includes(item.id));
+const readFile = (id: number) => {
+  const item = files.value?.find(i => i.id === id)
+  if (!item) return
+
+  const reader = new FileReader()
+  reader.addEventListener("progress", (e: ProgressEvent) => {
+    if (e.lengthComputable)
+      item.progress = Math.round((e.loaded / e.total) * 100)
+  })
+
+  reader.addEventListener("load", () => {
+    item.progress = 100
+  })
+  reader.readAsArrayBuffer(item.file)
+}
+
+
+function removeFiles(ids:number[]) {
+  if (files.value)
+    files.value = files.value.filter(item => !ids.includes(item.id));
   checkedFiles.value = [];
 }
 
-const isAllChecked = computed(() =>
-{
-  return files.value.length > 0 && checkedFiles.value.length === files.value.length
-})
-
-
-watch(isAllChecked, () =>
-{
-  return isAllChecked.value ? checkText.value= 'Uncheck all' : checkText.value= 'Check all'
-})
-
-function toggleAllChecked()
-{
-  if(!isAllChecked.value)
-  {
-    checkedFiles.value = files.value.map((file) => file.id)
-    checkText.value = 'Uncheck all'
-  }
-  else
-  {
-    checkedFiles.value = []
+const toggleAllChecked = () => {
+  if(!files.value)
     checkText.value = 'Check all'
+else {
+    if(!isAllChecked.value) {
+      checkedFiles.value = files.value!.map((file) => file.id)
+      checkText.value = 'Uncheck all'
+    }
+    else {
+      checkedFiles.value = []
+      checkText.value = 'Check all'
+    }
   }
 }
 
@@ -90,17 +118,20 @@ function toggleAllChecked()
 <ButtonGroup>
   <Button
     @click="toggleAllChecked"
-    variant="yellow_outline">
+    variant="yellow_outline"
+    :disabled="blockedAdd">
     {{ checkText }}
     <IconListCheck/>
   </Button>
-  <Button variant="green_outline">
+  <Button variant="green_outline"
+          :disabled="blockedAddRemove">
     Add to your plugins
     <IconFileImport/>
   </Button>
   <Button
     @click="removeFiles(checkedFiles)"
-    variant="red_outline">
+    variant="red_outline"
+    :disabled="blockedAddRemove">
     Remove
     <IconTrash/>
   </Button>
@@ -115,7 +146,7 @@ function toggleAllChecked()
       </EmptyMedia>
       <EmptyTitle>Import a plugin</EmptyTitle>
       <EmptyDescription>
-        Choose your script to upload.
+        Choose your script to upload.<br><br>Accepted file types:<br> .py, .sh, .bash, .ps1, .psm1
       </EmptyDescription>
     </EmptyHeader>
     <EmptyContent>

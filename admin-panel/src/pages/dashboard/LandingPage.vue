@@ -1,148 +1,62 @@
 <script setup lang="ts">
 import DataTable from "@/pages/dashboard/DataTable.vue"
 import {dashboardData} from "@/data/dashboardData.ts"
-import {computed, ref, watch} from "vue";
+import {computed, ref, useTemplateRef, watch} from "vue";
 import MyPagination from "@/helpers/MyPagination.vue";
 import StatsChart from "@/pages/dashboard/StatsChart.vue";
-import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
-import {ArrowLeftIcon, Search} from "lucide-vue-next";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem, DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
-import {
-  IconBellCog, IconChevronDown,
-  IconEyeCog,
-  IconLayoutColumns,
-  IconLock,
-  IconStatusChange, IconUser
-} from "@tabler/icons-vue";
-import {ButtonGroup} from "@/components/ui/button-group";
-import {Button} from "@/components/ui/button";
-import type {Alert} from "@/types/alert";
-import type {Paginable} from "@/types/paginable.ts";
+import type {AlertObject} from "@/types/types";
+import type {Paginable} from "@/types/types.ts";
+import DashboardActions from "@/pages/dashboard/DashboardActions.vue";
+import {Alert, AlertTitle} from "@/components/ui/alert";
+import {onClickOutside} from "@vueuse/core";
 
 const currentPage = ref(1)
-
-const searchFilter = ref()
-
-
+const searchFilter = ref('')
 const rowsData = ref(dashboardData)
 
-watch(searchFilter, () =>
-{
+
+watch(searchFilter, () => {
   currentPage.value = 1
 })
 
-const updateData = (data: Paginable[]) =>
-{
-  rowsData.value = data as Alert[]
+const filteredData = computed(() => {
+  if(!searchFilter.value)
+    return dashboardData
+  return dashboardData.filter((item: AlertObject) =>
+    item.header.toLowerCase().includes(searchFilter.value.toLowerCase()))
+})
+
+const updateData = (data: Paginable[]) => {
+  rowsData.value = data as AlertObject[]
 }
 
-const updatePage = (page: number) =>
-{
+const updatePage = (page: number) => {
   currentPage.value = page
 }
 
-const filteredData = computed(() =>
-{
-  if(!searchFilter.value)
-  {
-    return dashboardData
-  }
-  return dashboardData.filter((item) =>
-    item.header.toLowerCase().includes(searchFilter.value.toLowerCase()))
-})
+const updateSearch = (data: string) => {
+  searchFilter.value = data.trim()
+}
+
 
 </script>
 
 <template>
-
   <div>
-    <h1 class="text-center my-[2vh] text-[3vh] border-b pb-[2vh]   ">Dashboard</h1>
-    <div>
-      <div class="flex ml-[1vw] my-[2vh] ">
-        <ButtonGroup>
-          <ButtonGroup>
-            <Button variant="outline" size="icon" aria-label="Go Back">
-              <ArrowLeftIcon />
-            </Button>
-          </ButtonGroup>
-
-          <ButtonGroup>
-          <DropdownMenu>
-            <DropdownMenuTrigger as-child>
-              <Button variant="green_outline">
-                <IconLayoutColumns />
-                Customize Columns
-                <IconChevronDown />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent class="w-[10vw]">
-              <template v-for="column in table.getAllColumns().filter((column) => typeof column.accessorFn !== 'undefined' && column.getCanHide())" :key="column.id">
-                <DropdownMenuCheckboxItem
-                  class="capitalize"
-                  :model-value="column.getIsVisible()"
-                  @update:model-value="(value) => {
-
-                  column.toggleVisibility(value)
-                }"
-                >
-                  {{ column.id }}
-                </DropdownMenuCheckboxItem>
-              </template>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <DropdownMenu class="z-9999">
-            <DropdownMenuTrigger as-child>
-              <Button variant="orange_outline">
-                <IconBellCog/>
-                Alert actions
-                <IconChevronDown/>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent class="w-full z-99999">
-              <DropdownMenuItem>
-                <IconEyeCog/>Change priority
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <IconUser/>Change technician
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <IconStatusChange/>Change status
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <IconLock/>Close
-              </DropdownMenuItem>
-
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <InputGroup class="relative l-[30vw] w-[20vw]  " >
-            <InputGroupInput
-              v-model="searchFilter"
-              type="search"
-              placeholder="Search for alert"/>
-            <InputGroupAddon>
-              <Search/>
-            </InputGroupAddon>
-          </InputGroup>
-
-          </ButtonGroup>
-        </ButtonGroup>
-      </div>
-    </div>
-              <DataTable :data="rowsData" class="z-0"/>
-
-
-              <MyPagination
-                :data="filteredData"
-                :page="currentPage"
-                @update:paginated-data="updateData"
-                @update:pages="updatePage"
-              />
-
-    <StatsChart class="my-[4vh] mx-auto w-[60vw] h-[50vh]"/>
+    <h1 class="text-center my-[2vh] text-[3vh] border-b pb-[2vh] max-h-[5vh]  ">Dashboard</h1>
+    <DashboardActions class="max-h-[20vh]"
+      @update:search-data="updateSearch"
+    />
+    <DataTable
+      :data="rowsData"
+      :all="dashboardData"
+    />
+    <MyPagination
+      class="max-h-[5vh]"
+      :data="filteredData"
+      :page="currentPage"
+      @update:paginated-data="updateData"
+      @update:pages="updatePage"
+    />
   </div>
 </template>

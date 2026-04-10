@@ -32,9 +32,9 @@ export const buttonVariants = cva(
         orange_outline:
           "bg-background border font-bold dark:border-input  dark:bg-input/30 text-amber-500/90 hover:bg-amber-500/80 hover:text-primary",
         green_inside:
-        "bg-background dark:bg-input/30 dark:border-input text-green-500 focus:bg-green-500 hover:border-x-3 hover:border-green-500 focus:text-foreground dark:focus:bg-green-500/60",
+        "bg-background dark:bg-input/30 dark:border-input border-3 text-green-500 focus:bg-green-500 focus:text-foreground hover:border-green-500 ",
         red_inside:
-          "bg-background dark:bg-input/30 dark:border-input text-red-500 focus:bg-red-500 border focus:text-foreground hover:shadow-[0_0_1px_1px] hover:border-red-500 dark:focus:bg-red-500/60"
+          "bg-background dark:bg-input/30 dark:border-input border-3 text-red-500 focus:bg-red-500  focus:text-foreground  hover:border-red-500 ",
       },
       size: {
         "default": "h-9 px-4 py-2 has-[>svg]:px-3",

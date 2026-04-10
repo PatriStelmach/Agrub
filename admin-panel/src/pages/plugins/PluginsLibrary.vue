@@ -10,9 +10,9 @@ import {
 import {ArrowLeftIcon, Search} from "lucide-vue-next";
 import {ButtonGroup} from "@/components/ui/button-group";
 import {Button} from "@/components/ui/button";
-import type {Plugin} from "@/types/plugin.ts"
+import type {Plugin} from "@/types/types.ts"
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
-import type {Paginable} from "@/types/paginable.ts";
+import type {Paginable} from "@/types/types.ts";
 
 const currentPage = ref<number>(1)
 const searchFilter = ref('')

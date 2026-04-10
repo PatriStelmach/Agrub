@@ -18,7 +18,7 @@ import {Button} from "@/components/ui/button";
 import {Item, ItemContent} from "@/components/ui/item";
 import AddNew from "@/pages/systems/AddNew.vue";
 import {ref} from "vue";
-import type {System} from "@/types/system.ts";
+import type {System} from "@/types/types.ts";
 
 const isOpen = ref(false);
 const openSystemId = ref<number | null>(null);

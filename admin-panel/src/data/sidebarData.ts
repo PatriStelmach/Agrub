@@ -8,7 +8,7 @@ import {
   IconUsers,
   IconClipboardText, IconTerminal2, IconFileImport
 } from "@tabler/icons-vue"
-import type {User} from "@/types/user.ts";
+import type {User} from "@/types/types";
 export const sidebarData = {
   loggedUser: {
     id: 40,

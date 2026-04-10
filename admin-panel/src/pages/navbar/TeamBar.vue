@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ScrollArea } from '@/components/ui/scroll-area'
-import type {User} from "@/types/user.ts";
+import type {User} from "@/types/types.ts";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {SidebarMenu, SidebarMenuButton, SidebarMenuItem} from "@/components/ui/sidebar";
 import {

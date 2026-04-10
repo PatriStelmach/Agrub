@@ -1,7 +1,7 @@
 import zabbix_logo from "@/components/icons/zabbix_logo.jpeg"
 import wazuh_logo from "@/components/icons/wazuh_logo.png"
 import nagios_logo from "@/components/icons/nagios_logo.webp"
-import type {System} from "@/types/system.ts";
+import type {System} from "@/types/types";
 
 export const systemsLibraryData:  System[] = [
   {

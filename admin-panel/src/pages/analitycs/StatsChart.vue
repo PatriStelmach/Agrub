@@ -34,7 +34,7 @@ const chartConfig = {
 
 <template>
 <div class="my-[4vh]">
-  <ChartContainer :config="chartConfig" class="min-h-[200px] w-full">
+  <ChartContainer :config="chartConfig" class="min-h-50 w-full">
     <Label class="text-2xl mx-auto my-[4vh] ">Alerts this week</Label>
     <VisXYContainer :data="chartData">
       <VisGroupedBar

@@ -25,7 +25,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
-import type {User} from "@/types/user.ts";
+import type {User} from "@/types/types.ts";
 
 
 defineProps<{
