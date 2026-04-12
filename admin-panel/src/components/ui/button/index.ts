@@ -26,7 +26,7 @@ export const buttonVariants = cva(
         yellow_outline:
           "bg-background border font-bold dark:border-input  dark:bg-input/30 text-yellow-500/90 hover:bg-yellow-500/80 hover:text-primary",
         red_outline:
-          "bg-background border font-bold dark:border-input  dark:bg-input/30 text-red-500/90 hover:bg-red-500/80 hover:text-primary",
+          "bg-background border font-bold dark:border-input  dark:bg-input/30 text-destructive/90 hover:bg-destructive/80 hover:text-primary",
         cyan_outline:
           "bg-background border font-bold dark:border-input  dark:bg-input/30 text-cyan-500/90 hover:bg-cyan-500/80 hover:text-primary",
         orange_outline:
@@ -34,7 +34,7 @@ export const buttonVariants = cva(
         green_inside:
         "bg-background dark:bg-input/30 dark:border-input border-3 text-green-500 focus:bg-green-500 focus:text-foreground hover:border-green-500 ",
         red_inside:
-          "bg-background dark:bg-input/30 dark:border-input border-3 text-red-500 focus:bg-red-500  focus:text-foreground  hover:border-red-500 ",
+          "bg-background dark:bg-input/30 dark:border-input border-3 text-destructive focus:bg-destructive  focus:text-foreground  hover:border-red-500 ",
       },
       size: {
         "default": "h-9 px-4 py-2 has-[>svg]:px-3",

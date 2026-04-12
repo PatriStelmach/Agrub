@@ -41,13 +41,9 @@ watch(searchFilter, () => {
         </Button>
       </ButtonGroup>
       <ButtonGroup>
-        <Button variant="cyan_outline">
+        <Button variant="green_outline">
           Edit
           <IconPencilCode/>
-        </Button>
-        <Button variant="yellow_outline">
-          Turn off
-          <IconPlayerPause/>
         </Button>
         <Button variant="red_outline">
           Delete

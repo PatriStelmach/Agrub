@@ -10,7 +10,8 @@ export const myPluginsData: Plugin[] = [
     updatedAt: new Date(2025, 12, 22, 12, 20),
     on: true,
     weight: 5,
-    tags: ["shell", "scripting"]
+    tags: ["shell", "scripting"],
+    type: "log"
   },
   {
     id: 2,
@@ -22,7 +23,8 @@ export const myPluginsData: Plugin[] = [
     updatedAt: new Date(2025, 11, 10, 14, 30),
     on: true,
     weight: 8,
-    tags: ["python", "monitoring", "performance"]
+    tags: ["python", "monitoring", "performance"],
+    type: "alert"
   },
   {
     id: 3,
@@ -34,7 +36,8 @@ export const myPluginsData: Plugin[] = [
     updatedAt: new Date(2025, 10, 5, 16, 45),
     on: true,
     weight: 7,
-    tags: ["nodejs", "service", "api", "web"]
+    tags: ["nodejs", "service", "api", "web"],
+    type: "log"
   },
   {
     id: 4,
@@ -46,7 +49,8 @@ export const myPluginsData: Plugin[] = [
     updatedAt: new Date(2025, 9, 18, 10, 25),
     on: false,
     weight: 9,
-    tags: ["docker", "containers", "orchestration", "devops", "monitoring"]
+    tags: ["docker", "containers", "orchestration", "devops", "monitoring"],
+    type: "alert"
   },
   {
     id: 5,
@@ -59,7 +63,8 @@ export const myPluginsData: Plugin[] = [
     on: true,
     weight: 6,
     description: "Analyzes system logs for patterns and anomalies",
-    tags: ["logs", "analytics", "monitoring", "elasticsearch", "kibana"]
+    tags: ["logs", "analytics", "monitoring", "elasticsearch", "kibana"],
+    type: "log"
   },
   {
     id: 6,
@@ -71,7 +76,8 @@ export const myPluginsData: Plugin[] = [
     updatedAt: new Date(2025, 7, 14, 9, 15),
     on: false,
     weight: 4,
-    tags: ["cpu", "performance", "monitoring", "metrics"]
+    tags: ["cpu", "performance", "monitoring", "metrics"],
+    type: "alert"
   },
   {
     id: 7,
@@ -83,7 +89,8 @@ export const myPluginsData: Plugin[] = [
     updatedAt: new Date(2025, 6, 30, 11, 40),
     on: true,
     weight: 5,
-    tags: ["memory", "ram", "monitoring", "performance", "metrics"]
+    tags: ["memory", "ram", "monitoring", "performance", "metrics"],
+    type: "alert"
   },
   {
     id: 8,
@@ -95,7 +102,8 @@ export const myPluginsData: Plugin[] = [
     updatedAt: new Date(2025, 12, 1, 8, 30),
     on: true,
     weight: 7,
-    tags: ["network", "security", "scanning", "ports"]
+    tags: ["network", "security", "scanning", "ports"],
+    type: "log"
   },
   {
     id: 9,
@@ -108,7 +116,8 @@ export const myPluginsData: Plugin[] = [
     on: true,
     weight: 6,
     description: "Monitors disk usage and alerts on low space",
-    tags: ["disk", "storage", "monitoring", "performance", "filesystem"]
+    tags: ["disk", "storage", "monitoring", "performance", "filesystem"],
+    type: "alert"
   },
   {
     id: 10,
@@ -120,7 +129,8 @@ export const myPluginsData: Plugin[] = [
     updatedAt: new Date(2025, 12, 15, 13, 10),
     on: false,
     weight: 3,
-    tags: ["process", "system", "monitoring", "performance", "psutil"]
+    tags: ["process", "system", "monitoring", "performance", "psutil"],
+    type: "log"
   },
   {
     id: 11,
@@ -133,6 +143,202 @@ export const myPluginsData: Plugin[] = [
     on: false,
     weight: 8,
     description: "Audits file changes for security compliance",
-    tags: ["security", "audit", "filesystem", "compliance", "integrity"]
+    tags: ["security", "audit", "filesystem", "compliance", "integrity"],
+    type: "log"
+  },
+  {
+    id: 12,
+    name: "health checker",
+    creator: "Jack Miller",
+    language: "python",
+    runningIntervals: "1 m",
+    addedAt: new Date(2025, 3, 5, 8, 30),
+    updatedAt: new Date(2025, 11, 15, 10, 20),
+    on: true,
+    weight: 9,
+    tags: ["health", "monitoring", "status", "uptime"],
+    type: "alert"
+  },
+  {
+    id: 13,
+    name: "SSL tracker",
+    creator: "Karen Davis",
+    language: "bash",
+    runningIntervals: "24 h",
+    addedAt: new Date(2025, 4, 12, 12, 0),
+    updatedAt: new Date(2025, 10, 20, 14, 30),
+    on: true,
+    weight: 7,
+    tags: ["ssl", "certificate", "security", "expiry"],
+    type: "alert"
+  },
+  {
+    id: 14,
+    name: "error catcher",
+    creator: "Larry Wilson",
+    language: "PowerShell",
+    runningIntervals: "5 s",
+    addedAt: new Date(2025, 5, 18, 9, 15),
+    updatedAt: new Date(2025, 12, 5, 16, 45),
+    on: true,
+    weight: 8,
+    tags: ["errors", "exceptions", "debugging", "logging"],
+    type: "alert"
+  },
+  {
+    id: 15,
+    name: "access logger",
+    creator: "Nancy Moore",
+    language: "python",
+    runningIntervals: "10 s",
+    addedAt: new Date(2025, 6, 22, 11, 30),
+    updatedAt: new Date(2025, 11, 8, 13, 20),
+    on: true,
+    weight: 6,
+    tags: ["access", "auth", "login", "security"],
+    type: "log"
+  },
+  {
+    id: 16,
+    name: "db connector",
+    creator: "Oliver Taylor",
+    language: "bash",
+    runningIntervals: "30 s",
+    addedAt: new Date(2025, 7, 30, 14, 45),
+    updatedAt: new Date(2025, 12, 18, 9, 10),
+    on: true,
+    weight: 5,
+    tags: ["database", "connection", "pool", "postgres"],
+    type: "alert"
+  },
+  {
+    id: 17,
+    name: "queue watcher",
+    creator: "Patricia Anderson",
+    language: "python",
+    runningIntervals: "15 s",
+    addedAt: new Date(2025, 8, 14, 10, 20),
+    updatedAt: new Date(2025, 11, 25, 15, 30),
+    on: false,
+    weight: 7,
+    tags: ["queue", "messaging", "rabbitmq", "async"],
+    type: "log"
+  },
+  {
+    id: 18,
+    name: "backup scheduler",
+    creator: "Quinn Thomas",
+    language: "PowerShell",
+    runningIntervals: "12 h",
+    addedAt: new Date(2025, 9, 3, 8, 0),
+    updatedAt: new Date(2025, 12, 10, 12, 45),
+    on: true,
+    weight: 9,
+    tags: ["backup", "storage", "restore", "schedule"],
+    type: "log"
+  },
+  {
+    id: 19,
+    name: "API gateway",
+    creator: "Rachel Martinez",
+    language: "bash",
+    runningIntervals: "20 s",
+    addedAt: new Date(2025, 10, 11, 13, 15),
+    updatedAt: new Date(2025, 11, 30, 10, 25),
+    on: true,
+    weight: 8,
+    tags: ["api", "gateway", "proxy", "rest"],
+    type: "alert"
+  },
+  {
+    id: 20,
+    name: "metrics aggregator",
+    creator: "Steve Jackson",
+    language: "python",
+    runningIntervals: "1 m",
+    addedAt: new Date(2025, 11, 5, 9, 30),
+    updatedAt: new Date(2025, 12, 20, 14, 15),
+    on: true,
+    weight: 6,
+    tags: ["metrics", "aggregation", "prometheus", "grafana"],
+    type: "log"
+  },
+  {
+    id: 21,
+    name: "session manager",
+    creator: "Tina Harris",
+    language: "PowerShell",
+    runningIntervals: "5 m",
+    addedAt: new Date(2025, 11, 18, 11, 45),
+    updatedAt: new Date(2025, 12, 22, 16, 30),
+    on: false,
+    weight: 7,
+    tags: ["session", "auth", "token", "jwt"],
+    type: "log"
+  },
+  {
+    id: 22,
+    name: "rate limiter",
+    creator: "Uma Wilson",
+    language: "bash",
+    runningIntervals: "10 s",
+    addedAt: new Date(2025, 11, 25, 8, 20),
+    updatedAt: new Date(2025, 12, 24, 12, 10),
+    on: true,
+    weight: 8,
+    tags: ["rate", "limit", "throttle", "api"],
+    type: "alert"
+  },
+  {
+    id: 23,
+    name: "cache warmer",
+    creator: "Victor Chen",
+    language: "python",
+    runningIntervals: "30 m",
+    addedAt: new Date(2025, 12, 2, 10, 30),
+    updatedAt: new Date(2025, 12, 26, 15, 45),
+    on: true,
+    weight: 5,
+    tags: ["cache", "redis", "prefetch", "performance"],
+    type: "log"
+  },
+  {
+    id: 24,
+    name: "load balancer",
+    creator: "Wendy Lee",
+    language: "PowerShell",
+    runningIntervals: "15 s",
+    addedAt: new Date(2025, 12, 8, 13, 0),
+    updatedAt: new Date(2025, 12, 28, 9, 20),
+    on: true,
+    weight: 9,
+    tags: ["load", "balancer", "distribution", "traffic"],
+    type: "alert"
+  },
+  {
+    id: 25,
+    name: "audit trail",
+    creator: "Xavier Brown",
+    language: "bash",
+    runningIntervals: "1 h",
+    addedAt: new Date(2025, 12, 15, 9, 15),
+    updatedAt: new Date(2025, 12, 30, 11, 30),
+    on: true,
+    weight: 7,
+    tags: ["audit", "compliance", "tracking", "logging"],
+    type: "log"
+  },
+  {
+    id: 26,
+    name: "alert router",
+    creator: "Yolanda Garcia",
+    language: "python",
+    runningIntervals: "5 s",
+    addedAt: new Date(2025, 12, 20, 14, 45),
+    updatedAt: new Date(2025, 12, 31, 10, 15),
+    on: true,
+    weight: 8,
+    tags: ["alert", "routing", "notification", "escalation"],
+    type: "alert"
   }
 ]

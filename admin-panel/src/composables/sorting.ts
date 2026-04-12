@@ -1,4 +1,3 @@
-// composables/useSort.ts
 import { ref, computed } from 'vue'
 
 export function useSort<Paginable>(data: () => Paginable[], defaultSort: keyof Paginable) {

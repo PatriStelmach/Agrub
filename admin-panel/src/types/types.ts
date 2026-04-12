@@ -36,6 +36,7 @@ export interface Plugin
   addedAt?: Date,
   updatedAt?: Date,
   on?: boolean,
+  type?: "log" | "alert"
 }
 
 export interface System

@@ -36,7 +36,7 @@ defineProps<{
                   </AvatarFallback>
                   <span
                     class="absolute bottom-1 right-1 size-1.5 rounded-full  bg-green-500"
-                    :class="{'bg-red-500' : !user.active}"
+                    :class="{'bg-destructive' : !user.active}"
                   ></span>
                 </Avatar>
                 <div class="grid flex-1 text-left text-sm leading-tight">

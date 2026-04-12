@@ -46,7 +46,7 @@ watch(searchFilter, () => {
         <ButtonGroup>
           <DropdownMenu>
             <DropdownMenuTrigger as-child>
-              <Button variant="orange_outline">
+              <Button variant="green_outline">
                 <IconBellCog/>
                 Alert actions
                 <IconChevronDown/>

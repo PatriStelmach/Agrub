@@ -54,7 +54,7 @@ const props = defineProps<{
         <TableCell class="p-4">
           <Badge
             v-for="(tag, index) in plugin.tags"
-            class="cursor-pointer hover:bg-chart-1 mx-1"
+            class="cursor-pointer hover:bg-badge mx-1"
             variant="secondary"
             :key="index">{{tag}}</Badge>
         </TableCell>
