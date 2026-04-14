@@ -1,0 +1,19 @@
+import {ref, computed, type Ref} from 'vue'
+import { defineStore } from 'pinia'
+
+export const useCounterStore = defineStore('counter', () => {
+  const count = ref(0)
+  const doubleCount = computed(() => count.value * 2)
+  function increment() {
+    count.value++
+  }
+
+  return { count, doubleCount, increment }
+})
+
+export const useNavbarStore = defineStore('navbar', () =>
+{
+  const current = ref<string>('/')
+
+  return current
+})
