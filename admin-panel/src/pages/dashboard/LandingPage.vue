@@ -1,15 +1,11 @@
 <script setup lang="ts">
 import DataTable from "@/pages/dashboard/DataTable.vue"
 import {dashboardData} from "@/data/dashboardData.ts"
-import {computed, ref, useTemplateRef, watch} from "vue";
+import {computed, ref, watch} from "vue";
 import MyPagination from "@/helpers/MyPagination.vue";
-import StatsChart from "@/pages/dashboard/StatsChart.vue";
 import type {AlertObject} from "@/types/types";
 import type {Paginable} from "@/types/types.ts";
 import DashboardActions from "@/pages/dashboard/DashboardActions.vue";
-import {Alert, AlertTitle} from "@/components/ui/alert";
-import {onClickOutside} from "@vueuse/core";
-
 const currentPage = ref(1)
 const searchFilter = ref('')
 const rowsData = ref(dashboardData)

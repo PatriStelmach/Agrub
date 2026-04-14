@@ -22,9 +22,14 @@ export const sidebarData = {
   },
   navMain: [
     {
-      title: "Dashboard",
+      title: "Alerts",
       url: "/",
       icon: IconDashboard,
+    },
+    {
+      title: "Logs",
+      url: "#",
+      icon: IconClipboardText,
     },
     {
       title: "Connected systems",
@@ -41,11 +46,6 @@ export const sidebarData = {
       url: "#",
       icon: IconChartBar,
     },
-    {
-      title: "Log files",
-      url: "#",
-      icon: IconClipboardText,
-    }
   ],
   documents: [
     {

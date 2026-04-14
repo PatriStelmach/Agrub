@@ -32,7 +32,11 @@ export interface Plugin
   weight: number,
   createdAt?: Date,
   tags: string[]
-  runningIntervals?: string,
+  runningIntervals?: {
+    h: number,
+    m: number,
+    s: number
+  },
   addedAt?: Date,
   updatedAt?: Date,
   on?: boolean,
