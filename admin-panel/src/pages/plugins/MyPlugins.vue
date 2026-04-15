@@ -68,12 +68,10 @@ const checkedPlugins = (plugins:number[]) => {
   <div>
     <h1 class="text-center my-[2vh] text-[3vh] border-b pb-[2vh] max-h-[5vh] ">Your plugins</h1>
   <div>
-    <MyPluginsActions
-      @update:search-data="updateSearchData"
-    />
     <MyPluginsTable
       :data="rowsData"
       @update:checked="checkedPlugins"
+      @update:searchData="updateSearchData"
     />
 
     <MyPagination

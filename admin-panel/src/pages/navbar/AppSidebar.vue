@@ -37,12 +37,12 @@ import { usersData } from "@/data/usersData.ts";
         </SidebarMenuItem>
       </SidebarMenu>
     </SidebarHeader>
-    <SidebarContent class="bg-card h-[40vh]">
+    <SidebarContent class="bg-card max-h-[40vh] oveflow-auto scroll-style">
       <NavMain :items="sidebarData.navMain" />
       <NavDocuments :items="sidebarData.documents" />
     </SidebarContent>
-    <SidebarFooter class="bg-card h-[50vh]">
-      <NavUser :user="sidebarData.loggedUser" />
+    <SidebarFooter class="bg-card max-h-[40vh]">
+      <NavUser :user="sidebarData.loggedUser" class="1/7" />
       <TeamBar :data="usersData" class="h-6/7"/>
     </SidebarFooter>
   </Sidebar>

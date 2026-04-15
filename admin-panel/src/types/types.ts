@@ -27,6 +27,7 @@ export interface Plugin
   id: number,
   name: string,
   creator: string,
+  lastModifiedBy: string,
   language: "python" | "bash" | "PowerShell",
   description?: string,
   weight: number,
