@@ -10,6 +10,16 @@ export interface AlertObject
   closedAt?: Date,
 }
 
+export interface LogObject
+{
+  id: number
+  header: string,
+  content: string,
+  source: string,
+  technicianGroups?: string[],
+  createdAt: Date,
+}
+
 export interface User
 {
   id: number,

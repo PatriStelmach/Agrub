@@ -1,11 +1,11 @@
 import { ref, computed } from 'vue'
 
-export function useSort<Paginable>(data: () => Paginable[], defaultSort: keyof Paginable) {
-  const sortKey = ref<keyof Paginable>(defaultSort)
+export function useSort<T>(data: () => T[], defaultSort: keyof T) {
+  const sortKey = ref<keyof T>(defaultSort)
   const sortOrder = ref<'asc' | 'desc'>('desc')
 
   const sortedData = computed(() => {
-    const key = sortKey.value as keyof Paginable
+    const key = sortKey.value as keyof T
     if (!key) return data()
     return [...data()].sort((a , b) => {
       const aVal = a[key]

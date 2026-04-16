@@ -20,12 +20,7 @@ import {
   IconListCheck,
   IconX,
   IconPlus,
-  IconMinus,
-  IconArrowBarDown,
-  IconArrowBarUp,
-  IconLabel,
   IconLogs,
-  IconAlertCircle,
   IconAlertTriangleFilled,
   IconUserEdit, IconTrash, IconDatabase, IconStatusChange, IconTerminal2, IconFileImport,
   IconPencilCode
@@ -35,17 +30,8 @@ import {useSort} from "@/composables/sorting.ts";
 import SortableHead from "@/helpers/SortableHead.vue";
 import {useWrapping} from "@/composables/unwrapping.ts";
 import {Button} from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from "@/components/ui/select";
-import {Input} from "@/components/ui/input";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
 import {ArrowLeftIcon, Search} from "lucide-vue-next";
-import {ScrollArea} from "@/components/ui/scroll-area";
 import {availableTags} from "@/data/tags.ts";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -56,8 +42,6 @@ import {
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import {ButtonGroup} from "@/components/ui/button-group";
-import {myPluginsData} from "@/data/myPlugins.ts";
-
 
 const props = defineProps<{
   data: Plugin[];
@@ -68,12 +52,18 @@ const emit = defineEmits<{
   'update:search-data': [data:string]
 }>()
 
+const { sortedData, sortKey, sortOrder, toggleSort } = useSort<Plugin>(() => props.data, 'updatedAt')
+const { wrap, isUnwrapped, unwrap, originalItem, unwrappedItem, items } = useWrapping<Plugin>(sortedData)
 
 const searchFilter = ref<string>("")
 const checkedPlugins = ref<number[]>([])
 const tagSearch = ref("")
 const tagsListOpen = ref(false)
-const blockedRemoveAndChange = computed(() => !checkedPlugins.value.length)
+const unwrappedIntervals = ref<{id:number, h:number, m:number, s:number }>()
+
+const blockedRemoveAndChange = computed(() => {
+  return !checkedPlugins.value.length || (checkedPlugins.value.length && unwrappedItem.value)
+})
 const blockedEdit = computed(() => checkedPlugins.value.length !== 1)
 const existingTags = computed(() =>  unwrappedItem.value!.tags.includes(tagSearch.value))
 const allChecked = computed(() =>  props.data.length > 0 &&
@@ -82,17 +72,20 @@ const matchedTags = computed(() => availableTags.filter(t => t.includes(tagSearc
   .filter(t => !unwrappedItem.value!.tags.includes(t)))
 
 const intervals = computed(() => {
-  return sortedData.value.map(item => {
-    item
-  })
+  return sortedData.value.map(({ id, runningIntervals }) => ({
+    id: id,
+    h:time(runningIntervals!).h,
+    m:time(runningIntervals!).m,
+    s:time(runningIntervals!).s
+  }))
 })
 
 const correctTime = computed(() => {
-  if(unwrappedItem.value) {
-    const time = unwrappedItem.value.runningIntervals!
-    return  ![time.h, time.m, time.s].some( v => v < 0)
-      && time.h <= 23 && time.m <= 59 && time.s <= 59
-  } else { return true }
+  const item = unwrappedIntervals.value
+  if (item) {
+    return item ? ![item.h, item.m, item.s].some(v => v < 0)
+      && item.h <= 23 && item.m <= 59 && item.s <= 59 : true
+  } else return true
 })
 
 watch(checkedPlugins, (newChecked) => {
@@ -103,8 +96,11 @@ watch(searchFilter, () => {
   emit('update:search-data', searchFilter.value)
 }, {immediate: true})
 
-const { sortedData, sortKey, sortOrder, toggleSort } = useSort<Plugin>(() => props.data, 'updatedAt')
-const { wrap, isUnwrapped, unwrap, originalItem, unwrappedItem, items } = useWrapping<Plugin>(sortedData)
+watch(unwrappedItem,(newItem) => {
+  if(newItem) {
+    unwrappedIntervals.value = intervals.value.find(i => i.id === newItem.id)
+  }
+}, {deep: true, immediate: true})
 
 const addTag = () => {
   if(unwrappedItem.value && !existingTags.value) {
@@ -114,16 +110,18 @@ const addTag = () => {
 }
 
 const checkAll = () => {
-  !allChecked.value ?
+  return !allChecked.value ?
     checkedPlugins.value = props.data.map(plugin => plugin.id) : checkedPlugins.value = []
 }
 
 const changeStatus = () => {
-  checkedPlugins.value.forEach(p => {
-    const plugin = sortedData.value.find(s => s.id === p)
-    if(plugin)
-      plugin.on = !plugin.on
-  })
+  if(!unwrappedItem.value) {
+    checkedPlugins.value.forEach(p => {
+      const plugin = sortedData.value.find(s => s.id === p)
+      if (plugin)
+        plugin.on = !plugin.on
+    })
+  }
 }
 
 const time = (seconds: number) => {
@@ -135,15 +133,18 @@ const time = (seconds: number) => {
 }
 
 const check = (id: number) => {
-  checkedPlugins.value.some(p => p === id) ?
+  console.log(intervals.value)
+  return checkedPlugins.value.some(p => p === id) ?
     checkedPlugins.value = checkedPlugins.value.filter(p => p !== id) : checkedPlugins.value.push(id)
 }
 
 const savePlugin = () => {
-  wrap(true)
-  tagsListOpen.value=false
-  tagSearch.value=''
-  Object.values(unwrappedItem.value!.runningIntervals!).forEach(v => v === null ? 0 : true)
+  if(unwrappedItem.value && unwrappedIntervals.value) {
+    unwrappedItem.value.runningIntervals = unwrappedIntervals.value.h * 3600 + unwrappedIntervals.value.m * 60 + unwrappedIntervals.value.s
+    wrap(true)
+    tagsListOpen.value = false
+    tagSearch.value = ''
+  }
 
 }
 
@@ -258,7 +259,7 @@ const savePlugin = () => {
             :key="plugin.id"
             @click="!isUnwrapped(plugin.id) ? check(plugin.id): true; time(plugin.runningIntervals!)"
             :class="{'hover:bg-destructive/20': !plugin.on,
-             'bg-selected [&_td]:align-top  sticky h-22 lg:h-24 xl:h-26 2xl:h-30 top-13 bottom-11 hover:bg-card z-9999 cursor-auto'
+             'bg-selected [&_td]:align-top  sticky h-60! lg:h-70! xl:h-80! 2xl:h-90! top-13 bottom-11 hover:bg-card z-9999 cursor-auto'
                     : isUnwrapped(plugin.id) }">
             <TableCell class="pr-4">
               <input
@@ -327,7 +328,7 @@ const savePlugin = () => {
                 </Transition>
             </TableCell>
 
-            <TableCell v-if="!isUnwrapped(plugin.id)" class="">{{ plugin.runningIntervals }}h:{{ plugin.runningIntervals  }}m:{{ plugin.runningIntervals }}s
+            <TableCell v-if="!isUnwrapped(plugin.id)" class="">{{ time(plugin.runningIntervals!).h }}h:{{ time(plugin.runningIntervals!).m }}m:{{ time(plugin.runningIntervals!).s }}s
             </TableCell>
             <TableCell v-else class=" space-y-2">
               <div class="w-4/5 flex h-6 xl:h-10 2xl:h-12 mr-4 border-3 border-input bg-input/30 rounded-lg">
@@ -339,31 +340,8 @@ const savePlugin = () => {
                   :placeholder="index"
                   :max="{h : 23, m: 59, s: 59}[index]"
                   min="0"
-                  v-model="unwrappedItem!.runningIntervals!"
+                  v-model="unwrappedIntervals![index]"
                 />
-<!--                <input-->
-<!--                  class="w-1/3 text-center text-md xl:text-2xl 2xl:text-3xl"-->
-<!--                  type="number"-->
-<!--                  placeholder="hours"-->
-<!--                  max="23"-->
-<!--                  min="0"-->
-<!--                />-->
-<!--                <input-->
-<!--                  class="w-1/3 text-center text-md xl:text-2xl 2xl:text-3xl"-->
-<!--                  type="number"-->
-<!--                  placeholder="minutes"-->
-<!--                  max="59"-->
-<!--                  min="0"-->
-<!--                />-->
-<!--                <input-->
-<!--                  class="w-1/3 text-center text-md xl:text-2xl 2xl:text-3xl"-->
-<!--                  type="number"-->
-<!--                  placeholder="seconds"-->
-<!--                  max="59"-->
-<!--                  min="0"-->
-<!--                />-->
-                <input/>
-                <input/>
               </div>
               <Transition name="fade">
                 <span class="text-destructive" v-if="!correctTime">Wrong time format</span>

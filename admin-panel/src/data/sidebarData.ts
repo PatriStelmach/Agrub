@@ -28,7 +28,7 @@ export const sidebarData = {
     },
     {
       title: "Logs",
-      url: "#",
+      url: "/logs",
       icon: IconClipboardText,
     },
     {
