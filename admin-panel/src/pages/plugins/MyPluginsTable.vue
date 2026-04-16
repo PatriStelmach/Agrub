@@ -56,6 +56,7 @@ import {
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import {ButtonGroup} from "@/components/ui/button-group";
+import {myPluginsData} from "@/data/myPlugins.ts";
 
 
 const props = defineProps<{
@@ -66,6 +67,7 @@ const emit = defineEmits<{
   'update:checked': [plugins:number[]];
   'update:search-data': [data:string]
 }>()
+
 
 const searchFilter = ref<string>("")
 const checkedPlugins = ref<number[]>([])
@@ -79,14 +81,11 @@ const allChecked = computed(() =>  props.data.length > 0 &&
 const matchedTags = computed(() => availableTags.filter(t => t.includes(tagSearch.value))
   .filter(t => !unwrappedItem.value!.tags.includes(t)))
 
-watch(checkedPlugins, (newChecked) => {
-  emit('update:checked', newChecked);
+const intervals = computed(() => {
+  return sortedData.value.map(item => {
+    item
+  })
 })
-
-
-watch(searchFilter, () => {
-  emit('update:search-data', searchFilter.value)
-}, {immediate: true})
 
 const correctTime = computed(() => {
   if(unwrappedItem.value) {
@@ -94,8 +93,15 @@ const correctTime = computed(() => {
     return  ![time.h, time.m, time.s].some( v => v < 0)
       && time.h <= 23 && time.m <= 59 && time.s <= 59
   } else { return true }
-
 })
+
+watch(checkedPlugins, (newChecked) => {
+  emit('update:checked', newChecked);
+})
+
+watch(searchFilter, () => {
+  emit('update:search-data', searchFilter.value)
+}, {immediate: true})
 
 const { sortedData, sortKey, sortOrder, toggleSort } = useSort<Plugin>(() => props.data, 'updatedAt')
 const { wrap, isUnwrapped, unwrap, originalItem, unwrappedItem, items } = useWrapping<Plugin>(sortedData)
@@ -108,16 +114,33 @@ const addTag = () => {
 }
 
 const checkAll = () => {
-  if(!allChecked.value) {
-    checkedPlugins.value = props.data.map(plugin => plugin.id);
-  }
-  else {
-    checkedPlugins.value = [];
+  !allChecked.value ?
+    checkedPlugins.value = props.data.map(plugin => plugin.id) : checkedPlugins.value = []
+}
+
+const changeStatus = () => {
+  checkedPlugins.value.forEach(p => {
+    const plugin = sortedData.value.find(s => s.id === p)
+    if(plugin)
+      plugin.on = !plugin.on
+  })
+}
+
+const time = (seconds: number) => {
+  return {
+    h:Math.floor(seconds / 3600),
+    m:Math.floor((seconds % 3600) / 60),
+    s:seconds % 60
   }
 }
 
+const check = (id: number) => {
+  checkedPlugins.value.some(p => p === id) ?
+    checkedPlugins.value = checkedPlugins.value.filter(p => p !== id) : checkedPlugins.value.push(id)
+}
+
 const savePlugin = () => {
-  wrap(false)
+  wrap(true)
   tagsListOpen.value=false
   tagSearch.value=''
   Object.values(unwrappedItem.value!.runningIntervals!).forEach(v => v === null ? 0 : true)
@@ -138,12 +161,13 @@ const savePlugin = () => {
       <ButtonGroup>
         <Button
           :disabled="blockedEdit"
-          @click="unwrap(<Plugin>sortedData.find(p => p.id === checkedPlugins[0]!))"
+          @click="unwrap(checkedPlugins[0]!)"
           variant="green_outline">
           Edit
           <IconPencilCode/>
         </Button>
         <Button
+          @click="changeStatus"
           :disabled="blockedRemoveAndChange"
           variant="yellow_outline">
           Change Status
@@ -201,10 +225,10 @@ const savePlugin = () => {
   <div class=" mt-[2vh] mx-[1%] w-98/100 relative overflow-auto max-h-[70vh] scroll-style ">
     <Table id="my-plugin-table" class="w-99/100 text-md xl:text-xl 2xl:text-4xl  mx-auto  table-fixed border-collapse border-spacing-0">
       <TableCaption class="bg-secondary border-b border-t text-foreground sticky z-9999 bottom-0 py-[1vh] text-md xl:text-xl 2xl:text-4xl rounded-lg"> Your plugins:
-        <span class="font-extrabold">{{ props.data.length}}</span>
+        <span class="font-extrabold">{{ sortedData.length}}</span>
       </TableCaption>
       <TableHeader class="h-10 ">
-      <TableRow class="bg-secondary hover:bg-secondary ">
+      <TableRow class="bg-secondary [&_th]:py-4 hover:bg-secondary ">
         <TableHead class="w-3/100  pl-0 pr-4 ">
           <IconListCheck
             class="size-[2vh] mx-3 rounded-sm
@@ -232,6 +256,7 @@ const savePlugin = () => {
             class="cursor-pointer duration-0 border-radius-0 [&_td]:py-3 hover:bg-green-500/20 "
             v-for="plugin in items"
             :key="plugin.id"
+            @click="!isUnwrapped(plugin.id) ? check(plugin.id): true; time(plugin.runningIntervals!)"
             :class="{'hover:bg-destructive/20': !plugin.on,
              'bg-selected [&_td]:align-top  sticky h-22 lg:h-24 xl:h-26 2xl:h-30 top-13 bottom-11 hover:bg-card z-9999 cursor-auto'
                     : isUnwrapped(plugin.id) }">
@@ -302,7 +327,7 @@ const savePlugin = () => {
                 </Transition>
             </TableCell>
 
-            <TableCell v-if="!isUnwrapped(plugin.id)" class="">{{ plugin.runningIntervals?.h }}h:{{ plugin.runningIntervals?.m  }}m:{{ plugin.runningIntervals?.s }}s
+            <TableCell v-if="!isUnwrapped(plugin.id)" class="">{{ plugin.runningIntervals }}h:{{ plugin.runningIntervals  }}m:{{ plugin.runningIntervals }}s
             </TableCell>
             <TableCell v-else class=" space-y-2">
               <div class="w-4/5 flex h-6 xl:h-10 2xl:h-12 mr-4 border-3 border-input bg-input/30 rounded-lg">
@@ -314,8 +339,31 @@ const savePlugin = () => {
                   :placeholder="index"
                   :max="{h : 23, m: 59, s: 59}[index]"
                   min="0"
-                  v-model="unwrappedItem!.runningIntervals![index]"
+                  v-model="unwrappedItem!.runningIntervals!"
                 />
+<!--                <input-->
+<!--                  class="w-1/3 text-center text-md xl:text-2xl 2xl:text-3xl"-->
+<!--                  type="number"-->
+<!--                  placeholder="hours"-->
+<!--                  max="23"-->
+<!--                  min="0"-->
+<!--                />-->
+<!--                <input-->
+<!--                  class="w-1/3 text-center text-md xl:text-2xl 2xl:text-3xl"-->
+<!--                  type="number"-->
+<!--                  placeholder="minutes"-->
+<!--                  max="59"-->
+<!--                  min="0"-->
+<!--                />-->
+<!--                <input-->
+<!--                  class="w-1/3 text-center text-md xl:text-2xl 2xl:text-3xl"-->
+<!--                  type="number"-->
+<!--                  placeholder="seconds"-->
+<!--                  max="59"-->
+<!--                  min="0"-->
+<!--                />-->
+                <input/>
+                <input/>
               </div>
               <Transition name="fade">
                 <span class="text-destructive" v-if="!correctTime">Wrong time format</span>

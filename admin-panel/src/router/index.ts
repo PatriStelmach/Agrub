@@ -11,7 +11,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: () => import('../pages/dashboard/LandingPage.vue'),
+      component: () => import('@/pages/alerts/AlertsPage.vue'),
     },
     {
       path: '/systems_library',

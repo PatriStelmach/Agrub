@@ -23,9 +23,9 @@ export function useWrapping<Paginable extends {id: number}>(data: Ref<Paginable[
     unwrappedItem.value = null
   }
 
-  const unwrap = (item: Paginable) => {
-    originalItem.value = item
-    unwrappedItem.value = structuredClone(toRaw(item))
+  const unwrap = (id: number) => {
+    originalItem.value = items.value.find(p => p.id === id)
+    unwrappedItem.value = structuredClone(toRaw(originalItem.value))
   }
 
   return { unwrap, unwrappedItem, originalItem, wrap, isUnwrapped, items, indexUnwrapped }

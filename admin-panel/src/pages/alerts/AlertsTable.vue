@@ -107,7 +107,7 @@ const checkAll = () => {
           class="relative cursor-pointer duration-0 h-14 lg:h-16 xl:h-18 2xl:h-22 hover:bg-chart-1/30"
           v-for="alert in sortedData"
           :key="alert.id"
-          @dblclick="unwrap(alert)"
+          @dblclick="unwrap(alert.id)"
           :class="{'bg-selected [&_td]:align-top sticky h-22 lg:h-24 xl:h-26 2xl:h-30 top-13 bottom-11 hover:bg-card z-9999'
           : isUnwrapped(alert.id)}"
         >
@@ -161,4 +161,3 @@ const checkAll = () => {
     </Table>
   </div>
 </template>
-h-14 lg:h-16 xl:h-18 2xl:h-22

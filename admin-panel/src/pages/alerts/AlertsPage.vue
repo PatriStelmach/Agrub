@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import DataTable from "@/pages/dashboard/DataTable.vue"
+import AlertsTable from "@/pages/alerts/AlertsTable.vue"
 import {dashboardData} from "@/data/dashboardData.ts"
 import {computed, ref, watch} from "vue";
 import MyPagination from "@/helpers/MyPagination.vue";
 import type {AlertObject} from "@/types/types";
 import type {Paginable} from "@/types/types.ts";
-import DashboardActions from "@/pages/dashboard/DashboardActions.vue";
+import AlertsActions from "@/pages/alerts/AlertsActions.vue";
 const currentPage = ref(1)
 const searchFilter = ref('')
 const rowsData = ref(dashboardData)
@@ -40,10 +40,10 @@ const updateSearch = (data: string) => {
 <template>
   <div>
     <h1 class="text-center my-[2vh] text-[3vh] border-b pb-[2vh] max-h-[5vh]  ">Dashboard</h1>
-    <DashboardActions class="max-h-[20vh]"
+    <AlertsActions class="max-h-[20vh]"
       @update:search-data="updateSearch"
     />
-    <DataTable
+    <AlertsTable
       :data="rowsData"
       :all="dashboardData"
     />
