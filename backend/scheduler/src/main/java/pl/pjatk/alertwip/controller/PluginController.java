@@ -43,7 +43,6 @@ public class PluginController {
     // --- addCustomPlugin ---
     @PostMapping("/add")
     public Plugin addCustomPlugin(@RequestBody Plugin plugin) {
-        plugin.setId(null);
         return pluginRepository.save(plugin);
     }
 
