@@ -1,5 +1,6 @@
 package pl.pjatk.alertwip.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import java.util.List;
 
@@ -7,6 +8,7 @@ import java.util.List;
 public class Plugin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private Long id;
 
     private String name;
@@ -52,7 +54,7 @@ public class Plugin {
     public String getLanguage() {
         return language;
     }
-    
+
 
     public String getCode() {
         return code;
