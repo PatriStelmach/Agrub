@@ -12,11 +12,11 @@ import {
 } from "@/components/ui/table";
 import {Badge} from "@/components/ui/badge";
 import {Checkbox} from "@/components/ui/checkbox";
-import type {Plugin} from "@/types/types.ts"
+import type {LibraryPlugin} from "@/types/types.ts"
 import {watch} from "vue";
 
 const props = defineProps<{
-  data: Plugin[]
+  data: LibraryPlugin[]
 }>()
 
 

@@ -187,16 +187,21 @@ input[type="checkbox"]:focus-visible
   transform: scale(1.08);
 }
 
-.scroll-style::-webkit-scrollbar {
-  background: var(--background);
-  scrollbar-width: thin;
-  scroll-behavior: smooth;
+::-webkit-scrollbar-thumb {
+  border-radius: 1rem;
 }
 
-.scroll-style::-webkit-scrollbar-corner {
-  background: var(--secondary);
+::-webkit-scrollbar-track {
+  border-radius: 1rem;
 }
-.scroll-style::-webkit-scrollbar-thumb {
+
+::-webkit-scrollbar {
+  scrollbar-width: thin;
+  scroll-behavior: smooth;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
   background: var(--sidebar-ring);
 }
 

@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import {isValidCron} from "cron-validator";
+import cronParser  from 'cron-parser';
+import cronstrue from 'cronstrue'
 import
 {
   Table,
@@ -13,7 +16,7 @@ import
 import DateCell from "@/helpers/DateCell.vue";
 import {cn} from "@/lib/utils.ts";
 import {Badge} from "@/components/ui/badge";
-import type {Plugin} from "@/types/types.ts"
+import type {MyPlugin} from "@/types/types.ts"
 import {
   IconCancel,
   IconDeviceFloppy,
@@ -22,7 +25,7 @@ import {
   IconPlus,
   IconLogs,
   IconAlertTriangleFilled,
-  IconUserEdit, IconTrash, IconDatabase, IconStatusChange, IconTerminal2, IconFileImport,
+  IconClockBolt, IconTrash, IconDatabase, IconStatusChange, IconTerminal2, IconFileImport,
   IconPencilCode
 } from "@tabler/icons-vue"
 import {computed, ref, watch} from "vue";
@@ -42,9 +45,10 @@ import {
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import {ButtonGroup} from "@/components/ui/button-group";
+import {Input} from "@/components/ui/input";
 
 const props = defineProps<{
-  data: Plugin[];
+  data: MyPlugin[];
 }>()
 
 const emit = defineEmits<{
@@ -52,41 +56,40 @@ const emit = defineEmits<{
   'update:search-data': [data:string]
 }>()
 
-const { sortedData, sortKey, sortOrder, toggleSort } = useSort<Plugin>(() => props.data, 'updatedAt')
-const { wrap, isUnwrapped, unwrap, originalItem, unwrappedItem, items } = useWrapping<Plugin>(sortedData)
+const { sortedData, sortKey, sortOrder, toggleSort } = useSort<MyPlugin>(() => props.data, 'updatedAt')
+const { wrap, isUnwrapped, unwrap, originalItem, unwrappedItem, items } = useWrapping<MyPlugin>(sortedData)
 
 const searchFilter = ref<string>("")
 const checkedPlugins = ref<number[]>([])
 const tagSearch = ref("")
 const tagsListOpen = ref(false)
-const unwrappedIntervals = ref<{id:number, h:number, m:number, s:number }>()
 
-const blockedRemoveAndChange = computed(() => {
-  return !checkedPlugins.value.length || (checkedPlugins.value.length && unwrappedItem.value)
-})
+
 const blockedEdit = computed(() => checkedPlugins.value.length !== 1)
 const existingTags = computed(() =>  unwrappedItem.value!.tags.includes(tagSearch.value))
+
+const blockedRemoveAndChange = computed(() =>
+  !checkedPlugins.value.length || (checkedPlugins.value.length && unwrappedItem.value))
+
 const allChecked = computed(() =>  props.data.length > 0 &&
   checkedPlugins.value.length === props.data.length)
+
 const matchedTags = computed(() => availableTags.filter(t => t.includes(tagSearch.value))
   .filter(t => !unwrappedItem.value!.tags.includes(t)))
 
-const intervals = computed(() => {
-  return sortedData.value.map(({ id, runningIntervals }) => ({
-    id: id,
-    h:time(runningIntervals!).h,
-    m:time(runningIntervals!).m,
-    s:time(runningIntervals!).s
-  }))
+const cronDescription = computed(() => {
+  const cron = unwrappedItem.value!.cronExpression
+  if(cron) {
+    try {
+      cronParser.parse(cron, {strict:true})
+      return [cronstrue.toString(cron), true]
+    } catch (e) {
+      return [e, false]
+    }
+  }
+  return [cron, true]
 })
 
-const correctTime = computed(() => {
-  const item = unwrappedIntervals.value
-  if (item) {
-    return item ? ![item.h, item.m, item.s].some(v => v < 0)
-      && item.h <= 23 && item.m <= 59 && item.s <= 59 : true
-  } else return true
-})
 
 watch(checkedPlugins, (newChecked) => {
   emit('update:checked', newChecked);
@@ -96,14 +99,8 @@ watch(searchFilter, () => {
   emit('update:search-data', searchFilter.value)
 }, {immediate: true})
 
-watch(unwrappedItem,(newItem) => {
-  if(newItem) {
-    unwrappedIntervals.value = intervals.value.find(i => i.id === newItem.id)
-  }
-}, {deep: true, immediate: true})
-
 const addTag = () => {
-  if(unwrappedItem.value && !existingTags.value) {
+  if(unwrappedItem.value && !existingTags.value && tagSearch.value) {
     unwrappedItem.value.tags.push(tagSearch.value)
     tagSearch.value = ''
   }
@@ -124,28 +121,17 @@ const changeStatus = () => {
   }
 }
 
-const time = (seconds: number) => {
-  return {
-    h:Math.floor(seconds / 3600),
-    m:Math.floor((seconds % 3600) / 60),
-    s:seconds % 60
-  }
-}
-
 const check = (id: number) => {
-  console.log(intervals.value)
   return checkedPlugins.value.some(p => p === id) ?
     checkedPlugins.value = checkedPlugins.value.filter(p => p !== id) : checkedPlugins.value.push(id)
 }
 
 const savePlugin = () => {
-  if(unwrappedItem.value && unwrappedIntervals.value) {
-    unwrappedItem.value.runningIntervals = unwrappedIntervals.value.h * 3600 + unwrappedIntervals.value.m * 60 + unwrappedIntervals.value.s
+  if(unwrappedItem.value) {
     wrap(true)
     tagsListOpen.value = false
     tagSearch.value = ''
   }
-
 }
 
 </script>
@@ -223,8 +209,8 @@ const savePlugin = () => {
     </ButtonGroup>
   </div>
 
-  <div class=" mt-[2vh] mx-[1%] w-98/100 relative overflow-auto max-h-[70vh] scroll-style ">
-    <Table id="my-plugin-table" class="w-99/100 text-md xl:text-xl 2xl:text-4xl  mx-auto  table-fixed border-collapse border-spacing-0">
+  <div class=" mt-[2vh] mx-[1%] w-98/100 relative overflow-auto max-h-[70vh]   ">
+    <Table id="my-plugin-table" class="w-99/100  text-md lg:text-lg xl:text-xl 2xl:text-2xl  mx-auto  table-fixed border-collapse border-spacing-0">
       <TableCaption class="bg-secondary border-b border-t text-foreground sticky z-9999 bottom-0 py-[1vh] text-md xl:text-xl 2xl:text-4xl rounded-lg"> Your plugins:
         <span class="font-extrabold">{{ sortedData.length}}</span>
       </TableCaption>
@@ -241,22 +227,22 @@ const savePlugin = () => {
           />
             </TableHead>
 
-        <SortableHead keyName="name" label="Plugin" :sort-key="sortKey" class=" w-15/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-        <SortableHead keyName="tags" label="Tags" :sort-key="sortKey" class=" w-27/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-        <SortableHead keyName="runningIntervals" label="Intervals" :sort-key="sortKey" class=" w-12/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+        <SortableHead keyName="name" label="Name" :sort-key="sortKey" class=" w-13/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+        <SortableHead keyName="tags" label="Tags" :sort-key="sortKey" class=" w-21/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+        <SortableHead keyName="cronExpression" label="Cron" :sort-key="sortKey" class=" w-21/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
         <SortableHead keyName="type" label="Type" :sort-key="sortKey" class=" w-6/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-        <SortableHead keyName="language" label="Language" :sort-key="sortKey" class=" w-7/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-        <SortableHead keyName="updatedAt" label="Last modified" :sort-key="sortKey" class=" w-16/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+        <SortableHead keyName="language" label="Language" :sort-key="sortKey" class=" w-8/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+        <SortableHead keyName="updatedAt" label="Last modified" :sort-key="sortKey" class=" w-14/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
         <SortableHead keyName="on" label="Status" :sort-key="sortKey" class=" w-7/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
         <SortableHead keyName="weight" label="Weight" :sort-key="sortKey" class="  w-7/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
           </TableRow>
         </TableHeader>
         <TableBody >
           <TableRow
-            class="cursor-pointer duration-0 border-radius-0 [&_td]:py-3 hover:bg-green-500/20 "
+            class="cursor-pointer duration-0 border-radius-0 [&_td]:py-3 [&_td]:pr-4 hover:bg-green-500/20 "
             v-for="plugin in items"
             :key="plugin.id"
-            @click="!isUnwrapped(plugin.id) ? check(plugin.id): true; time(plugin.runningIntervals!)"
+            @click="!isUnwrapped(plugin.id) ? check(plugin.id): true;"
             :class="{'hover:bg-destructive/20': !plugin.on,
              'bg-selected [&_td]:align-top  sticky h-60! lg:h-70! xl:h-80! 2xl:h-90! top-13 bottom-11 hover:bg-card z-9999 cursor-auto'
                     : isUnwrapped(plugin.id) }">
@@ -273,90 +259,95 @@ const savePlugin = () => {
             <TableCell v-if="!isUnwrapped(plugin.id)"  class=" whitespace-break-spaces">
               <Badge
                 v-for="(tag, index) in plugin.tags"
-                class="cursor-pointer hover:bg-badge mr-1 mb-2  text-sm xl:text-lg 2xl:text-4xl"
+                class="cursor-pointer hover:bg-badge mr-1 mb-2  text-sm lg:text-lg xl:text-xl 2xl:text-3xl"
                 variant="secondary"
                 :key="index"
               >{{tag}}</Badge>
             </TableCell>
             <TableCell v-else class=" whitespace-break-spaces" >
+              <Transition name="slide-fade">
+                <div v-if="tagsListOpen" class="mb-4">
+                  <InputGroup
+                    class="w-full xl:h-14 2xl:h-18  "
+                    :class="{'rounded-br-none rounded-bl-none' : matchedTags.length || tagSearch === ''}">
+                    <InputGroupInput
+                      class="text-lg! lg:text-xl! xl:text-2xl! 2xl:text-4xl!"
+                      v-model="tagSearch"
+                      type="search"
+                      @keyup.enter="addTag"
+                      @keyup.esc="tagsListOpen=!tagsListOpen"
+                      placeholder="Add new tags"/>
+                    <InputGroupAddon><IconPlus class="size-4 lg:size-6 xl:size-7 2xl:size-10 cursor-pointer" @click="addTag"/></InputGroupAddon>
+                  </InputGroup>
+                  <div class="max-h-30 w-full mb-2  overflow-y-auto border-2 border-t-0! border-input p-2 rounded-b-md" v-if="matchedTags.length ">
+                    <Badge
+                      class="cursor-pointer hover:bg-badge mr-1 mb-1  text-sm lg:text-lg xl:text-xl 2xl:text-3xl"
+                      variant="secondary"
+                      @click="unwrappedItem!.tags.push(tag); tagSearch = ''"
+                      v-for="(tag, index) in matchedTags" :key="index">{{tag}}</Badge>
+                  </div>
+                  <Transition name="fade" class="w-full">
+                  <span
+                    v-if="existingTags"
+                    class="text-sm lg:text-md xl:text-xl 2xl:text-3xl text-destructive cursor-text w-full">
+                  Tag already exists</span>
+                  </Transition>
+                </div>
+              </Transition>
                 <div class="w-full justify-between">
                   <Badge
                     v-for="(tag, index) in unwrappedItem!.tags"
-                    class="cursor-pointer hover:bg-badge mr-1 mb-2  text-sm xl:text-lg 2xl:text-4xl h-6 xl:h-10 2xl:h-12"
+                    class="cursor-pointer hover:bg-badge mr-1 mb-2  text-sm lg:text-lg xl:text-xl 2xl:text-3xl h-4 lg:h-7 xl:h-8 2xl:h-12"
                     variant="secondary"
                     :key="index"
                   >{{tag}}
                     <div>
                       <IconX
                         @click="unwrappedItem!.tags.splice(index, 1)"
-                        class="h-4 xl:h-8 2xl:h-10 hover:text-destructive">
+                        class="size-4 lg:size-5 xl:size-6 2xl:size-10 hover:text-destructive">
                       </IconX>
                     </div>
                   </Badge>
-                  <Button class="align-middle size-6 xl:size-10 2xl:size-12 "
+                  <Button class="align-middle size-6 lg:size-7 xl:size-8 2xl:size-12 "
                           :variant="tagsListOpen ? 'red_inside': 'green_inside'" @click="tagsListOpen=!tagsListOpen; tagSearch=''">
-                    <component stroke="2" class=" size-4 xl:size-8 2xl:size-10" :is=" tagsListOpen ? IconX: IconPlus" />
+                    <component stroke="2" class=" size-4 lg:size-5 xl:size-6 2xl:size-10" :is=" tagsListOpen ? IconX: IconPlus" />
                   </Button>
                 </div>
-                <Transition name="slide-fade">
-                  <div v-if="tagsListOpen">
-                    <Transition name="fade" class="w-full">
-                  <span
-                    v-if="existingTags"
-                    class="text-sm lg:text-md xl:text-xl 2xl:text-4xl text-destructive cursor-text w-full">
-                  Tag already exists</span>
-                    </Transition>
-                    <InputGroup  class="w-2/3 xl:h-14 2xl:h-18 my-2">
-                      <InputGroupInput
-                        class="text-sm lg:text-md xl:text-xl 2xl:text-4xl"
-                        v-model="tagSearch"
-                        type="search"
-                        @keyup.enter="addTag"
-                        @keyup.esc="tagsListOpen=!tagsListOpen"
-                        placeholder="Add new tags"/>
-                      <InputGroupAddon><IconPlus class="cursor-pointer" @click="addTag"/></InputGroupAddon>
-                    </InputGroup>
-                    <div class="max-h-30 w-2/3 scroll-style overflow-y-auto border-2 p-2" v-if="matchedTags.length ">
-                      <Badge
-                        class="cursor-pointer hover:bg-badge mr-1 mb-1  text-sm xl:text-lg 2xl:text-4xl"
-                        variant="secondary"
-                        @click="unwrappedItem!.tags.push(tag); tagSearch = ''"
-                        v-for="(tag, index) in matchedTags" :key="index">{{tag}}</Badge>
-                    </div>
-                  </div>
-                </Transition>
+
             </TableCell>
 
-            <TableCell v-if="!isUnwrapped(plugin.id)" class="">{{ time(plugin.runningIntervals!).h }}h:{{ time(plugin.runningIntervals!).m }}m:{{ time(plugin.runningIntervals!).s }}s
+            <TableCell v-if="!isUnwrapped(plugin.id)" class="whitespace-break-spaces">
+              {{ cronstrue.toString(plugin.cronExpression) }}
             </TableCell>
-            <TableCell v-else class=" space-y-2">
-              <div class="w-4/5 flex h-6 xl:h-10 2xl:h-12 mr-4 border-3 border-input bg-input/30 rounded-lg">
-                <input
-                  v-for="index in  ['h', 'm', 's'] as const " :key="index"
-                  class="w-1/3 text-center text-md xl:text-2xl 2xl:text-3xl"
-                  :class="{ 'border-[0_3px_0_3px] border-input' : index == 'm'}"
-                  type="number"
-                  :placeholder="index"
-                  :max="{h : 23, m: 59, s: 59}[index]"
-                  min="0"
-                  v-model="unwrappedIntervals![index]"
+            <TableCell v-else class="grid space-y-2">
+              <InputGroup class="relative w-full xl:h-14 2xl:h-18 mb-2">
+                <InputGroupInput
+                  class=" text-center text-lg! lg:text-xl! xl:text-2xl! 2xl:text-4xl!"
+                  type="text"
+                  placeholder="cron expression"
+                  v-model="unwrappedItem!.cronExpression"
                 />
-              </div>
-              <Transition name="fade">
-                <span class="text-destructive" v-if="!correctTime">Wrong time format</span>
-              </Transition>
+                <InputGroupAddon><IconClockBolt class="absolute left-4 size-4 lg:size-6 xl:size-7 2xl:size-10"/></InputGroupAddon>
+              </InputGroup>
+
+                <span
+                  class=" w-full text-center whitespace-break-spaces text-sm lg:text-lg xl:text-xl 2xl:text-3xl"
+                  :class="{'text-destructive' : !cronDescription[1]}"
+                >{{ cronDescription[0]}}</span>
+
             </TableCell>
             <TableCell v-if="!isUnwrapped(plugin.id)" class="">
               <component class="text-badge size-7 lg:size-8 xl:size-10 2xl:size-16" :class="{'text-yellow-500' : plugin.type === 'alert' }" :is="plugin.type === 'log' ? IconLogs : IconAlertTriangleFilled "/>
             </TableCell>
             <TableCell v-else class="">
-              <RadioGroup v-model="unwrappedItem!.type" :default-value="plugin.type">
-                <div class="flex items-center space-x-2">
-                  <RadioGroupItem id=radio-log value="log" />
-                  <Label class="cursor-pointer" for="radio-log">log</Label>
+              <RadioGroup v-model="unwrappedItem!.type" :default-value="plugin.type"
+                          class=" **:text-lg **:lg:text-xl **:xl:text-2xl **:2xl:text-3xl">
+                <div class="flex items-center space-x-2 ">
+                  <RadioGroupItem class="size-4 lg:size-5 xl:size-6 2xl:size-8" id=radio-log value="log" />
+                  <Label class="cursor-pointer " for="radio-log">log</Label>
                 </div>
                 <div class="flex items-center space-x-2">
-                  <RadioGroupItem id="radio-alert" value="alert" />
+                  <RadioGroupItem class="size-4 lg:size-5 xl:size-6 2xl:size-8" id="radio-alert" value="alert" />
                   <Label class="cursor-pointer" for="radio-alert">alert</Label>
                 </div>
               </RadioGroup>
@@ -381,25 +372,26 @@ const savePlugin = () => {
                 class="size-7 lg:size-8 xl:size-10 2xl:size-16"
               />
             </TableCell>
-            <DateCell v-if="plugin.updatedAt" :date="plugin.updatedAt"></DateCell>
+            <DateCell class=" text-md lg:text-lg xl:text-xl 2xl:text-2xl " v-if="plugin.updatedAt" :date="plugin.updatedAt"></DateCell>
             <TableCell v-if="!isUnwrapped(plugin.id)" class=" text-green-500" :class="{'text-destructive' : !plugin.on}">{{ plugin.on ? 'On' : 'Off'}}</TableCell>
             <TableCell v-else class="">
               <RadioGroup
                 @update:model-value="unwrappedItem!.on = $event === 'on'"
                 :model-value="unwrappedItem!.on ? 'on' : 'off'"
-                :default-value="plugin.on ? 'on' : 'off'">
+                :default-value="plugin.on ? 'on' : 'off'"
+                class=" **:text-lg **:lg:text-xl **:xl:text-2xl **:2xl:text-3xl">
                 <div class="flex items-center space-x-2">
-                  <RadioGroupItem id=radio-on value="on" />
+                  <RadioGroupItem class="size-4 lg:size-5 xl:size-6 2xl:size-8" id=radio-on value="on" />
                   <Label class="cursor-pointer text-green-500"  for="radio-on">On</Label>
                 </div>
                 <div class="flex items-center space-x-2">
-                  <RadioGroupItem id="radio-off" value="off" />
+                  <RadioGroupItem class="size-4 lg:size-5 xl:size-6 2xl:size-8" id="radio-off" value="off" />
                   <Label class="cursor-pointer text-destructive" for="radio-off">Off</Label>
                 </div>
               </RadioGroup>
 
             </TableCell>
-            <TableCell class="">{{plugin.weight}} KB</TableCell>
+            <TableCell class=" text-md lg:text-lg xl:text-xl 2xl:text-2xl ">{{plugin.weight}} KB</TableCell>
             <Button
               v-if="isUnwrapped(plugin.id)"
               @click="wrap(false); tagsListOpen=false; tagSearch=''; checkAll"

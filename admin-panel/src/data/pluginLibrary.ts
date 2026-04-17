@@ -1,5 +1,5 @@
-import type {Plugin} from "@/types/types"
-export const pluginLibraryData: Plugin[] = [
+import type {LibraryPlugin} from "@/types/types"
+export const pluginLibraryData: LibraryPlugin[] = [
   {
     id: 1,
     name: "System Monitor",

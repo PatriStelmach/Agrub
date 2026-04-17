@@ -26,7 +26,7 @@ import {computed, ref, watch} from "vue";
 import {Badge} from "@/components/ui/badge";
 import MyPagination from "@/helpers/MyPagination.vue";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
-import type { Plugin } from "@/types/types.ts";
+import type { MyPlugin } from "@/types/types.ts";
 import type {Paginable} from "@/types/types.ts";
 import MyPluginsActions from "@/pages/plugins/MyPluginsActions.vue";
 
@@ -39,7 +39,7 @@ const filteredData = computed(() => {
   if(!searchFilter.value) {
     return myPluginsData;
   }
-  return myPluginsData.filter((item) =>
+  return myPluginsData.filter((item: MyPlugin) =>
     item.name.toLowerCase().includes(searchFilter.value.toLowerCase())) ;
 })
 
@@ -48,7 +48,7 @@ watch(searchFilter, () => {
 })
 
 const updateData = (data:Paginable[]) => {
-  rowsData.value = data as Plugin[]
+  rowsData.value = data as MyPlugin[]
 }
 const updateSearchData = (data: string) => {
   searchFilter.value = data.trim()

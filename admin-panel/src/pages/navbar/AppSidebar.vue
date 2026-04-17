@@ -37,7 +37,7 @@ import { usersData } from "@/data/usersData.ts";
         </SidebarMenuItem>
       </SidebarMenu>
     </SidebarHeader>
-    <SidebarContent class="bg-card max-h-[40vh] oveflow-auto scroll-style">
+    <SidebarContent class="bg-card max-h-[40vh] oveflow-auto  ">
       <NavMain :items="sidebarData.navMain" />
       <NavDocuments :items="sidebarData.documents" />
     </SidebarContent>

@@ -32,22 +32,34 @@ export interface User
   avatar?: string | File
 }
 
-export interface Plugin
+export interface MyPlugin
 {
   id: number,
   name: string,
   creator: string,
   language: "python" | "bash" | "PowerShell",
-  description?: string,
+  description: string,
   code: string,
   weight: number,
-  createdAt?: Date,
   tags: string[]
-  cron?: string
-  addedAt?: Date,
-  updatedAt?: Date,
-  on?: boolean,
-  type?: "log" | "alert"
+  cronExpression: string
+  updatedAt: Date,
+  on: boolean,
+  type: "log" | "alert"
+}
+
+export interface LibraryPlugin
+{
+  id: number,
+  name: string,
+  creator: string,
+  language: "python" | "bash" | "PowerShell",
+  description: string,
+  code: string,
+  weight: number,
+  createdAt: Date,
+  tags: string[],
+  type: "log" | "alert"
 }
 
 
@@ -67,4 +79,4 @@ export interface fileType
   progress:number
 }
 
-export type Paginable = Plugin | AlertObject;
+export type Paginable = MyPlugin | AlertObject;

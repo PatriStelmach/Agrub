@@ -77,7 +77,7 @@ const checkAll = () => {
 </script>
 
 <template>
-  <div class=" mt-[2vh] mx-[1%] w-98/100 relative overflow-auto max-h-[70vh] scroll-style ">
+  <div class=" mt-[2vh] mx-[1%] w-98/100 relative overflow-auto max-h-[70vh]   ">
     <Table id="alert-table" class="w-99/100 text-md xl:text-xl 2xl:text-4xl  mx-auto  table-fixed">
       <TableCaption class="bg-secondary border-b border-t text-foreground sticky z-9999 bottom-0 py-[1vh] text-md xl:text-xl 2xl:text-4xl">Current Alerts:
         <span class="font-extrabold">{{ props.all.length}}</span>

@@ -10,13 +10,13 @@ import {
 import {ArrowLeftIcon, Search} from "lucide-vue-next";
 import {ButtonGroup} from "@/components/ui/button-group";
 import {Button} from "@/components/ui/button";
-import type {Plugin} from "@/types/types.ts"
+import type {LibraryPlugin} from "@/types/types.ts"
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
 import type {Paginable} from "@/types/types.ts";
 
 const currentPage = ref<number>(1)
 const searchFilter = ref('')
-const rowsData = ref<Plugin[]>(pluginLibraryData)
+const rowsData = ref<LibraryPlugin[]>(pluginLibraryData)
 
 
 watch(searchFilter, () =>
@@ -26,7 +26,7 @@ watch(searchFilter, () =>
 
 const updateData = (data:Paginable[]) =>
 {
-  rowsData.value = data as Plugin[]
+  rowsData.value = data as LibraryPlugin[]
 }
 
 const updatePage = (page: number) =>

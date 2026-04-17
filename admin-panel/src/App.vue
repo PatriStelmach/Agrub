@@ -21,7 +21,7 @@ import TopRightButtons from "@/pages/globals/topRightButtons.vue";
       <SidebarProvider class="w-auto min-h-0">
         <AppSidebar class="bg-card" variant="inset" />
       </SidebarProvider>
-      <RouterView class="bg-background  border rounded-2xl flex-1 overflow-auto scroll-style " />
+      <RouterView class="bg-background  border rounded-2xl flex-1 overflow-auto   " />
     </main>
   </div>
 

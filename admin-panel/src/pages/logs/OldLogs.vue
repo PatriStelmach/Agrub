@@ -28,9 +28,9 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<LogObject>(() => 
           />
         </TableHead>
 
-        <SortableHead keyName="name" label="Plugin" :sort-key="sortKey" class=" w-11/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+        <SortableHead keyName="name" label="Name" :sort-key="sortKey" class=" w-11/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
         <SortableHead keyName="tags" label="Tags" :sort-key="sortKey" class=" w-22/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-        <SortableHead keyName="runningIntervals" label="Intervals" :sort-key="sortKey" class=" w-11/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+        <SortableHead keyName="cronExpression" label="Intervals" :sort-key="sortKey" class=" w-11/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
         <SortableHead keyName="type" label="Type" :sort-key="sortKey" class=" w-6/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
         <SortableHead keyName="language" label="Language" :sort-key="sortKey" class=" w-7/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
         <SortableHead keyName="updatedAt" label="Last modified" :sort-key="sortKey" class=" w-15/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
