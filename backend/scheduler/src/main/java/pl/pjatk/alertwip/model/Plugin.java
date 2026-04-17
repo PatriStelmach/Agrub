@@ -15,6 +15,13 @@ public class Plugin {
 
     private boolean isActive;
 
+    @Column(columnDefinition = "TEXT")
+    private String code;
+
+    @ElementCollection
+    private List<String> tags;
+
+
     public boolean isActive() {
         return isActive;
     }
@@ -22,12 +29,6 @@ public class Plugin {
     public void setActive(boolean active) {
         isActive = active;
     }
-
-    @Column(columnDefinition = "TEXT")
-    private String code;
-
-    @ElementCollection
-    private List<String> tags;
 
     public Long getId() {
         return id;
