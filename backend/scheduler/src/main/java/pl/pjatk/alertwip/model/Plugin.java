@@ -10,7 +10,9 @@ public class Plugin {
     private Long id;
 
     private String name;
+    @Column(updatable = false)
     private String creator;
+    @Column(updatable = false)
     private String language; // "py", "ps", "sh"
 
     private boolean isActive;
