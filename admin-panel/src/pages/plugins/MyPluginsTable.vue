@@ -241,15 +241,14 @@ const savePlugin = () => {
           />
             </TableHead>
 
-        <SortableHead keyName="name" label="Plugin" :sort-key="sortKey" class=" w-11/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-        <SortableHead keyName="tags" label="Tags" :sort-key="sortKey" class=" w-22/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-        <SortableHead keyName="runningIntervals" label="Intervals" :sort-key="sortKey" class=" w-11/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+        <SortableHead keyName="name" label="Plugin" :sort-key="sortKey" class=" w-15/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+        <SortableHead keyName="tags" label="Tags" :sort-key="sortKey" class=" w-27/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+        <SortableHead keyName="runningIntervals" label="Intervals" :sort-key="sortKey" class=" w-12/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
         <SortableHead keyName="type" label="Type" :sort-key="sortKey" class=" w-6/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
         <SortableHead keyName="language" label="Language" :sort-key="sortKey" class=" w-7/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-        <SortableHead keyName="updatedAt" label="Last modified" :sort-key="sortKey" class=" w-15/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-        <SortableHead keyName="lastModifiedBy" label="Modified by" :sort-key="sortKey" class=" w-13/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-        <SortableHead keyName="on" label="Status" :sort-key="sortKey" class=" w-6/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-        <SortableHead keyName="weight" label="Weight" :sort-key="sortKey" class="  w-6/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+        <SortableHead keyName="updatedAt" label="Last modified" :sort-key="sortKey" class=" w-16/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+        <SortableHead keyName="on" label="Status" :sort-key="sortKey" class=" w-7/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+        <SortableHead keyName="weight" label="Weight" :sort-key="sortKey" class="  w-7/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
           </TableRow>
         </TableHeader>
         <TableBody >
@@ -348,7 +347,7 @@ const savePlugin = () => {
               </Transition>
             </TableCell>
             <TableCell v-if="!isUnwrapped(plugin.id)" class="">
-              <component class="text-badge size-7" :class="{'text-yellow-500' : plugin.type === 'alert' }" :is="plugin.type === 'log' ? IconLogs : IconAlertTriangleFilled "/>
+              <component class="text-badge size-7 lg:size-8 xl:size-10 2xl:size-16" :class="{'text-yellow-500' : plugin.type === 'alert' }" :is="plugin.type === 'log' ? IconLogs : IconAlertTriangleFilled "/>
             </TableCell>
             <TableCell v-else class="">
               <RadioGroup v-model="unwrappedItem!.type" :default-value="plugin.type">
@@ -367,23 +366,22 @@ const savePlugin = () => {
                 v-if="plugin.language === 'python'"
                 alt="python_icon"
                 src="@/components/icons/python_icon.png"
-                class="size-6 lg:size-8 xl:size-10 2xl:size-16"
+                class="size-7 lg:size-8 xl:size-10 2xl:size-16"
               />
               <img
                 v-if="plugin.language === 'bash'"
                 alt="bash_icon"
                 src="@/components/icons/bash_icon.png"
-                class="size-6 lg:size-8 xl:size-10 2xl:size-16"
+                class="size-7 lg:size-8 xl:size-10 2xl:size-16"
               />
               <img
                 v-if="plugin.language === 'PowerShell'"
                 alt="powershell_icon"
                 src="@/components/icons/powershell_icon.png"
-                class="size-6 lg:size-8 xl:size-10 2xl:size-16"
+                class="size-7 lg:size-8 xl:size-10 2xl:size-16"
               />
             </TableCell>
             <DateCell v-if="plugin.updatedAt" :date="plugin.updatedAt"></DateCell>
-            <TableCell><div class="flex items-center gap-x-2 "><IconUserEdit stroke="1.5"/> {{ plugin.lastModifiedBy}}</div></TableCell>
             <TableCell v-if="!isUnwrapped(plugin.id)" class=" text-green-500" :class="{'text-destructive' : !plugin.on}">{{ plugin.on ? 'On' : 'Off'}}</TableCell>
             <TableCell v-else class="">
               <RadioGroup
