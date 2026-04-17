@@ -48,17 +48,11 @@ public class Plugin {
         return creator;
     }
 
-    public void setCreator(String creator) {
-        this.creator = creator;
-    }
 
     public String getLanguage() {
         return language;
     }
-
-    public void setLanguage(String language) {
-        this.language = language;
-    }
+    
 
     public String getCode() {
         return code;
