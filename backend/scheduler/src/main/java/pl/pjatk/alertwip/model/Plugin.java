@@ -11,6 +11,8 @@ public class Plugin {
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private Long id;
 
+    private boolean isLog;
+
     private String name;
     @Column(updatable = false)
     private String creator;
@@ -25,6 +27,14 @@ public class Plugin {
     @ElementCollection
     private List<String> tags;
 
+
+    public boolean isLog() {
+        return isLog;
+    }
+
+    public void setLog(boolean log) {
+        isLog = log;
+    }
 
     public boolean isActive() {
         return isActive;

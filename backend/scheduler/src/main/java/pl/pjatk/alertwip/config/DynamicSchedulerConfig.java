@@ -3,15 +3,14 @@ package pl.pjatk.alertwip.config;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
-import org.springframework.scheduling.config.CronTask;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.scheduling.support.CronTrigger;
 import pl.pjatk.alertwip.model.ScheduledTask;
 import pl.pjatk.alertwip.repository.ScheduledTaskRepository;
 import pl.pjatk.alertwip.service.PythonScriptService;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 
 @Configuration
@@ -21,8 +20,7 @@ public class DynamicSchedulerConfig implements SchedulingConfigurer {
     private final PythonScriptService pythonService;
     private final TaskScheduler taskScheduler;
 
-    // Mapa przechowująca zaplanowane zadania, aby móc je anulować/aktualizować
-    private final Map<Long, ScheduledFuture<?>> scheduledTasks = new HashMap<>();
+    private final Map<Long, ScheduledFuture<?>> scheduledTasks = new ConcurrentHashMap<>();
 
     public DynamicSchedulerConfig(ScheduledTaskRepository repository,
                                   PythonScriptService pythonService,
@@ -34,44 +32,44 @@ public class DynamicSchedulerConfig implements SchedulingConfigurer {
 
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
-        // Ustawiamy egzekutor dla zadań planowanych
         taskRegistrar.setScheduler(taskScheduler);
-
-        // Uruchamiamy proces odświeżania zadań z bazy danych
-        refreshSchedule();
+        // Przy starcie aplikacji ładujemy wszystkie aktywne zadania raz
+        loadAllActiveTasks();
     }
 
-    // Metoda wywoływana cyklicznie (np. co 60 sekund), aby sprawdzić zmiany w bazie
-    @org.springframework.scheduling.annotation.Scheduled(fixedRate = 60000)
-    public void refreshSchedule() {
-        var tasksFromDb = repository.findByActiveTrue();
+    private void loadAllActiveTasks() {
+        repository.findByActiveTrue().forEach(this::updateSchedule);
+    }
 
-        // Usuwamy zadania, które zostały wyłączone w bazie
-        scheduledTasks.keySet().removeIf(taskId -> {
-            boolean stillActive = tasksFromDb.stream().anyMatch(t -> t.getId().equals(taskId));
-            if (!stillActive) {
-                scheduledTasks.get(taskId).cancel(false);
-                System.out.println("Zadanie ID: " + taskId + " zostało usunięte z harmonogramu.");
-                return true;
-            }
-            return false;
-        });
+    /**
+     * Główna metoda wywoływana przez kontroler po dodaniu lub edycji zadania.
+     */
+    public void updateSchedule(ScheduledTask task) {
+        stopTask(task.getId());
 
-        // Dodajemy nowe zadania lub aktualizujemy istniejące
-        for (ScheduledTask task : tasksFromDb) {
-            if (!scheduledTasks.containsKey(task.getId())) {
-                scheduleTask(task);
+        if (task.isActive() && task.getCronExpression() != null) {
+            try {
+                ScheduledFuture<?> future = taskScheduler.schedule(
+                        () -> pythonService.runScript(task),
+                        new CronTrigger(task.getCronExpression())
+                );
+                scheduledTasks.put(task.getId(), future);
+                System.out.println("[SCHEDULER] Zaplanowano/Zaktualizowano: " + task.getTaskName());
+            } catch (Exception e) {
+                System.err.println("[SCHEDULER] Błąd CRON w zadaniu " + task.getId() + ": " + e.getMessage());
             }
         }
     }
 
-    private void scheduleTask(ScheduledTask task) {
-        ScheduledFuture<?> future = taskScheduler.schedule(
-                () -> pythonService.runScript(task),
-                new org.springframework.scheduling.support.CronTrigger(task.getCronExpression())
-        );
-
-        scheduledTasks.put(task.getId(), future);
-        System.out.println("Zaplanowano zadanie: " + task.getTaskName() + " (Cron: " + task.getCronExpression() + ")");
+    /**
+     * Metoda wywoływana przy usuwaniu zadania lub wyłączaniu go.
+     */
+    public void stopTask(Long taskId) {
+        ScheduledFuture<?> future = scheduledTasks.get(taskId);
+        if (future != null) {
+            future.cancel(false);
+            scheduledTasks.remove(taskId);
+            System.out.println("[SCHEDULER] Zatrzymano zadanie ID: " + taskId);
+        }
     }
 }

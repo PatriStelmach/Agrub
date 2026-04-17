@@ -11,6 +11,15 @@ public class ScheduledTask {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    public boolean isLog() {
+        return isLog;
+    }
+
+    public void setLog(boolean log) {
+        isLog = log;
+    }
+
+    private boolean isLog;
     public boolean isActive() {
         return active;
     }
