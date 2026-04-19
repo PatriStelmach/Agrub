@@ -65,6 +65,14 @@ class MainApp extends StatelessWidget {
 
 T0D0:
 
+ASAP
+1. Finalizacja alertu dla Androida ( screen, overlay Navigatorem)
+2. Mockup pushowania alertów
+3. Logika alarmu przy nowym extreme
+4. Mockup skryptów
+5. Nowe skrypty push, logika uruchamiania ( przygotować repo na podpięcie)
+
+
 App Theme:
 - odpicowanie elementów stałych, żeby nie wyglądały tak szkolnie
 - uporządkowanie obramowań containerów/usunięcie jak będzie lepiej
@@ -80,8 +88,7 @@ Login screen/authorization screen?
 - Layout
 - przygotowanie logiki pod autoryzację z serwerem
 
-Alerts Screen:
-- filtrowanie po severity itp. 
+
 
 Propozycja finalnego układu folderów i plików w MVVM, wprwoadzać według potrzeb rozwoju
 lib/data/models z modelami
