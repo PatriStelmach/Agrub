@@ -12,7 +12,6 @@ import {ButtonGroup} from "@/components/ui/button-group";
 import {Button} from "@/components/ui/button";
 import type {LibraryPlugin} from "@/types/types.ts"
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
-import type {Paginable} from "@/types/types.ts";
 
 const currentPage = ref<number>(1)
 const searchFilter = ref('')
@@ -24,7 +23,7 @@ watch(searchFilter, () =>
   currentPage.value = 1
 })
 
-const updateData = (data:Paginable[]) =>
+const updateData = (data:LibraryPlugin[]) =>
 {
   rowsData.value = data as LibraryPlugin[]
 }

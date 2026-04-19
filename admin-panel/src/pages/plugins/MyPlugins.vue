@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" >
 import MyPluginsTable from "@/pages/plugins/MyPluginsTable.vue";
 import {myPluginsData} from "@/data/myPlugins.ts";
 import {ArrowLeftIcon, Search} from 'lucide-vue-next'
@@ -27,7 +27,6 @@ import {Badge} from "@/components/ui/badge";
 import MyPagination from "@/helpers/MyPagination.vue";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
 import type { MyPlugin } from "@/types/types.ts";
-import type {Paginable} from "@/types/types.ts";
 import MyPluginsActions from "@/pages/plugins/MyPluginsActions.vue";
 
 const currentPage = ref<number>(1)
@@ -47,7 +46,7 @@ watch(searchFilter, () => {
   currentPage.value = 1
 })
 
-const updateData = (data:Paginable[]) => {
+const updateData = (data:MyPlugin[]) => {
   rowsData.value = data as MyPlugin[]
 }
 const updateSearchData = (data: string) => {

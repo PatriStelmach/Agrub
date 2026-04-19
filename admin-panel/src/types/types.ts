@@ -44,8 +44,18 @@ export interface MyPlugin
   tags: string[]
   cronExpression: string
   updatedAt: Date,
-  on: boolean,
-  type: "log" | "alert"
+  active: boolean,
+  log: boolean
+}
+
+export interface ImportPlugin {
+  name: string,
+  creator: string,
+  language: "python" | "bash" | "PowerShell",
+  code: string,
+  description: string,
+  tags: string[],
+  log: boolean
 }
 
 export interface LibraryPlugin
@@ -55,11 +65,11 @@ export interface LibraryPlugin
   creator: string,
   language: "python" | "bash" | "PowerShell",
   description: string,
-  code: string,
+  code?: string,
   weight: number,
   createdAt: Date,
   tags: string[],
-  type: "log" | "alert"
+  log?: boolean
 }
 
 
@@ -79,4 +89,3 @@ export interface fileType
   progress:number
 }
 
-export type Paginable = MyPlugin | AlertObject;

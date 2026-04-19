@@ -1,9 +1,9 @@
 import {computed, type Ref, ref, toRaw} from "vue";
 
-export function useWrapping<Paginable extends {id: number}>(data: Ref<Paginable[]>) {
+export function useWrapping<T extends {id: number}>(data: Ref<T[]>) {
 
-  const unwrappedItem = ref<Paginable | null>(null)
-  const originalItem = ref<Paginable | null>(null)
+  const unwrappedItem = ref<T | null>(null)
+  const originalItem = ref<T | null>(null)
   const items = computed(() =>  data.value)
 
   const indexUnwrapped = computed(() => {

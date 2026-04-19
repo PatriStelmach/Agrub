@@ -9,10 +9,10 @@ export const myPluginsData: MyPlugin[] = [
     description: "A simple bash script that runs in a loop and outputs iteration messages.",
     cronExpression: "* */10 * * * 1-5",
     updatedAt: new Date(2025, 0, 22, 12, 20),
-    on: true,
+    active: true,
     weight: 5,
     tags: ["shell", "scripting"],
-    type: "log"
+    log: true
   },
   {
     id: 2,
@@ -23,10 +23,10 @@ export const myPluginsData: MyPlugin[] = [
     description: "Python-based system monitor that tracks CPU usage and alerts when thresholds are exceeded.",
     cronExpression: "* */5 * * * *",
     updatedAt: new Date(2025, 11, 10, 14, 30),
-    on: true,
+    active: true,
     weight: 8,
     tags: ["python", "monitoring", "performance"],
-    type: "alert"
+    log: false
   },
   {
     id: 3,
@@ -37,10 +37,10 @@ export const myPluginsData: MyPlugin[] = [
     description: "Express.js service providing health check endpoints for monitoring system status.",
     cronExpression: "0 0 12 * * 1-5",
     updatedAt: new Date(2025, 10, 5, 16, 45),
-    on: true,
+    active: true,
     weight: 7,
     tags: ["nodejs", "service", "api", "web"],
-    type: "log"
+    log: true
   },
   {
     id: 4,
@@ -51,10 +51,10 @@ export const myPluginsData: MyPlugin[] = [
     description: "Monitors running Docker containers and reports their status for orchestration purposes.",
     cronExpression: "10 1 */2 * * *",
     updatedAt: new Date(2025, 9, 18, 10, 25),
-    on: false,
+    active: false,
     weight: 9,
     tags: ["docker", "containers", "orchestration", "devops", "monitoring"],
-    type: "alert"
+    log: false
   },
   {
     id: 5,
@@ -65,10 +65,10 @@ export const myPluginsData: MyPlugin[] = [
     description: "Analyzes system logs for patterns and anomalies, detecting error frequencies.",
     cronExpression: "*/30 * * * * *",
     updatedAt: new Date(2025, 8, 25, 15, 50),
-    on: true,
+    active: true,
     weight: 6,
     tags: ["logs", "analytics", "monitoring", "elasticsearch", "kibana"],
-    type: "log"
+    log: true
   },
   {
     id: 6,
@@ -79,10 +79,10 @@ export const myPluginsData: MyPlugin[] = [
     description: "Monitors CPU load percentage and triggers alerts when usage exceeds safe thresholds.",
     cronExpression: "* */2 * * * *",
     updatedAt: new Date(2025, 7, 14, 9, 15),
-    on: false,
+    active: false,
     weight: 4,
     tags: ["cpu", "performance", "monitoring", "metrics"],
-    type: "alert"
+    log: false
   },
   {
     id: 7,
@@ -93,10 +93,10 @@ export const myPluginsData: MyPlugin[] = [
     description: "Checks RAM usage and reports memory consumption statistics for system performance.",
     cronExpression: "0 8 * * * *",
     updatedAt: new Date(2025, 6, 30, 11, 40),
-    on: true,
+    active: true,
     weight: 5,
     tags: ["memory", "ram", "monitoring", "performance", "metrics"],
-    type: "alert"
+    log: false
   },
   {
     id: 8,
@@ -107,10 +107,10 @@ export const myPluginsData: MyPlugin[] = [
     description: "Scans network ports on specified hosts to detect open services and security issues.",
     cronExpression: "* */10 * * * *",
     updatedAt: new Date(2025, 0, 1, 8, 30),
-    on: true,
+    active: true,
     weight: 7,
     tags: ["network", "security", "scanning", "ports"],
-    type: "log"
+    log: true
   },
   {
     id: 9,
@@ -121,10 +121,10 @@ export const myPluginsData: MyPlugin[] = [
     description: "Monitors disk usage across all drives and alerts when available space runs low.",
     cronExpression: "* */10 * * * *",
     updatedAt: new Date(2025, 11, 20, 17, 25),
-    on: true,
+    active: true,
     weight: 6,
     tags: ["disk", "storage", "monitoring", "performance", "filesystem"],
-    type: "alert"
+    log: false
   },
   {
     id: 10,
@@ -135,10 +135,10 @@ export const myPluginsData: MyPlugin[] = [
     description: "Watches running processes and reports their CPU and memory usage in real-time.",
     cronExpression: "*/15 * * * * *",
     updatedAt: new Date(2025, 0, 15, 13, 10),
-    on: false,
+    active: false,
     weight: 3,
     tags: ["process", "system", "monitoring", "performance", "psutil"],
-    type: "log"
+    log: true
   },
   {
     id: 11,
@@ -149,10 +149,10 @@ export const myPluginsData: MyPlugin[] = [
     description: "Audits file changes in critical directories for security compliance and integrity verification.",
     cronExpression: "0 2 * * 1 *",
     updatedAt: new Date(2025, 10, 12, 14, 45),
-    on: false,
+    active: false,
     weight: 8,
     tags: ["security", "audit", "filesystem", "compliance", "integrity"],
-    type: "log"
+    log: true
   },
   {
     id: 12,
@@ -163,10 +163,10 @@ export const myPluginsData: MyPlugin[] = [
     description: "Checks system health endpoints and reports uptime status for critical services.",
     cronExpression: "10 30 * * * 1-5",
     updatedAt: new Date(2025, 11, 15, 10, 20),
-    on: true,
+    active: true,
     weight: 9,
     tags: ["health", "monitoring", "status", "uptime"],
-    type: "alert"
+    log: false
   },
   {
     id: 13,
@@ -177,10 +177,10 @@ export const myPluginsData: MyPlugin[] = [
     description: "Tracks SSL certificate expiration dates and alerts before certificates expire.",
     cronExpression: "0 6 * * * 1-7",
     updatedAt: new Date(2025, 10, 20, 14, 30),
-    on: true,
+    active: true,
     weight: 7,
     tags: ["ssl", "certificate", "security", "expiry"],
-    type: "alert"
+    log: false
   },
   {
     id: 14,
@@ -191,10 +191,10 @@ export const myPluginsData: MyPlugin[] = [
     description: "Catches and logs application errors and exceptions from error log files.",
     cronExpression: "*/5 * * * * *",
     updatedAt: new Date(2025, 0, 5, 16, 45),
-    on: true,
+    active: true,
     weight: 8,
     tags: ["errors", "exceptions", "debugging", "logging"],
-    type: "alert"
+    log: false
   },
   {
     id: 15,
@@ -205,10 +205,10 @@ export const myPluginsData: MyPlugin[] = [
     description: "Logs user access and authentication events for security auditing.",
     cronExpression: "* * */3 * * *",
     updatedAt: new Date(2025, 11, 8, 13, 20),
-    on: true,
+    active: true,
     weight: 6,
     tags: ["access", "auth", "login", "security"],
-    type: "log"
+    log: true
   },
   {
     id: 16,
@@ -219,10 +219,10 @@ export const myPluginsData: MyPlugin[] = [
     description: "Connects to PostgreSQL databases and monitors connection pool status.",
     cronExpression: "0 9 * * * 1",
     updatedAt: new Date(2025, 0, 18, 9, 10),
-    on: true,
+    active: true,
     weight: 5,
     tags: ["database", "connection", "pool", "postgres"],
-    type: "alert"
+    log: false
   },
   {
     id: 17,
@@ -233,10 +233,10 @@ export const myPluginsData: MyPlugin[] = [
     description: "Watches message queue depths in RabbitMQ and monitors async processing.",
     cronExpression: "* */15 * * * *",
     updatedAt: new Date(2025, 11, 25, 15, 30),
-    on: false,
+    active: false,
     weight: 7,
     tags: ["queue", "messaging", "rabbitmq", "async"],
-    type: "log"
+    log: true
   },
   {
     id: 18,
@@ -247,10 +247,10 @@ export const myPluginsData: MyPlugin[] = [
     description: "Schedules and executes automated backups of important data to storage.",
     cronExpression: "0 3 * * 10 *",
     updatedAt: new Date(2025, 0, 10, 12, 45),
-    on: true,
+    active: true,
     weight: 9,
     tags: ["backup", "storage", "restore", "schedule"],
-    type: "log"
+    log: true
   },
   {
     id: 19,
@@ -261,10 +261,10 @@ export const myPluginsData: MyPlugin[] = [
     description: "Proxies and monitors API requests through a central gateway for routing.",
     cronExpression: "* */30 * * * *",
     updatedAt: new Date(2025, 11, 30, 10, 25),
-    on: true,
+    active: true,
     weight: 8,
     tags: ["api", "gateway", "proxy", "rest"],
-    type: "alert"
+    log: false
   },
   {
     id: 20,
@@ -275,10 +275,10 @@ export const myPluginsData: MyPlugin[] = [
     description: "Aggregates application metrics and exports them for Prometheus monitoring.",
     cronExpression: "0 12 * * * 1-5",
     updatedAt: new Date(2025, 0, 20, 14, 15),
-    on: true,
+    active: true,
     weight: 6,
     tags: ["metrics", "aggregation", "prometheus", "grafana"],
-    type: "log"
+    log: true
   },
   {
     id: 21,
@@ -289,10 +289,10 @@ export const myPluginsData: MyPlugin[] = [
     description: "Manages user sessions and generates JWT tokens for authentication across services.",
     cronExpression: "* * */4 * * 1-5",
     updatedAt: new Date(2025, 0, 22, 16, 30),
-    on: false,
+    active: false,
     weight: 7,
     tags: ["session", "auth", "token", "jwt"],
-    type: "log"
+    log: true
   },
   {
     id: 22,
@@ -303,10 +303,10 @@ export const myPluginsData: MyPlugin[] = [
     description: "Limits API request rates per user to prevent abuse and ensure fair usage.",
     cronExpression: "*/20 * * * * 3",
     updatedAt: new Date(2025, 0, 24, 12, 10),
-    on: true,
+    active: true,
     weight: 8,
     tags: ["rate", "limit", "throttle", "api"],
-    type: "alert"
+    log: false
   },
   {
     id: 23,
@@ -317,10 +317,10 @@ export const myPluginsData: MyPlugin[] = [
     description: "Preloads frequently accessed data into Redis cache for improved performance.",
     cronExpression: "0 5 * * * */2",
     updatedAt: new Date(2025, 0, 26, 15, 45),
-    on: true,
+    active: true,
     weight: 5,
     tags: ["cache", "redis", "prefetch", "performance"],
-    type: "log"
+    log: true
   },
   {
     id: 24,
@@ -331,10 +331,10 @@ export const myPluginsData: MyPlugin[] = [
     description: "Distributes incoming traffic across multiple servers to balance load efficiently.",
     cronExpression: "0 18 * * 5 3",
     updatedAt: new Date(2025, 0, 28, 9, 20),
-    on: true,
+    active: true,
     weight: 9,
     tags: ["load", "balancer", "distribution", "traffic"],
-    type: "alert"
+    log: false
   },
   {
     id: 25,
@@ -345,10 +345,10 @@ export const myPluginsData: MyPlugin[] = [
     description: "Tracks all system events and user actions for compliance and security auditing.",
     cronExpression: "0 1 * * * *",
     updatedAt: new Date(2025, 0, 30, 11, 30),
-    on: true,
+    active: true,
     weight: 7,
     tags: ["audit", "compliance", "tracking", "logging"],
-    type: "log"
+    log: true
   },
   {
     id: 26,
@@ -359,9 +359,9 @@ export const myPluginsData: MyPlugin[] = [
     description: "Routes alerts to appropriate notification channels based on severity and escalation rules.",
     cronExpression: "* */6 * * * *",
     updatedAt: new Date(2025, 0, 31, 10, 15),
-    on: true,
+    active: true,
     weight: 8,
     tags: ["alert", "routing", "notification", "escalation"],
-    type: "alert"
+    log: false
   }
 ]

@@ -46,6 +46,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {ButtonGroup} from "@/components/ui/button-group";
 import {Input} from "@/components/ui/input";
+import {dateParser} from "@/composables/dateParser.ts";
 
 const props = defineProps<{
   data: MyPlugin[];
@@ -58,6 +59,9 @@ const emit = defineEmits<{
 
 const { sortedData, sortKey, sortOrder, toggleSort } = useSort<MyPlugin>(() => props.data, 'updatedAt')
 const { wrap, isUnwrapped, unwrap, originalItem, unwrappedItem, items } = useWrapping<MyPlugin>(sortedData)
+// const cronDate = computed(() => {
+//   return unwrappedItem.value ? dateParser(cronParser.parse(unwrappedItem.value.cronExpression).next().toDate()) : null
+// })
 
 const searchFilter = ref<string>("")
 const checkedPlugins = ref<number[]>([])
@@ -77,12 +81,15 @@ const allChecked = computed(() =>  props.data.length > 0 &&
 const matchedTags = computed(() => availableTags.filter(t => t.includes(tagSearch.value))
   .filter(t => !unwrappedItem.value!.tags.includes(t)))
 
+const nextCron = computed(() =>
+  unwrappedItem.value ? dateParser(cronParser.parse(unwrappedItem.value.cronExpression).next().toDate()).fullDate : '')
+
 const cronDescription = computed(() => {
   const cron = unwrappedItem.value!.cronExpression
   if(cron) {
     try {
       cronParser.parse(cron, {strict:true})
-      return [cronstrue.toString(cron), true]
+      return [cronstrue.toString(cron), nextCron, true]
     } catch (e) {
       return [e, false]
     }
@@ -116,7 +123,7 @@ const changeStatus = () => {
     checkedPlugins.value.forEach(p => {
       const plugin = sortedData.value.find(s => s.id === p)
       if (plugin)
-        plugin.on = !plugin.on
+        plugin.active = !plugin.active
     })
   }
 }
@@ -211,11 +218,11 @@ const savePlugin = () => {
 
   <div class=" mt-[2vh] mx-[1%] w-98/100 relative overflow-auto max-h-[70vh]   ">
     <Table id="my-plugin-table" class="w-99/100  text-md lg:text-lg xl:text-xl 2xl:text-2xl  mx-auto  table-fixed border-collapse border-spacing-0">
-      <TableCaption class="bg-secondary border-b border-t text-foreground sticky z-9999 bottom-0 py-[1vh] text-md xl:text-xl 2xl:text-4xl rounded-lg"> Your plugins:
+      <TableCaption class="bg-secondary border-b border-t text-foreground sticky z-9 bottom-0 py-[1vh] text-md xl:text-xl 2xl:text-4xl "> Your plugins:
         <span class="font-extrabold">{{ sortedData.length}}</span>
       </TableCaption>
-      <TableHeader class="h-10 ">
-      <TableRow class="bg-secondary [&_th]:py-4 hover:bg-secondary ">
+      <TableHeader class="h-10  ">
+      <TableRow class="bg-secondary [&_th]:py-4 hover:bg-secondary **:text-md! **:lg:text-xl! **:xl:text-2xl! **:2xl:text-4xl! ">
         <TableHead class="w-3/100  pl-0 pr-4 ">
           <IconListCheck
             class="size-[2vh] mx-3 rounded-sm
@@ -228,8 +235,8 @@ const savePlugin = () => {
             </TableHead>
 
         <SortableHead keyName="name" label="Name" :sort-key="sortKey" class=" w-13/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-        <SortableHead keyName="tags" label="Tags" :sort-key="sortKey" class=" w-21/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-        <SortableHead keyName="cronExpression" label="Cron" :sort-key="sortKey" class=" w-21/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+        <SortableHead keyName="tags" label="Tags" :sort-key="sortKey" class=" w-17/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+        <SortableHead keyName="cronExpression" label="Cron" :sort-key="sortKey" class=" w-25/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
         <SortableHead keyName="type" label="Type" :sort-key="sortKey" class=" w-6/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
         <SortableHead keyName="language" label="Language" :sort-key="sortKey" class=" w-8/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
         <SortableHead keyName="updatedAt" label="Last modified" :sort-key="sortKey" class=" w-14/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
@@ -239,12 +246,12 @@ const savePlugin = () => {
         </TableHeader>
         <TableBody >
           <TableRow
-            class="cursor-pointer duration-0 border-radius-0 [&_td]:py-3 [&_td]:pr-4 hover:bg-green-500/20 "
+            class="cursor-pointer duration-0 border-radius-0 [&_td]:py-2 [&_td]:pr-4 hover:bg-green-500/20 "
             v-for="plugin in items"
             :key="plugin.id"
             @click="!isUnwrapped(plugin.id) ? check(plugin.id): true;"
-            :class="{'hover:bg-destructive/20': !plugin.on,
-             'bg-selected [&_td]:align-top  sticky h-60! lg:h-70! xl:h-80! 2xl:h-90! top-13 bottom-11 hover:bg-card z-9999 cursor-auto'
+            :class="{'hover:bg-destructive/20': !plugin.active,
+             'bg-selected [&_td]:align-top  sticky h-60! lg:h-70! xl:h-80! 2xl:h-90! [&_td]:pt-4! top-14 bottom-11 hover:bg-card z-9 cursor-auto'
                     : isUnwrapped(plugin.id) }">
             <TableCell class="pr-4">
               <input
@@ -318,6 +325,10 @@ const savePlugin = () => {
 
             <TableCell v-if="!isUnwrapped(plugin.id)" class="whitespace-break-spaces">
               {{ cronstrue.toString(plugin.cronExpression) }}
+              <br>
+              <span>Next run: {{ dateParser(cronParser.parse(plugin.cronExpression).next().toDate()).fullDate }}
+              </span>
+
             </TableCell>
             <TableCell v-else class="grid space-y-2">
               <InputGroup class="relative w-full xl:h-14 2xl:h-18 mb-2">
@@ -331,23 +342,27 @@ const savePlugin = () => {
               </InputGroup>
 
                 <span
-                  class=" w-full text-center whitespace-break-spaces text-sm lg:text-lg xl:text-xl 2xl:text-3xl"
-                  :class="{'text-destructive' : !cronDescription[1]}"
-                >{{ cronDescription[0]}}</span>
+                  class="grid gap-y-2 w-full text-center whitespace-break-spaces text-sm lg:text-lg xl:text-xl 2xl:text-3xl"
+                  :class="{'text-destructive' : !cronDescription[2]}"
+                >
+                  <span>{{ cronDescription[0]}}</span>
+                  <span v-if="cronDescription[2]">
+                    Next run: {{ cronDescription[1]}}</span>
+                </span>
 
             </TableCell>
             <TableCell v-if="!isUnwrapped(plugin.id)" class="">
-              <component class="text-badge size-7 lg:size-8 xl:size-10 2xl:size-16" :class="{'text-yellow-500' : plugin.type === 'alert' }" :is="plugin.type === 'log' ? IconLogs : IconAlertTriangleFilled "/>
+              <component class="text-badge size-7 lg:size-8 xl:size-10 2xl:size-16" :class="{'text-yellow-500' : !plugin.log }" :is="plugin.log ? IconLogs : IconAlertTriangleFilled "/>
             </TableCell>
             <TableCell v-else class="">
-              <RadioGroup v-model="unwrappedItem!.type" :default-value="plugin.type"
+              <RadioGroup v-model="unwrappedItem!.log" :default-value="plugin.log"
                           class=" **:text-lg **:lg:text-xl **:xl:text-2xl **:2xl:text-3xl">
                 <div class="flex items-center space-x-2 ">
-                  <RadioGroupItem class="size-4 lg:size-5 xl:size-6 2xl:size-8" id=radio-log value="log" />
+                  <RadioGroupItem class="size-4 lg:size-5 xl:size-6 2xl:size-8" id=radio-log :value="true" />
                   <Label class="cursor-pointer " for="radio-log">log</Label>
                 </div>
                 <div class="flex items-center space-x-2">
-                  <RadioGroupItem class="size-4 lg:size-5 xl:size-6 2xl:size-8" id="radio-alert" value="alert" />
+                  <RadioGroupItem class="size-4 lg:size-5 xl:size-6 2xl:size-8" id="radio-alert" :value="false" />
                   <Label class="cursor-pointer" for="radio-alert">alert</Label>
                 </div>
               </RadioGroup>
@@ -373,12 +388,12 @@ const savePlugin = () => {
               />
             </TableCell>
             <DateCell class=" text-md lg:text-lg xl:text-xl 2xl:text-2xl " v-if="plugin.updatedAt" :date="plugin.updatedAt"></DateCell>
-            <TableCell v-if="!isUnwrapped(plugin.id)" class=" text-green-500" :class="{'text-destructive' : !plugin.on}">{{ plugin.on ? 'On' : 'Off'}}</TableCell>
+            <TableCell v-if="!isUnwrapped(plugin.id)" class=" text-green-500" :class="{'text-destructive' : !plugin.active}">{{ plugin.active ? 'On' : 'Off'}}</TableCell>
             <TableCell v-else class="">
               <RadioGroup
-                @update:model-value="unwrappedItem!.on = $event === 'on'"
-                :model-value="unwrappedItem!.on ? 'on' : 'off'"
-                :default-value="plugin.on ? 'on' : 'off'"
+                @update:model-value="unwrappedItem!.active = $event === 'on'"
+                :model-value="unwrappedItem!.active ? 'on' : 'off'"
+                :default-value="plugin.active ? 'on' : 'off'"
                 class=" **:text-lg **:lg:text-xl **:xl:text-2xl **:2xl:text-3xl">
                 <div class="flex items-center space-x-2">
                   <RadioGroupItem class="size-4 lg:size-5 xl:size-6 2xl:size-8" id=radio-on value="on" />

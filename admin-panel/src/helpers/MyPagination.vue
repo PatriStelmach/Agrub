@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="T">
 
 import {
   Pagination,
@@ -11,17 +11,17 @@ import {Label} from "@/components/ui/label";
 import {computed, ref, watch} from "vue";
 import {Button} from "@/components/ui/button";
 import {DropdownMenu, DropdownMenuTrigger, DropdownMenuItem, DropdownMenuContent, DropdownMenuGroup} from "@/components/ui/dropdown-menu";
-import type {Paginable} from "@/types/types.ts";
+
 
 const props = defineProps<{
-  data: Paginable[]
+  data: T[]
   page: number
 }>()
 const currentPage = ref<number>(1)
 const itemsPerPage = ref<number>(50)
 
 const emit = defineEmits<{
-  'update:paginated-data': [data: Paginable[]],
+  'update:paginated-data': [data: T[]],
   'update:pages': [page: number]
 }>()
 
