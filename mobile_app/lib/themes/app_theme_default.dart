@@ -26,7 +26,9 @@ class AppTheme {
         foregroundColor: null,
         elevation: null,
         centerTitle: null,
-        titleTextStyle: TextStyle(), // Tu styl tekstu tytułu
+        titleTextStyle: TextStyle(
+          color: Colors.black
+        ), // Tu styl tekstu tytułu
       ),
 
       // Elevated Button

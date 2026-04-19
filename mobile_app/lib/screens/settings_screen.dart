@@ -22,31 +22,7 @@ class SettingsScreen extends StatelessWidget {
           margin: const EdgeInsets.symmetric(vertical: 10.0),
           ),
 
-        Text("DEBUG FUNCTIONS"),
-        Row(children: [
-          Expanded(
-          child: Text('Trigger extreme alert alarm', textAlign: TextAlign.center),
-          ),
-          Expanded(
-          child: ElevatedButton(onPressed: () {}, child: Text('Alarm',) ),
-          ),
-        ],),
-        Row(children: [
-          Expanded(
-          child: Text('Opis opcji', textAlign: TextAlign.center),
-          ),
-          Expanded(
-          child: ElevatedButton(onPressed: () {}, child: Text('button opcji')),
-          ),
-        ],),
-        Row(children: [
-          Expanded(
-          child: Text('Opis opcji',textAlign: TextAlign.center),
-          ),
-          Expanded(
-          child: ElevatedButton(onPressed: () {}, child: Text('button opcji')),
-          ),
-        ],),
+
 
         ]
         );

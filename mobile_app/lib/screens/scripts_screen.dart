@@ -2,8 +2,8 @@ import 'package:alert_app/logic/admin_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class AdminScreen extends StatelessWidget {
-  const AdminScreen({super.key});
+class ScriptsScreen extends StatelessWidget {
+  const ScriptsScreen({super.key});
 
 
 

@@ -25,10 +25,20 @@ class HomeScreen extends StatelessWidget {
           Row(
             spacing: 50,
             children: [
-            Text('Latest ping recorded at: ', style: TextStyle(fontSize: 20)),
-            Spacer(),
-            Text(shortPingTime, style: TextStyle(fontSize: 20))
-          ],),
+            Expanded(
+              child: 
+              
+                Row(
+                  children: [
+                    Text('Latest ping recorded at: ', style: TextStyle(fontSize: 20)),
+                     Spacer(),
+                Text(shortPingTime, style: TextStyle(fontSize: 20))
+                  ],
+                ),
+                
+              
+            ),
+                      ],),
         Text('Latest Alerts', style: TextStyle(fontSize: 30)),
         
             Expanded(
@@ -61,7 +71,7 @@ class HomeScreen extends StatelessWidget {
               ),
               
             
-            Text('Lastest Critical Alerts', style: TextStyle(fontSize: 30)),
+            Text('Latest Critical Alerts', style: TextStyle(fontSize: 30)),
 
               Expanded(
               child: Container(
