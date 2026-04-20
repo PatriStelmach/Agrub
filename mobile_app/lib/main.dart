@@ -1,5 +1,6 @@
 import 'package:alert_app/data/repositories/alert_repository.dart';
 import 'package:alert_app/data/repositories/user_repository.dart';
+import 'package:alert_app/services/navigation_service.dart';
 import 'package:alert_app/logic/admin_view_model.dart';
 import 'package:alert_app/logic/alerts_view_model.dart';
 import 'package:alert_app/logic/home_view_model.dart';
@@ -10,6 +11,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 void main() {
+
+//checking if flutter engine is ready
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(
     MultiProvider(
       providers: [
@@ -55,9 +59,11 @@ class MainApp extends StatelessWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.light,
+      navigatorKey: navigationService.navigatorKey,
       home: GeneralLayout());
     
     }
+    
   }
 
   /*
@@ -66,8 +72,7 @@ class MainApp extends StatelessWidget {
 T0D0:
 
 ASAP
-1. Finalizacja alertu dla Androida ( screen, overlay Navigatorem)
-2. Mockup pushowania alertów
+2. Mockup pushowania alertów pod FCM ( underway)
 3. Logika alarmu przy nowym extreme
 4. Mockup skryptów
 5. Nowe skrypty push, logika uruchamiania ( przygotować repo na podpięcie)
@@ -77,24 +82,10 @@ App Theme:
 - odpicowanie elementów stałych, żeby nie wyglądały tak szkolnie
 - uporządkowanie obramowań containerów/usunięcie jak będzie lepiej
 
-Funkcjonalności ogólne:
-- przyjmowanie nowego alertu do appki -> jak i ile przechowywać? -> dodać jako test
-- ekran alarmu
-- alarm kiedy pojawia się alert o najwyższym poziomie, dla debuga podpiąć pod button
-- działający alarm dźwiękowy i wibracje na androidzie (mimo wyciszenia), na iOS(bez wyciszenia)
-- uporządkować funkcje pobierające info z serwera, przygotowanie pod podpięcie, firebase?
 
 Login screen/authorization screen?
 - Layout
 - przygotowanie logiki pod autoryzację z serwerem
-
-
-
-Propozycja finalnego układu folderów i plików w MVVM, wprwoadzać według potrzeb rozwoju
-lib/data/models z modelami
-lib data/services lub/oraz repositories w pierwszym HTTP(Rest?) w drugim pobieranie danych?
-Jak faktycznie będzie coś tylko liczącego itd. to można zrobić "utility"
-
 
 
 

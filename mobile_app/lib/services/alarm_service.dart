@@ -7,17 +7,19 @@ import 'package:vibration/vibration.dart';
 
 
 class AlarmService {
-  void triggerAlarm() async {
-    print('Service triggerd');
-    if (Platform.isAndroid) {
-      final _player = AudioPlayer();
-
   
-    // 1. Odpal dźwięk (plik musi być w pubspec.yaml)
-    await _player.play(AssetSource('audio/alarm.mp3'));
+  final player = AudioPlayer();
 
-    // 2. Odpal wibracje (jeśli urządzenie na to pozwala)
-    if (await Vibration.hasVibrator() ?? false) {
+  void triggerAlarm() async {
+    
+    
+    if (Platform.isAndroid) {
+      
+      await player.setReleaseMode(ReleaseMode.loop);
+      await player.play(AssetSource('audio/alarm.mp3'));
+
+    // Vibrations (if possible)
+    if (await Vibration.hasVibrator()) {
       Vibration.vibrate(duration: 2000, amplitude: 255);
     }
   
@@ -26,4 +28,12 @@ class AlarmService {
       
     }
   }
+
+    Future<void> stopAlarm() async {
+   
+    await player.stop();
+    }
 }
+
+
+

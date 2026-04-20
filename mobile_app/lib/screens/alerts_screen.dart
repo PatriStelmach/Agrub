@@ -33,7 +33,6 @@ class _AlertsScreenState extends State<AlertsScreen> {
             icon: const Icon(Icons.menu),
             style: const TextStyle(color: Colors.black),
             onChanged: (String? newValue) {
-              print("Zmieniam na: $newValue");
               setState(() {
                 dropDownValue = newValue!;
               });

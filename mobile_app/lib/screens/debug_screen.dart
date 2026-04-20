@@ -16,7 +16,7 @@ class DebugScreen extends StatelessWidget {
           
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(onPressed: () {debugViewModel.AlarmPressed();}, child: Text('Trigger extreme alert alarm') ),
+            child: ElevatedButton(onPressed: () {debugViewModel.alarmPressed();}, child: Text('Trigger extreme alert alarm') ),
           ),
           )
         ],),
