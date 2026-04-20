@@ -66,7 +66,7 @@ const updatePage = (page: number) => {
 <template>
   <div >
     <div class="relative max-h-[10vh] items-center align-middle">
-      <h1 class="text-center my-[2vh] text-[3vh] border-b pb-[1vh]">Alerts dashboard</h1>
+      <h1 class="text-center my-[2vh] text-xl xl:text-2xl 2xl:text-4xl border-b pb-[2vh]">Alerts dashboard</h1>
 
       <div class="absolute left-4 top-0 flex  ">
         <ButtonGroup>

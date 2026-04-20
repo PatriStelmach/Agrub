@@ -12,13 +12,14 @@ import NavBar from "@/pages/navbar/NavBar.vue";
     <header class="w-screen">
 
       <nav class="flex w-full h-[5vh] bg-card justify-center items-center">
-        <NavBar/>
+
         <TopRightButtons/>
       </nav>
     </header>
 
-    <main class="bg-card flex flex-1 min-h-0 ">
-      <RouterView class="bg-background  border rounded-2xl flex-1 overflow-auto   " />
+    <main class="bg-card flex flex-1  ">
+      <NavBar/>
+      <RouterView class="bg-background  border flex-1 overflow-auto rounded-lg  " />
     </main>
   </div>
 

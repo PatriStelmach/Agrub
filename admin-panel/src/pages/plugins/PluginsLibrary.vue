@@ -77,7 +77,7 @@ const filteredData = computed(() =>
         </ButtonGroup>
 
       </div>
-        <h1 class="text-center my-[2vh] text-[3vh] border-b pb-[1vh]">Plugins library</h1>
+        <h1 class="text-center my-[2vh] text-xl xl:text-2xl 2xl:text-4xl border-b pb-[2vh]">Plugins library</h1>
       <div>
     </div>
 

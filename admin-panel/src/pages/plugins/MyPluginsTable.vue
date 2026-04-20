@@ -142,7 +142,7 @@ const savePlugin = () => {
 
 <template>
 <div class="relative">
-  <h1 class="text-center my-[2vh] text-[3vh] border-b pb-[1vh]">Your plugins</h1>
+  <h1 class="text-center my-[2vh] text-xl xl:text-2xl 2xl:text-4xl border-b pb-[2vh]">Your plugins</h1>
   <div class="flex absolute top-0 left-4">
     <ButtonGroup>
       <ButtonGroup class="hidden sm:flex">
@@ -180,36 +180,6 @@ const savePlugin = () => {
             <Search/>
           </InputGroupAddon>
         </InputGroup>
-      </ButtonGroup>
-      <ButtonGroup>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger as-child>
-            <Button variant="outline" size="icon" aria-label="More Options"><IconPlus/></Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" class="w-52">
-            <DropdownMenuLabel class="border-b">Plugins</DropdownMenuLabel>
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <RouterLink class="flex w-full gap-x-2" to="/import_plugins">
-                  <IconFileImport/>Import
-                </RouterLink>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <IconTerminal2/>Create</DropdownMenuItem>
-              <DropdownMenuItem>
-                <IconDatabase/>Plugins library
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator/>
-            <DropdownMenuGroup>
-              <DropdownMenuLabel class=" border-b">Tags</DropdownMenuLabel>
-              <DropdownMenuItem>
-                <component :is="IconPencilCode"/>Create</DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <Badge>Add</Badge>
       </ButtonGroup>
     </ButtonGroup>
   </div>
