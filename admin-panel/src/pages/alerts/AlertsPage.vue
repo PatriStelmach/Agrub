@@ -61,58 +61,55 @@ const updatePage = (page: number) => {
   currentPage.value = page
 }
 
-const updateSearch = (data: string) => {
-  searchFilter.value = data.trim()
-}
-
 </script>
 
 <template>
-  <div>
-    <h1 class="text-center my-[2vh] text-[3vh] border-b pb-[2vh] max-h-[5vh]  ">Dashboard</h1>
+  <div >
+    <div class="relative max-h-[10vh] items-center align-middle">
+      <h1 class="text-center my-[2vh] text-[3vh] border-b pb-[1vh]">Alerts dashboard</h1>
 
-    <div class="flex ml-[1vw] my-[2vh] ">
-      <ButtonGroup>
+      <div class="absolute left-4 top-0 flex  ">
         <ButtonGroup>
-          <Button variant="outline" size="icon" aria-label="Go Back">
-            <ArrowLeftIcon />
-          </Button>
-          <InputGroup class="relative l-[30vw] w-[20vw]  " >
-            <InputGroupInput
-              v-model="searchFilter"
-              type="search"
-              placeholder="Search for alert"/>
-            <InputGroupAddon>
-              <Search/>
-            </InputGroupAddon>
-          </InputGroup>
+          <ButtonGroup>
+            <Button variant="outline" size="icon" aria-label="Go Back">
+              <ArrowLeftIcon />
+            </Button>
+            <InputGroup class="relative l-[30vw] w-[20vw]  " >
+              <InputGroupInput
+                v-model="searchFilter"
+                type="search"
+                placeholder="Search for alert"/>
+              <InputGroupAddon>
+                <Search/>
+              </InputGroupAddon>
+            </InputGroup>
 
+          </ButtonGroup>
         </ButtonGroup>
-      </ButtonGroup>
+      </div>
     </div>
-
-    <div class=" mt-[2vh] mx-[1%] w-98/100 relative overflow-auto max-h-[70vh]   ">
+    <div class=" mt-[2vh] mx-[1%] w-98/100 relative overflow-auto max-h-[75vh]   ">
       <Table id="alert-table" class="w-99/100 text-md xl:text-xl 2xl:text-4xl  mx-auto  table-fixed">
-        <TableCaption class="bg-secondary border-b border-t text-foreground sticky z-9999 bottom-0 py-[1vh] text-md xl:text-xl 2xl:text-4xl">Current Alerts:
+        <TableCaption class="bg-secondary border-b border-t text-foreground sticky z-9 bottom-0 py-[1vh] text-md xl:text-xl 2xl:text-4xl">Current Alerts:
           <span class="font-extrabold">{{ dashboardData.length}}</span>
         </TableCaption>
         <TableHeader class="h-10">
           <TableRow class="bg-secondary hover:bg-secondary **:text-md! *:py-4 **:lg:text-xl! **:xl:text-2xl! **:2xl:text-4xl!">
-            <SortableHead keyName="header" label="Alert" :sort-key="sortKey" class="w-24/100 pl-4" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-            <SortableHead keyName="source" label="Source" :sort-key="sortKey" class="w-12/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-            <SortableHead keyName="status" label="Status" :sort-key="sortKey" class="w-10/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-            <SortableHead keyName="priority" label="Priority" :sort-key="sortKey" class="w-10/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-            <SortableHead keyName="technicianGroups" label="Groups" :sort-key="sortKey" class="w-30/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="header" label="Alert" :sort-key="sortKey" class="w-20/100 pl-4" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="source" label="Source" :sort-key="sortKey" class="w-16/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="status" label="Status" :sort-key="sortKey" class="w-15/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="priority" label="Priority" :sort-key="sortKey" class="w-15/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="technicianGroups" label="Groups" :sort-key="sortKey" class="w-20/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
             <SortableHead keyName="createdAt" label="Timestamp" :sort-key="sortKey" class="w-14/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
           </TableRow>
         </TableHeader>
         <TableBody >
           <TableRow
-            class="relative cursor-pointer duration-0 h-14 lg:h-16 xl:h-18 2xl:h-22 hover:bg-chart-1/30"
+            class="relative cursor-pointer duration-0  hover:bg-chart-1/30"
             v-for="alert in sortedData"
             :key="alert.id"
           >
-            <TableCell class="pl-4 py-2 whitespace-pre-wrap">{{alert.header}}</TableCell>
+            <TableCell class="pl-4 py-2 whitespace-break-spaces">{{alert.header}}</TableCell>
             <TableCell class="py-2">
               <Badge
                 class="cursor-pointer hover:bg-badge mr-1 ml-[-0.5em] text-md xl:text-xl 2xl:text-4xl"
@@ -137,7 +134,7 @@ const updateSearch = (data: string) => {
             </TableCell>
 
             <TableCell
-              class="py-2  whitespace-pre-wrap">{{ alert.technicianGroups?.join(", ") }}</TableCell>
+              class="py-2  whitespace-break-spaces">{{ alert.technicianGroups?.join(", ") }}</TableCell>
             <DateCell v-if="alert.createdAt" class="py-2" :date="alert.createdAt "></DateCell>
 
           </TableRow>
@@ -147,7 +144,7 @@ const updateSearch = (data: string) => {
       </Table>
     </div>
     <MyPagination
-      class="max-h-[5vh]"
+      class="max-h-[5vh] z-99"
       :data="filteredData"
       :page="currentPage"
       @update:paginated-data="updateData"

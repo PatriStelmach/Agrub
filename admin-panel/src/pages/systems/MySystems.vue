@@ -26,7 +26,7 @@ import {
     </EmptyHeader>
     <EmptyContent>
       <div class="flex gap-2">
-        <RouterLink to="/systems_library"><Button class="cursor-pointer">Add System</Button></RouterLink>
+        <RouterLink to="/all_systems"><Button class="cursor-pointer">Add System</Button></RouterLink>
         <RouterLink to="/plugins_library">
           <Button class="cursor-pointer" variant="outline">
             Add plugin

@@ -59,9 +59,6 @@ const emit = defineEmits<{
 
 const { sortedData, sortKey, sortOrder, toggleSort } = useSort<MyPlugin>(() => props.data, 'updatedAt')
 const { wrap, isUnwrapped, unwrap, originalItem, unwrappedItem, items } = useWrapping<MyPlugin>(sortedData)
-// const cronDate = computed(() => {
-//   return unwrappedItem.value ? dateParser(cronParser.parse(unwrappedItem.value.cronExpression).next().toDate()) : null
-// })
 
 const searchFilter = ref<string>("")
 const checkedPlugins = ref<number[]>([])
@@ -144,8 +141,9 @@ const savePlugin = () => {
 </script>
 
 <template>
-
-  <div class="flex ml-[1vw] my-[2vh] ">
+<div class="relative">
+  <h1 class="text-center my-[2vh] text-[3vh] border-b pb-[1vh]">Your plugins</h1>
+  <div class="flex absolute top-0 left-4">
     <ButtonGroup>
       <ButtonGroup class="hidden sm:flex">
         <Button variant="outline" size="icon" aria-label="Go Back">
@@ -200,7 +198,7 @@ const savePlugin = () => {
               <DropdownMenuItem>
                 <IconTerminal2/>Create</DropdownMenuItem>
               <DropdownMenuItem>
-                <IconDatabase/>Search for plugins
+                <IconDatabase/>Plugins library
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator/>
@@ -215,20 +213,20 @@ const savePlugin = () => {
       </ButtonGroup>
     </ButtonGroup>
   </div>
+</div>
 
-  <div class=" mt-[2vh] mx-[1%] w-98/100 relative overflow-auto max-h-[70vh]   ">
+
+  <div class=" mt-[2vh] mx-[1%] w-98/100 relative overflow-auto max-h-[75vh]   ">
     <Table id="my-plugin-table" class="w-99/100  text-md lg:text-lg xl:text-xl 2xl:text-2xl  mx-auto  table-fixed border-collapse border-spacing-0">
       <TableCaption class="bg-secondary border-b border-t text-foreground sticky z-9 bottom-0 py-[1vh] text-md xl:text-xl 2xl:text-4xl "> Your plugins:
         <span class="font-extrabold">{{ sortedData.length}}</span>
       </TableCaption>
       <TableHeader class="h-10  ">
       <TableRow class="bg-secondary [&_th]:py-4 hover:bg-secondary **:text-md! **:lg:text-xl! **:xl:text-2xl! **:2xl:text-4xl! ">
-        <TableHead class="w-3/100  pl-0 pr-4 ">
-          <IconListCheck
-            class="size-[2vh] mx-3 rounded-sm
-                  hover:shadow-[0_0_10px_1px] hover:shadow-green-500 hover:scale-105
-                  hover:bg-green-500 cursor-pointer transition duration-100"
-            :class="{'text-green-500 hover:bg-primary hover:shadow-primary': allChecked }"
+        <TableHead class="w-3/100 px-4 ">
+          <input
+            type="checkbox"
+            class="size-[1vw] cursor-pointer align-middle"
 
             @click="checkAll"
           />
@@ -237,10 +235,10 @@ const savePlugin = () => {
         <SortableHead keyName="name" label="Name" :sort-key="sortKey" class=" w-13/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
         <SortableHead keyName="tags" label="Tags" :sort-key="sortKey" class=" w-17/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
         <SortableHead keyName="cronExpression" label="Cron" :sort-key="sortKey" class=" w-25/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-        <SortableHead keyName="type" label="Type" :sort-key="sortKey" class=" w-6/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+        <SortableHead keyName="log" label="Type" :sort-key="sortKey" class=" w-6/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
         <SortableHead keyName="language" label="Language" :sort-key="sortKey" class=" w-8/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
         <SortableHead keyName="updatedAt" label="Last modified" :sort-key="sortKey" class=" w-14/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-        <SortableHead keyName="on" label="Status" :sort-key="sortKey" class=" w-7/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+        <SortableHead keyName="active" label="Status" :sort-key="sortKey" class=" w-7/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
         <SortableHead keyName="weight" label="Weight" :sort-key="sortKey" class="  w-7/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
           </TableRow>
         </TableHeader>
@@ -253,7 +251,7 @@ const savePlugin = () => {
             :class="{'hover:bg-destructive/20': !plugin.active,
              'bg-selected [&_td]:align-top  sticky h-60! lg:h-70! xl:h-80! 2xl:h-90! [&_td]:pt-4! top-14 bottom-11 hover:bg-card z-9 cursor-auto'
                     : isUnwrapped(plugin.id) }">
-            <TableCell class="pr-4">
+            <TableCell class="px-4">
               <input
                 type="checkbox"
                 :id="cn('my-plugin-no-'+plugin.id)" class="size-[1vw] cursor-pointer align-middle"
@@ -355,14 +353,17 @@ const savePlugin = () => {
               <component class="text-badge size-7 lg:size-8 xl:size-10 2xl:size-16" :class="{'text-yellow-500' : !plugin.log }" :is="plugin.log ? IconLogs : IconAlertTriangleFilled "/>
             </TableCell>
             <TableCell v-else class="">
-              <RadioGroup v-model="unwrappedItem!.log" :default-value="plugin.log"
-                          class=" **:text-lg **:lg:text-xl **:xl:text-2xl **:2xl:text-3xl">
+              <RadioGroup
+                :model-value="String(unwrappedItem!.log)"
+                @update:model-value="unwrappedItem!.log = $event === 'true'"
+                :default-value="String(unwrappedItem!.log)"
+                class=" **:text-lg **:lg:text-xl **:xl:text-2xl **:2xl:text-3xl">
                 <div class="flex items-center space-x-2 ">
-                  <RadioGroupItem class="size-4 lg:size-5 xl:size-6 2xl:size-8" id=radio-log :value="true" />
+                  <RadioGroupItem class="size-4 lg:size-5 xl:size-6 2xl:size-8" id=radio-log value="true" />
                   <Label class="cursor-pointer " for="radio-log">log</Label>
                 </div>
                 <div class="flex items-center space-x-2">
-                  <RadioGroupItem class="size-4 lg:size-5 xl:size-6 2xl:size-8" id="radio-alert" :value="false" />
+                  <RadioGroupItem class="size-4 lg:size-5 xl:size-6 2xl:size-8" id="radio-alert" value="false" />
                   <Label class="cursor-pointer" for="radio-alert">alert</Label>
                 </div>
               </RadioGroup>

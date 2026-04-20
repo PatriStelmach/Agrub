@@ -10,18 +10,19 @@ import {
   DropdownMenuSeparator, DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import {IconUser , IconNotification, IconUserCircle} from "@tabler/icons-vue";
+import {sidebarData} from "@/data/sidebarData.ts";
+import {usersData} from "@/data/usersData.ts";
+import NavUser from "@/pages/teambar/NavUser.vue";
 
-defineProps<{
-  data: User[]
-}>()
 </script>
 
 <template>
-<ScrollArea class=" border-t-4 pt-4">
 
+  <NavUser :user="sidebarData.loggedUser"/>
+  <ScrollArea class=" border-t-4 pt-4">
       <SidebarMenu>
         <SidebarMenuItem
-          v-for="user in data"
+          v-for="user in usersData"
           :key="user.id"
           class="inline ">
           <DropdownMenu>
@@ -83,5 +84,5 @@ defineProps<{
           </DropdownMenu>
         </SidebarMenuItem>
       </SidebarMenu>
-</ScrollArea>
+  </ScrollArea>
 </template>

@@ -5,8 +5,13 @@ const router = createRouter({
   routes: [
     {
       path: '/my_systems',
-      name: 'systems',
+      name: 'my_systems',
       component: () => import('../pages/systems/MySystems.vue'),
+    },
+    {
+      path: '/all_systems',
+      name: 'all_systems',
+      component: () => import('../pages/systems/AllSystems.vue'),
     },
     {
       path: '/',
@@ -14,9 +19,9 @@ const router = createRouter({
       component: () => import('@/pages/alerts/AlertsPage.vue'),
     },
     {
-      path: '/systems_library',
-      name: 'systems_library',
-      component: () => import('../pages/systems/SystemsLibrary.vue'),
+      path: '/alerts',
+      name: 'alerts',
+      component: () => import('@/pages/alerts/AlertsPage.vue'),
     },
     {
       path: '/plugins_library',
@@ -27,11 +32,6 @@ const router = createRouter({
       path: '/my_plugins',
       name: 'my_plugins',
       component: () => import('../pages/plugins/MyPlugins.vue'),
-    },
-    {
-      path: '/add_new_system',
-      name: 'add_new_system',
-      component: () => import('../pages/systems/AddNew.vue'),
     },
     {
       path: '/import_plugins',

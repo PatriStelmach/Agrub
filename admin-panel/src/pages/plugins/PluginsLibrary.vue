@@ -48,37 +48,39 @@ const filteredData = computed(() =>
 
 <template>
   <div>
-    <h1 class="text-center my-[2vh] text-[3vh] border-b pb-[2vh]   md ">Plugins library</h1>
-  <div class="mx-auto w-full">
+    <div class="relative max-h-[10vh] items-center align-middle">
+      <div class="absolute left-4 top-0">
 
-    <div class="flex ml-[1vw] my-[2vh] ">
+        <ButtonGroup >
+          <ButtonGroup>
+            <Button variant="outline" size="icon" aria-label="Go Back">
+              <ArrowLeftIcon />
+            </Button>
+          </ButtonGroup>
 
-      <ButtonGroup class="hidden sm:flex">
-        <ButtonGroup>
-          <Button variant="outline" size="icon" aria-label="Go Back">
-            <ArrowLeftIcon />
-          </Button>
+          <ButtonGroup>
+            <Button variant="green_outline">
+              Add to your plugins
+              <IconFileImport/>
+            </Button>
+
+            <InputGroup class="relative l-[30vw] w-[20vw]  " >
+              <InputGroupInput
+                v-model="searchFilter"
+                type="search"
+                placeholder="Search for plugin"/>
+              <InputGroupAddon>
+                <Search/>
+              </InputGroupAddon>
+            </InputGroup>
+          </ButtonGroup>
         </ButtonGroup>
 
-        <ButtonGroup>
-        <Button variant="green_outline">
-          Add to your plugins
-          <IconFileImport/>
-        </Button>
-
-      <InputGroup class="relative l-[30vw] w-[20vw]  " >
-        <InputGroupInput
-          v-model="searchFilter"
-          type="search"
-          placeholder="Search for plugin"/>
-        <InputGroupAddon>
-          <Search/>
-        </InputGroupAddon>
-      </InputGroup>
-        </ButtonGroup>
-    </ButtonGroup>
-
+      </div>
+        <h1 class="text-center my-[2vh] text-[3vh] border-b pb-[1vh]">Plugins library</h1>
+      <div>
     </div>
+
 <PluginsLibraryTable :data="rowsData" />
 
     <MyPagination
@@ -88,6 +90,6 @@ const filteredData = computed(() =>
       @update:pages="updatePage"
       />
   </div>
-  </div>
+</div>
 </template>
 

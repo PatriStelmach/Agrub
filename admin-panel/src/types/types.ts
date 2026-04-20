@@ -38,8 +38,8 @@ export interface MyPlugin
   name: string,
   creator: string,
   language: "python" | "bash" | "PowerShell",
-  description: string,
-  code: string,
+  description?: string,
+  code?: string,
   weight: number,
   tags: string[]
   cronExpression: string
@@ -64,7 +64,7 @@ export interface LibraryPlugin
   name: string,
   creator: string,
   language: "python" | "bash" | "PowerShell",
-  description: string,
+  description?: string,
   code?: string,
   weight: number,
   createdAt: Date,
