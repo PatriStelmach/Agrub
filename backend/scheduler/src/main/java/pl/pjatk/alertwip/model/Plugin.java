@@ -13,6 +13,16 @@ public class Plugin {
 
     private boolean isLog;
 
+    private String description;
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String decription) {
+        this.description = decription;
+    }
+
     private String name;
     @Column(updatable = false)
     private String creator;

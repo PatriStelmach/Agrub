@@ -3,6 +3,7 @@ package pl.pjatk.alertwip.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.pjatk.alertwip.config.DynamicSchedulerConfig;
+import pl.pjatk.alertwip.dto.TaskRequestDTO;
 import pl.pjatk.alertwip.model.Plugin;
 import pl.pjatk.alertwip.model.ScheduledTask;
 import pl.pjatk.alertwip.repository.PluginRepository;
@@ -24,20 +25,17 @@ public class TaskController {
     }
 
     @PostMapping("/add")
-    public ScheduledTask addTask(@RequestBody Map<String, Object> payload) {
+    public ScheduledTask addTask(@RequestBody TaskRequestDTO dto) {
         ScheduledTask task = new ScheduledTask();
-        task.setTaskName((String) payload.get("taskName"));
-        task.setScriptName((String) payload.get("scriptName"));
-        task.setLog((Boolean) payload.get("isLog"));
+        task.setTaskName(dto.taskName());
+        task.setScriptName(dto.scriptName());
+        task.setLog(dto.isLog());
 
-        // LOGIKA TŁUMACZENIA
-        if (payload.containsKey("seconds")) {
-            // Tryb Basic: np. co 30 sekund -> "*/30 * * * * *"
-            int seconds = (Integer) payload.get("seconds");
-            task.setCronExpression("*/" + seconds + " * * * * *");
+        // Logika tłumaczenia
+        if (dto.seconds() != null) {
+            task.setCronExpression("*/" + dto.seconds() + " * * * * *");
         } else {
-            // Tryb Advanced: bierzesz gotowego Crona
-            task.setCronExpression((String) payload.get("cronExpression"));
+            task.setCronExpression(dto.cronExpression());
         }
 
         ScheduledTask saved = repository.save(task);
