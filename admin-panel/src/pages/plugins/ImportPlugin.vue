@@ -106,7 +106,7 @@ else {
 
 <template>
   <div>
-    <h1 class="text-center my-[2vh] text-[3vh] border-b pb-[2vh]   md ">Importing Plugins</h1>
+    <h1 class="text-center my-[2vh] text-[3vh] border-b pb-[2vh] ">Importing Plugins</h1>
     <div class="mx-auto w-full">
 
   <ButtonGroup class="ml-[2vw]">

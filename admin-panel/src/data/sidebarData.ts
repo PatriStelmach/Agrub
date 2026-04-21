@@ -28,7 +28,7 @@ export const sidebarData = {
     },
     {
       title: "Logs",
-      url: "#",
+      url: "/logs",
       icon: IconClipboardText,
     },
     {
@@ -38,7 +38,7 @@ export const sidebarData = {
     },
     {
       title: "Add new system",
-      url: "/systems_library",
+      url: "/all_systems",
       icon: IconLayoutGridAdd,
     },
     {
