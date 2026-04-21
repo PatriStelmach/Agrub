@@ -40,7 +40,7 @@ export interface MyPlugin
   name: string,
   fileName: string
   creator: string,
-  language: "python" | "bash" | "PowerShell",
+  language: ".py" | ".sh" | ".bash" | ".ps1"  | ".psm1",
   description?: string,
   code?: string,
   weight: number,
@@ -51,10 +51,30 @@ export interface MyPlugin
   log: boolean
 }
 
+export interface MyPluginsFromApi
+{
+  active: boolean
+  creator: string,
+  isLog: boolean,
+  name: string,
+  fileName: string,
+  language: string,
+  updatedAt: Date,
+  weight: number,
+  tags: string[],
+  cronExpression: string,
+}
+
+export interface PluginDetails
+{
+  description: string,
+  code: string,
+}
+
 export interface ImportPlugin {
   name: string,
   creator: string,
-  language: "python" | "bash" | "PowerShell",
+  language: ".py" | ".sh" | ".bash" | ".ps1"  | ".psm1",
   code: string,
   description: string,
   tags: string[],

@@ -1,14 +1,16 @@
-import {computed, type Ref, ref, toRaw} from "vue";
+import {type Ref, ref, toRaw} from "vue";
 
-export function useWrapping<T>(data: Ref<T[]>) {
+export function useWrapping<T extends object>(
+  data: Ref<T[]>,
+  key: keyof T = 'id' as keyof T
+) {
 
   const unwrappedItem = ref<T | null>(null)
   const originalItem = ref<T | null>(null)
-  const items = computed(() =>  data.value)
 
 
-  const isUnwrapped = (i: T) => {
-    return unwrappedItem.value === i
+  const isUnwrapped = (keyValue: string | number) => {
+    return unwrappedItem.value?.[key] === keyValue
   }
 
   const wrap = (save: boolean) => {
@@ -20,10 +22,10 @@ export function useWrapping<T>(data: Ref<T[]>) {
     unwrappedItem.value = null
   }
 
-  const unwrap = (i: T) => {
-    originalItem.value = items.value.find(p => p === i )
+  const unwrap = (keyValue: string | number) => {
+    originalItem.value = data.value.find(p => p?.[key] === keyValue )
     unwrappedItem.value = structuredClone(toRaw(originalItem.value))
   }
 
-  return { unwrap, unwrappedItem, originalItem, wrap, isUnwrapped, items }
+  return { unwrap, unwrappedItem, originalItem, wrap, isUnwrapped }
 }

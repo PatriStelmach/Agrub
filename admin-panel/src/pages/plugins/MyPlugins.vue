@@ -6,10 +6,10 @@ import type { MyPlugin } from "@/types/types.ts";
 import {useSearchFilter} from "@/composables/useSearchFilter.ts";
 import {useMyPluginStore} from "@/stores/myPluginStore.ts";
 const myPluginStore = useMyPluginStore()
-
-const { updatePage, filteredData, tableData, updateData, updateSearchData, currentPage } =
-  useSearchFilter<MyPlugin>(() => myPluginsData,(plugin) => plugin.name)
 myPluginStore.getAllMyPlugins()
+const { updatePage, filteredData, tableData, updateData, updateSearchData, currentPage } =
+  useSearchFilter<MyPlugin>(() => myPluginStore.allMyPlugins,(plugin) => plugin.name)
+
 
 </script>
 
@@ -19,7 +19,6 @@ myPluginStore.getAllMyPlugins()
   <div>
     <MyPluginsTable
       :data="tableData"
-      @update:checked="myPluginStore.checkedPlugins"
       @update:searchData="updateSearchData"
     />
 

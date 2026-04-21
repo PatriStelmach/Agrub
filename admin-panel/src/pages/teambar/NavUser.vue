@@ -36,15 +36,7 @@ defineProps<{
 
 <template>
   <SidebarMenu>
-    <SidebarMenuItem class="border-b-4">
-      <SidebarMenuButton class="flex items-center justify-center mb-4 text-lg">
-        <IconUsers class="size-5!"/>
-        <RouterLink to="/team">
-          <span>Team</span>
-        </RouterLink>
-      </SidebarMenuButton>
-    </SidebarMenuItem>
-    <SidebarMenuItem class="py-2">
+
       <DropdownMenu>
         <DropdownMenuTrigger as-child>
           <SidebarMenuButton
@@ -108,6 +100,5 @@ defineProps<{
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-    </SidebarMenuItem>
   </SidebarMenu>
 </template>

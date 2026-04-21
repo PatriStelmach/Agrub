@@ -35,6 +35,8 @@ export const buttonVariants = cva(
         "bg-background dark:bg-input/30 dark:border-green-500 border-2 text-green-500 f hover:shadow-[0_0_10px_1px] hover:shadow-green-500 ",
         red_inside:
           "bg-background dark:bg-input/30 dark:border-destructive border-2 text-destructive   hover:shadow-[0_0_10px_1px] hover:shadow-destructive ",
+        yellow_inside:
+          "bg-background dark:bg-input/30 dark:border-yellow-500 border-2 text-yellow-500   hover:shadow-[0_0_10px_1px] hover:shadow-yellow-500 ",
       },
       size: {
         "default": "h-9 px-4 py-2 has-[>svg]:px-3",

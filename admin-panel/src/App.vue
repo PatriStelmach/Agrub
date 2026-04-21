@@ -6,18 +6,16 @@ import NavBar from "@/pages/navbar/NavBar.vue";
 
 <template>
 
-  <div class="h-screen flex flex-col font-mono font-thin">
-    <header class="w-screen">
-
-      <nav class="flex w-full h-[5vh] bg-card justify-center items-center">
-
+  <div class="h-screen flex flex-col font-mono font-thin ">
+    <header class="relative w-full">
+      <nav class="absolute top-0 flex w-full h-[5vh] bg-card justify-center items-center">
         <TopRightButtons/>
       </nav>
     </header>
 
     <main class="bg-card flex flex-1  ">
       <NavBar/>
-      <RouterView class="bg-background  border flex-1 overflow-auto rounded-lg  " />
+      <RouterView class="bg-background mt-20 border flex-1 overflow-auto rounded-lg  " />
     </main>
   </div>
 

@@ -16,11 +16,11 @@ import
 import DateCell from "@/helpers/DateCell.vue";
 import {cn} from "@/lib/utils.ts";
 import {Badge} from "@/components/ui/badge";
-import type {MyPlugin} from "@/types/types.ts"
+import type {MyPlugin, PluginDetails} from "@/types/types.ts"
 import {
   IconCancel,
   IconDeviceFloppy,
-  IconListCheck,
+  IconMessageCode,
   IconX,
   IconPlus,
   IconLogs,
@@ -47,26 +47,31 @@ import {
 import {ButtonGroup} from "@/components/ui/button-group";
 import {Input} from "@/components/ui/input";
 import {dateParser} from "@/composables/dateParser.ts";
+import {useMyPluginStore} from "@/stores/myPluginStore.ts";
+import {my} from "cronstrue/dist/i18n/locales/my";
+import PluginDetailsDialog from "@/pages/plugins/PluginDetailsDialog.vue";
 
 const props = defineProps<{
   data: MyPlugin[];
 }>()
 
 const emit = defineEmits<{
-  'update:checked': [plugins:number[]];
   'update:search-data': [data:string]
 }>()
 
+const store = useMyPluginStore()
 const { sortedData, sortKey, sortOrder, toggleSort } = useSort<MyPlugin>(() => props.data, 'updatedAt')
-const { wrap, isUnwrapped, unwrap, originalItem, unwrappedItem, items } = useWrapping<MyPlugin>(sortedData)
+const { wrap, isUnwrapped, unwrap, originalItem, unwrappedItem } = useWrapping(sortedData, 'fileName')
 
+const open = ref(false);
 const searchFilter = ref<string>("")
-const checkedPlugins = ref<number[]>([])
+const checkedPlugins = ref<string[]>([])
 const tagSearch = ref("")
 const tagsListOpen = ref(false)
+const unwrappedDetails = ref<PluginDetails>({code:'',description:''})
 
 
-const blockedEdit = computed(() => checkedPlugins.value.length !== 1)
+const blockedEdit = computed(() => checkedPlugins.value.length !== 1 || unwrappedItem.value)
 const existingTags = computed(() =>  unwrappedItem.value!.tags.includes(tagSearch.value))
 
 const blockedRemoveAndChange = computed(() =>
@@ -78,7 +83,7 @@ const allChecked = computed(() =>  props.data.length > 0 &&
 const matchedTags = computed(() => availableTags.filter(t => t.includes(tagSearch.value))
   .filter(t => !unwrappedItem.value!.tags.includes(t)))
 
-const nextCron = computed(() =>
+const nextUnwrappedCron = computed(() =>
   unwrappedItem.value ? dateParser(cronParser.parse(unwrappedItem.value.cronExpression).next().toDate()).fullDate : '')
 
 const cronDescription = computed(() => {
@@ -86,17 +91,12 @@ const cronDescription = computed(() => {
   if(cron) {
     try {
       cronParser.parse(cron, {strict:true})
-      return [cronstrue.toString(cron), nextCron, true]
+      return [cronstrue.toString(cron), nextUnwrappedCron, true]
     } catch (e) {
       return [e, false]
     }
   }
   return [cron, true]
-})
-
-
-watch(checkedPlugins, (newChecked) => {
-  emit('update:checked', newChecked);
 })
 
 watch(searchFilter, () => {
@@ -117,17 +117,35 @@ const checkAll = () => {
 
 const changeStatus = () => {
   if(!unwrappedItem.value) {
-    checkedPlugins.value.forEach(p => {
-      const plugin = sortedData.value.find(s => s.id === p)
-      if (plugin)
-        plugin.active = !plugin.active
-    })
+     console.log(store.changeStatus(checkedPlugins.value))
   }
 }
 
-const check = (id: number) => {
-  return checkedPlugins.value.some(p => p === id) ?
-    checkedPlugins.value = checkedPlugins.value.filter(p => p !== id) : checkedPlugins.value.push(id)
+const deletePlugins = () => {
+  if(!unwrappedItem.value) {
+    console.log(store.deleteMyPlugins(checkedPlugins.value))
+  }
+}
+
+const getDetails = async (fileName: string) => {
+  unwrappedDetails.value = await store.getMyPluginDetails(fileName)
+}
+
+const nextRun = (plugin: MyPlugin) => {
+  return plugin.cronExpression ?  dateParser(cronParser.parse(plugin.cronExpression).next().toDate()).fullDate : ''
+}
+
+const check = (fileName: string) => {
+  return checkedPlugins.value.some(p => p === fileName) ?
+    checkedPlugins.value = checkedPlugins.value.filter(p => p !== fileName) : checkedPlugins.value.push(fileName)
+}
+
+const closePlugin = () => {
+  if(unwrappedItem.value) {
+    wrap(false);
+    tagsListOpen.value = false;
+    tagSearch.value = '';
+  }
 }
 
 const savePlugin = () => {
@@ -145,7 +163,7 @@ const savePlugin = () => {
   <h1 class="text-center my-[2vh] text-xl xl:text-2xl 2xl:text-4xl border-b pb-[2vh]">Your plugins</h1>
   <div class="flex absolute top-0 left-4">
     <ButtonGroup>
-      <ButtonGroup class="hidden sm:flex">
+      <ButtonGroup class=" flex">
         <Button variant="outline" size="icon" aria-label="Go Back">
           <ArrowLeftIcon />
         </Button>
@@ -153,7 +171,7 @@ const savePlugin = () => {
       <ButtonGroup>
         <Button
           :disabled="blockedEdit"
-          @click="unwrap(checkedPlugins[0]!)"
+          @click="unwrap(checkedPlugins[0]!); getDetails(checkedPlugins[0]!)"
           variant="green_outline">
           Edit
           <IconPencilCode/>
@@ -166,12 +184,13 @@ const savePlugin = () => {
           <IconStatusChange/>
         </Button>
         <Button
+          @click="deletePlugins"
           :disabled="blockedRemoveAndChange"
           variant="red_outline">
           Delete
           <IconTrash/>
         </Button>
-        <InputGroup class="relative l-[30vw] w-[20vw]  " >
+        <InputGroup class=" w-[14vw] border-l-2! " >
           <InputGroupInput
             v-model="searchFilter"
             type="search"
@@ -215,11 +234,11 @@ const savePlugin = () => {
         <TableBody >
           <TableRow
             class="cursor-pointer duration-0 border-radius-0 [&_td]:py-2 [&_td]:pr-4 hover:bg-green-500/20 "
-            v-for="plugin in items"
+            v-for="plugin in sortedData"
             :key="plugin.fileName"
             @click="!isUnwrapped(plugin.fileName) ? check(plugin.fileName): true;"
             :class="{'hover:bg-destructive/20': !plugin.active,
-             'bg-selected [&_td]:align-top  sticky h-60! lg:h-70! xl:h-80! 2xl:h-90! [&_td]:pt-4! top-11 bottom-11 hover:bg-card z-9 cursor-auto'
+             'bg-selected [&_td]:align-top  sticky h-40! lg:h-70! xl:h-80! 2xl:h-90! [&_td]:pt-4! top-11 bottom-11 hover:bg-card z-9 cursor-auto'
                     : isUnwrapped(plugin.fileName) }">
             <TableCell class="px-4">
               <input
@@ -292,9 +311,9 @@ const savePlugin = () => {
             </TableCell>
 
             <TableCell v-if="!isUnwrapped(plugin.fileName)" class="whitespace-break-spaces">
-              {{ cronstrue.toString(plugin.cronExpression) }}
+              {{ plugin.cronExpression ? cronstrue.toString(plugin.cronExpression) : ''}}
               <br>
-              <span>Next run: {{ dateParser(cronParser.parse(plugin.cronExpression).next().toDate()).fullDate }}
+              <span>Next run: {{ nextRun(plugin) }}
               </span>
 
             </TableCell>
@@ -340,19 +359,19 @@ const savePlugin = () => {
             </TableCell>
             <TableCell class="">
               <img
-                v-if="plugin.language === 'python'"
+                v-if="plugin.language === '.py'"
                 alt="python_icon"
                 src="@/components/icons/python_icon.png"
                 class="size-7 lg:size-8 xl:size-10 2xl:size-16"
               />
               <img
-                v-if="plugin.language === 'bash'"
+                v-if="['.bash', 'sh'].includes(plugin.language)"
                 alt="bash_icon"
                 src="@/components/icons/bash_icon.png"
                 class="size-7 lg:size-8 xl:size-10 2xl:size-16"
               />
               <img
-                v-if="plugin.language === 'PowerShell'"
+                v-if="['.ps1', '.psm1'].includes(plugin.language)"
                 alt="powershell_icon"
                 src="@/components/icons/powershell_icon.png"
                 class="size-7 lg:size-8 xl:size-10 2xl:size-16"
@@ -378,24 +397,35 @@ const savePlugin = () => {
 
             </TableCell>
             <TableCell class=" text-md lg:text-lg xl:text-xl 2xl:text-2xl ">{{plugin.weight}} KB</TableCell>
-            <Button
-              v-if="isUnwrapped(plugin.fileName)"
-              @click="wrap(false); tagsListOpen=false; tagSearch=''; checkAll"
-              variant="red_inside"
-              class="text-destructive items-center align-middle flex gap-x-2 absolute bottom-2 left-3 ">
-              Cancel<IconCancel class="size-4"/>
-            </Button>
-            <Button
-              v-if="isUnwrapped(plugin.fileName)"
-              @click="savePlugin"
-              variant="green_inside"
-              class="text-green-500 items-center flex gap-x-2 absolute bottom-2 right-3">
-              Save<IconDeviceFloppy class="size-5"/>
-            </Button>
+            <div v-if="isUnwrapped(plugin.fileName)" class="flex space-x-1 absolute bottom-4 right-3 *:items-center *:align-middle *:flex *:gap-x-2 ">
+              <Button
+                @click="closePlugin"
+                variant="red_inside">
+                Cancel<IconCancel class="size-4 xl:size-5"/>
+              </Button>
+              <PluginDetailsDialog
+                :code="unwrappedDetails!.code"
+                :description="unwrappedDetails!.description"
+              >
+                <Button
+                  @click="open = true"
+                  variant="yellow_inside">
+                  Details<IconMessageCode class="size-4 xl:size-5"/>
+                </Button>
+              </PluginDetailsDialog>
+              <Button
+                @click="savePlugin"
+                variant="green_inside">
+                Save<IconDeviceFloppy class="size-4 xl:size-5"/>
+              </Button>
+            </div><Teleport to="body">
+
+          </Teleport>
           </TableRow>
         </TableBody>
       <TableFooter>
       </TableFooter>
       </Table>
     </div>
+
 </template>

@@ -199,6 +199,7 @@ input[type="checkbox"]:focus-visible
   scrollbar-width: thin;
   scroll-behavior: smooth;
   border-radius: 10px;
+  width: 0.4em;
 }
 
 ::-webkit-scrollbar-thumb {
