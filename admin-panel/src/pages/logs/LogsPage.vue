@@ -71,7 +71,7 @@ const updatePage = (page: number) => {
               <InputGroupInput
                 v-model="searchFilter"
                 type="search"
-                placeholder="Search for alert"/>
+                placeholder="Search for log"/>
               <InputGroupAddon>
                 <Search/>
               </InputGroupAddon>
@@ -87,10 +87,11 @@ const updatePage = (page: number) => {
             <span class="font-extrabold">{{ logsData.length }}</span>
           </TableCaption>
           <TableHeader class="h-10">
-            <TableRow class="bg-secondary hover:bg-secondary *:py-4 **:text-md! **:lg:text-xl! **:xl:text-2xl! **:2xl:text-4xl!">
+            <TableRow class="bg-secondary hover:bg-secondary *:py-2 **:text-md! **:lg:text-xl! **:xl:text-2xl! **:2xl:text-4xl!">
               <SortableHead keyName="header" label="Header" :sort-key="sortKey" class="w-20/100 pl-4 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
               <SortableHead keyName="source" label="Source" :sort-key="sortKey" class="w-16/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-              <SortableHead keyName="content" label="Content" :sort-key="sortKey" class="30/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+              <SortableHead keyName="content" label="Content" :sort-key="sortKey" class="15/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+              <SortableHead keyName="severity" label="Severity" :sort-key="sortKey" class="15/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
               <SortableHead keyName="technicianGroups" label="Groups" :sort-key="sortKey" class="w-20/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
               <SortableHead keyName="createdAt" label="Timestamp" :sort-key="sortKey" class="w-14/100  " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
             </TableRow>
@@ -112,7 +113,17 @@ const updatePage = (page: number) => {
               <TableCell class="py-2 whitespace-break-spaces"
               >{{log.content}}
               </TableCell>
-
+              <TableCell class="py-2"
+                         :class="{
+              'text-sky-500': ['not classified', 'unknown'].includes(log.severity.toLowerCase()),
+              'text-lime-500': ['low', 'ok', 'information'].includes(log.severity.toLowerCase()),
+              'text-yellow-500': ['medium', 'warning'].includes(log.severity.toLowerCase()),
+              'text-amber-500': log.severity.toLowerCase() === 'average',
+              'text-orange-500': log.severity.toLowerCase() === 'high',
+              'text-red-500': ['critical', 'disaster'].includes(log.severity.toLowerCase()),
+              }"
+              >{{log.severity}}
+              </TableCell>
               <TableCell
                 class="py-2  whitespace-break-spaces">{{ log.technicianGroups?.join(", ") }}</TableCell>
               <DateCell v-if="log.createdAt" class="py-2" :date="log.createdAt "></DateCell>

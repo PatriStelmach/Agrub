@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {isValidCron} from "cron-validator";
+import axios from 'axios'
 import cronParser  from 'cron-parser';
 import cronstrue from 'cronstrue'
 import
@@ -112,7 +112,7 @@ const addTag = () => {
 
 const checkAll = () => {
   return !allChecked.value ?
-    checkedPlugins.value = props.data.map(plugin => plugin.id) : checkedPlugins.value = []
+    checkedPlugins.value = props.data.map(plugin => plugin.fileName) : checkedPlugins.value = []
 }
 
 const changeStatus = () => {
@@ -192,7 +192,7 @@ const savePlugin = () => {
         <span class="font-extrabold">{{ sortedData.length}}</span>
       </TableCaption>
       <TableHeader class="h-10  ">
-      <TableRow class="bg-secondary [&_th]:py-4 hover:bg-secondary **:text-md! **:lg:text-xl! **:xl:text-2xl! **:2xl:text-4xl! ">
+      <TableRow class="bg-secondary [&_th]:py-2 hover:bg-secondary **:text-md! **:lg:text-xl! **:xl:text-2xl! **:2xl:text-4xl! ">
         <TableHead class="w-3/100 px-4 ">
           <input
             type="checkbox"
@@ -216,22 +216,22 @@ const savePlugin = () => {
           <TableRow
             class="cursor-pointer duration-0 border-radius-0 [&_td]:py-2 [&_td]:pr-4 hover:bg-green-500/20 "
             v-for="plugin in items"
-            :key="plugin.id"
-            @click="!isUnwrapped(plugin.id) ? check(plugin.id): true;"
+            :key="plugin.fileName"
+            @click="!isUnwrapped(plugin.fileName) ? check(plugin.fileName): true;"
             :class="{'hover:bg-destructive/20': !plugin.active,
-             'bg-selected [&_td]:align-top  sticky h-60! lg:h-70! xl:h-80! 2xl:h-90! [&_td]:pt-4! top-14 bottom-11 hover:bg-card z-9 cursor-auto'
-                    : isUnwrapped(plugin.id) }">
+             'bg-selected [&_td]:align-top  sticky h-60! lg:h-70! xl:h-80! 2xl:h-90! [&_td]:pt-4! top-11 bottom-11 hover:bg-card z-9 cursor-auto'
+                    : isUnwrapped(plugin.fileName) }">
             <TableCell class="px-4">
               <input
                 type="checkbox"
-                :id="cn('my-plugin-no-'+plugin.id)" class="size-[1vw] cursor-pointer align-middle"
-                :value="plugin.id"
+                :id="cn('my-plugin-no-'+plugin.fileName)" class="size-[1vw] cursor-pointer align-middle"
+                :value="plugin.fileName"
                 v-model="checkedPlugins"
               />
             </TableCell>
             <TableCell class=" whitespace-break-spaces">{{plugin.name}}</TableCell>
 
-            <TableCell v-if="!isUnwrapped(plugin.id)"  class=" whitespace-break-spaces">
+            <TableCell v-if="!isUnwrapped(plugin.fileName)"  class=" whitespace-break-spaces">
               <Badge
                 v-for="(tag, index) in plugin.tags"
                 class="cursor-pointer hover:bg-badge mr-1 mb-2  text-sm lg:text-lg xl:text-xl 2xl:text-3xl"
@@ -291,7 +291,7 @@ const savePlugin = () => {
 
             </TableCell>
 
-            <TableCell v-if="!isUnwrapped(plugin.id)" class="whitespace-break-spaces">
+            <TableCell v-if="!isUnwrapped(plugin.fileName)" class="whitespace-break-spaces">
               {{ cronstrue.toString(plugin.cronExpression) }}
               <br>
               <span>Next run: {{ dateParser(cronParser.parse(plugin.cronExpression).next().toDate()).fullDate }}
@@ -319,7 +319,7 @@ const savePlugin = () => {
                 </span>
 
             </TableCell>
-            <TableCell v-if="!isUnwrapped(plugin.id)" class="">
+            <TableCell v-if="!isUnwrapped(plugin.fileName)" class="">
               <component class="text-badge size-7 lg:size-8 xl:size-10 2xl:size-16" :class="{'text-yellow-500' : !plugin.log }" :is="plugin.log ? IconLogs : IconAlertTriangleFilled "/>
             </TableCell>
             <TableCell v-else class="">
@@ -359,7 +359,7 @@ const savePlugin = () => {
               />
             </TableCell>
             <DateCell class=" text-md lg:text-lg xl:text-xl 2xl:text-2xl " v-if="plugin.updatedAt" :date="plugin.updatedAt"></DateCell>
-            <TableCell v-if="!isUnwrapped(plugin.id)" class=" text-green-500" :class="{'text-destructive' : !plugin.active}">{{ plugin.active ? 'On' : 'Off'}}</TableCell>
+            <TableCell v-if="!isUnwrapped(plugin.fileName)" class=" text-green-500" :class="{'text-destructive' : !plugin.active}">{{ plugin.active ? 'On' : 'Off'}}</TableCell>
             <TableCell v-else class="">
               <RadioGroup
                 @update:model-value="unwrappedItem!.active = $event === 'on'"
@@ -379,14 +379,14 @@ const savePlugin = () => {
             </TableCell>
             <TableCell class=" text-md lg:text-lg xl:text-xl 2xl:text-2xl ">{{plugin.weight}} KB</TableCell>
             <Button
-              v-if="isUnwrapped(plugin.id)"
+              v-if="isUnwrapped(plugin.fileName)"
               @click="wrap(false); tagsListOpen=false; tagSearch=''; checkAll"
               variant="red_inside"
               class="text-destructive items-center align-middle flex gap-x-2 absolute bottom-2 left-3 ">
               Cancel<IconCancel class="size-4"/>
             </Button>
             <Button
-              v-if="isUnwrapped(plugin.id)"
+              v-if="isUnwrapped(plugin.fileName)"
               @click="savePlugin"
               variant="green_inside"
               class="text-green-500 items-center flex gap-x-2 absolute bottom-2 right-3">

@@ -94,11 +94,11 @@ const updatePage = (page: number) => {
           <span class="font-extrabold">{{ dashboardData.length}}</span>
         </TableCaption>
         <TableHeader class="h-10">
-          <TableRow class="bg-secondary hover:bg-secondary **:text-md! *:py-4 **:lg:text-xl! **:xl:text-2xl! **:2xl:text-4xl!">
+          <TableRow class="bg-secondary hover:bg-secondary **:text-md! *:py-2 **:lg:text-xl! **:xl:text-2xl! **:2xl:text-4xl!">
             <SortableHead keyName="header" label="Alert" :sort-key="sortKey" class="w-20/100 pl-4" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
             <SortableHead keyName="source" label="Source" :sort-key="sortKey" class="w-16/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
             <SortableHead keyName="status" label="Status" :sort-key="sortKey" class="w-15/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-            <SortableHead keyName="priority" label="Priority" :sort-key="sortKey" class="w-15/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="severity" label="Severity" :sort-key="sortKey" class="w-15/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
             <SortableHead keyName="technicianGroups" label="Groups" :sort-key="sortKey" class="w-20/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
             <SortableHead keyName="createdAt" label="Timestamp" :sort-key="sortKey" class="w-14/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
           </TableRow>
@@ -124,13 +124,16 @@ const updatePage = (page: number) => {
                         class="size-4 text-emerald-500"/>
               </div>
             </TableCell>
-
             <TableCell class="py-2"
                        :class="{
-              'text-green-500': alert.priority === 'low',
-              'text-yellow-500': alert.priority === 'medium',
-              'text-destructive': alert.priority === 'high'}"
-            >{{alert.priority}}
+              'text-sky-500': ['not classified', 'unknown'].includes(alert.severity.toLowerCase()),
+              'text-lime-500': ['low', 'ok', 'information'].includes(alert.severity.toLowerCase()),
+              'text-yellow-500': ['medium', 'warning'].includes(alert.severity.toLowerCase()),
+              'text-amber-500': alert.severity.toLowerCase() === 'average',
+              'text-orange-500': alert.severity.toLowerCase() === 'high',
+              'text-red-500': ['critical', 'disaster'].includes(alert.severity.toLowerCase()),
+              }"
+            >{{alert.severity}}
             </TableCell>
 
             <TableCell

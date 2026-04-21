@@ -44,6 +44,20 @@ const logContents = [
   "Warning: resource usage high",
 ];
 
+const severityOptions = [
+  "Not classified",
+  "Information",
+  "Warning",
+  "Average",
+  "High",
+  "Disaster",
+  "Low",
+  "Medium",
+  "Critical",
+  "Ok",
+  "Unknown",
+];
+
 const groups = ["Network Team", "Security Team", "System Administrators", "DevOps", "Support Team"];
 
 export const logsData: LogObject[] = Array.from({ length: 100 }, (_, i) => {
@@ -80,6 +94,7 @@ export const logsData: LogObject[] = Array.from({ length: 100 }, (_, i) => {
     header,
     content: logContents[i % logContents.length]!,
     source,
+    severity: severityOptions[i % severityOptions.length]!,
     technicianGroups: [groups[i % groups.length]!],
     createdAt,
   };

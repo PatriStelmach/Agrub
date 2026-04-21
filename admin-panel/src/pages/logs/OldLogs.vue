@@ -16,7 +16,7 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<LogObject>(() => 
       <span class="font-extrabold">{{ sortedData.length}}</span>
     </TableCaption>
     <TableHeader class="h-10 ">
-      <TableRow class="bg-secondary [&_th]:py-4 hover:bg-secondary ">
+      <TableRow class="bg-secondary [&_th]:py-2 hover:bg-secondary ">
         <TableHead class="w-3/100  pl-0 pr-4 ">
           <IconListCheck
             class="size-[2vh] mx-3 rounded-sm

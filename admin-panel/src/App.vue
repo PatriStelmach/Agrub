@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import {SidebarProvider} from "@/components/ui/sidebar";
-import AppSidebar from "@/pages/navbar/AppSidebar.vue";
 import TopRightButtons from "@/pages/globals/topRightButtons.vue";
 import NavBar from "@/pages/navbar/NavBar.vue";
 </script>

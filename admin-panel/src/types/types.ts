@@ -1,10 +1,12 @@
+export const api_url = 'http://localhost:10000/api'
+
 export interface AlertObject
 {
   id: number
   header: string,
   source: string,
   status: "Sent" | "In Process" | "Done",
-  priority: "low" | "medium" | "high",
+  severity: string,
   technicianGroups?: string[],
   createdAt: Date,
   closedAt?: Date,
@@ -16,6 +18,7 @@ export interface LogObject
   header: string,
   content: string,
   source: string,
+  severity: string,
   technicianGroups?: string[],
   createdAt: Date,
 }
@@ -34,8 +37,8 @@ export interface User
 
 export interface MyPlugin
 {
-  id: number,
   name: string,
+  fileName: string
   creator: string,
   language: "python" | "bash" | "PowerShell",
   description?: string,

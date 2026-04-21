@@ -36,7 +36,7 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<LibraryPlugin>(()
         <span class="font-extrabold">{{ props.data.length}}</span>
       </TableCaption>
       <TableHeader class="h-10">
-        <TableRow class="bg-secondary hover:bg-secondary **:text-md! *:py-4 **:lg:text-xl! **:xl:text-2xl! **:2xl:text-4xl!">
+        <TableRow class="bg-secondary hover:bg-secondary **:text-md! *:py-2 **:lg:text-xl! **:xl:text-2xl! **:2xl:text-4xl!">
         <SortableHead keyName="name" label="Name" :sort-key="sortKey" class="pl-4 w-13/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
         <SortableHead keyName="creator" label="Creator" :sort-key="sortKey" class=" w-13/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
         <SortableHead keyName="tags" label="Tags" :sort-key="sortKey" class=" w-17/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
@@ -50,7 +50,7 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<LibraryPlugin>(()
       <TableRow
         class=" cursor-grab duration-0 hover:bg-blue-700/30"
         v-for="plugin in sortedData"
-        :key="plugin.id">
+        :key="plugin.fileName">
         <TableCell class="pl-4 y-2">{{plugin.name}}</TableCell>
         <TableCell class="py-2">{{plugin.creator}}</TableCell>
         <TableCell class="py-2">

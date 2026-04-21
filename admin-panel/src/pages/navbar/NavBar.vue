@@ -57,7 +57,7 @@ const navItems = [
       </AccordionTrigger>
       <AccordionContent class="grid gap-y-2 ">
         <RouterLink class="hover:bg-input py-2 px-1 rounded-md xl:text-lg" v-for="link in item.links" :key="link.to" :to="link.to">
-          <div class="flex gap-x-2"><component class="size-4  xl:size-6" :is="link.icon"/> {{link.label}} </div></RouterLink>
+          <div class="flex items-center gap-x-2"><component class="size-4  xl:size-6" :is="link.icon"/> {{link.label}} </div></RouterLink>
       </AccordionContent>
     </AccordionItem>
   </Accordion>

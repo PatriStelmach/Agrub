@@ -1,8 +1,8 @@
 import type {MyPlugin} from "@/types/types"
 export const myPluginsData: MyPlugin[] = [
   {
-    id: 1,
     name: "bash script",
+    fileName: "bash_script.sh",
     creator: "John Doe",
     language: "bash",
     code: "#!/bin/bash\n\necho \"Starting bash script...\"\nfor i in {1..5}; do\n    echo \"Iteration $i\"\n    sleep 1\ndone\necho \"Script completed.\"",
@@ -15,8 +15,8 @@ export const myPluginsData: MyPlugin[] = [
     log: true
   },
   {
-    id: 2,
     name: "python monitor",
+    fileName: "python_monitor.py",
     creator: "Jane Smith",
     language: "python",
     code: "import psutil\nimport time\n\ndef check_cpu():\n    cpu_percent = psutil.cpu_percent(interval=1)\n    return cpu_percent\n\nwhile True:\n    usage = check_cpu()\n    print(f\"CPU Usage: {usage}%\")\n    time.sleep(30)",
@@ -29,8 +29,8 @@ export const myPluginsData: MyPlugin[] = [
     log: false
   },
   {
-    id: 3,
     name: "node service",
+    fileName: "node_service.ps1",
     creator: "Bob Johnson",
     language: "PowerShell",
     code: "const express = require('express');\nconst app = express();\n\napp.get('/health', (req, res) => {\n    res.json({ status: 'ok', timestamp: Date.now() });\n});\n\napp.listen(3000, () => {\n    console.log('Service running on port 3000');\n});",
@@ -43,8 +43,8 @@ export const myPluginsData: MyPlugin[] = [
     log: true
   },
   {
-    id: 4,
     name: "docker watcher",
+    fileName: "docker_watcher.sh",
     creator: "Alice Brown",
     language: "bash",
     code: "#!/bin/bash\n\nCONTAINERS=$(docker ps --format \"{{.Names}}\")\nfor container in $CONTAINERS; do\n    STATUS=$(docker inspect --format='{{.State.Status}}' $container)\n    echo \"Container: $container - Status: $STATUS\"\ndone",
@@ -57,8 +57,8 @@ export const myPluginsData: MyPlugin[] = [
     log: false
   },
   {
-    id: 5,
     name: "log analyzer",
+    fileName: "log_analyzer.py",
     creator: "Charlie Wilson",
     language: "python",
     code: "import re\nfrom collections import Counter\n\ndef analyze_logs(filepath):\n    with open(filepath, 'r') as f:\n        lines = f.readlines()\n    errors = [l for l in lines if 'ERROR' in l]\n    return Counter(errors)",
@@ -71,8 +71,8 @@ export const myPluginsData: MyPlugin[] = [
     log: true
   },
   {
-    id: 6,
     name: "cpu monitor",
+    fileName: "cpu_monitor.ps1",
     creator: "David Lee",
     language: "PowerShell",
     code: "$cpu = Get-CimInstance Win32_Processor\n$usage = $cpu.LoadPercentage\n\nif ($usage -gt 80) {\n    Write-Output \"High CPU: $usage%\"\n} else {\n    Write-Output \"CPU OK: $usage%\"\n}",
@@ -85,8 +85,8 @@ export const myPluginsData: MyPlugin[] = [
     log: false
   },
   {
-    id: 7,
     name: "memory checker",
+    fileName: "memory_checker.sh",
     creator: "Eva Martinez",
     language: "bash",
     code: "#!/bin/bash\n\nTOTAL=$(free -m | awk 'NR==2{print $2}')\nUSED=$(free -m | awk 'NR==2{print $3}')\nPERCENT=$((USED * 100 / TOTAL))\n\necho \"Memory: $USED MB used / $TOTAL MB ($PERCENT%)\"",
@@ -99,8 +99,8 @@ export const myPluginsData: MyPlugin[] = [
     log: false
   },
   {
-    id: 8,
     name: "network scanner",
+    fileName: "network_scanner.py",
     creator: "Frank Garcia",
     language: "python",
     code: "import socket\n\ndef scan_port(host, port):\n    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)\n    sock.settimeout(1)\n    result = sock.connect_ex((host, port))\n    sock.close()\n    return result == 0",
@@ -113,8 +113,8 @@ export const myPluginsData: MyPlugin[] = [
     log: true
   },
   {
-    id: 9,
     name: "disk monitor",
+    fileName: "disk_monitor.ps1",
     creator: "Grace Chen",
     language: "PowerShell",
     code: "$drives = Get-PSDrive -PSProvider FileSystem\nforeach ($drive in $drives) {\n    $free = [math]::Round($drive.Free / 1GB, 2)\n    Write-Output \"Drive $($drive.Name): $free GB free\"\n}",
@@ -127,8 +127,8 @@ export const myPluginsData: MyPlugin[] = [
     log: false
   },
   {
-    id: 10,
     name: "process watcher",
+    fileName: "process_watcher.py",
     creator: "Henry Taylor",
     language: "python",
     code: "import psutil\n\ndef get_processes():\n    processes = []\n    for proc in psutil.process_iter(['pid', 'name', 'cpu_percent']):\n        processes.append(proc.info)\n    return processes",
@@ -141,8 +141,8 @@ export const myPluginsData: MyPlugin[] = [
     log: true
   },
   {
-    id: 11,
     name: "file auditor",
+    fileName: "file_auditor.sh",
     creator: "Isabella White",
     language: "bash",
     code: "#!/bin/bash\n\nWATCH_DIR=\"/etc\"\nHASH_FILE=\"/var/log/file_hashes.sha256\"\n\nfind $WATCH_DIR -type f -exec sha256sum {} \\; > $HASH_FILE.new\ndiff $HASH_FILE $HASH_FILE.new || echo \"Changes detected!\"",
@@ -155,8 +155,8 @@ export const myPluginsData: MyPlugin[] = [
     log: true
   },
   {
-    id: 12,
     name: "health checker",
+    fileName: "health_checker.py",
     creator: "Jack Miller",
     language: "python",
     code: "import requests\nfrom datetime import datetime\n\ndef check_health(url):\n    try:\n        response = requests.get(url, timeout=5)\n        return {\n            'status': response.status_code,\n            'time': datetime.now().isoformat()\n        }\n    except Exception as e:\n        return {'error': str(e)}",
@@ -169,8 +169,8 @@ export const myPluginsData: MyPlugin[] = [
     log: false
   },
   {
-    id: 13,
     name: "SSL tracker",
+    fileName: "ssl_tracker.sh",
     creator: "Karen Davis",
     language: "bash",
     code: "#!/bin/bash\n\nDOMAIN=\"example.com\"\nEXPIRY=$(echo | openssl s_client -servername $DOMAIN -connect $DOMAIN:443 2>/dev/null | openssl x509 -noout -dates | grep notAfter | cut -d= -f2)\necho \"SSL cert for $DOMAIN expires: $EXPIRY\"",
@@ -183,8 +183,8 @@ export const myPluginsData: MyPlugin[] = [
     log: false
   },
   {
-    id: 14,
     name: "error catcher",
+    fileName: "error_catcher.ps1",
     creator: "Larry Wilson",
     language: "PowerShell",
     code: "$logPath = \"C:\\Logs\\errors.log\"\n$errors = Get-Content $logPath -Tail 100 | Where-Object { $_ -match \"ERROR|EXCEPTION\" }\n\nif ($errors) {\n    Write-Output \"Found $($errors.Count) errors\"\n    $errors | ForEach-Object { Write-Output $_ }\n}",
@@ -197,8 +197,8 @@ export const myPluginsData: MyPlugin[] = [
     log: false
   },
   {
-    id: 15,
     name: "access logger",
+    fileName: "access_logger.py",
     creator: "Nancy Moore",
     language: "python",
     code: "import logging\nfrom datetime import datetime\n\nlogging.basicConfig(filename='access.log', level=logging.INFO)\n\ndef log_access(user, action):\n    logging.info(f\"{datetime.now()} - User: {user} - Action: {action}\")",
@@ -211,8 +211,8 @@ export const myPluginsData: MyPlugin[] = [
     log: true
   },
   {
-    id: 16,
     name: "db connector",
+    fileName: "db_connector.sh",
     creator: "Oliver Taylor",
     language: "bash",
     code: "#!/bin/bash\n\nPGHOST=\"localhost\"\nPGDATABASE=\"mydb\"\nPGUSER=\"admin\"\n\nCONN_STATUS=$(psql -h $PGHOST -U $PGUSER -d $PGDATABASE -c \"SELECT 1\" 2>&1)\nif echo \"$CONN_STATUS\" | grep -q \"1 row\"; then\n    echo \"Database connection OK\"\nelse\n    echo \"Database connection failed\"\nfi",
