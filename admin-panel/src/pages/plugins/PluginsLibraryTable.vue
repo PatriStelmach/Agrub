@@ -56,8 +56,7 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<LibraryPlugin>(()
         <TableCell class="whitespace-break-spaces">
           <Badge
             v-for="(tag, index) in plugin.tags"
-            class="cursor-pointer hover:bg-badge mr-1 my-1  text-sm lg:text-md xl:text-lg 2xl:text:2xl"
-            variant="secondary"
+            variant="tags"
             :key="index">{{tag}}</Badge>
         </TableCell>
         <TableCell>

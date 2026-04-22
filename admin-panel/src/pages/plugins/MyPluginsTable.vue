@@ -254,8 +254,7 @@ const savePlugin = () => {
             <TableCell v-if="!isUnwrapped(plugin.fileName)"  class=" whitespace-break-spaces">
               <Badge
                 v-for="(tag, index) in plugin.tags"
-                class="cursor-pointer hover:bg-badge mr-1 my-1  text-sm lg:text-md xl:text-lg 2xl:text:2xl"
-                variant="secondary"
+                variant="tags"
                 :key="index"
               >{{tag}}</Badge>
             </TableCell>
@@ -276,8 +275,7 @@ const savePlugin = () => {
                   </InputGroup>
                   <div class="max-h-30 w-full mb-2  overflow-y-auto border-2 border-t-0! border-input p-2 rounded-b-md" v-if="matchedTags.length ">
                     <Badge
-                      class="cursor-pointer hover:bg-badge mr-1 mb-1  text-sm lg:text-md xl:text-lg 2xl:text:2xl"
-                      variant="secondary"
+                      variant="tags"
                       @click="unwrappedItem!.tags.push(tag); tagSearch = ''"
                       v-for="(tag, index) in matchedTags" :key="index">{{tag}}</Badge>
                   </div>
@@ -292,8 +290,7 @@ const savePlugin = () => {
                 <div class="w-full justify-between">
                   <Badge
                     v-for="(tag, index) in unwrappedItem!.tags"
-                    class="cursor-pointer hover:bg-badge mr-1 my-1  text-sm lg:text-md xl:text-lg 2xl:text:2xl h-4 lg:h-7 xl:h-8 2xl:h-12"
-                    variant="secondary"
+                    variant="tags"
                     :key="index"
                   >{{tag}}
                     <div>

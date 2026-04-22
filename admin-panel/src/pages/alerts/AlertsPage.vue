@@ -93,8 +93,7 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<AlertObject>(() =
             <TableCell class="pl-4  whitespace-break-spaces">{{alert.header}}</TableCell>
             <TableCell class="">
               <Badge
-                class="cursor-pointer hover:bg-badge mr-1 ml-[-0.5em] text-md lg:text-lg xl:text-xl 2xl:text:3xl"
-                variant="secondary"
+                variant="source"
               >{{alert.source}}</Badge>
             </TableCell>
             <TableCell class=" gap-x-2 items-center">
@@ -118,7 +117,15 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<AlertObject>(() =
             </TableCell>
 
             <TableCell
-              class="  whitespace-break-spaces">{{ alert.technicianGroups?.join(", ") }}</TableCell>
+              class="py-2  whitespace-break-spaces">
+              <Badge
+                variant="groups"
+                v-for="(group, index) in alert.technicianGroups"
+                :key="index"
+              >
+                {{ group }}
+              </Badge>
+            </TableCell>
             <DateCell v-if="alert.createdAt" class="" :date="alert.createdAt "></DateCell>
             <TableCell>
               <Button variant="orange_outline">

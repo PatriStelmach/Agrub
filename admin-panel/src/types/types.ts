@@ -30,7 +30,7 @@ export interface User
   surname: string,
   active: boolean,
   email?: string,
-  role: "admin" | "technician"
+  role: "Administrator" | "Technician"
   groups: string[]
   avatar?: string
 }

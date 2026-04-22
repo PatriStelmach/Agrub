@@ -40,6 +40,8 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --color-selected: var(--selected);
   --color-badge: var(--badge);
+  --color-badge1: var(--badge1);
+  --color-badge2: var(--badge2);
 }
 :root {
   --checkbox-border-color: #8b8c89;
@@ -79,6 +81,8 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.551 0.027 264.364);
   --badge: oklch(0.59 0.14 242);
+  --badge1: oklch(0.731 0.205 132.694);
+  --badge2: oklch(54.5% 0.246 16.439);
 }
 
 .light {

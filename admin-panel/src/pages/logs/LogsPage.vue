@@ -104,18 +104,17 @@ const updatePage = (page: number) => {
               v-for="log in sortedData"
               :key="log.id"
             >
-              <TableCell class="pl-4 py-2  whitespace-break-spaces">{{log.header}}</TableCell>
-              <TableCell class="py-2">
+              <TableCell class="pl-4   whitespace-break-spaces">{{log.header}}</TableCell>
+              <TableCell class="">
                 <Badge
-                  class="cursor-pointer hover:bg-badge mr-1 ml-[-0.5em] text-md lg:text-lg xl:text-xl 2xl:text:3xl"
-                  variant="secondary"
+                  variant="source"
                 >{{log.source}}</Badge>
               </TableCell>
 
-              <TableCell class="py-2 whitespace-break-spaces"
+              <TableCell class=" whitespace-break-spaces"
               >{{log.content}}
               </TableCell>
-              <TableCell class="py-2"
+              <TableCell class=""
                          :class="{
               'text-sky-500': ['not classified', 'unknown'].includes(log.severity.toLowerCase()),
               'text-lime-500': ['low', 'ok', 'information'].includes(log.severity.toLowerCase()),
@@ -127,8 +126,16 @@ const updatePage = (page: number) => {
               >{{log.severity}}
               </TableCell>
               <TableCell
-                class="py-2  whitespace-break-spaces">{{ log.technicianGroups?.join(", ") }}</TableCell>
-              <DateCell v-if="log.createdAt" class="py-2" :date="log.createdAt "></DateCell>
+                class="  whitespace-break-spaces">
+                <Badge
+                  variant="groups"
+                  v-for="(group, index) in log.technicianGroups"
+                  :key="index"
+                >
+                  {{ group }}
+                </Badge>
+              </TableCell>
+              <DateCell v-if="log.createdAt" class="" :date="log.createdAt "></DateCell>
               <TableCell>
                 <Button variant="orange_outline">
                   <IconListDetails/>

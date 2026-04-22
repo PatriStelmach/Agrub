@@ -16,6 +16,15 @@ export const badgeVariants = cva(
          "border-transparent bg-destructive text-white [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
         outline:
           "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
+        groups:
+          "border-transparent text-primary bg-badge/80 hover:bg-badge/50 cursor-pointer hover:scale-105 transition-all duration-50" +
+          " hover:shadow-badge hover:shadow-md mr-1 my-1 text-sm xl:text-md 2xl:text-lg ",
+        tags:
+          "border-transparent text-primary bg-accent hover:bg-badge2 cursor-pointer hover:scale-105 transition-all duration-50" +
+          " hover:shadow-badge2 hover:shadow-md mr-1 my-1 text-sm xl:text-lg 2xl:text-lg",
+        source:
+          "border-transparent text-primary bg-accent hover:bg-badge1 cursor-pointer hover:scale-105 transition-all duration-50" +
+          " hover:shadow-badge1 hover:shadow-md text-md lg:text-lg 2xl:text-xl "
       },
     },
     defaultVariants: {
