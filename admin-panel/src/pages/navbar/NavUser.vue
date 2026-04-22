@@ -1,28 +1,41 @@
 <script setup lang="ts">
-import { ScrollArea } from '@/components/ui/scroll-area'
-import type {User} from "@/types/types.ts";
-import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
-import {SidebarMenu, SidebarMenuButton, SidebarMenuItem} from "@/components/ui/sidebar";
+import {
+  IconDotsVertical,
+  IconLogout,
+  IconNotification, IconUsers,
+  IconUserCircle,
+} from "@tabler/icons-vue"
+
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from '@/components/ui/avatar'
 import {
   DropdownMenu,
-  DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator, DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
-import {IconUser, IconNotification, IconUserCircle, IconUsers} from "@tabler/icons-vue";
-import {sidebarData} from "@/data/sidebarData.ts";
-import {usersData} from "@/data/usersData.ts";
-import NavUser from "@/pages/teambar/NavUser.vue";
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import {
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from '@/components/ui/sidebar'
+import type {User} from "@/types/types.ts";
+
+
+defineProps<{
+  user: User
+}>()
 
 </script>
 
 <template>
-
-  <div class=" bottom-4 flex-1 min-h-0 max-h-110 overflow-auto">
-    <SidebarMenuItem
-      v-for="user in usersData"
-      :key="user.id"
-      class="inline ">
+  <SidebarMenu>
       <DropdownMenu>
         <DropdownMenuTrigger as-child>
           <SidebarMenuButton
@@ -35,7 +48,6 @@ import NavUser from "@/pages/teambar/NavUser.vue";
               </AvatarFallback>
               <span
                 class="absolute bottom-1 right-1 size-1.5 rounded-full  bg-green-500"
-                :class="{'bg-destructive' : !user.active}"
               ></span>
             </Avatar>
             <div class="grid flex-1 text-left text-sm leading-tight">
@@ -44,6 +56,7 @@ import NavUser from "@/pages/teambar/NavUser.vue";
                 {{ user.email }}
               </span>
             </div>
+            <IconDotsVertical class="ml-auto size-4" />
           </SidebarMenuButton>
         </DropdownMenuTrigger>
         <DropdownMenuContent
@@ -54,9 +67,10 @@ import NavUser from "@/pages/teambar/NavUser.vue";
         >
           <DropdownMenuLabel class="p-0 font-normal">
             <div class="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-              <Avatar class="size-9 rounded-lg grayscale">
-                <AvatarFallback class="rounded-full">
-                  {{user.firstname.slice(0,1) + user.surname.slice(0,1)}}
+              <Avatar class="h-8 w-8 rounded-lg">
+                <AvatarImage :src="user.avatar as string" :alt="user.firstname + '_' + user.surname + '_avatar'"  />
+                <AvatarFallback class="rounded-lg">
+                  CN
                 </AvatarFallback>
               </Avatar>
               <div class="grid flex-1 text-left text-sm leading-tight">
@@ -78,8 +92,12 @@ import NavUser from "@/pages/teambar/NavUser.vue";
               Notifications
             </DropdownMenuItem>
           </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem>
+            <IconLogout />
+            Log out
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-    </SidebarMenuItem>
-  </div>
+  </SidebarMenu>
 </template>
