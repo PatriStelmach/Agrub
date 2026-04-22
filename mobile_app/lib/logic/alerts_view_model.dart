@@ -8,12 +8,14 @@ class AlertsViewModel extends ChangeNotifier {
 final AlertRepository repository;
 AlertsViewModel({required this.repository}) {
   repository.addListener(notifyListeners);
+
 }
 
 
 
-late List<Alert> alertsList = repository.mockData;
+List<Alert> sortedAlerts = [];
 
+List<Alert> get alertsList => repository.alertsCache.values.toList();
 
 
 void sortAlertsBy(String property) {
@@ -35,7 +37,7 @@ final getter = getters[property]!;
 
 final newList = List<Alert>.from(alertsList);
 newList.sort((a,b) => getter(a).compareTo(getter(b)));
-alertsList = newList;
+sortedAlerts = newList;
 
 notifyListeners();
 }

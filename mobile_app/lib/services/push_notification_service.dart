@@ -2,12 +2,16 @@ import 'package:alert_app/data/models/alert_model.dart';
 
 import 'package:alert_app/data/repositories/alert_repository.dart';
 
+//mock imports
+import 'dart:convert';
+import 'package:flutter/services.dart';
+
 class PushNotificationService {
 
 
 
-  void incomingPush(List<Alert> incomingAlerts) {
-
+  Future<void> incomingPush() async {
+ 
   
   }
 

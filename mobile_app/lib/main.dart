@@ -1,7 +1,7 @@
 import 'package:alert_app/data/repositories/alert_repository.dart';
 import 'package:alert_app/data/repositories/user_repository.dart';
 import 'package:alert_app/services/navigation_service.dart';
-import 'package:alert_app/logic/admin_view_model.dart';
+import 'package:alert_app/logic/plugins_view_model.dart';
 import 'package:alert_app/logic/alerts_view_model.dart';
 import 'package:alert_app/logic/home_view_model.dart';
 import 'package:alert_app/logic/user_view_model.dart';
@@ -22,8 +22,8 @@ void main() {
         ChangeNotifierProvider(create: (_) => UserRepository()),
         
         //Creation of view models
-        ChangeNotifierProvider<AdminViewModel>(
-          create: (context) => AdminViewModel(
+        ChangeNotifierProvider<PluginsViewModel>(
+          create: (context) => PluginsViewModel(
             repository: context.read<AlertRepository>(),
           )),
 
@@ -75,7 +75,7 @@ ASAP
 2. Mockup pushowania alertów pod FCM ( underway)
 3. Logika alarmu przy nowym extreme
 4. Mockup skryptów
-5. Nowe skrypty push, logika uruchamiania ( przygotować repo na podpięcie)
+
 
 
 App Theme:

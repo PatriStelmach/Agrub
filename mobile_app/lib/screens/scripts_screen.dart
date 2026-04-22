@@ -1,4 +1,4 @@
-import 'package:alert_app/logic/admin_view_model.dart';
+import 'package:alert_app/logic/plugins_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -10,7 +10,7 @@ class ScriptsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    final adminViewModel = context.watch<AdminViewModel>();
+    final adminViewModel = context.watch<PluginsViewModel>();
     
     return Column(
       children: [

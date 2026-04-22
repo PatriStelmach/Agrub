@@ -17,6 +17,16 @@ class _AlertsScreenState extends State<AlertsScreen> {
 
     final alertsViewModel = context.watch<AlertsViewModel>();
     
+if (alertsViewModel.alertsList.isEmpty) {
+    return const Scaffold( 
+      body: Center(
+        child: Text("No alerts found. Consider checking the button in Debug Screen!"),
+      ),
+    );
+}
+else {
+  alertsViewModel.sortAlertsBy(dropDownValue);
+}
 
     
     return Column(
@@ -25,87 +35,82 @@ class _AlertsScreenState extends State<AlertsScreen> {
 
             Row(
               children: [
-                Text("Sort by - "),
+                Text("Sort by - ", style: TextStyle(fontSize: 30)),
                 DropdownButton<String>(
-            padding: EdgeInsets.all(6),
-            borderRadius: BorderRadius.all(Radius.circular(16)),
-            value: dropDownValue, 
-            icon: const Icon(Icons.menu),
-            style: const TextStyle(color: Colors.black),
-            onChanged: (String? newValue) {
-              setState(() {
+                            padding: EdgeInsets.all(6),
+                            borderRadius: BorderRadius.all(Radius.circular(16)),
+                            value: dropDownValue, 
+                            icon: const Icon(Icons.menu),
+                            style: const TextStyle(color: Colors.black), 
+                            onChanged: (String? newValue) {
+                              setState(() {
                 dropDownValue = newValue!;
-              });
-            },
-            items:const[
-            DropdownMenuItem<String>(value: 'id', child: Text('ID')),
-            DropdownMenuItem<String>(value: 'title', child: Text('Title')),
-            DropdownMenuItem<String>(value: 'createdAt', child: Text('CreatedAt')),
-            ]
+                              });
+                            },
+                            items:const[
+                            DropdownMenuItem<String>(value: 'id', child: Text('ID',style:TextStyle(fontSize: 30))),
+                            DropdownMenuItem<String>(value: 'title', child: Text('Title',style:TextStyle(fontSize: 30))),
+                            DropdownMenuItem<String>(value: 'createdAt', child: Text('CreatedAt',style:TextStyle(fontSize: 30))),
+                            ]
+                            ),
+              ]
             ),
-                ElevatedButton(onPressed: () {alertsViewModel.sortAlertsBy(dropDownValue);}, child: Text("Sortuj"))
-              ],
-            ),    
+                
 
           
 
 
             Expanded(
-              child: Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.black),
-                borderRadius: BorderRadius.circular(12),
-              ),
+              child: ListView.builder(
+              itemCount: alertsViewModel.sortedAlerts.length,
+              itemBuilder: (context, index) {
+                final alert = alertsViewModel.sortedAlerts[index];
               
-                child: ListView.builder(
-                itemCount: alertsViewModel.alertsList.length,
-                itemBuilder: (context, index) {
-                  final alert = alertsViewModel.alertsList[index];
-
-                  return Card (
-                    color: alert.severityColor,
-                     child: ExpansionTile(
-                     title: Text(alert.title),
-                    subtitle: Text(alert.hostName),
-                    leading: Icon(Icons.warning, color: Colors.black),
-                    children: [
-                      Column(
-                        children: [
+                return Card (
+                  color: alert?.severityColor,
+                   child: ExpansionTile(
+                   title: Text(alert?.title ?? 'No Title'),
+                  subtitle: Text(alert?.hostName ?? 'Unknown Host'),
+                  leading: Icon(Icons.warning, color: Colors.black),
+                  children: [
+                    Column(
+                      children: [
+                        Row(
+                          children: [
+                            Text(alert?.source ?? 'Unknown Host'),
+                            Spacer(),
+                            Text(alert?.createdAt.toString() ?? 'Unknown Time'),
+                          ],),
                           Row(
                             children: [
-                              Text(alert.source),
+                              Text(alert?.status.toString()?? 'Unknown Status'),
                               Spacer(),
-                              Text(alert.createdAt.toString()),
+                              Text(alert?.severity.toString() ?? 'Unknown Severity'),
                             ],),
-                            Row(
-                              children: [
-                                Text(alert.status.toString()),
-                                Spacer(),
-                                Text(alert.severity.toString()),
-                              ],),
-                       
-                          SizedBox(
-                            width: double.infinity,
-                            child:ElevatedButton(onPressed:() { alertsViewModel.acknowledgeAlert(alert.id);}, child: Text('Acknowledge')) 
-                            )
-                          
-                        ]
+                     
+                        SizedBox(
+                          width: double.infinity,
+                          child:ElevatedButton(onPressed:() { alertsViewModel.acknowledgeAlert(alert!.id);}, child: Text('Acknowledge')) 
+                          )
                         
-
-                      )
-
-                    ],
+                      ]
+                      
+                    
                     )
-                     );
               
-              },
-                padding: const EdgeInsets.all(10),
-                scrollDirection: Axis.vertical,
-                )
+                  ],
+                  )
+                   );
+                            
+                            },
+              padding: const EdgeInsets.all(10),
+              scrollDirection: Axis.vertical,
               ),
               ),
-              ]
+              ],
     );
+        
+  
 
   }
 }

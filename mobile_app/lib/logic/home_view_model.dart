@@ -14,15 +14,16 @@ DateTime? get lastPing => repository.lastPing;
 
 
 List<Alert> latestAlerts() {
-  List<Alert> sortedAlerts = List.from(testAlerts);
-   sortedAlerts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-   return sortedAlerts.take(3).toList();
+ 
+    List<Alert> allAlerts = repository.alertsCache.values.toList();
+    allAlerts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    return allAlerts.take(3).toList();
 }
 
 List<Alert> latestCriticalAlerts() {
-  List<Alert> criticalAlerts = List.from(testAlerts);
-  criticalAlerts.removeWhere((alert) => alert.severity != AlertSeverity.extreme);
-  return criticalAlerts;
+  return repository.alertsCache.values
+      .where((alert) => alert.severity == AlertSeverity.extreme)
+      .toList();
 }
 
 }
