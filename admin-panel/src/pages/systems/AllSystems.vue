@@ -65,12 +65,12 @@ const closeDialog = () => {
               {{system.name}}</CardHeader>
             <img :alt="system.name+'_image'" :src="system.img"  class="rounded-full size-[6vh] mr-4">
           </div>
-          <CardAction class="mx-4 text-md xl:text-xl 2xl:text-4xl flex items-center gap-2"
+          <CardAction class="mx-4 text-md lg:text-lg xl:text-xl 2xl:text:3xl flex items-center gap-2"
                       v-if="system.openSource">
             <IconBrandOpenSource class="text-green-500  size-8 xl:size-12 2xl:size-16"/>
             Open Source
           </CardAction>
-          <CardAction v-else class="mx-4 text-md xl:text-xl 2xl:text-4xl flex items-center gap-1">
+          <CardAction v-else class="mx-4 text-md lg:text-lg xl:text-xl 2xl:text:3xl flex items-center gap-1">
             <IconCurrencyDollar class="text-blue-500 size-8 xl:size-12 2xl:size-16"/>
             Commercial
           </CardAction>

@@ -63,14 +63,14 @@ const store = useMyPluginStore()
 const { sortedData, sortKey, sortOrder, toggleSort } = useSort<MyPlugin>(() => props.data, 'updatedAt')
 const { wrap, isUnwrapped, unwrap, originalItem, unwrappedItem } = useWrapping(sortedData, 'fileName')
 
-const open = ref(false);
+const openDetailsDialog = ref(false);
 const searchFilter = ref<string>("")
 const checkedPlugins = ref<string[]>([])
 const tagSearch = ref("")
 const tagsListOpen = ref(false)
 const unwrappedDetails = ref<PluginDetails>({code:'',description:''})
 
-
+const blockedCheckbox = computed(() => !!unwrappedItem.value)
 const blockedEdit = computed(() => checkedPlugins.value.length !== 1 || unwrappedItem.value)
 const existingTags = computed(() =>  unwrappedItem.value!.tags.includes(tagSearch.value))
 
@@ -179,7 +179,7 @@ const savePlugin = () => {
         <Button
           @click="changeStatus"
           :disabled="blockedRemoveAndChange"
-          variant="yellow_outline">
+          variant="orange_outline">
           Change Status
           <IconStatusChange/>
         </Button>
@@ -205,18 +205,18 @@ const savePlugin = () => {
 </div>
 
 
-  <div class=" mt-[2vh] mx-[1%] w-98/100 relative overflow-auto max-h-[75vh]   ">
+  <div class="  mt-[2vh] mx-[1%] w-98/100 relative overflow-auto max-h-[77vh]   ">
     <Table id="my-plugin-table" class="w-99/100  text-md lg:text-lg xl:text-xl 2xl:text-2xl  mx-auto  table-fixed border-collapse border-spacing-0">
-      <TableCaption class="bg-secondary border-b border-t text-foreground sticky z-9 bottom-0 py-[1vh] text-md xl:text-xl 2xl:text-4xl "> Your plugins:
+      <TableCaption class="bg-secondary border-b border-t text-foreground sticky z-9 bottom-0 py-[1vh] text-md lg:text-lg xl:text-xl 2xl:text:3xl "> Your plugins:
         <span class="font-extrabold">{{ sortedData.length}}</span>
       </TableCaption>
       <TableHeader class="h-10  ">
       <TableRow class="bg-secondary [&_th]:py-2 hover:bg-secondary **:text-md! **:lg:text-xl! **:xl:text-2xl! **:2xl:text-4xl! ">
         <TableHead class="w-3/100 px-4 ">
           <input
+            :disabled="blockedCheckbox"
             type="checkbox"
             class="size-[1vw] cursor-pointer align-middle"
-
             @click="checkAll"
           />
             </TableHead>
@@ -233,15 +233,16 @@ const savePlugin = () => {
         </TableHeader>
         <TableBody >
           <TableRow
-            class="cursor-pointer duration-0 border-radius-0 [&_td]:py-2 [&_td]:pr-4 hover:bg-green-500/20 "
+            class="cursor-pointer duration-0 border-radius-0  [&_td]:py-2 [&_td]:pr-4 hover:bg-green-500/20 "
             v-for="plugin in sortedData"
             :key="plugin.fileName"
-            @click="!isUnwrapped(plugin.fileName) ? check(plugin.fileName): true;"
+            @click="blockedCheckbox ? true: check(plugin.fileName)"
             :class="{'hover:bg-destructive/20': !plugin.active,
              'bg-selected [&_td]:align-top  sticky h-40! lg:h-70! xl:h-80! 2xl:h-90! [&_td]:pt-4! top-11 bottom-11 hover:bg-card z-9 cursor-auto'
                     : isUnwrapped(plugin.fileName) }">
             <TableCell class="px-4">
               <input
+                :disabled="blockedCheckbox"
                 type="checkbox"
                 :id="cn('my-plugin-no-'+plugin.fileName)" class="size-[1vw] cursor-pointer align-middle"
                 :value="plugin.fileName"
@@ -253,7 +254,7 @@ const savePlugin = () => {
             <TableCell v-if="!isUnwrapped(plugin.fileName)"  class=" whitespace-break-spaces">
               <Badge
                 v-for="(tag, index) in plugin.tags"
-                class="cursor-pointer hover:bg-badge mr-1 mb-2  text-sm lg:text-lg xl:text-xl 2xl:text-3xl"
+                class="cursor-pointer hover:bg-badge mr-1 my-1  text-sm lg:text-md xl:text-lg 2xl:text:2xl"
                 variant="secondary"
                 :key="index"
               >{{tag}}</Badge>
@@ -275,7 +276,7 @@ const savePlugin = () => {
                   </InputGroup>
                   <div class="max-h-30 w-full mb-2  overflow-y-auto border-2 border-t-0! border-input p-2 rounded-b-md" v-if="matchedTags.length ">
                     <Badge
-                      class="cursor-pointer hover:bg-badge mr-1 mb-1  text-sm lg:text-lg xl:text-xl 2xl:text-3xl"
+                      class="cursor-pointer hover:bg-badge mr-1 mb-1  text-sm lg:text-md xl:text-lg 2xl:text:2xl"
                       variant="secondary"
                       @click="unwrappedItem!.tags.push(tag); tagSearch = ''"
                       v-for="(tag, index) in matchedTags" :key="index">{{tag}}</Badge>
@@ -291,7 +292,7 @@ const savePlugin = () => {
                 <div class="w-full justify-between">
                   <Badge
                     v-for="(tag, index) in unwrappedItem!.tags"
-                    class="cursor-pointer hover:bg-badge mr-1 mb-2  text-sm lg:text-lg xl:text-xl 2xl:text-3xl h-4 lg:h-7 xl:h-8 2xl:h-12"
+                    class="cursor-pointer hover:bg-badge mr-1 my-1  text-sm lg:text-md xl:text-lg 2xl:text:2xl h-4 lg:h-7 xl:h-8 2xl:h-12"
                     variant="secondary"
                     :key="index"
                   >{{tag}}
@@ -329,7 +330,7 @@ const savePlugin = () => {
               </InputGroup>
 
                 <span
-                  class="grid gap-y-2 w-full text-center whitespace-break-spaces text-sm lg:text-lg xl:text-xl 2xl:text-3xl"
+                  class="grid gap-y-2 w-full text-center whitespace-break-spaces text-sm lg:text-md xl:text-lg 2xl:text:2xl"
                   :class="{'text-destructive' : !cronDescription[2]}"
                 >
                   <span>{{ cronDescription[0]}}</span>
@@ -397,28 +398,32 @@ const savePlugin = () => {
 
             </TableCell>
             <TableCell class=" text-md lg:text-lg xl:text-xl 2xl:text-2xl ">{{plugin.weight}} KB</TableCell>
-            <div v-if="isUnwrapped(plugin.fileName)" class="flex space-x-1 absolute bottom-4 right-3 *:items-center *:align-middle *:flex *:gap-x-2 ">
+            <ButtonGroup v-if="isUnwrapped(plugin.fileName)" class="flex  absolute bottom-4 right-3 *:items-center *:align-middle *:flex">
               <Button
                 @click="closePlugin"
-                variant="red_inside">
+                variant="red_outline">
                 Cancel<IconCancel class="size-4 xl:size-5"/>
               </Button>
-              <PluginDetailsDialog
-                :code="unwrappedDetails!.code"
-                :description="unwrappedDetails!.description"
-              >
-                <Button
-                  @click="open = true"
-                  variant="yellow_inside">
-                  Details<IconMessageCode class="size-4 xl:size-5"/>
-                </Button>
-              </PluginDetailsDialog>
+              <Button variant="orange_outline">
+                <PluginDetailsDialog
+                  :code="unwrappedDetails!.code"
+                  :description="unwrappedDetails!.description"
+                >
+                  <Button
+                    @click="openDetailsDialog = true"
+                    class="border-0! p-0! bg-transparent! text-amber-500 hover:text-primary"
+                    >
+                    Details<IconMessageCode class="size-4 xl:size-5"/>
+                  </Button>
+                </PluginDetailsDialog>
+              </Button>
+
               <Button
                 @click="savePlugin"
-                variant="green_inside">
+                variant="green_outline">
                 Save<IconDeviceFloppy class="size-4 xl:size-5"/>
               </Button>
-            </div><Teleport to="body">
+            </ButtonGroup><Teleport to="body">
 
           </Teleport>
           </TableRow>

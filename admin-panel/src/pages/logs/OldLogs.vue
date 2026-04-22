@@ -11,8 +11,8 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<LogObject>(() => 
 </script>
 
 <template>
-  <Table id="my-plugin-table" class="w-99/100 text-md xl:text-xl 2xl:text-4xl  mx-auto  table-fixed border-collapse border-spacing-0">
-    <TableCaption class="bg-secondary border-b border-t text-foreground sticky z-9999 bottom-0 py-[1vh] text-md xl:text-xl 2xl:text-4xl rounded-lg"> Your plugins:
+  <Table id="my-plugin-table" class="w-99/100 text-md lg:text-lg xl:text-xl 2xl:text:3xl  mx-auto  table-fixed border-collapse border-spacing-0">
+    <TableCaption class="bg-secondary border-b border-t text-foreground sticky z-9999 bottom-0 py-[1vh] text-md lg:text-lg xl:text-xl 2xl:text:3xl rounded-lg"> Your plugins:
       <span class="font-extrabold">{{ sortedData.length}}</span>
     </TableCaption>
     <TableHeader class="h-10 ">

@@ -32,7 +32,7 @@ export interface User
   email?: string,
   role: "admin" | "technician"
   groups: string[]
-  avatar?: string | File
+  avatar?: string
 }
 
 export interface MyPlugin

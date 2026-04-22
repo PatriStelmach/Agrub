@@ -19,7 +19,7 @@ export const usersData: User[] = [
     email: "piotr.nowak@alert.pl",
     role: "technician",
     groups: ["Technical", "Service"],
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=piotr"
+    avatar: ""
   },
   {
     id: 3,
@@ -39,7 +39,7 @@ export const usersData: User[] = [
     email: "jan.dabrowski@alert.pl",
     role: "technician",
     groups: ["Technical", "Network"],
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=jan"
+    avatar: ""
   },
   {
     id: 5,
@@ -59,7 +59,7 @@ export const usersData: User[] = [
     email: "tomasz.wojcik@alert.pl",
     role: "technician",
     groups: ["Technical", "Service"],
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=tomasz"
+    avatar: ""
   },
   {
     id: 7,
@@ -69,7 +69,6 @@ export const usersData: User[] = [
     email: "magdalena.kaminska@alert.pl",
     role: "admin",
     groups: ["Administration"],
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=magdalena"
   },
   {
     id: 8,
@@ -79,7 +78,6 @@ export const usersData: User[] = [
     email: "robert.kowalczyk@alert.pl",
     role: "technician",
     groups: ["Technical", "Database"],
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=robert"
   },
   {
     id: 9,
@@ -119,7 +117,6 @@ export const usersData: User[] = [
     email: "jakub.kozlowski@alert.pl",
     role: "technician",
     groups: ["Technical", "Network"],
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=jakub"
   },
   {
     id: 13,
@@ -139,7 +136,6 @@ export const usersData: User[] = [
     email: "michal.mazur@alert.pl",
     role: "technician",
     groups: ["Technical", "Database"],
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=michal"
   },
   {
     id: 15,
@@ -159,7 +155,6 @@ export const usersData: User[] = [
     email: "pawel.piotrowski@alert.pl",
     role: "technician",
     groups: ["Technical", "Service"],
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=pawel"
   },
   {
     id: 17,
@@ -179,7 +174,6 @@ export const usersData: User[] = [
     email: "lukasz.jablonski@alert.pl",
     role: "technician",
     groups: ["Technical", "Network"],
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=lukasz"
   },
   {
     id: 19,
@@ -199,6 +193,5 @@ export const usersData: User[] = [
     email: "sebastian.adamski@alert.pl",
     role: "technician",
     groups: ["Technical", "Database"],
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=sebastian"
   }
 ]

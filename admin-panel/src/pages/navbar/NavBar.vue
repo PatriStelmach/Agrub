@@ -12,7 +12,7 @@ import {
   IconScript, IconSitemap, IconSitemapOff,
   IconUpload, IconUserCircle, IconUsers
 } from "@tabler/icons-vue";
-import TeamBar from "@/pages/teambar/TeamBar.vue";
+import TeamBar from "@/pages/navbar/TeamBar.vue";
 import {
   Sidebar, SidebarHeader,
   SidebarInput,
@@ -29,7 +29,7 @@ import {
 import {Avatar, AvatarFallback} from "@/components/ui/avatar";
 import {usersData} from "@/data/usersData.ts";
 import {sidebarData} from "@/data/sidebarData.ts";
-import NavUser from "@/pages/teambar/NavUser.vue";
+import NavUser from "@/pages/navbar/NavUser.vue";
 
 const navItems = [
   {
@@ -66,14 +66,14 @@ const navItems = [
 
 <template>
 
-  <SidebarProvider class="h-full  border-none px-4 w-60 ">
-    <SidebarInset class=" h-full flex flex-col w-40 xl:w-50 bg-card">
+  <SidebarProvider class="  border-none px-4 w-60 ">
+    <SidebarInset class="  flex flex-col w-40 xl:w-50 bg-card">
       <SidebarHeader>
         <div class="text-xl space-x-2 flex pl-2 pt-4"><IconPhoneRinging/>
           <span>Alert</span>
         </div>
       </SidebarHeader>
-      <Accordion class="mt-2" type="single" collapsible>
+      <Accordion class="mt-10" type="single" collapsible>
         <AccordionItem class="" v-for="item in navItems" :key="item.label" :value="item.label">
           <AccordionTrigger class=" cursor-pointer lg:text-lg xl:text-xl">
             <div class="flex items-center text-center space-x-2 xl:space-x-4">
@@ -87,8 +87,7 @@ const navItems = [
         </AccordionItem>
       </Accordion>
       <div class="mb-4  mt-auto bg-card">
-
-        <SidebarMenu class=" mt-auto mb-0">
+        <SidebarMenu class=" ">
           <SidebarMenuItem class="border-y-4">
             <SidebarMenuButton class="flex items-center text-center justify-center my-2 text-lg">
               <IconUsers class="xl:size-5! 2xl:size-6!"/>
@@ -98,7 +97,7 @@ const navItems = [
             </SidebarMenuButton>
           </SidebarMenuItem>
           <TeamBar  />
-          <NavUser  :user="sidebarData.loggedUser"/>
+          <NavUser class="border-t-4 pt-2" :user="sidebarData.loggedUser"/>
         </SidebarMenu>
       </div>
     </SidebarInset>

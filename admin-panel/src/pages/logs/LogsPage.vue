@@ -25,6 +25,7 @@ import MyPagination from "@/helpers/MyPagination.vue";
 import {ButtonGroup} from "@/components/ui/button-group";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
 import {ArrowLeftIcon, Search} from "lucide-vue-next";
+import { IconListDetails} from "@tabler/icons-vue";
 
 
 const { sortedData, sortKey, sortOrder, toggleSort } = useSort<LogObject>(() => rowsData.value, 'createdAt')
@@ -67,7 +68,7 @@ const updatePage = (page: number) => {
             <Button variant="outline" size="icon" aria-label="Go Back">
               <ArrowLeftIcon />
             </Button>
-            <InputGroup class="relative l-[30vw] w-[20vw]  " >
+            <InputGroup >
               <InputGroupInput
                 v-model="searchFilter"
                 type="search"
@@ -81,19 +82,20 @@ const updatePage = (page: number) => {
         </ButtonGroup>
       </div>
     </div>
-    <div class=" mt-[2vh] mx-[1%] w-98/100 relative overflow-auto max-h-[75vh]   ">
-        <Table id="log-table" class="w-99/100 text-md xl:text-xl 2xl:text-4xl  mx-auto  table-fixed">
-          <TableCaption class="bg-secondary border-b border-t text-foreground sticky z-9 bottom-0 py-[1vh] text-md xl:text-xl 2xl:text-4xl">Current logs:
+    <div class=" mt-[2vh] mx-[1%] w-98/100 relative overflow-auto max-h-[77vh]   ">
+        <Table id="log-table" class="w-99/100 text-md lg:text-lg xl:text-xl 2xl:text:3xl  mx-auto  table-fixed">
+          <TableCaption class="bg-secondary border-b border-t text-foreground sticky z-9 bottom-0 py-[1vh] text-md lg:text-lg xl:text-xl 2xl:text:3xl">Current logs:
             <span class="font-extrabold">{{ logsData.length }}</span>
           </TableCaption>
           <TableHeader class="h-10">
-            <TableRow class="bg-secondary hover:bg-secondary *:py-2 **:text-md! **:lg:text-xl! **:xl:text-2xl! **:2xl:text-4xl!">
-              <SortableHead keyName="header" label="Header" :sort-key="sortKey" class="w-20/100 pl-4 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-              <SortableHead keyName="source" label="Source" :sort-key="sortKey" class="w-16/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-              <SortableHead keyName="content" label="Content" :sort-key="sortKey" class="15/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-              <SortableHead keyName="severity" label="Severity" :sort-key="sortKey" class="15/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-              <SortableHead keyName="technicianGroups" label="Groups" :sort-key="sortKey" class="w-20/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <TableRow class="bg-secondary hover:bg-secondary  **:text-md! **:lg:text-xl! **:xl:text-2xl! **:2xl:text-4xl!">
+              <SortableHead keyName="header" label="Header" :sort-key="sortKey" class="w-18/100 pl-4 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+              <SortableHead keyName="source" label="Source" :sort-key="sortKey" class="w-14/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+              <SortableHead keyName="content" label="Content" :sort-key="sortKey" class="w-21/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+              <SortableHead keyName="severity" label="Severity" :sort-key="sortKey" class="w-13/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+              <SortableHead keyName="technicianGroups" label="Groups" :sort-key="sortKey" class="w-15/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
               <SortableHead keyName="createdAt" label="Timestamp" :sort-key="sortKey" class="w-14/100  " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+              <TableHead class="w-5/100"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody >
@@ -105,7 +107,7 @@ const updatePage = (page: number) => {
               <TableCell class="pl-4 py-2  whitespace-break-spaces">{{log.header}}</TableCell>
               <TableCell class="py-2">
                 <Badge
-                  class="cursor-pointer hover:bg-badge mr-1 ml-[-0.5em] text-md xl:text-xl 2xl:text-4xl"
+                  class="cursor-pointer hover:bg-badge mr-1 ml-[-0.5em] text-md lg:text-lg xl:text-xl 2xl:text:3xl"
                   variant="secondary"
                 >{{log.source}}</Badge>
               </TableCell>
@@ -127,7 +129,11 @@ const updatePage = (page: number) => {
               <TableCell
                 class="py-2  whitespace-break-spaces">{{ log.technicianGroups?.join(", ") }}</TableCell>
               <DateCell v-if="log.createdAt" class="py-2" :date="log.createdAt "></DateCell>
-
+              <TableCell>
+                <Button variant="orange_outline">
+                  <IconListDetails/>
+                </Button>
+              </TableCell>
             </TableRow>
           </TableBody>
           <TableFooter>

@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import {pluginLibraryData} from "@/data/pluginLibrary.ts";
-import {computed, ref, watch} from "vue";
 import MyPagination from "@/helpers/MyPagination.vue";
 import PluginsLibraryTable from "@/pages/plugins/PluginsLibraryTable.vue";
 import {
-  IconFileImport,
+  IconMessageCode,
 } from "@tabler/icons-vue";
 
 import {ArrowLeftIcon, Search} from "lucide-vue-next";
@@ -12,37 +11,10 @@ import {ButtonGroup} from "@/components/ui/button-group";
 import {Button} from "@/components/ui/button";
 import type {LibraryPlugin} from "@/types/types.ts"
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
+import {useSearchFilter} from "@/composables/useSearchFilter.ts";
 
-const currentPage = ref<number>(1)
-const searchFilter = ref('')
-const rowsData = ref<LibraryPlugin[]>(pluginLibraryData)
-
-
-watch(searchFilter, () =>
-{
-  currentPage.value = 1
-})
-
-const updateData = (data:LibraryPlugin[]) =>
-{
-  rowsData.value = data as LibraryPlugin[]
-}
-
-const updatePage = (page: number) =>
-{
-  currentPage.value = page
-}
-
-const filteredData = computed(() =>
-{
-  if(!searchFilter.value)
-  {
-    return pluginLibraryData
-  }
-  return pluginLibraryData.filter((item) =>
-    item.name.toLowerCase().includes(searchFilter.value.toLowerCase()))
-})
-
+const { updatePage, filteredData, tableData, updateData, updateSearchData, currentPage, searchFilter } =
+  useSearchFilter<LibraryPlugin>(() => pluginLibraryData,(item) => item.name)
 
 </script>
 
@@ -56,15 +28,8 @@ const filteredData = computed(() =>
             <Button variant="outline" size="icon" aria-label="Go Back">
               <ArrowLeftIcon />
             </Button>
-          </ButtonGroup>
 
-          <ButtonGroup>
-            <Button variant="green_outline">
-              Add to your plugins
-              <IconFileImport/>
-            </Button>
-
-            <InputGroup class="relative l-[30vw] w-[20vw]  " >
+            <InputGroup  >
               <InputGroupInput
                 v-model="searchFilter"
                 type="search"
@@ -81,7 +46,7 @@ const filteredData = computed(() =>
       <div>
     </div>
 
-<PluginsLibraryTable :data="rowsData" />
+<PluginsLibraryTable :data="tableData" />
 
     <MyPagination
       :data="filteredData"
