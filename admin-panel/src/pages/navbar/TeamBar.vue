@@ -37,7 +37,7 @@ import NavUser from "@/pages/navbar/NavUser.vue";
                 </AvatarFallback>
               </Avatar>
               <span
-                class="absolute bottom-0 right-0 size-2 rounded-full  bg-green-500"
+                class="absolute bottom-0 right-0 size-2 rounded-full  bg-badge1"
                 :class="{'bg-red-500' : !user.active}"
               ></span>
             </div>

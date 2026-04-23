@@ -1,5 +1,5 @@
 <script setup lang="ts" >
-import type { AlertObject} from "@/types/types.ts";
+import {type AlertObject, Severity} from "@/types/types.ts";
 import {dashboardData} from "@/data/dashboardData.ts"
 import MyPagination from "@/helpers/MyPagination.vue";
 import {
@@ -41,6 +41,8 @@ const { updatePage, filteredData, tableData, updateData, updateSearchData, curre
 
 const { sortedData, sortKey, sortOrder, toggleSort } = useSort<AlertObject>(() => tableData.value as AlertObject[], 'createdAt')
 
+
+
 </script>
 
 <template>
@@ -70,16 +72,16 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<AlertObject>(() =
     </div>
     <div class=" mt-[2vh] mx-[1%] w-98/100 relative overflow-auto max-h-[77vh]   ">
       <Table id="alert-table" class="w-99/100 text-md lg:text-lg xl:text-xl 2xl:text:3xl  mx-auto  table-fixed">
-        <TableCaption class="bg-secondary border-b border-t text-foreground sticky z-9 bottom-0 py-[1vh] text-md lg:text-lg xl:text-xl 2xl:text:3xl">Current Alerts:
+        <TableCaption class="bg-secondary border-b border-t text-foreground sticky z-9 bottom-0 py-2 text-md lg:text-lg xl:text-xl 2xl:text:3xl">Current Alerts:
           <span class="font-extrabold">{{ dashboardData.length}}</span>
         </TableCaption>
         <TableHeader class="h-10">
           <TableRow class="bg-secondary hover:bg-secondary **:text-md! *: **:lg:text-xl! **:xl:text-2xl! **:2xl:text-4xl!">
             <SortableHead keyName="header" label="Alert" :sort-key="sortKey" class="w-24/100 pl-4" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
             <SortableHead keyName="source" label="Source" :sort-key="sortKey" class="w-14/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-            <SortableHead keyName="status" label="Status" :sort-key="sortKey" class="w-15/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-            <SortableHead keyName="severity" label="Severity" :sort-key="sortKey" class="w-13/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-            <SortableHead keyName="technicianGroups" label="Groups" :sort-key="sortKey" class="w-15/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="status" label="Status" :sort-key="sortKey" class="w-10/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="severity" label="Severity" :sort-key="sortKey" class="w-10/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="technicianGroups" label="Groups" :sort-key="sortKey" class="w-20/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
             <SortableHead keyName="createdAt" label="Timestamp" :sort-key="sortKey" class="w-14/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
             <TableHead class="w-5/100"></TableHead>
           </TableRow>
@@ -101,18 +103,18 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<AlertObject>(() =
               <IconLoader v-if="alert.status === 'In Process'"
                           class="size-4 animate-spin text-muted-foreground"/>
               <IconSend v-if="alert.status === 'Sent'"
-                        class="size-4 text-emerald-500"/>
+                        class="size-4 text-badge1"/>
               </div>
             </TableCell>
             <TableCell class=""
                        :class="{
-              'text-sky-500': ['not classified', 'unknown'].includes(alert.severity.toLowerCase()),
-              'text-lime-500': ['low', 'ok', 'information'].includes(alert.severity.toLowerCase()),
-              'text-yellow-500': ['medium', 'warning'].includes(alert.severity.toLowerCase()),
-              'text-amber-500': alert.severity.toLowerCase() === 'average',
-              'text-orange-500': alert.severity.toLowerCase() === 'high',
-              'text-red-500': ['critical', 'disaster'].includes(alert.severity.toLowerCase()),
-              }"
+                      'text-sky-500': [Severity.NOT_CLASSIFIED, Severity.UNKNOWN].includes(alert.severity),
+                      'text-badge1': [Severity.LOW, Severity.OK, Severity.INFORMATION].includes(alert.severity),
+                      'text-yellow-500': [Severity.MEDIUM, Severity.WARNING].includes(alert.severity),
+                      'text-amber-500': alert.severity === Severity.AVERAGE,
+                      'text-orange-500': alert.severity === Severity.HIGH,
+                      'text-red-500': [Severity.CRITICAL, Severity.DISASTER].includes(alert.severity),
+                    }"
             >{{alert.severity}}
             </TableCell>
 
