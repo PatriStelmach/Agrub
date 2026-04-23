@@ -1,0 +1,43 @@
+[
+  {
+    "name": "Network Latency Checker",
+    "fileName": "ping_check.py",
+    "creator": "SysAdmin_Sopot",
+    "language": ".py",
+    "description": "Mierzy opóźnienia do głównych węzłów sieciowych i zapisuje wyniki w formacie CSV.",
+    "code": "import os\nprint(os.system('ping -c 4 8.8.8.8'))",
+    "weight": 10,
+    "tags": ["network", "latency", "monitoring"],
+    "cronExpression": "*/15 * * * *",
+    "updatedAt": "2026-04-23T08:15:00.000Z",
+    "active": true,
+    "log": true
+  },
+  {
+    "name": "Database Backup Script",
+    "fileName": "db_dump.sh",
+    "creator": "DB_Master",
+    "language": ".sh",
+    "description": "Wykonuje pełny zrzut bazy danych MySQL i przesyła go na serwer backupowy.",
+    "weight": 50,
+    "tags": ["database", "security", "backup"],
+    "cronExpression": "0 1 * * *",
+    "updatedAt": "2026-04-22T23:00:12.500Z",
+    "active": false,
+    "log": true
+  },
+  {
+    "name": "Service Health Check",
+    "fileName": "health_check.ps1",
+    "creator": "DevOps_Lead",
+    "language": ".ps1",
+    "description": "Weryfikuje status kluczowych usług systemowych w środowisku Windows.",
+    "code": "Get-Service | Where-Object {$_.Status -eq 'Stopped'}",
+    "weight": 15,
+    "tags": ["windows", "health", "services"],
+    "cronExpression": "0 * * * *",
+    "updatedAt": "2026-04-23T12:00:00.000Z",
+    "active": true,
+    "log": false
+  }
+]

@@ -1,4 +1,5 @@
 import 'package:alert_app/data/repositories/alert_repository.dart';
+import 'package:alert_app/data/repositories/plugin_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:alert_app/logic/debug_view_model.dart';
 import 'package:provider/provider.dart';
@@ -30,7 +31,7 @@ class DebugScreen extends StatelessWidget {
           child: 
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(onPressed: () {}, child: Text(' Push - new alerts(no extreme)')),
+            child: ElevatedButton(onPressed: () {Provider.of<PluginsRepository>(context, listen:false).updateAllPlugins();}, child: Text(' Push - new plugins')),
           ),
           ),
         ],),

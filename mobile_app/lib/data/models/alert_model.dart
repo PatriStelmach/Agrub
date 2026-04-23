@@ -4,13 +4,13 @@ import 'dart:convert';
 //Below model of Alert will have to be changed to match alert info available from API
 
 enum AlertSeverity { info, low, medium, high, extreme }
-enum AlertStatus { problem, acknowledged, resolved }
+enum AlertStatus { sent, inProgress, done}
 
 class Alert {
   final String id;
   final String title;
   final String hostName;
-  final String ipAddress;
+
   final AlertSeverity severity;
   final AlertStatus status;
   final DateTime createdAt;
@@ -21,7 +21,6 @@ class Alert {
     required this.id,
     required this.title,
     required this.hostName,
-    required this.ipAddress,
     required this.severity,
     required this.status,
     required this.createdAt,
@@ -43,12 +42,10 @@ class Alert {
 
   factory Alert.fromJson(Map<String,dynamic> json) {
 
-    print("Mapowanie alertu: ${json['id']} - tytuł: ${json['title']}");
     return Alert(
     id: json['id'],
     title: json['title'],
     hostName: json['hostName'],
-    ipAddress: json['ipAddress'],
     severity: AlertSeverity.values.byName(json['severity']),
     createdAt: DateTime.parse(json['createdAt']),
     status: AlertStatus.values.byName(json['status']),

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "862892237479",
+    "project_id": "alertapp-e2d2c",
+    "storage_bucket": "alertapp-e2d2c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:862892237479:android:b1b6ba7441d3555b297182",
+        "android_client_info": {
+          "package_name": "com.example.alert_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB6xLBcJDaNY7fJ-9xRvrYf0Y1_D9Nn3Kg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
