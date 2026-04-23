@@ -215,11 +215,13 @@ input[type="checkbox"]:focus-visible
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.5s ease;
+  transition: all 0.3s linear;
+  transform: scale(1)
 }
 
 .fade-enter-from,
 .fade-leave-to {
+  transform: scale(0.1);
   opacity: 0;
 }
 
@@ -241,6 +243,31 @@ input[type="checkbox"]:focus-visible
   opacity: 0;
 }
 
+.slide-fade-card-enter-active,
+.slide-fade-card-leave-active,
+.slide-fade-card-move {
+  transition: all 0.4s ease-in-out;
+}
+
+.slide-fade-card-leave-active {
+  position: absolute;
+}
+
+
+.slide-fade-card-enter-active {
+  transition: all 0.4s ease-in-out;
+}
+
+.slide-fade-card-enter-from {
+  transform: scale(0);
+  opacity: 0;
+}
+
+.slide-fade-card-leave-to {
+  transform: scale(0);
+  opacity: 0;
+}
+
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
@@ -253,3 +280,6 @@ input[type=number] {
 
 
 
+.user-box.expanded {
+  max-height: 500px; /* większa niż maksymalna możliwa */
+}

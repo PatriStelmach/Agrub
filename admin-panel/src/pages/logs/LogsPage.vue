@@ -117,7 +117,7 @@ const updatePage = (page: number) => {
               <TableCell class=""
                          :class="{
               'text-sky-500': ['not classified', 'unknown'].includes(log.severity.toLowerCase()),
-              'text-lime-500': ['low', 'ok', 'information'].includes(log.severity.toLowerCase()),
+              'text-badge1': ['low', 'ok', 'information'].includes(log.severity.toLowerCase()),
               'text-yellow-500': ['medium', 'warning'].includes(log.severity.toLowerCase()),
               'text-amber-500': log.severity.toLowerCase() === 'average',
               'text-orange-500': log.severity.toLowerCase() === 'high',

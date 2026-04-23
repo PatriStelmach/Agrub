@@ -29,22 +29,6 @@ export const useMyPluginStore = defineStore('my-plugins', () => {
       })))
   }
 
-  // const getAllMyPlugins = async () => {
-  //   allMyPlugins.value = await axios.get(`${api_url}/local-scripts/list`)
-  //     .then((res) => res.data.map((item: MyPluginsFromApi) => ({
-  //       active: item.active,
-  //       creator: item.creator,
-  //       log: item.isLog,
-  //       name: item.name,
-  //       fileName: item.fileName,
-  //       language: item.language,
-  //       updatedAt: new Date(item.updatedAt),
-  //       weight: item.weight,
-  //       tags: item.tags,
-  //       cronExpression: item.cronExpression,
-  //     })))
-  // }
-
   const changeStatus = async (fileNames: string[]) => {
     return await axios.post(`${api_url}/local-scripts/change-status`, fileNames).then((res) => res.data)
   }

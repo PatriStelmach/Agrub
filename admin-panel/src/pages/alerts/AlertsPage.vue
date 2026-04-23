@@ -41,6 +41,8 @@ const { updatePage, filteredData, tableData, updateData, updateSearchData, curre
 
 const { sortedData, sortKey, sortOrder, toggleSort } = useSort<AlertObject>(() => tableData.value as AlertObject[], 'createdAt')
 
+
+
 </script>
 
 <template>
@@ -101,13 +103,13 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<AlertObject>(() =
               <IconLoader v-if="alert.status === 'In Process'"
                           class="size-4 animate-spin text-muted-foreground"/>
               <IconSend v-if="alert.status === 'Sent'"
-                        class="size-4 text-emerald-500"/>
+                        class="size-4 text-badge1"/>
               </div>
             </TableCell>
             <TableCell class=""
                        :class="{
               'text-sky-500': ['not classified', 'unknown'].includes(alert.severity.toLowerCase()),
-              'text-lime-500': ['low', 'ok', 'information'].includes(alert.severity.toLowerCase()),
+              'text-badge1': ['low', 'ok', 'information'].includes(alert.severity.toLowerCase()),
               'text-yellow-500': ['medium', 'warning'].includes(alert.severity.toLowerCase()),
               'text-amber-500': alert.severity.toLowerCase() === 'average',
               'text-orange-500': alert.severity.toLowerCase() === 'high',

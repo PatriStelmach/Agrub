@@ -21,7 +21,7 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<LogObject>(() => 
           <IconListCheck
             class="size-[2vh] mx-3 rounded-sm
                   hover:shadow-[0_0_10px_1px] hover:shadow-green-500 hover:scale-105
-                  hover:bg-green-500 cursor-pointer transition duration-100"
+                  hover:bg-badge1 cursor-pointer transition duration-100"
             :class="{'text-green-500 hover:bg-primary hover:shadow-primary': allChecked }"
 
             @click="checkAll"

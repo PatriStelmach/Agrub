@@ -50,6 +50,7 @@ import {dateParser} from "@/composables/dateParser.ts";
 import {useMyPluginStore} from "@/stores/myPluginStore.ts";
 import {my} from "cronstrue/dist/i18n/locales/my";
 import PluginDetailsDialog from "@/pages/plugins/PluginDetailsDialog.vue";
+import {useBadgeFilter} from "@/composables/useBadgeFilter.ts";
 
 const props = defineProps<{
   data: MyPlugin[];
@@ -62,17 +63,19 @@ const emit = defineEmits<{
 const store = useMyPluginStore()
 const { sortedData, sortKey, sortOrder, toggleSort } = useSort<MyPlugin>(() => props.data, 'updatedAt')
 const { wrap, isUnwrapped, unwrap, originalItem, unwrappedItem } = useWrapping(sortedData, 'fileName')
+const { badgeListOpen, addBadge, availableBadges, existingBadge, matchedBadges, badgeSearch } = useBadgeFilter<MyPlugin>(
+  unwrappedItem,
+  availableTags,
+  () => unwrappedItem.value?.tags ?? []
+)
 
 const openDetailsDialog = ref(false);
 const searchFilter = ref<string>("")
 const checkedPlugins = ref<string[]>([])
-const tagSearch = ref("")
-const tagsListOpen = ref(false)
 const unwrappedDetails = ref<PluginDetails>({code:'',description:''})
 
 const blockedCheckbox = computed(() => !!unwrappedItem.value)
 const blockedEdit = computed(() => checkedPlugins.value.length !== 1 || unwrappedItem.value)
-const existingTags = computed(() =>  unwrappedItem.value!.tags.includes(tagSearch.value))
 
 const blockedRemoveAndChange = computed(() =>
   !checkedPlugins.value.length || (checkedPlugins.value.length && unwrappedItem.value))
@@ -80,8 +83,7 @@ const blockedRemoveAndChange = computed(() =>
 const allChecked = computed(() =>  props.data.length > 0 &&
   checkedPlugins.value.length === props.data.length)
 
-const matchedTags = computed(() => availableTags.filter(t => t.includes(tagSearch.value))
-  .filter(t => !unwrappedItem.value!.tags.includes(t)))
+
 
 const nextUnwrappedCron = computed(() =>
   unwrappedItem.value ? dateParser(cronParser.parse(unwrappedItem.value.cronExpression).next().toDate()).fullDate : '')
@@ -103,12 +105,6 @@ watch(searchFilter, () => {
   emit('update:search-data', searchFilter.value)
 }, {immediate: true})
 
-const addTag = () => {
-  if(unwrappedItem.value && !existingTags.value && tagSearch.value) {
-    unwrappedItem.value.tags.push(tagSearch.value)
-    tagSearch.value = ''
-  }
-}
 
 const checkAll = () => {
   return !allChecked.value ?
@@ -143,16 +139,16 @@ const check = (fileName: string) => {
 const closePlugin = () => {
   if(unwrappedItem.value) {
     wrap(false);
-    tagsListOpen.value = false;
-    tagSearch.value = '';
+    badgeListOpen.value = false;
+    badgeSearch.value = '';
   }
 }
 
 const savePlugin = () => {
   if(unwrappedItem.value) {
     wrap(true)
-    tagsListOpen.value = false
-    tagSearch.value = ''
+    badgeListOpen.value = false
+    badgeSearch.value = ''
   }
 }
 
@@ -233,7 +229,7 @@ const savePlugin = () => {
         </TableHeader>
         <TableBody >
           <TableRow
-            class="cursor-pointer duration-0 border-radius-0  [&_td]:py-2 [&_td]:pr-4 hover:bg-green-500/20 "
+            class="cursor-pointer duration-0 border-radius-0  [&_td]:py-2 [&_td]:pr-4 hover:bg-badge1/20 "
             v-for="plugin in sortedData"
             :key="plugin.fileName"
             @click="blockedCheckbox ? true: check(plugin.fileName)"
@@ -260,28 +256,28 @@ const savePlugin = () => {
             </TableCell>
             <TableCell v-else class=" whitespace-break-spaces" >
               <Transition name="slide-fade">
-                <div v-if="tagsListOpen" class="mb-4">
+                <div v-if="badgeListOpen" class="mb-4">
                   <InputGroup
                     class="w-full xl:h-14 2xl:h-18  "
-                    :class="{'rounded-br-none rounded-bl-none' : matchedTags.length || tagSearch === ''}">
+                    :class="{'rounded-br-none rounded-bl-none' : matchedBadges.length || badgeSearch === ''}">
                     <InputGroupInput
                       class="text-lg! lg:text-xl! xl:text-2xl! 2xl:text-4xl!"
-                      v-model="tagSearch"
+                      v-model="badgeSearch"
                       type="search"
-                      @keyup.enter="addTag"
-                      @keyup.esc="tagsListOpen=!tagsListOpen"
+                      @keyup.enter="addBadge"
+                      @keyup.esc="badgeListOpen=!badgeListOpen"
                       placeholder="Add new tags"/>
-                    <InputGroupAddon><IconPlus class="size-4 lg:size-6 xl:size-7 2xl:size-10 cursor-pointer" @click="addTag"/></InputGroupAddon>
+                    <InputGroupAddon><IconPlus class="size-4 lg:size-6 xl:size-7 2xl:size-10 cursor-pointer" @click="addBadge"/></InputGroupAddon>
                   </InputGroup>
-                  <div class="max-h-30 w-full mb-2  overflow-y-auto border-2 border-t-0! border-input p-2 rounded-b-md" v-if="matchedTags.length ">
+                  <div class="max-h-30 w-full mb-2  overflow-y-auto border-2 border-t-0! border-input p-2 rounded-b-md" v-if="matchedBadges.length ">
                     <Badge
                       variant="tags"
-                      @click="unwrappedItem!.tags.push(tag); tagSearch = ''"
-                      v-for="(tag, index) in matchedTags" :key="index">{{tag}}</Badge>
+                      @click="unwrappedItem!.tags.push(tag); badgeSearch = ''"
+                      v-for="(tag, index) in matchedBadges" :key="index">{{tag}}</Badge>
                   </div>
                   <Transition name="fade" class="w-full">
                   <span
-                    v-if="existingTags"
+                    v-if="existingBadge"
                     class="text-sm lg:text-md xl:text-xl 2xl:text-3xl text-destructive cursor-text w-full">
                   Tag already exists</span>
                   </Transition>
@@ -301,8 +297,8 @@ const savePlugin = () => {
                     </div>
                   </Badge>
                   <Button class="align-middle size-6 lg:size-7 xl:size-8 2xl:size-12 "
-                          :variant="tagsListOpen ? 'red_inside': 'green_inside'" @click="tagsListOpen=!tagsListOpen; tagSearch=''">
-                    <component stroke="2" class=" size-4 lg:size-5 xl:size-6 2xl:size-10" :is=" tagsListOpen ? IconX: IconPlus" />
+                          :variant="badgeListOpen ? 'red_inside': 'green_inside'" @click="badgeListOpen=!badgeListOpen; badgeSearch=''">
+                    <component stroke="2" class=" size-4 lg:size-5 xl:size-6 2xl:size-10" :is=" badgeListOpen ? IconX: IconPlus" />
                   </Button>
                 </div>
 
