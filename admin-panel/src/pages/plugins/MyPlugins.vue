@@ -1,79 +1,25 @@
-<script setup lang="ts">
+<script setup lang="ts" >
 import MyPluginsTable from "@/pages/plugins/MyPluginsTable.vue";
 import {myPluginsData} from "@/data/myPlugins.ts";
-import {ArrowLeftIcon, Search} from 'lucide-vue-next'
-import { Button } from '@/components/ui/button'
-import { ButtonGroup } from '@/components/ui/button-group'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
-
-import
-{
-  IconFileImport,
-  IconDatabase,
-  IconTerminal2,
-  IconPencilCode,
-  IconPlayerPause, IconTrash, IconPlus
-} from "@tabler/icons-vue";
-import {computed, ref, watch} from "vue";
-import {Badge} from "@/components/ui/badge";
 import MyPagination from "@/helpers/MyPagination.vue";
-import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
-import type { Plugin } from "@/types/types.ts";
-import type {Paginable} from "@/types/types.ts";
-import MyPluginsActions from "@/pages/plugins/MyPluginsActions.vue";
+import type { MyPlugin } from "@/types/types.ts";
+import {useSearchFilter} from "@/composables/useSearchFilter.ts";
+import {useMyPluginStore} from "@/stores/myPluginStore.ts";
+const myPluginStore = useMyPluginStore()
+myPluginStore.getAllMyPlugins()
+const { updatePage, filteredData, tableData, updateData, updateSearchData, currentPage } =
+  useSearchFilter<MyPlugin>(() => myPluginStore.allMyPlugins,(plugin) => plugin.name)
 
-const currentPage = ref<number>(1)
-const searchFilter = ref('')
-const rowsData = ref(myPluginsData)
-const checkedPluginsIds = ref<number[]>()
-
-const filteredData = computed(() => {
-  if(!searchFilter.value) {
-    return myPluginsData;
-  }
-  return myPluginsData.filter((item) =>
-    item.name.toLowerCase().includes(searchFilter.value.toLowerCase())) ;
-})
-
-watch(searchFilter, () => {
-  currentPage.value = 1
-})
-
-const updateData = (data:Paginable[]) => {
-  rowsData.value = data as Plugin[]
-}
-const updateSearchData = (data: string) => {
-  searchFilter.value = data.trim()
-
-}
-const updatePage = (page: number) => {
-  currentPage.value = page
-}
-
-const checkedPlugins = (plugins:number[]) => {
-  checkedPluginsIds.value = plugins
-}
 
 </script>
 
 <template>
   <div>
-    <h1 class="text-center my-[2vh] text-[3vh] border-b pb-[2vh] max-h-[5vh] ">Your plugins</h1>
+
   <div>
-    <MyPluginsActions
-      @update:search-data="updateSearchData"
-    />
     <MyPluginsTable
-      :data="rowsData"
-      @update:checked="checkedPlugins"
+      :data="tableData"
+      @update:searchData="updateSearchData"
     />
 
     <MyPagination

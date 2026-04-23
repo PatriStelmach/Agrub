@@ -7,7 +7,7 @@ export const usersData: User[] = [
     surname: "Kowalska",
     active: true,
     email: "anna.kowalska@alert.pl",
-    role: "admin",
+    role: "Administrator",
     groups: ["Administration"],
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=anna"
   },
@@ -17,9 +17,9 @@ export const usersData: User[] = [
     surname: "Nowak",
     active: false,
     email: "piotr.nowak@alert.pl",
-    role: "technician",
-    groups: ["Technical", "Service"],
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=piotr"
+    role: "Technician",
+    groups: ["Technical", "Service", "System Administration"],
+    avatar: ""
   },
   {
     id: 3,
@@ -27,7 +27,7 @@ export const usersData: User[] = [
     surname: "Wiśniewska",
     active: true,
     email: "ewa.wisniewska@alert.pl",
-    role: "admin",
+    role: "Administrator",
     groups: ["Administration"],
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=ewa"
   },
@@ -37,9 +37,9 @@ export const usersData: User[] = [
     surname: "Dąbrowski",
     active: true,
     email: "jan.dabrowski@alert.pl",
-    role: "technician",
+    role: "Technician",
     groups: ["Technical", "Network"],
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=jan"
+    avatar: ""
   },
   {
     id: 5,
@@ -47,7 +47,7 @@ export const usersData: User[] = [
     surname: "Lewandowska",
     active: false,
     email: "katarzyna.lewandowska@alert.pl",
-    role: "admin",
+    role: "Administrator",
     groups: ["Administration"],
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=katarzyna"
   },
@@ -57,9 +57,9 @@ export const usersData: User[] = [
     surname: "Wójcik",
     active: true,
     email: "tomasz.wojcik@alert.pl",
-    role: "technician",
+    role: "Technician",
     groups: ["Technical", "Service"],
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=tomasz"
+    avatar: ""
   },
   {
     id: 7,
@@ -67,9 +67,8 @@ export const usersData: User[] = [
     surname: "Kamińska",
     active: true,
     email: "magdalena.kaminska@alert.pl",
-    role: "admin",
+    role: "Administrator",
     groups: ["Administration"],
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=magdalena"
   },
   {
     id: 8,
@@ -77,9 +76,8 @@ export const usersData: User[] = [
     surname: "Kowalczyk",
     active: false,
     email: "robert.kowalczyk@alert.pl",
-    role: "technician",
+    role: "Technician",
     groups: ["Technical", "Database"],
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=robert"
   },
   {
     id: 9,
@@ -87,7 +85,7 @@ export const usersData: User[] = [
     surname: "Zielińska",
     active: true,
     email: "joanna.zielinska@alert.pl",
-    role: "admin",
+    role: "Administrator",
     groups: ["Administration"],
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=joanna"
   },
@@ -97,7 +95,7 @@ export const usersData: User[] = [
     surname: "Szymczak",
     active: true,
     email: "marek.szymczak@alert.pl",
-    role: "technician",
+    role: "Technician",
     groups: ["Technical", "Service"],
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=marek"
   },
@@ -107,7 +105,7 @@ export const usersData: User[] = [
     surname: "Woźniak",
     active: false,
     email: "agnieszka.wozniak@alert.pl",
-    role: "admin",
+    role: "Administrator",
     groups: ["Administration"],
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=agnieszka"
   },
@@ -117,9 +115,8 @@ export const usersData: User[] = [
     surname: "Kozłowski",
     active: true,
     email: "jakub.kozlowski@alert.pl",
-    role: "technician",
+    role: "Technician",
     groups: ["Technical", "Network"],
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=jakub"
   },
   {
     id: 13,
@@ -127,7 +124,7 @@ export const usersData: User[] = [
     surname: "Jankowska",
     active: true,
     email: "karolina.jankowska@alert.pl",
-    role: "admin",
+    role: "Administrator",
     groups: ["Administration"],
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=karolina"
   },
@@ -137,9 +134,8 @@ export const usersData: User[] = [
     surname: "Mazur",
     active: false,
     email: "michal.mazur@alert.pl",
-    role: "technician",
+    role: "Technician",
     groups: ["Technical", "Database"],
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=michal"
   },
   {
     id: 15,
@@ -147,7 +143,7 @@ export const usersData: User[] = [
     surname: "Krawczyk",
     active: true,
     email: "aleksandra.krawczyk@alert.pl",
-    role: "admin",
+    role: "Administrator",
     groups: ["Administration"],
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=aleksandra"
   },
@@ -157,9 +153,8 @@ export const usersData: User[] = [
     surname: "Piotrowski",
     active: true,
     email: "pawel.piotrowski@alert.pl",
-    role: "technician",
+    role: "Technician",
     groups: ["Technical", "Service"],
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=pawel"
   },
   {
     id: 17,
@@ -167,7 +162,7 @@ export const usersData: User[] = [
     surname: "Grabowska",
     active: false,
     email: "monika.grabowska@alert.pl",
-    role: "admin",
+    role: "Administrator",
     groups: ["Administration"],
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=monika"
   },
@@ -177,9 +172,8 @@ export const usersData: User[] = [
     surname: "Jabłoński",
     active: true,
     email: "lukasz.jablonski@alert.pl",
-    role: "technician",
+    role: "Technician",
     groups: ["Technical", "Network"],
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=lukasz"
   },
   {
     id: 19,
@@ -187,7 +181,7 @@ export const usersData: User[] = [
     surname: "Nowicka",
     active: true,
     email: "dorota.nowicka@alert.pl",
-    role: "admin",
+    role: "Administrator",
     groups: ["Administration"],
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=dorota"
   },
@@ -197,8 +191,7 @@ export const usersData: User[] = [
     surname: "Adamski",
     active: false,
     email: "sebastian.adamski@alert.pl",
-    role: "technician",
+    role: "Technician",
     groups: ["Technical", "Database"],
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=sebastian"
   }
 ]

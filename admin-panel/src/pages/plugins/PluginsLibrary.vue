@@ -1,86 +1,52 @@
 <script setup lang="ts">
 import {pluginLibraryData} from "@/data/pluginLibrary.ts";
-import {computed, ref, watch} from "vue";
 import MyPagination from "@/helpers/MyPagination.vue";
 import PluginsLibraryTable from "@/pages/plugins/PluginsLibraryTable.vue";
 import {
-  IconFileImport,
+  IconMessageCode,
 } from "@tabler/icons-vue";
 
 import {ArrowLeftIcon, Search} from "lucide-vue-next";
 import {ButtonGroup} from "@/components/ui/button-group";
 import {Button} from "@/components/ui/button";
-import type {Plugin} from "@/types/types.ts"
+import type {LibraryPlugin} from "@/types/types.ts"
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
-import type {Paginable} from "@/types/types.ts";
+import {useSearchFilter} from "@/composables/useSearchFilter.ts";
 
-const currentPage = ref<number>(1)
-const searchFilter = ref('')
-const rowsData = ref<Plugin[]>(pluginLibraryData)
-
-
-watch(searchFilter, () =>
-{
-  currentPage.value = 1
-})
-
-const updateData = (data:Paginable[]) =>
-{
-  rowsData.value = data as Plugin[]
-}
-
-const updatePage = (page: number) =>
-{
-  currentPage.value = page
-}
-
-const filteredData = computed(() =>
-{
-  if(!searchFilter.value)
-  {
-    return pluginLibraryData
-  }
-  return pluginLibraryData.filter((item) =>
-    item.name.toLowerCase().includes(searchFilter.value.toLowerCase()))
-})
-
+const { updatePage, filteredData, tableData, updateData, updateSearchData, currentPage, searchFilter } =
+  useSearchFilter<LibraryPlugin>(() => pluginLibraryData,(item) => item.name)
 
 </script>
 
 <template>
   <div>
-    <h1 class="text-center my-[2vh] text-[3vh] border-b pb-[2vh]   md ">Plugins library</h1>
-  <div class="mx-auto w-full">
+    <div class="relative max-h-[10vh] items-center align-middle">
+      <div class="absolute left-4 top-0">
 
-    <div class="flex ml-[1vw] my-[2vh] ">
+        <ButtonGroup >
+          <ButtonGroup>
+            <Button variant="outline" size="icon" aria-label="Go Back">
+              <ArrowLeftIcon />
+            </Button>
 
-      <ButtonGroup class="hidden sm:flex">
-        <ButtonGroup>
-          <Button variant="outline" size="icon" aria-label="Go Back">
-            <ArrowLeftIcon />
-          </Button>
+            <InputGroup  >
+              <InputGroupInput
+                v-model="searchFilter"
+                type="search"
+                placeholder="Search for plugin"/>
+              <InputGroupAddon>
+                <Search/>
+              </InputGroupAddon>
+            </InputGroup>
+          </ButtonGroup>
         </ButtonGroup>
 
-        <ButtonGroup>
-        <Button variant="green_outline">
-          Add to your plugins
-          <IconFileImport/>
-        </Button>
-
-      <InputGroup class="relative l-[30vw] w-[20vw]  " >
-        <InputGroupInput
-          v-model="searchFilter"
-          type="search"
-          placeholder="Search for plugin"/>
-        <InputGroupAddon>
-          <Search/>
-        </InputGroupAddon>
-      </InputGroup>
-        </ButtonGroup>
-    </ButtonGroup>
-
+      </div>
+        <h1 class="text-center my-[2vh] text-xl xl:text-2xl 2xl:text-4xl border-b pb-[2vh]">Plugins library</h1>
+      <div>
     </div>
-<PluginsLibraryTable :data="rowsData" />
+
+<PluginsLibraryTable :data="tableData" />
 
     <MyPagination
       :data="filteredData"
@@ -89,6 +55,6 @@ const filteredData = computed(() =>
       @update:pages="updatePage"
       />
   </div>
-  </div>
+</div>
 </template>
 

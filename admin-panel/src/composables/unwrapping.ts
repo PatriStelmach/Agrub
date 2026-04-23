@@ -1,17 +1,16 @@
-import {computed, type Ref, ref, toRaw} from "vue";
+import {type Ref, ref, toRaw} from "vue";
 
-export function useWrapping<Paginable extends {id: number}>(data: Ref<Paginable[]>) {
+export function useWrapping<T extends object>(
+  data: Ref<T[]>,
+  key: keyof T = 'id' as keyof T
+) {
 
-  const unwrappedItem = ref<Paginable | null>(null)
-  const originalItem = ref<Paginable | null>(null)
-  const items = computed(() =>  data.value)
+  const unwrappedItem = ref<T | null>(null)
+  const originalItem = ref<T | null>(null)
 
-  const indexUnwrapped = computed(() => {
-    return data.value.findIndex(i => i.id === originalItem.value.id)
-  })
 
-  const isUnwrapped = (id: number) => {
-    return unwrappedItem.value?.id === id
+  const isUnwrapped = (keyValue: string | number) => {
+    return unwrappedItem.value?.[key] === keyValue
   }
 
   const wrap = (save: boolean) => {
@@ -23,10 +22,10 @@ export function useWrapping<Paginable extends {id: number}>(data: Ref<Paginable[
     unwrappedItem.value = null
   }
 
-  const unwrap = (item: Paginable) => {
-    originalItem.value = item
-    unwrappedItem.value = structuredClone(toRaw(item))
+  const unwrap = (keyValue: string | number) => {
+    originalItem.value = data.value.find(p => p?.[key] === keyValue )
+    unwrappedItem.value = structuredClone(toRaw(originalItem.value))
   }
 
-  return { unwrap, unwrappedItem, originalItem, wrap, isUnwrapped, items, indexUnwrapped }
+  return { unwrap, unwrappedItem, originalItem, wrap, isUnwrapped }
 }

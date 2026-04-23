@@ -5,18 +5,23 @@ const router = createRouter({
   routes: [
     {
       path: '/my_systems',
-      name: 'systems',
+      name: 'my_systems',
       component: () => import('../pages/systems/MySystems.vue'),
+    },
+    {
+      path: '/all_systems',
+      name: 'all_systems',
+      component: () => import('../pages/systems/AllSystems.vue'),
     },
     {
       path: '/',
       name: 'home',
-      component: () => import('../pages/dashboard/LandingPage.vue'),
+      component: () => import('@/pages/alerts/AlertsPage.vue'),
     },
     {
-      path: '/systems_library',
-      name: 'systems_library',
-      component: () => import('../pages/systems/SystemsLibrary.vue'),
+      path: '/alerts',
+      name: 'alerts',
+      component: () => import('@/pages/alerts/AlertsPage.vue'),
     },
     {
       path: '/plugins_library',
@@ -29,11 +34,6 @@ const router = createRouter({
       component: () => import('../pages/plugins/MyPlugins.vue'),
     },
     {
-      path: '/add_new_system',
-      name: 'add_new_system',
-      component: () => import('../pages/systems/AddNew.vue'),
-    },
-    {
       path: '/import_plugins',
       name: 'import_plugins',
       component: () => import('../pages/plugins/ImportPlugin.vue')
@@ -41,7 +41,12 @@ const router = createRouter({
     {
       path: '/team',
       name: 'team',
-      component: () => import('../pages/users/TeamMembers.vue')
+      component: () => import('../pages/users/TeamPage.vue')
+    },
+    {
+      path: '/logs',
+      name: 'logs',
+      component: () => import('../pages/logs/LogsPage.vue')
     }
 
   ],

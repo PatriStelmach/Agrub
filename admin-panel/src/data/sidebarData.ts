@@ -12,10 +12,10 @@ import type {User} from "@/types/types";
 export const sidebarData = {
   loggedUser: {
     id: 40,
-    firstname: "admin",
+    firstname: "Administrator",
     surname: "pjatk",
     email: "admin@pjatk",
-    role: "admin" as User["role"],
+    role: "Administrator" as User["role"],
     groups: ["Administration"],
     avatar: "/avatars/shadcn.jpg",
     active: true
@@ -28,7 +28,7 @@ export const sidebarData = {
     },
     {
       title: "Logs",
-      url: "#",
+      url: "/logs",
       icon: IconClipboardText,
     },
     {
@@ -38,7 +38,7 @@ export const sidebarData = {
     },
     {
       title: "Add new system",
-      url: "/systems_library",
+      url: "/all_systems",
       icon: IconLayoutGridAdd,
     },
     {

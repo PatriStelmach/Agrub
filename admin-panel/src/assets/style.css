@@ -40,6 +40,8 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --color-selected: var(--selected);
   --color-badge: var(--badge);
+  --color-badge1: var(--badge1);
+  --color-badge2: var(--badge2);
 }
 :root {
   --checkbox-border-color: #8b8c89;
@@ -79,6 +81,8 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.551 0.027 264.364);
   --badge: oklch(0.59 0.14 242);
+  --badge1: oklch(0.731 0.205 132.694);
+  --badge2: oklch(54.5% 0.246 16.439);
 }
 
 .light {
@@ -102,7 +106,7 @@
   --border: oklch(0.928 0.006 264.531);
   --input: oklch(0.928 0.006 264.531);
   --ring: oklch(0.707 0.022 261.325);
-  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-1: oklch(0.688 0.243 264.376);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.828 0.189 84.429);
@@ -120,8 +124,9 @@
 
 @theme
 {
+  --breakpoint-sm: 1000px;
   --breakpoint-md: 1480px;
-  --breakpoint-lg: 1900px;
+  --breakpoint-lg: 1920px;
   --breakpoint-xl: 2400px;
   --breakpoint-2xl: 3600px;
 }
@@ -164,7 +169,9 @@ input[type="checkbox"]:not(:disabled):checked
 }
 input[type="checkbox"]:disabled
 {
-  background-color: var(--primary);
+  background-color: var(--muted);
+  border-color: var(--muted);
+  cursor: not-allowed;
 }
 input[type="checkbox"]:disabled:checked
 {
@@ -187,16 +194,22 @@ input[type="checkbox"]:focus-visible
   transform: scale(1.08);
 }
 
-.scroll-style::-webkit-scrollbar {
-  background: var(--background);
-  scrollbar-width: thin;
-  scroll-behavior: smooth;
+::-webkit-scrollbar-thumb {
+  border-radius: 1rem;
 }
 
-.scroll-style::-webkit-scrollbar-corner {
-  background: var(--secondary);
+::-webkit-scrollbar-track {
+  border-radius: 1rem;
 }
-.scroll-style::-webkit-scrollbar-thumb {
+
+::-webkit-scrollbar {
+  scrollbar-width: thin;
+  scroll-behavior: smooth;
+  border-radius: 10px;
+  width: 0.4em;
+}
+
+::-webkit-scrollbar-thumb {
   background: var(--sidebar-ring);
 }
 

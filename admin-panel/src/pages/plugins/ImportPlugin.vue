@@ -106,38 +106,40 @@ else {
 
 <template>
   <div>
-    <h1 class="text-center my-[2vh] text-[3vh] border-b pb-[2vh]   md ">Importing Plugins</h1>
-    <div class="mx-auto w-full">
+    <div class="relative">
+      <h1 class="text-center my-[2vh] text-xl xl:text-2xl 2xl:text-4xl border-b pb-[2vh]">Logs Dashboard</h1>
+      <div class="absolute top-0 left-4 flex">
 
-  <ButtonGroup class="ml-[2vw]">
+  <ButtonGroup >
     <ButtonGroup>
-      <Button variant="outline">
-      <ArrowLeftIcon/>
-    </Button>
+      <Button variant="outline" size="icon" aria-label="Go Back">
+        <ArrowLeftIcon />
+      </Button>
     </ButtonGroup>
-<ButtonGroup>
-  <Button
-    @click="toggleAllChecked"
-    variant="yellow_outline"
-    :disabled="blockedAdd">
-    {{ checkText }}
-    <IconListCheck/>
-  </Button>
-  <Button variant="green_outline"
-          :disabled="blockedAddRemove">
-    Add to your plugins
-    <IconFileImport/>
-  </Button>
-  <Button
-    @click="removeFiles(checkedFiles)"
-    variant="red_outline"
-    :disabled="blockedAddRemove">
-    Remove
-    <IconTrash/>
-  </Button>
-</ButtonGroup>
-
+    <ButtonGroup>
+      <Button
+        @click="toggleAllChecked"
+        variant="orange_outline"
+        :disabled="blockedAdd">
+        {{ checkText }}
+        <IconListCheck/>
+      </Button>
+      <Button variant="green_outline"
+              :disabled="blockedAddRemove">
+        Add to your plugins
+        <IconFileImport/>
+      </Button>
+      <Button
+        @click="removeFiles(checkedFiles)"
+        variant="red_outline"
+        :disabled="blockedAddRemove">
+        Remove
+        <IconTrash/>
+      </Button>
+    </ButtonGroup>
   </ButtonGroup>
+    </div>
+  </div>
 
   <Empty class=" ">
     <EmptyHeader>
@@ -220,5 +222,5 @@ else {
     </Button>
   </Empty>
   </div>
-  </div>
+
 </template>
