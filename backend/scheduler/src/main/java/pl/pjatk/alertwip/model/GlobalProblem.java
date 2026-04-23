@@ -58,4 +58,14 @@ public class GlobalProblem {
     public void setOccurrenceTime(LocalDateTime occurrenceTime) {
         this.occurrenceTime = occurrenceTime;
     }
+
+    private int severity;
+
+    public int getSeverity() {
+        return severity;
+    }
+
+    public void setSeverity(int severity) {
+        this.severity = severity;
+    }
 }

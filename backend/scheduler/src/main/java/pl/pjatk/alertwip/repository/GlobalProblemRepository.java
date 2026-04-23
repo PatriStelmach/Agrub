@@ -11,6 +11,8 @@ public interface GlobalProblemRepository extends JpaRepository<GlobalProblem, Lo
 
     Optional<GlobalProblem> findByTaskId(Long taskId);
 
+    Optional<GlobalProblem> findByTaskName(String taskName);
+
     boolean existsByTaskId(Long taskId);
 
     void deleteByTaskId(Long taskId);

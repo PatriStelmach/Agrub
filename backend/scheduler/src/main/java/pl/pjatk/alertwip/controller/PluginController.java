@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/plugins")
-@CrossOrigin(origins = "*")
 public class PluginController {
 
     private final PluginRepository pluginRepository;

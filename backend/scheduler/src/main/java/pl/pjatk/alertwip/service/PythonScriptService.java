@@ -22,14 +22,17 @@ public class PythonScriptService {
 
     private final GlobalProblemRepository problemRepository;
     private final TaskExecutionLogRepository logRepository;
+    private final SseNotifService sseService;
 
     @Value("${app.scripts.path}")
     private String scriptsPath;
 
     public PythonScriptService(TaskExecutionLogRepository logRepository,
-                               GlobalProblemRepository problemRepository) {
+                               GlobalProblemRepository problemRepository,
+                               SseNotifService sseService) {
         this.problemRepository = problemRepository;
         this.logRepository = logRepository;
+        this.sseService = sseService;
     }
 
     /**
@@ -90,9 +93,9 @@ public class PythonScriptService {
         } finally {
             saveLogToDatabase(task, outputCollector.toString(), status);
 
-            if (!task.isLog()) {
-                handleAlerting(task, exitCode, outputCollector.toString());
-            }
+            // Wywołujemy mechanizm alertowania unconditionally - wewnątrz on sam sprawdzi,
+            // czy zignorować (severity 1), utworzyć (severity >= 2), czy rozwiązać stary alert
+            handleAlerting(task, exitCode, outputCollector.toString());
         }
     }
 
@@ -100,18 +103,32 @@ public class PythonScriptService {
         Optional<GlobalProblem> existingProblem = problemRepository.findByTaskId(task.getId());
 
         if (exitCode != 0) {
-            GlobalProblem problem = existingProblem.orElse(new GlobalProblem());
-            problem.setTaskId(task.getId());
-            problem.setTaskName(task.getTaskName());
-            problem.setLastErrorMessage(output.length() > 255 ? output.substring(0, 252) + "..." : output);
-            problem.setOccurrenceTime(LocalDateTime.now());
-            problemRepository.save(problem);
+            // SCENARIUSZ: BŁĄD SKRYPTU
+            if (task.getSeverity() >= 2) {
+                // Severity 2-5 -> Traktujemy jako ERROR (GlobalProblem)
+                GlobalProblem problem = existingProblem.orElse(new GlobalProblem());
+                problem.setTaskId(task.getId());
+                problem.setTaskName(task.getTaskName());
+                problem.setLastErrorMessage(output.length() > 255 ? output.substring(0, 252) + "..." : output);
+                problem.setSeverity(task.getSeverity()); // Używamy czystego int z modelu
+                problem.setOccurrenceTime(LocalDateTime.now());
 
-            if (existingProblem.isEmpty()) System.out.println("[!!!] NOWY ALERT: " + task.getTaskName());
+                GlobalProblem saved = problemRepository.save(problem);
+
+                if (existingProblem.isEmpty()) {
+                    sseService.sendAlert("NEW_ALERT", saved);
+                }
+            } else {
+                // Severity 1 -> Traktujemy jako LOG
+                // Na razie tutaj nic nie robimy (docelowo: zapis do ogólnego logu systemowego)
+                System.out.println("[LOG] Skrypt " + task.getTaskName() + " zakończył się błędem, ale ma severity 1.");
+            }
         } else {
+            // SCENARIUSZ: SKRYPT OK
             if (existingProblem.isPresent()) {
-                problemRepository.delete(existingProblem.get());
-                System.out.println("[OK] RECOVERY: Problem rozwiązany dla: " + task.getTaskName());
+                GlobalProblem problemToResolve = existingProblem.get();
+                problemRepository.delete(problemToResolve);
+                sseService.sendAlert("ALERT_RESOLVED", problemToResolve);
             }
         }
     }
