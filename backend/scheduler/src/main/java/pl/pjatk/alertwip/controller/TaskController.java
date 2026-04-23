@@ -4,24 +4,26 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.pjatk.alertwip.config.DynamicSchedulerConfig;
 import pl.pjatk.alertwip.dto.TaskRequestDTO;
-import pl.pjatk.alertwip.model.Plugin;
 import pl.pjatk.alertwip.model.ScheduledTask;
-import pl.pjatk.alertwip.repository.PluginRepository;
 import pl.pjatk.alertwip.repository.ScheduledTaskRepository;
-import pl.pjatk.alertwip.service.PythonScriptService;
-import java.util.List;
-import java.util.Map;
+import pl.pjatk.alertwip.service.PluginManagerService;
 
 @RestController
 @RequestMapping("/api/tasks")
+@CrossOrigin(origins = "*") // Zawsze warto pamiętać o CORS dla frontendu
 public class TaskController {
 
     private final ScheduledTaskRepository repository;
     private final DynamicSchedulerConfig schedulerConfig;
+    private final PluginManagerService pluginManagerService;
 
-    public TaskController(ScheduledTaskRepository repository, DynamicSchedulerConfig schedulerConfig) {
+    // Wstrzykujemy PluginManagerService
+    public TaskController(ScheduledTaskRepository repository,
+                          DynamicSchedulerConfig schedulerConfig,
+                          PluginManagerService pluginManagerService) {
         this.repository = repository;
         this.schedulerConfig = schedulerConfig;
+        this.pluginManagerService = pluginManagerService;
     }
 
     @PostMapping("/add")
@@ -29,14 +31,20 @@ public class TaskController {
         ScheduledTask task = new ScheduledTask();
         task.setTaskName(dto.taskName());
         task.setScriptName(dto.scriptName());
-        task.setLog(dto.isLog());
 
-        // Logika tłumaczenia
+        // Magia dzieje się tutaj - serwer sam decyduje na podstawie pliku!
+        boolean isLog = pluginManagerService.isLogScript(dto.scriptName());
+        task.setLog(isLog);
+
+        // Logika tłumaczenia interwału na Crona
         if (dto.seconds() != null) {
             task.setCronExpression("*/" + dto.seconds() + " * * * * *");
         } else {
             task.setCronExpression(dto.cronExpression());
         }
+
+        // Domyślnie nowe zadanie jest od razu aktywne (możesz to zmienić wg uznania)
+        task.setActive(true);
 
         ScheduledTask saved = repository.save(task);
         schedulerConfig.updateSchedule(saved);
@@ -45,8 +53,10 @@ public class TaskController {
 
     @PutMapping("/edit")
     public ScheduledTask editTask(@RequestBody ScheduledTask task) {
+        boolean realIsLog = pluginManagerService.isLogScript(task.getScriptName());
+        task.setLog(realIsLog);
+
         ScheduledTask saved = repository.save(task);
-        // REAKCJA NATYCHMIASTOWA
         schedulerConfig.updateSchedule(saved);
         return saved;
     }
@@ -54,7 +64,6 @@ public class TaskController {
     @DeleteMapping("/{id}")
     public void deleteTask(@PathVariable Long id) {
         repository.deleteById(id);
-        // ZATRZYMANIE W PAMIĘCI
         schedulerConfig.stopTask(id);
     }
 
@@ -64,7 +73,6 @@ public class TaskController {
         task.setActive(!task.isActive());
         repository.save(task);
 
-        // Aktualizujemy harmonogram na podstawie nowego statusu active
         schedulerConfig.updateSchedule(task);
     }
 }

@@ -4,17 +4,16 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public record PluginDTO(
-        Long id,              // ID z bazy
-        String fileName,      // Nazwa pliku na dysku (null w sklepie)
-        String name,
+        Long id,
+        String name,          // bez rozszerzenia
         String creator,
         String description,
-        String language,
+        String extension,     // np. ".py", ".sh", ".ps1"
         long weight,          // w KB
         List<String> tags,
-        String cronExpression, // null w sklepie
+        String cronExpression,
         LocalDateTime updatedAt,
         boolean active,
         boolean isLog,
-        boolean isInstalled   // Flaga informująca, czy mamy to już na dysku
+        boolean isInstalled
 ) {}

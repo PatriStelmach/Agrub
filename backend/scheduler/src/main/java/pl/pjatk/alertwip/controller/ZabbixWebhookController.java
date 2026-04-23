@@ -16,7 +16,7 @@ public class ZabbixWebhookController {
 
         System.out.println("[ZABBIX WEBHOOK] " + eventStatus + ": " + eventName + " na hoście " + host);
 
-        // Tutaj możesz dodać logikę zapisu do bazy lub powiadomienia użytkownika
+        // do dodania kurwa co robić z tymi alertami
         return ResponseEntity.ok("Alert processed");
     }
 }
