@@ -1,5 +1,7 @@
 import 'package:alert_app/data/repositories/alert_repository.dart';
+import 'package:alert_app/data/repositories/plugin_repository.dart';
 import 'package:alert_app/data/repositories/user_repository.dart';
+import 'package:alert_app/firebase_options.dart';
 import 'package:alert_app/services/navigation_service.dart';
 import 'package:alert_app/logic/plugins_view_model.dart';
 import 'package:alert_app/logic/alerts_view_model.dart';
@@ -7,35 +9,45 @@ import 'package:alert_app/logic/home_view_model.dart';
 import 'package:alert_app/logic/user_view_model.dart';
 import 'package:alert_app/screens/general_layout_screen.dart';
 import 'package:alert_app/themes/app_theme_default.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+Future<void> main() async {
 
 //checking if flutter engine is ready
   WidgetsFlutterBinding.ensureInitialized();
+
+  // To inicjalizuje Firebase
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+
   runApp(
     MultiProvider(
       providers: [
         //Single source of truth
         ChangeNotifierProvider(create: (_) => AlertRepository()),
+        ChangeNotifierProvider(create: (_) => PluginsRepository()),
         ChangeNotifierProvider(create: (_) => UserRepository()),
         
         //Creation of view models
         ChangeNotifierProvider<PluginsViewModel>(
           create: (context) => PluginsViewModel(
-            repository: context.read<AlertRepository>(),
+            pluginsRepository: context.read<PluginsRepository>(),
           )),
 
         ChangeNotifierProvider<HomeViewModel>(
           create: (context) => HomeViewModel(
             repository: context.read<AlertRepository>(),
-          )),
+          )..getMyToken(),
+          ),
 
 
         ChangeNotifierProvider<AlertsViewModel>(
           create: (context) => AlertsViewModel(
-            repository: context.read<AlertRepository>(),
+            alertsRepository: context.read<AlertRepository>(),
           )),
           
         ChangeNotifierProvider<UserViewModel>(

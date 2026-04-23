@@ -1,4 +1,4 @@
-import 'package:alert_app/screens/scripts_screen.dart';
+import 'package:alert_app/screens/plugins_screen.dart';
 import 'package:alert_app/screens/home_screen.dart';
 import 'package:alert_app/screens/alerts_screen.dart';
 import 'package:alert_app/screens/settings_screen.dart';
@@ -50,7 +50,7 @@ String dropDownValue = 'Home';
             items:const[
             DropdownMenuItem<String>(value: 'Home', child: Text('Home')),
             DropdownMenuItem<String>(value: 'Alerts', child: Text('Alerts')),
-            DropdownMenuItem<String>(value: 'Scripts', child: Text('Scripts')),
+            DropdownMenuItem<String>(value: 'Plugins', child: Text('Plugins')),
             DropdownMenuItem<String>(value: 'Settings', child: Text('Settings')),
             
             ]
@@ -76,7 +76,7 @@ String dropDownValue = 'Home';
           case 'Home': return HomeScreen();
           case 'Alerts': return AlertsScreen();
           case 'Settings': return SettingsScreen();
-          case 'Scripts': return ScriptsScreen();
+          case 'Plugins': return PluginsScreen();
           case 'User': return UserScreen();
           case 'Debug': return DebugScreen();
           default: return HomeScreen();

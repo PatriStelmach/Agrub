@@ -1,9 +1,19 @@
 import 'package:alert_app/data/repositories/alert_repository.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 import '../data/models/alert_model.dart';
 
 class HomeViewModel extends ChangeNotifier {
+
+
+void getMyToken() async {
+  String? token = await FirebaseMessaging.instance.getToken();
+  print("Mój FCM Token: $token"); // Skopiuj to z konsoli VS Code!
+}
+
+
+
 
 final AlertRepository repository;
 HomeViewModel({required this.repository}) {
