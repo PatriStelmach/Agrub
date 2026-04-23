@@ -32,15 +32,25 @@ import gsap from "gsap";
 import {Label} from "@/components/ui/label";
 import {Select} from "@/components/ui/select";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
+import {useBadgeFilter} from "@/composables/useBadgeFilter.ts";
+import {inputText, nameLabel} from "@/assets/cssFunctions.ts";
 
 // const { updatePage, filteredData, tableData, updateData, updateSearchData, currentPage } = use
 const users = computed(() => {
   return usersData;
 })
 
+const groups = ["Technicial", "Database",  "System Admins", "Administration", "Servers", "Network"]
+
 const { wrap, unwrap, unwrappedItem, isUnwrapped, originalItem } = useWrapping(users)
 const { updatePage, filteredData, tableData, updateData, updateSearchData, currentPage, searchFilter } =
   useSearchFilter<User>(() => users.value,(user) => `${user.firstname} ${user.surname}` )
+
+const { badgeSearch, availableBadges, addBadge, badgeListOpen, matchedBadges, existingBadge } = useBadgeFilter<User>(
+  unwrappedItem,
+  groups,
+  () => unwrappedItem.value?.groups ?? []
+)
 
 
 
@@ -79,7 +89,7 @@ const { updatePage, filteredData, tableData, updateData, updateSearchData, curre
     </div>
   </div>
     <TransitionGroup
-      class=" px-6 py-2 pr-3 grid grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 max-h-[80vh] overflow-y-auto"
+      class=" px-6 py-2 pr-3 grid sm:grid-cols-2 md:grid-cols-4  xl:grid-cols-5 gap-6 max-h-[80vh] overflow-y-auto"
       tag="div"
       name="slide-fade-card"
     >
@@ -107,15 +117,21 @@ const { updatePage, filteredData, tableData, updateData, updateSearchData, curre
             <span v-if="!isUnwrapped(user.id)" class="truncate font-medium ">{{ `${user.firstname} ${user.surname}` }}</span>
             <div v-else class="space-x-2 flex transition duration-900">
               <div class="grid space-y-2">
-                <Label :for="`${user.id}_firstname`">Firstname</Label>
+                <Label
+                  :class="nameLabel"
+                  :for="`${user.id}_firstname`">Firstname</Label>
                 <Input
+                  :class="inputText"
                   :id="`${user.id}_firstname`"
                   :default-value="user.firstname"
                 />
               </div>
               <div class="grid space-y-2">
-                <Label :for="`${user.id}_surname`">Surname</Label>
+                <Label
+                  :class="nameLabel"
+                  :for="`${user.id}_surname`">Surname</Label>
                 <Input
+                  :class="inputText"
                   :id="`${user.id}_surname`"
                   :default-value="user.surname"
                 />
@@ -123,8 +139,11 @@ const { updatePage, filteredData, tableData, updateData, updateSearchData, curre
             </div>
             <span v-if="!isUnwrapped(user.id)" class="text-muted-foreground truncate text-xs">{{ user.email }} </span>
             <div class="grid space-y-2" v-else>
-              <Label :for="`${user.id}_email`">e-mail</Label>
+              <Label
+                :class="nameLabel"
+                :for="`${user.id}_email`">e-mail</Label>
               <Input
+                :class="inputText"
                 :id="`${user.id}_email`"
                 :default-value="user.email"
               />
@@ -151,51 +170,53 @@ const { updatePage, filteredData, tableData, updateData, updateSearchData, curre
             </RadioGroup>
           <div v-else class="flex space-x-1">
             <component :is="user.role === 'Administrator' ? IconKey : IconTool" stroke="2" />
-            <h1 class="font-bold mb-2 text-lg">{{ user.role }}</h1>
+            <h1 class="font-bold mb-2 text-lg xl:text-xl 2xl:text-2xl">{{ user.role }}</h1>
           </div>
           <div class="flex flex-2 items-start whitespace-break-spaces">
-            <div class="flex space-x-1 items-center mr-1 mt-1">
+            <div class="flex space-x-1 items-center mr-2 mt-1">
               <IconUsersGroup stroke="1.5" />
-              <h1>Groups:</h1>
+              <h1 :class="nameLabel">Groups:</h1>
             </div>
-            <Transition v-if="isUnwrapped(user.id)" name="slide-fade">
-              <div class="mb-4">
-                <InputGroup
-                  class="w-full xl:h-14 2xl:h-18  "
-                  :class="{'rounded-br-none rounded-bl-none' : matchedBadges.length || badgeSearch === ''}">
-                  <InputGroupInput
-                    class="text-lg! lg:text-xl! xl:text-2xl! 2xl:text-4xl!"
-                    v-model="badgeSearch"
-                    type="search"
-                    @keyup.enter="addBadge"
-                    @keyup.esc="badgeListOpen=!badgeListOpen"
-                    placeholder="Add new tags"/>
-                  <InputGroupAddon><IconPlus class="size-4 lg:size-6 xl:size-7 2xl:size-10 cursor-pointer" @click="addBadge"/></InputGroupAddon>
-                </InputGroup>
-                <div class="max-h-30 w-full mb-2  overflow-y-auto border-2 border-t-0! border-input p-2 rounded-b-md" v-if="matchedBadges.length ">
-                  <Badge
-                    variant="tags"
-                    @click="unwrappedItem!.tags.push(tag); badgeSearch = ''"
-                    v-for="(tag, index) in matchedBadges" :key="index">{{tag}}</Badge>
+            <div>
+              <Transition v-if="isUnwrapped(user.id)" class="mb-4" tag="div" name="slide-fade">
+                <div  v-if="isUnwrapped(user.id) && unwrappedItem" >
+                  <InputGroup
+                    class="w-4/5 xl:h-10 2xl:h-12  "
+                    :class="{'rounded-br-none rounded-bl-none' : matchedBadges.length || badgeSearch === ''}">
+                    <InputGroupInput
+                      :class="inputText"
+                      v-model="badgeSearch"
+                      type="search"
+                      @keyup.enter="addBadge"
+                      @keyup.esc="badgeListOpen=!badgeListOpen"
+                      placeholder="Add new group"/>
+                    <InputGroupAddon><IconPlus class="size-4 lg:size-5 xl:size-6 2xl:size-8 cursor-pointer" @click="addBadge"/></InputGroupAddon>
+                  </InputGroup>
+                  <div class="max-h-20 w-4/5 mb-2  overflow-y-auto border-2 border-t-0! border-input p-2 rounded-b-md" v-if="matchedBadges.length ">
+                    <Badge
+                      variant="groups"
+                      @click="unwrappedItem.groups.push(group); badgeSearch = ''"
+                      v-for="(group, index) in matchedBadges" :key="index">{{group}}</Badge>
+                  </div>
+                  <Transition name="fade" class="w-full">
+                    <span
+                      v-if="existingBadge"
+                      class="text-sm lg:text-md xl:text-xl 2xl:text-3xl text-destructive cursor-text w-full">
+                    Tag already exists</span>
+                  </Transition>
                 </div>
-                <Transition name="fade" class="w-full">
-                  <span
-                    v-if="existingBadge"
-                    class="text-sm lg:text-md xl:text-xl 2xl:text-3xl text-destructive cursor-text w-full">
-                  Tag already exists</span>
-                </Transition>
+              </Transition>
+              <div>
+                <Badge variant="groups" v-for="(group, index) in (isUnwrapped(user.id) ? unwrappedItem?.groups : user.groups)" :key="index">
+                  {{ group }}
+                </Badge>
               </div>
-            </Transition>
-            <div v-else>
-              <Badge variant="groups" v-for="(group, index) in user.groups" :key="index">
-                {{ group }}
-              </Badge>
             </div>
           </div>
         </CardDescription>
-        <CardFooter class="relative" v-if="isUnwrapped(user.id)">
+        <CardFooter class="m-0 flex justify-end" v-if="isUnwrapped(user.id)">
           <Button
-            class="absolute right-3 bottom-0 flex items-center"
+            class=" flex items-center"
             variant="green_inside"
           >
             Save

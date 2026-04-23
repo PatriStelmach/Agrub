@@ -279,7 +279,3 @@ input[type=number] {
 }
 
 
-
-.user-box.expanded {
-  max-height: 500px; /* większa niż maksymalna możliwa */
-}

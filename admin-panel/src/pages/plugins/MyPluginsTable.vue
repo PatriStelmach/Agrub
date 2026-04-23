@@ -1,32 +1,31 @@
 <script setup lang="ts">
-import axios from 'axios'
-import cronParser  from 'cron-parser';
+import cronParser from 'cron-parser';
 import cronstrue from 'cronstrue'
-import
-{
+import {
   Table,
   TableBody,
-  TableHeader,
-  TableRow,
+  TableCaption,
   TableCell,
   TableFooter,
   TableHead,
-  TableCaption
+  TableHeader,
+  TableRow
 } from "@/components/ui/table";
 import DateCell from "@/helpers/DateCell.vue";
 import {cn} from "@/lib/utils.ts";
 import {Badge} from "@/components/ui/badge";
-import type {MyPlugin, PluginDetails} from "@/types/types.ts"
+import {Language, type MyPlugin, Severity} from "@/types/types.ts"
 import {
   IconCancel,
+  IconClockBolt,
   IconDeviceFloppy,
+  IconLabel,
   IconMessageCode,
-  IconX,
+  IconPencilCode,
   IconPlus,
-  IconLogs,
-  IconAlertTriangleFilled,
-  IconClockBolt, IconTrash, IconDatabase, IconStatusChange, IconTerminal2, IconFileImport,
-  IconPencilCode
+  IconStatusChange,
+  IconTrash,
+  IconX
 } from "@tabler/icons-vue"
 import {computed, ref, watch} from "vue";
 import {useSort} from "@/composables/sorting.ts";
@@ -37,20 +36,21 @@ import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/inpu
 import {ArrowLeftIcon, Search} from "lucide-vue-next";
 import {availableTags} from "@/data/tags.ts";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
+import {Label} from "@/components/ui/label";
 import {
-  DropdownMenu,
-  DropdownMenuContent, DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {ButtonGroup} from "@/components/ui/button-group";
 import {Input} from "@/components/ui/input";
 import {dateParser} from "@/composables/dateParser.ts";
 import {useMyPluginStore} from "@/stores/myPluginStore.ts";
-import {my} from "cronstrue/dist/i18n/locales/my";
 import PluginDetailsDialog from "@/pages/plugins/PluginDetailsDialog.vue";
 import {useBadgeFilter} from "@/composables/useBadgeFilter.ts";
+import {inputText} from "@/assets/cssFunctions.ts";
 
 const props = defineProps<{
   data: MyPlugin[];
@@ -62,17 +62,15 @@ const emit = defineEmits<{
 
 const store = useMyPluginStore()
 const { sortedData, sortKey, sortOrder, toggleSort } = useSort<MyPlugin>(() => props.data, 'updatedAt')
-const { wrap, isUnwrapped, unwrap, originalItem, unwrappedItem } = useWrapping(sortedData, 'fileName')
-const { badgeListOpen, addBadge, availableBadges, existingBadge, matchedBadges, badgeSearch } = useBadgeFilter<MyPlugin>(
+const { wrap, isUnwrapped, unwrap, unwrappedItem } = useWrapping(sortedData, 'fileName')
+const { badgeListOpen, addBadge, availableBadges, existingBadge, matchedBadges, badgeSearch } = useBadgeFilter<MyPlugin | null>(
   unwrappedItem,
   availableTags,
   () => unwrappedItem.value?.tags ?? []
 )
-
-const openDetailsDialog = ref(false);
+const showInfoDialog = ref<boolean>(false)
 const searchFilter = ref<string>("")
 const checkedPlugins = ref<string[]>([])
-const unwrappedDetails = ref<PluginDetails>({code:'',description:''})
 
 const blockedCheckbox = computed(() => !!unwrappedItem.value)
 const blockedEdit = computed(() => checkedPlugins.value.length !== 1 || unwrappedItem.value)
@@ -83,13 +81,11 @@ const blockedRemoveAndChange = computed(() =>
 const allChecked = computed(() =>  props.data.length > 0 &&
   checkedPlugins.value.length === props.data.length)
 
-
-
 const nextUnwrappedCron = computed(() =>
   unwrappedItem.value ? dateParser(cronParser.parse(unwrappedItem.value.cronExpression).next().toDate()).fullDate : '')
 
 const cronDescription = computed(() => {
-  const cron = unwrappedItem.value!.cronExpression
+  const cron = unwrappedItem.value?.cronExpression
   if(cron) {
     try {
       cronParser.parse(cron, {strict:true})
@@ -104,7 +100,6 @@ const cronDescription = computed(() => {
 watch(searchFilter, () => {
   emit('update:search-data', searchFilter.value)
 }, {immediate: true})
-
 
 const checkAll = () => {
   return !allChecked.value ?
@@ -124,7 +119,11 @@ const deletePlugins = () => {
 }
 
 const getDetails = async (fileName: string) => {
-  unwrappedDetails.value = await store.getMyPluginDetails(fileName)
+  if(unwrappedItem.value) {
+    const details = await store.getMyPluginDetails(fileName)
+    unwrappedItem.value.code = details.code
+    unwrappedItem.value.description = details.description
+  }
 }
 
 const nextRun = (plugin: MyPlugin) => {
@@ -136,6 +135,14 @@ const check = (fileName: string) => {
     checkedPlugins.value = checkedPlugins.value.filter(p => p !== fileName) : checkedPlugins.value.push(fileName)
 }
 
+const updateDetails = (code: string, description: string) => {
+  if(unwrappedItem.value) {
+    unwrappedItem.value.code = code
+    unwrappedItem.value.description = description
+    console.log(unwrappedItem.value)
+  }
+}
+
 const closePlugin = () => {
   if(unwrappedItem.value) {
     wrap(false);
@@ -144,11 +151,17 @@ const closePlugin = () => {
   }
 }
 
-const savePlugin = () => {
+const savePlugin = async () => {
   if(unwrappedItem.value) {
-    wrap(true)
-    badgeListOpen.value = false
-    badgeSearch.value = ''
+    const response = await store.editMyPlugin(unwrappedItem.value)
+    if(response.success) {
+      wrap(true, response.message )
+      badgeListOpen.value = false
+      badgeSearch.value = ''
+    }
+    showInfoDialog.value = true
+
+
   }
 }
 
@@ -245,7 +258,18 @@ const savePlugin = () => {
                 v-model="checkedPlugins"
               />
             </TableCell>
-            <TableCell class=" whitespace-break-spaces">{{plugin.name}}</TableCell>
+            <TableCell v-if="isUnwrapped(plugin.fileName)">
+              <InputGroup
+                class="w-full xl:h-10 2xl:h-12 ">
+                <InputGroupInput
+                  :class="inputText"
+                  v-model="plugin.name"
+                  type="text"
+                  placeholder="plugin name"/>
+                <InputGroupAddon><IconLabel class="size-4 lg:size-5 xl:size-6 2xl:size-8 cursor-pointer"/></InputGroupAddon>
+              </InputGroup>
+            </TableCell>
+            <TableCell v-else class=" whitespace-break-spaces">{{plugin.name}}</TableCell>
 
             <TableCell v-if="!isUnwrapped(plugin.fileName)"  class=" whitespace-break-spaces">
               <Badge
@@ -258,21 +282,21 @@ const savePlugin = () => {
               <Transition name="slide-fade">
                 <div v-if="badgeListOpen" class="mb-4">
                   <InputGroup
-                    class="w-full xl:h-14 2xl:h-18  "
+                    class="w-full xl:h-10 2xl:h-12  "
                     :class="{'rounded-br-none rounded-bl-none' : matchedBadges.length || badgeSearch === ''}">
                     <InputGroupInput
-                      class="text-lg! lg:text-xl! xl:text-2xl! 2xl:text-4xl!"
+                      :class="inputText"
                       v-model="badgeSearch"
                       type="search"
                       @keyup.enter="addBadge"
                       @keyup.esc="badgeListOpen=!badgeListOpen"
                       placeholder="Add new tags"/>
-                    <InputGroupAddon><IconPlus class="size-4 lg:size-6 xl:size-7 2xl:size-10 cursor-pointer" @click="addBadge"/></InputGroupAddon>
+                    <InputGroupAddon><IconPlus class="size-4 lg:size-5 xl:size-6 2xl:size-8 cursor-pointer" @click="addBadge"/></InputGroupAddon>
                   </InputGroup>
                   <div class="max-h-30 w-full mb-2  overflow-y-auto border-2 border-t-0! border-input p-2 rounded-b-md" v-if="matchedBadges.length ">
                     <Badge
                       variant="tags"
-                      @click="unwrappedItem!.tags.push(tag); badgeSearch = ''"
+                      @click="unwrappedItem?.tags.push(tag); badgeSearch = ''"
                       v-for="(tag, index) in matchedBadges" :key="index">{{tag}}</Badge>
                   </div>
                   <Transition name="fade" class="w-full">
@@ -285,7 +309,7 @@ const savePlugin = () => {
               </Transition>
                 <div class="w-full justify-between">
                   <Badge
-                    v-for="(tag, index) in unwrappedItem!.tags"
+                    v-for="(tag, index) in unwrappedItem?.tags"
                     variant="tags"
                     :key="index"
                   >{{tag}}
@@ -312,14 +336,14 @@ const savePlugin = () => {
 
             </TableCell>
             <TableCell v-else class="grid space-y-2">
-              <InputGroup class="relative w-full xl:h-14 2xl:h-18 mb-2">
+              <InputGroup class="relative w-full xl:h-10 2xl:h-12 mb-2">
                 <InputGroupInput
-                  class=" text-center text-lg! lg:text-xl! xl:text-2xl! 2xl:text-4xl!"
+                  class=" text-center input-text"
                   type="text"
                   placeholder="cron expression"
                   v-model="unwrappedItem!.cronExpression"
                 />
-                <InputGroupAddon><IconClockBolt class="absolute left-4 size-4 lg:size-6 xl:size-7 2xl:size-10"/></InputGroupAddon>
+                <InputGroupAddon><IconClockBolt class="absolute left-4 size-4 lg:size-5 xl:size-6 2xl:size-8"/></InputGroupAddon>
               </InputGroup>
 
                 <span
@@ -332,51 +356,47 @@ const savePlugin = () => {
                 </span>
 
             </TableCell>
-            <TableCell v-if="!isUnwrapped(plugin.fileName)" class="">
-              <component class="text-badge size-7 lg:size-8 xl:size-10 2xl:size-16" :class="{'text-yellow-500' : !plugin.log }" :is="plugin.log ? IconLogs : IconAlertTriangleFilled "/>
+
+            <TableCell v-if="isUnwrapped(plugin.fileName) && unwrappedItem" class="">
+              <Select
+                v-model="unwrappedItem.severity"
+              >
+                <SelectTrigger class="w-full text-lg lg:text-xl xl:text-2xl 2xl:text-3xl">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem v-for="value in Severity" :key="value" :value="value">{{value}}</SelectItem>
+                </SelectContent>
+              </Select>
             </TableCell>
-            <TableCell v-else class="">
-              <RadioGroup
-                :model-value="String(unwrappedItem!.log)"
-                @update:model-value="unwrappedItem!.log = $event === 'true'"
-                :default-value="String(unwrappedItem!.log)"
-                class=" **:text-lg **:lg:text-xl **:xl:text-2xl **:2xl:text-3xl">
-                <div class="flex items-center space-x-2 ">
-                  <RadioGroupItem class="size-4 lg:size-5 xl:size-6 2xl:size-8" id=radio-log value="true" />
-                  <Label class="cursor-pointer " for="radio-log">log</Label>
-                </div>
-                <div class="flex items-center space-x-2">
-                  <RadioGroupItem class="size-4 lg:size-5 xl:size-6 2xl:size-8" id="radio-alert" value="false" />
-                  <Label class="cursor-pointer" for="radio-alert">alert</Label>
-                </div>
-              </RadioGroup>
+            <TableCell v-else  class="">
+              {{ plugin.severity }}
             </TableCell>
             <TableCell class="">
               <img
-                v-if="plugin.language === '.py'"
+                v-if="plugin.language === Language.PYTHON"
                 alt="python_icon"
                 src="@/components/icons/python_icon.png"
                 class="size-7 lg:size-8 xl:size-10 2xl:size-16"
               />
               <img
-                v-if="['.bash', 'sh'].includes(plugin.language)"
+                v-if="[Language.BASH, Language.SH].includes(plugin.language)"
                 alt="bash_icon"
                 src="@/components/icons/bash_icon.png"
                 class="size-7 lg:size-8 xl:size-10 2xl:size-16"
               />
               <img
-                v-if="['.ps1', '.psm1'].includes(plugin.language)"
+                v-if="[Language.POWERSHELL, Language.POWERSHELL_MODULE].includes(plugin.language)"
                 alt="powershell_icon"
                 src="@/components/icons/powershell_icon.png"
                 class="size-7 lg:size-8 xl:size-10 2xl:size-16"
               />
             </TableCell>
             <DateCell class=" text-md lg:text-lg xl:text-xl 2xl:text-2xl " v-if="plugin.updatedAt" :date="plugin.updatedAt"></DateCell>
-            <TableCell v-if="!isUnwrapped(plugin.fileName)" class=" text-green-500" :class="{'text-destructive' : !plugin.active}">{{ plugin.active ? 'On' : 'Off'}}</TableCell>
-            <TableCell v-else class="">
+            <TableCell v-if="isUnwrapped(plugin.fileName) && unwrappedItem" class="">
               <RadioGroup
-                @update:model-value="unwrappedItem!.active = $event === 'on'"
-                :model-value="unwrappedItem!.active ? 'on' : 'off'"
+                @update:model-value="unwrappedItem.active = $event === 'on'"
+                :model-value="unwrappedItem.active ? 'on' : 'off'"
                 :default-value="plugin.active ? 'on' : 'off'"
                 class=" **:text-lg **:lg:text-xl **:xl:text-2xl **:2xl:text-3xl">
                 <div class="flex items-center space-x-2">
@@ -388,23 +408,23 @@ const savePlugin = () => {
                   <Label class="cursor-pointer text-destructive" for="radio-off">Off</Label>
                 </div>
               </RadioGroup>
-
             </TableCell>
+            <TableCell v-else class=" text-green-500" :class="{'text-destructive' : !plugin.active}">{{ plugin.active ? 'On' : 'Off'}}</TableCell>
             <TableCell class=" text-md lg:text-lg xl:text-xl 2xl:text-2xl ">{{plugin.weight}} KB</TableCell>
-            <ButtonGroup v-if="isUnwrapped(plugin.fileName)" class="flex  absolute bottom-4 right-3 *:items-center *:align-middle *:flex">
+            <ButtonGroup v-if="isUnwrapped(plugin.fileName) && unwrappedItem" class="flex  absolute bottom-4 right-3 *:items-center *:align-middle *:flex">
               <Button
                 @click="closePlugin"
                 variant="red_outline">
                 Cancel<IconCancel class="size-4 xl:size-5"/>
               </Button>
-              <Button variant="orange_outline">
+              <Button variant="orange_outline" class="p-0">
                 <PluginDetailsDialog
-                  :code="unwrappedDetails!.code"
-                  :description="unwrappedDetails!.description"
+                  :code="unwrappedItem.code ?? ''"
+                  :description="unwrappedItem.description ?? ''"
+                  @update:save-changes="updateDetails"
                 >
                   <Button
-                    @click="openDetailsDialog = true"
-                    class="border-0! p-0! bg-transparent! text-amber-500 hover:text-primary"
+                    class="border-0! m-0 rounded-none bg-transparent! text-amber-500 hover:text-primary"
                     >
                     Details<IconMessageCode class="size-4 xl:size-5"/>
                   </Button>
@@ -425,5 +445,4 @@ const savePlugin = () => {
       </TableFooter>
       </Table>
     </div>
-
 </template>
