@@ -1,13 +1,6 @@
-export const dashboardData: {
-  id: number
-  subject: string,
-  message: string,
-  source: string,
-  status: "Sent" | "In Process" | "Done",
-  severity: 0 | 1 | 2 | 3 | 4 | 5,
-  createdAt: Date,
-  closedAt?: Date,
-}[] = [
+import type {AlertObject} from "@/types/types.ts";
+
+export const dashboardData: AlertObject[] = [
   {
     id: 1,
     subject: "CPU usage over 80%",
@@ -80,7 +73,7 @@ export const dashboardData: {
     subject: "HDD usage over 60%",
     message: "Disk usage on primary drive has reached 60%, please verify available storage space.",
     source: "Zabbix",
-    status: "Done",
+    status: "Sent",
     severity: 1,
     createdAt: new Date("2024-12-29T13:20:00"),
     closedAt: new Date("2024-12-29T16:50:00"),
@@ -101,7 +94,7 @@ export const dashboardData: {
     message: "Network switch has reached maximum port capacity. No additional connections available.",
     source: "My_switch_plugin",
     status: "In Process",
-    severity: 5,
+    severity: 4,
     createdAt: new Date("2024-12-27T14:15:00"),
   },
   {

@@ -9,7 +9,7 @@ import {
   TableHeader, TableRow
 } from "@/components/ui/table";
 import {Badge} from "@/components/ui/badge";
-import type {LibraryPlugin, MyPlugin} from "@/types/types.ts"
+import {Language, type LibraryPlugin, type MyPlugin} from "@/types/types.ts"
 import SortableHead from "@/helpers/SortableHead.vue";
 import {useSort} from "@/composables/sorting.ts";
 import {IconAlertTriangleFilled, IconLogs} from "@tabler/icons-vue";
@@ -30,7 +30,7 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<LibraryPlugin>(()
 
   <div class=" mt-[2vh] mx-[1%] w-98/100 relative overflow-auto max-h-[77vh]   ">
     <Table id="alert-table" class="w-99/100 text-md lg:text-lg xl:text-xl 2xl:text:3xl  mx-auto  table-fixed">
-      <TableCaption class="bg-secondary border-b border-t text-foreground sticky z-9 bottom-0 py-[1vh] text-md lg:text-lg xl:text-xl 2xl:text:3xl">Current Alerts:
+      <TableCaption class="bg-secondary border-b border-t text-foreground sticky z-9 py-2 bottom-0  text-md lg:text-lg xl:text-xl 2xl:text:3xl">Current Alerts:
         <span class="font-extrabold">{{ props.data.length}}</span>
       </TableCaption>
       <TableHeader class="h-10">
@@ -46,61 +46,61 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<LibraryPlugin>(()
 
         </TableRow>
     </TableHeader>
-    <TableBody>
-      <TableRow
-        class=" cursor-grab duration-0 hover:bg-blue-700/30"
-        v-for="plugin in sortedData"
-        :key="plugin.id">
-        <TableCell class="pl-4 ">{{plugin.name}}</TableCell>
-        <TableCell class="">{{plugin.creator}}</TableCell>
-        <TableCell class="whitespace-break-spaces">
-          <Badge
-            v-for="(tag, index) in plugin.tags"
-            variant="tags"
-            :key="index">{{tag}}</Badge>
-        </TableCell>
-        <TableCell>
-          <component class="text-badge size-7 lg:size-8 xl:size-10 2xl:size-16" :class="{'text-yellow-500' : !plugin.log }" :is="plugin.log ? IconLogs : IconAlertTriangleFilled "/>
-        </TableCell>
-        <TableCell class="">
-          <img
-            v-if="plugin.language === 'python'"
-            alt="python_icon"
-            src="@/components/icons/python_icon.png"
-            class="size-6 lg:size-7 xl:size-8 2x:size-9"
-          />
-          <img
-            v-if="plugin.language === 'bash'"
-            alt="bash_icon"
-            src="@/components/icons/bash_icon.png"
-            class="size-6 lg:size-7 xl:size-8 2x:size-9"
-          />
-          <img
-            v-if="plugin.language === 'PowerShell'"
-            alt="powershell_icon"
-            src="@/components/icons/powershell_icon.png"
-            class="size-6 lg:size-7 xl:size-8 2x:size-9"
-          />
-        </TableCell>
-        <DateCell class="" :date="plugin.createdAt as Date"></DateCell>
-        <TableCell class="">{{plugin.weight}} Kb</TableCell>
-        <TableCell>
-          <ButtonGroup>
-            <Button
-              variant="orange_outline"
-            >
-              <IconSourceCode/>
-            </Button>
-            <Button
-              variant="green_outline"
-              class="border-l!"
-            >
-              <IconDownload/>
-            </Button>
-          </ButtonGroup>
-        </TableCell>
-      </TableRow>
-    </TableBody>
+      <TransitionGroup tag="tbody" name="slide-fade">
+        <TableRow
+          class=" cursor-pointer duration-0 hover:bg-blue-700/30"
+          v-for="plugin in sortedData"
+          :key="plugin.id">
+          <TableCell class="pl-4 ">{{plugin.name}}</TableCell>
+          <TableCell class="">{{plugin.creator}}</TableCell>
+          <TableCell class="whitespace-break-spaces">
+            <Badge
+              v-for="(tag, index) in plugin.tags"
+              variant="tags"
+              :key="index">{{tag}}</Badge>
+          </TableCell>
+          <TableCell>
+            <component class="text-badge size-7 lg:size-8 xl:size-10 2xl:size-16" :class="{'text-yellow-500' : !plugin.log }" :is="plugin.log ? IconLogs : IconAlertTriangleFilled "/>
+          </TableCell>
+          <TableCell class="">
+            <img
+              v-if="plugin.language === Language.PYTHON"
+              alt="python_icon"
+              src="@/components/icons/python_icon.png"
+              class="size-7 lg:size-8 xl:size-10 2xl:size-16"
+            />
+            <img
+              v-if="[Language.BASH, Language.SH].includes(plugin.language)"
+              alt="bash_icon"
+              src="@/components/icons/bash_icon.png"
+              class="size-7 lg:size-8 xl:size-10 2xl:size-16"
+            />
+            <img
+              v-if="[Language.POWERSHELL, Language.POWERSHELL_MODULE].includes(plugin.language)"
+              alt="powershell_icon"
+              src="@/components/icons/powershell_icon.png"
+              class="size-7 lg:size-8 xl:size-10 2xl:size-16"
+            />
+          </TableCell>
+          <DateCell class="" :date="plugin.createdAt as Date"></DateCell>
+          <TableCell class="">{{plugin.weight}} Kb</TableCell>
+          <TableCell>
+            <ButtonGroup>
+              <Button
+                variant="orange_outline"
+              >
+                <IconSourceCode/>
+              </Button>
+              <Button
+                variant="green_outline"
+                class="border-l!"
+              >
+                <IconDownload/>
+              </Button>
+            </ButtonGroup>
+          </TableCell>
+        </TableRow>
+      </TransitionGroup>
     <TableFooter>
     </TableFooter>
   </Table>

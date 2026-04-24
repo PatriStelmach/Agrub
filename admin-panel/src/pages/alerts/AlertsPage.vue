@@ -129,9 +129,9 @@ const mouseLeave = () => {
         v-if="isAlertHovered"
         v-model="hoveredData"
         :style="descriptionBox"
-        class="z-9999 max-w-120 border-2 border-badge shadow-md shadow-badge">
-        <CardHeader>{{ hoveredData?.subject }}</CardHeader>
-        <CardContent class=" wrap-break-word">{{ hoveredData?.message}}</CardContent>
+        class="z-9999 max-w-120 border-2 border-badge shadow-sm shadow-badge">
+        <CardHeader><Label class=" font-extrabold ">Subject: </Label> {{ hoveredData?.subject }}</CardHeader>
+        <CardContent class="max-w-full wrap-break-word"><Label class="pb-2 grid font-extrabold">Message:</Label> {{ hoveredData?.message}}</CardContent>
       </Card>
       <Table id="alert-table" class="w-99/100 text-md lg:text-lg xl:text-xl 2xl:text:3xl  mx-auto  table-fixed">
         <TableCaption class="bg-secondary border-b border-t text-foreground sticky z-9 bottom-0 py-2 text-md lg:text-lg xl:text-xl 2xl:text:3xl">Current Alerts:
@@ -147,48 +147,49 @@ const mouseLeave = () => {
             <SortableHead keyName="createdAt" label="Timestamp" :sort-key="sortKey" class="w-14/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
           </TableRow>
         </TableHeader>
-        <TableBody >
-          <TableRow
-            :id="`${alert.id}_row`"
-            class="relative cursor-pointer duration-0  hover:bg-chart-1/30"
-            v-for="alert in sortedData"
-            :key="alert.id"
-          >
-            <TableCell class="pl-4  whitespace-nowrap">{{alert.subject}}</TableCell>
-            <TableCell class=""
+          <TransitionGroup tag="tbody" name="slide-fade">
+            <TableRow
+              :id="`${alert.id}_row`"
+              class="relative cursor-pointer duration-0  hover:bg-chart-1/30"
+              v-for="alert in sortedData"
+              :key="alert.id"
+            >
+              <TableCell class="pl-4  whitespace-nowrap">{{alert.subject}}</TableCell>
+              <TableCell class=""
 
-            ><span class=" bg-linear-to-l py-1 px-8 font-bold text-xl rounded-xl" :class="{
-                      'from-sky-400 to-sky-400/70': alert.severity === 0,
-                      'from-badge1 to-badge/80': alert.severity === 1,
-                      'from-yellow-500 to-yellow-500/70': alert.severity === 2,
-                      'from-amber-500 to-amber-500/70': alert.severity === 3,
-                      'from-orange-500 to-orange-500/70': alert.severity === 4,
-                      'from-badge2 to-badge2/70': alert.severity === 5,
-                    }">{{alert.severity}}</span>
-            </TableCell>
+              ><div class=" bg-linear-to-l w-2/3 text-center font-bold text-xl " :class="{
+                      'from-badge/50 via-badge to-badge/50': alert.severity === 0,
+                      'from-badge1/50 via-badge1 to-badge1/50': alert.severity === 1,
+                      'from-yellow-400/50 via-yellow-400 to-yellow-400/50': alert.severity === 2,
+                      'from-amber-500/50 via-amber-500 to-amber-500/50': alert.severity === 3,
+                      'from-orange-500/50 via-orange-500 to-orange-500/50': alert.severity === 4,
+                      'from-badge2/50 via-badge2 to-badge2/50': alert.severity === 5,
+                    }">{{alert.severity}}</div>
+              </TableCell>
               <TableCell
                 @mouseenter="mouseEnter(alert.id)"
                 @mouseleave="mouseLeave"
                 class="truncate">{{alert.message}}</TableCell>
-            <TableCell class="">
-              <Badge
-                variant="source"
-              >{{alert.source}}</Badge>
-            </TableCell>
-            <TableCell class=" gap-x-2 items-center">
-              <div class="flex gap-x-2 items-center">{{alert.status}}
-              <IconLoader v-if="alert.status === 'In Process'"
-                          class="size-4 animate-spin text-muted-foreground"/>
-              <IconSend v-if="alert.status === 'Sent'"
-                        class="size-4 text-badge1"/>
-              </div>
-            </TableCell>
-            <DateCell v-if="alert.createdAt" class="" :date="alert.createdAt "></DateCell>
+              <TableCell class="">
+                <Badge
+                  variant="source"
+                >{{alert.source}}</Badge>
+              </TableCell>
+              <TableCell class=" gap-x-2 items-center">
+                <div class="flex gap-x-2 items-center">{{alert.status}}
+                  <IconLoader v-if="alert.status === 'In Process'"
+                              class="size-4 animate-spin text-muted-foreground"/>
+                  <IconSend v-if="alert.status === 'Sent'"
+                            class="size-4 text-badge1"/>
+                </div>
+              </TableCell>
+              <DateCell v-if="alert.createdAt" class="" :date="alert.createdAt "></DateCell>
 
 
 
-          </TableRow>
-        </TableBody>
+            </TableRow>
+          </TransitionGroup>
+
         <TableFooter>
         </TableFooter>
       </Table>

@@ -234,12 +234,12 @@ input[type="checkbox"]:focus-visible
 }
 
 .slide-fade-enter-from {
-  transform: translateX(-5rem);
+  transform: translateX(-50rem);
   opacity: 0;
 }
 
 .slide-fade-leave-to {
-  transform: translateX(5rem);
+  transform: translateX(50rem);
   opacity: 0;
 }
 
