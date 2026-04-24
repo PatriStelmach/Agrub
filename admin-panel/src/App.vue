@@ -2,10 +2,15 @@
 import { RouterView } from 'vue-router'
 import TopRightButtons from "@/pages/globals/topRightButtons.vue";
 import NavBar from "@/pages/navbar/NavBar.vue";
+import {Toaster} from "vue-sonner";
 </script>
 
 <template>
-
+  <Toaster
+    theme="system"
+    richColors
+    position="top-center"
+  />
   <div class="h-screen flex flex-col  ">
     <header class="relative w-full">
       <nav class="absolute top-0 flex w-full h-[5vh] bg-card justify-center items-center">

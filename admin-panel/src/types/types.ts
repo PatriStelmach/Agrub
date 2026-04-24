@@ -47,7 +47,7 @@ export interface MyPluginsFromApi
   severity: Severity,
   name: string,
   fileName: string,
-  language: string,
+  language: Language,
   updatedAt: Date,
   weight: number,
   tags: string[],

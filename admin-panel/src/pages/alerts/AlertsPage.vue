@@ -35,6 +35,9 @@ import {
 import SortableHead from "@/helpers/SortableHead.vue";
 import {useSort} from "@/composables/sorting.ts";
 import {useSearchFilter} from "@/composables/useSearchFilter.ts";
+import { useAlertStore } from "@/stores/alertStore";
+
+const alertStore = useAlertStore();
 
 const { updatePage, filteredData, tableData, updateData, updateSearchData, currentPage, searchFilter } =
   useSearchFilter<AlertObject>(() => dashboardData,(item) => item.header)
