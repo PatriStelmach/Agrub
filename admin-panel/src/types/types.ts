@@ -3,11 +3,11 @@ export const api_url = 'http://localhost:10000/api'
 export interface AlertObject
 {
   id: number
-  header: string,
+  subject: string,
+  message: string,
   source: string,
   status: "Sent" | "In Process" | "Done",
   severity: 0 | 1 | 2 | 3 | 4 | 5,
-  technicianGroups?: string[],
   createdAt: Date,
   closedAt?: Date,
 }

@@ -8,7 +8,8 @@ import {dashboardData} from "@/data/dashboardData.ts";
 export const useAlertStore = defineStore('useAlertStore', () => {
   const currentAlerts = ref<AlertObject[]>([])
 
-  const getAllCurrentAlerts = computed(() =>  currentAlerts.value)
+  const getAllCurrentAlerts = computed(() =>
+    currentAlerts.value.filter(a => a.status !== "Done"))
 
   const setCurrentAlerts = (newAlerts: AlertObject[]) => {
     currentAlerts.value = newAlerts;

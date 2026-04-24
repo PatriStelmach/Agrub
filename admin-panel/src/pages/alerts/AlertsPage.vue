@@ -1,5 +1,5 @@
 <script setup lang="ts" >
-import {type AlertObject, Severity} from "@/types/types.ts";
+import {type AlertObject} from "@/types/types.ts";
 import {dashboardData} from "@/data/dashboardData.ts"
 import MyPagination from "@/helpers/MyPagination.vue";
 import {
@@ -36,8 +36,10 @@ import SortableHead from "@/helpers/SortableHead.vue";
 import {useSort} from "@/composables/sorting.ts";
 import {useSearchFilter} from "@/composables/useSearchFilter.ts";
 import { useAlertStore } from "@/stores/alertStore";
-import {onMounted} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {generateRandomString} from "ts-randomstring/lib";
+import {useMouse} from "@vueuse/core";
+import {Card, CardContent, CardHeader} from "@/components/ui/card";
 
 
 const alertStore = useAlertStore();
@@ -45,9 +47,25 @@ onMounted(() => {
   alertStore.getCurrentAlertsRequest()
 })
 
-const { updatePage, filteredData, tableData, updateData, updateSearchData, currentPage, searchFilter } =
-  useSearchFilter<AlertObject>(() => alertStore.currentAlerts,(item) => item.header)
+const isAlertHovered = ref<boolean>(false);
+const hoveredId = ref<number | null>(null);
 
+const hoveredData = computed(() =>
+  sortedData.value.find(p => p.id === hoveredId.value))
+
+const descriptionBox = computed(() => {
+  return {
+    position: 'fixed',
+    top: `${y.value}px`,
+    left: `${x.value}px`,
+    pointerEvents: "none",
+    transform: 'translate(-10px, 20px)'
+  }
+})
+
+const { updatePage, filteredData, tableData, updateData, updateSearchData, currentPage, searchFilter } =
+  useSearchFilter<AlertObject>(() => alertStore.getAllCurrentAlerts,(item) => item.subject)
+const { x, y } = useMouse()
 const { sortedData, sortKey, sortOrder, toggleSort } = useSort<AlertObject>(() => tableData.value as AlertObject[], 'createdAt')
 
 const randomString = (length: number): string => {
@@ -58,15 +76,24 @@ const randomString = (length: number): string => {
 function randomAlert() {
   alertStore.addCurrentAlert( {
     id: Math.floor(Math.random() * 10000000000),
-    header: randomString(10),
+    subject: randomString(10),
     source: randomString(10),
+    message: randomString(100),
     status: "Sent" ,
     severity: 0 ,
-    technicianGroups: [randomString(10), randomString(7), randomString(5),],
     createdAt: new Date(Date.now()),
   })
 }
 
+const mouseEnter = (id: number) => {
+  isAlertHovered.value = true
+  hoveredId.value = id
+}
+
+const mouseLeave = () => {
+  isAlertHovered.value = false
+  hoveredId.value = null
+}
 
 </script>
 
@@ -98,28 +125,51 @@ function randomAlert() {
       </div>
     </div>
     <div class=" mt-[2vh] mx-[1%] w-98/100 relative overflow-auto max-h-[77vh]   ">
+      <Card
+        v-if="isAlertHovered"
+        v-model="hoveredData"
+        :style="descriptionBox"
+        class="z-9999 max-w-120 border-2 border-badge shadow-md shadow-badge">
+        <CardHeader>{{ hoveredData?.subject }}</CardHeader>
+        <CardContent class=" wrap-break-word">{{ hoveredData?.message}}</CardContent>
+      </Card>
       <Table id="alert-table" class="w-99/100 text-md lg:text-lg xl:text-xl 2xl:text:3xl  mx-auto  table-fixed">
         <TableCaption class="bg-secondary border-b border-t text-foreground sticky z-9 bottom-0 py-2 text-md lg:text-lg xl:text-xl 2xl:text:3xl">Current Alerts:
           <span class="font-extrabold">{{ dashboardData.length}}</span>
         </TableCaption>
         <TableHeader class="h-10">
           <TableRow class="bg-secondary hover:bg-secondary **:text-md! *: **:lg:text-xl! **:xl:text-2xl! **:2xl:text-4xl!">
-            <SortableHead keyName="header" label="Alert" :sort-key="sortKey" class="w-24/100 pl-4" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-            <SortableHead keyName="source" label="Source" :sort-key="sortKey" class="w-14/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="subject" label="Alert" :sort-key="sortKey" class="w-15/100 pl-4" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="severity" label="Severity" :sort-key="sortKey" class="w-8/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="message" label="Message" :sort-key="sortKey" class="w-38/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="source" label="Source" :sort-key="sortKey" class="w-15/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
             <SortableHead keyName="status" label="Status" :sort-key="sortKey" class="w-10/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-            <SortableHead keyName="severity" label="Severity" :sort-key="sortKey" class="w-10/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-            <SortableHead keyName="technicianGroups" label="Groups" :sort-key="sortKey" class="w-20/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
             <SortableHead keyName="createdAt" label="Timestamp" :sort-key="sortKey" class="w-14/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-            <TableHead class="w-5/100"></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody >
           <TableRow
+            :id="`${alert.id}_row`"
             class="relative cursor-pointer duration-0  hover:bg-chart-1/30"
             v-for="alert in sortedData"
             :key="alert.id"
           >
-            <TableCell class="pl-4  whitespace-break-spaces">{{alert.header}}</TableCell>
+            <TableCell class="pl-4  whitespace-nowrap">{{alert.subject}}</TableCell>
+            <TableCell class=""
+
+            ><span class=" bg-linear-to-l py-1 px-8 font-bold text-xl rounded-xl" :class="{
+                      'from-sky-400 to-sky-400/70': alert.severity === 0,
+                      'from-badge1 to-badge/80': alert.severity === 1,
+                      'from-yellow-500 to-yellow-500/70': alert.severity === 2,
+                      'from-amber-500 to-amber-500/70': alert.severity === 3,
+                      'from-orange-500 to-orange-500/70': alert.severity === 4,
+                      'from-badge2 to-badge2/70': alert.severity === 5,
+                    }">{{alert.severity}}</span>
+            </TableCell>
+              <TableCell
+                @mouseenter="mouseEnter(alert.id)"
+                @mouseleave="mouseLeave"
+                class="truncate">{{alert.message}}</TableCell>
             <TableCell class="">
               <Badge
                 variant="source"
@@ -133,39 +183,16 @@ function randomAlert() {
                         class="size-4 text-badge1"/>
               </div>
             </TableCell>
-            <TableCell class=""
-                       :class="{
-                      'text-sky-500': alert.severity === 0,
-                      'text-badge1': alert.severity === 1,
-                      'text-yellow-500': alert.severity === 2,
-                      'text-amber-500': alert.severity === 3,
-                      'text-orange-500': alert.severity === 4,
-                      'text-badge2': alert.severity === 5,
-                    }"
-            >{{alert.severity}}
-            </TableCell>
-
-            <TableCell
-              class="py-2  whitespace-break-spaces">
-              <Badge
-                variant="groups"
-                v-for="(group, index) in alert.technicianGroups"
-                :key="index"
-              >
-                {{ group }}
-              </Badge>
-            </TableCell>
             <DateCell v-if="alert.createdAt" class="" :date="alert.createdAt "></DateCell>
-            <TableCell>
-              <Button variant="orange_outline">
-                <IconListDetails/>
-              </Button>
-            </TableCell>
+
+
+
           </TableRow>
         </TableBody>
         <TableFooter>
         </TableFooter>
       </Table>
+
     </div>
     <MyPagination
       class="max-h-[5vh] z-99"
@@ -175,4 +202,5 @@ function randomAlert() {
       @update:pages="updatePage"
     />
   </div>
+
 </template>
