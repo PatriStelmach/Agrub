@@ -1,7 +1,7 @@
 package pl.pjatk.alertwip.service;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 
 import java.util.List;
 import java.util.Map;
@@ -9,16 +9,16 @@ import java.util.Map;
 @Service
 public class ZabbixApiService {
 
-    private final RestTemplate restTemplate;
+    private final RestClient restClient;
     private final SystemSettingService settingService;
 
-    public ZabbixApiService(RestTemplate restTemplate, SystemSettingService settingService) {
-        this.restTemplate = restTemplate;
+    public ZabbixApiService(RestClient restClient, SystemSettingService settingService) {
+        this.restClient = restClient;
         this.settingService = settingService;
     }
 
+    @SuppressWarnings("unchecked")
     public List<Map<String, Object>> getActiveProblems() {
-        // Zamiast user/password pobieramy tylko URL i gotowy Token API
         String apiUrl = settingService.getValue("zabbix_url", "");
         String apiToken = settingService.getValue("zabbix_api_token", "");
 
@@ -26,11 +26,10 @@ public class ZabbixApiService {
             throw new IllegalStateException("Konfiguracja Zabbixa jest niekompletna. Skonfiguruj API Token w panelu.");
         }
 
-        // Budujemy od razu zapytanie docelowe, wstrzykując Token do pola "auth"
         Map<String, Object> request = Map.of(
                 "jsonrpc", "2.0",
                 "method", "problem.get",
-                "auth", apiToken, // <-- O tutaj idzie nasz token!
+                "auth", apiToken,
                 "params", Map.of(
                         "output", List.of("eventid", "name", "severity"),
                         "selectHosts", List.of("host"),
@@ -40,7 +39,12 @@ public class ZabbixApiService {
         );
 
         try {
-            Map<String, Object> response = restTemplate.postForObject(apiUrl, request, Map.class);
+            Map<String, Object> response = restClient.post()
+                    .uri(apiUrl)
+                    .body(request)
+                    .retrieve()
+                    .body(Map.class); // Automatyczne mapowanie JSONa
+
             if (response != null && response.containsKey("result")) {
                 return (List<Map<String, Object>>) response.get("result");
             }

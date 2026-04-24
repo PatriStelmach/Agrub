@@ -29,7 +29,7 @@ public class ZabbixWebhookController {
         String eventName = (String) payload.getOrDefault("name", "Nieznany błąd");
         String host = (String) payload.getOrDefault("host", "Nieznany host");
 
-        // WYCIĄGAMY SEVERITY Z JSONA (jeśli Zabbix tego nie prześle, domyślnie "0")
+        // WYCIĄGAMY SEVERITY Z JSONA
         int severity = 0;
         Object sevObj = payload.get("severity");
         if (sevObj != null) {
@@ -38,36 +38,47 @@ public class ZabbixWebhookController {
             } catch (NumberFormatException ignored) {}
         }
 
-        String uniqueProblemName = "[ZABBIX] " + host + " - " + eventName;
+        // Używamy nowego UniqueKey (odpowiednik starego taskName)
+        String uniqueProblemKey = "[ZABBIX] " + host + " - " + eventName;
 
         if (eventStatus.equalsIgnoreCase("PROBLEM")) {
-            Optional<GlobalProblem> existing = problemRepository.findByTaskName(uniqueProblemName);
+            // Szukamy, czy ten problem już istnieje i NIE JEST zamknięty
+            Optional<GlobalProblem> existing = problemRepository.findByUniqueKey(uniqueProblemKey)
+                    .filter(p -> !"Done".equals(p.getStatus()));
 
             if (existing.isEmpty()) {
                 GlobalProblem problem = new GlobalProblem();
-                problem.setTaskName(uniqueProblemName);
-                problem.setLastErrorMessage("Alert odebrany z Zabbixa z hosta: " + host);
 
-                // USTAWIAMY OSOBNE POLE SEVERITY
+                // Mapowanie na nowy model (zgodnie ze standardem ITSM)
+                problem.setUniqueKey(uniqueProblemKey);
+                problem.setSubject(eventName);
+                problem.setSource(host);
+                problem.setContent("Alert odebrany z Zabbixa z hosta: " + host);
+                problem.setStatus("Sent"); // Oznaczamy jako nowy
                 problem.setSeverity(severity);
-
-                problem.setOccurrenceTime(LocalDateTime.now());
+                problem.setCreatedAt(LocalDateTime.now());
 
                 GlobalProblem saved = problemRepository.save(problem);
                 sseService.sendAlert("NEW_ALERT", saved);
+                System.out.println("[WEBHOOK] Otrzymano nowy alert z Zabbixa: " + uniqueProblemKey);
             }
 
         } else if (eventStatus.equalsIgnoreCase("OK") || eventStatus.equalsIgnoreCase("RESOLVED")) {
-            // Skoro jest OK, szukamy problemu i go usuwamy (Recovery)
-            Optional<GlobalProblem> existing = problemRepository.findByTaskName(uniqueProblemName);
+            // Skoro jest OK, szukamy otwartego problemu i oznaczamy jako DONE
+            Optional<GlobalProblem> existing = problemRepository.findByUniqueKey(uniqueProblemKey)
+                    .filter(p -> !"Done".equals(p.getStatus()));
 
-            if (existing.isPresent()) {
-                GlobalProblem problemToResolve = existing.get();
-                problemRepository.delete(problemToResolve);
+            existing.ifPresent(problem -> {
+                // MIĘKKIE USUWANIE (Soft Delete) - Archiwizujemy problem
+                problem.setStatus("Done");
+                problem.setClosedAt(LocalDateTime.now());
+
+                problemRepository.save(problem);
 
                 // INFORMUJEMY VUE O NAPRAWIE!
-                sseService.sendAlert("ALERT_RESOLVED", problemToResolve);
-            }
+                sseService.sendAlert("ALERT_RESOLVED", problem);
+                System.out.println("[WEBHOOK] Alert rozwiązany: " + uniqueProblemKey);
+            });
         }
 
         return ResponseEntity.ok("Alert processed");

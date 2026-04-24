@@ -1,26 +1,28 @@
 package pl.pjatk.alertwip.service;
 
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import pl.pjatk.alertwip.model.GlobalProblem;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Service
 public class SseNotifService {
 
-    // CopyOnWriteArrayList jest kluczowe! Zapobiega błędom ConcurrentModificationException,
-    // gdy jeden wątek dodaje użytkownika, a inny w tym samym czasie wysyła alert.
+    // Używamy bezpiecznej kolekcji dla środowisk wielowątkowych
     private final List<SseEmitter> emitters = new CopyOnWriteArrayList<>();
 
     public SseEmitter subscribe() {
-        // Ustawiamy brak timeoutu (Long.MAX_VALUE), żeby przeglądarka nie rozłączała się co 30 sekund
+        // Long.MAX_VALUE oznacza, że połączenie nie zostanie zerwane przez timeout serwera
         SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
         emitters.add(emitter);
 
-        // Sprzątanie po odłączeniu użytkownika (np. zamknięcie karty w przeglądarce)
+        // Usuwanie "martwych" połączeń po rozłączeniu klienta (Vue)
         emitter.onCompletion(() -> emitters.remove(emitter));
         emitter.onTimeout(() -> emitters.remove(emitter));
         emitter.onError((e) -> emitters.remove(emitter));
@@ -28,23 +30,27 @@ public class SseNotifService {
         return emitter;
     }
 
-    public void sendAlert(String eventName, Object payload) {
+    public void sendAlert(String eventStatus, GlobalProblem alert) {
         List<SseEmitter> deadEmitters = new ArrayList<>();
 
-        emitters.forEach(emitter -> {
+        // Budujemy żądany obiekt JSON zawierający "status" i "message"
+        Map<String, Object> payload = Map.of(
+                "status", eventStatus, // Będzie to np. "NEW_ALERT" lub "ALERT_RESOLVED"
+                "message", alert       // Cały obiekt GlobalProblem
+        );
+
+        for (SseEmitter emitter : emitters) {
             try {
-                // Wysyłamy zdarzenie. Spring automatycznie zamieni 'payload' na JSON.
-                emitter.send(SseEmitter.event()
-                        .name(eventName)
-                        .data(payload));
+                // Wysyłamy zwykły, bezimienny strumień danych (domyślny event SSE),
+                // który zrzuci naszą Mapę do ładnego JSON-a
+                emitter.send(payload, MediaType.APPLICATION_JSON);
             } catch (IOException e) {
-                // Jeśli wysłanie się nie powiodło (użytkownik uciekł, a serwer jeszcze tego nie wie),
-                // oznaczamy go do usunięcia.
+                // Jeśli nie da się wysłać (np. ktoś zamknął przeglądarkę brutualnie), oznacz do usunięcia
                 deadEmitters.add(emitter);
             }
-        });
+        }
 
-        // Usuwamy martwe połączenia
+        // Czyścimy listę z nieaktywnych klientów
         emitters.removeAll(deadEmitters);
     }
 }

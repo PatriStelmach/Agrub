@@ -107,11 +107,12 @@ public class PythonScriptService {
             if (task.getSeverity() >= 2) {
                 // Severity 2-5 -> Traktujemy jako ERROR (GlobalProblem)
                 GlobalProblem problem = existingProblem.orElse(new GlobalProblem());
-                problem.setTaskId(task.getId());
-                problem.setTaskName(task.getTaskName());
-                problem.setLastErrorMessage(output.length() > 255 ? output.substring(0, 252) + "..." : output);
-                problem.setSeverity(task.getSeverity()); // Używamy czystego int z modelu
-                problem.setOccurrenceTime(LocalDateTime.now());
+                problem.setUniqueKey("SCRIPT-" + task.getId());
+                problem.setSubject(task.getTaskName());
+                problem.setSource("Local System");
+                problem.setContent(output);
+                problem.setStatus("Sent"); // Domyślnie
+                problem.setCreatedAt(LocalDateTime.now());
 
                 GlobalProblem saved = problemRepository.save(problem);
 
@@ -124,13 +125,23 @@ public class PythonScriptService {
                 System.out.println("[LOG] Skrypt " + task.getTaskName() + " zakończył się błędem, ale ma severity 1.");
             }
         } else {
-            // SCENARIUSZ: SKRYPT OK
-            if (existingProblem.isPresent()) {
-                GlobalProblem problemToResolve = existingProblem.get();
-                problemRepository.delete(problemToResolve);
+        // SCENARIUSZ: SKRYPT OK
+        if (existingProblem.isPresent()) {
+            GlobalProblem problemToResolve = existingProblem.get();
+
+            // Zamykamy tylko, jeśli nie jest już zamknięty
+            if (!"Done".equals(problemToResolve.getStatus())) {
+                problemToResolve.setStatus("Done");
+                problemToResolve.setClosedAt(LocalDateTime.now());
+
+                problemRepository.save(problemToResolve);
+
+                // SSE nadal wysyła info, żeby Vue usunęło czerwoną belkę z ekranu!
                 sseService.sendAlert("ALERT_RESOLVED", problemToResolve);
+                System.out.println("[PYTHON] Skrypt naprawiony. Alert zamknięty: " + task.getTaskName());
             }
         }
+    }
     }
 
     private void saveLogToDatabase(ScheduledTask task, String output, String status) {

@@ -2,70 +2,69 @@ package pl.pjatk.alertwip.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class GlobalProblem {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // taskId służy jako klucz do powiązania problemu z konkretnym zadaniem
-    private Long taskId;
-    private String taskName;
+    // Wewnętrzny klucz backendowy do zapobiegania duplikatów (np. "SCRIPT-42" albo "[ZABBIX] web01 - CPU")
+    private String uniqueKey;
 
-    // Zmieniono z description na lastErrorMessage
-    @Column(length = 255)
-    private String lastErrorMessage;
+    private String subject;
 
-    // Zmieniono z startTime na occurrenceTime
-    private LocalDateTime occurrenceTime;
+    @Column(columnDefinition = "TEXT")
+    private String content;
 
-    // Konstruktor bezargumentowy dla JPA
-    public GlobalProblem() {}
+    private String source;
 
-    public Long getId() {
-        return id;
-    }
+    private String status = "Sent"; // "Sent" | "In Process" | "Done"
 
-    public Long getTaskId() {
-        return taskId;
-    }
+    private int severity = 1;
 
-    public void setTaskId(Long taskId) {
-        this.taskId = taskId;
-    }
+    // Automatycznie tworzy tabelę powiązaną dla listy stringów
+    @ElementCollection
+    @CollectionTable(name = "alert_technician_groups", joinColumns = @JoinColumn(name = "alert_id"))
+    @Column(name = "group_name")
+    private List<String> technicianGroups = new ArrayList<>();
 
-    public String getTaskName() {
-        return taskName;
-    }
+    private LocalDateTime createdAt;
 
-    public void setTaskName(String taskName) {
-        this.taskName = taskName;
-    }
+    private LocalDateTime closedAt;
 
-    public String getLastErrorMessage() {
-        return lastErrorMessage;
-    }
+    // --- GETTERY I SETTERY ---
 
-    public void setLastErrorMessage(String lastErrorMessage) {
-        this.lastErrorMessage = lastErrorMessage;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public LocalDateTime getOccurrenceTime() {
-        return occurrenceTime;
-    }
+    public String getUniqueKey() { return uniqueKey; }
+    public void setUniqueKey(String uniqueKey) { this.uniqueKey = uniqueKey; }
 
-    public void setOccurrenceTime(LocalDateTime occurrenceTime) {
-        this.occurrenceTime = occurrenceTime;
-    }
+    public String getSubject() { return subject; }
+    public void setSubject(String subject) { this.subject = subject; }
 
-    private int severity;
+    public String getContent() { return content; }
+    public void setContent(String content) { this.content = content; }
 
-    public int getSeverity() {
-        return severity;
-    }
+    public String getSource() { return source; }
+    public void setSource(String source) { this.source = source; }
 
-    public void setSeverity(int severity) {
-        this.severity = severity;
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+
+    public int getSeverity() { return severity; }
+    public void setSeverity(int severity) { this.severity = severity; }
+
+    public List<String> getTechnicianGroups() { return technicianGroups; }
+    public void setTechnicianGroups(List<String> technicianGroups) { this.technicianGroups = technicianGroups; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public LocalDateTime getClosedAt() { return closedAt; }
+    public void setClosedAt(LocalDateTime closedAt) { this.closedAt = closedAt; }
 }
