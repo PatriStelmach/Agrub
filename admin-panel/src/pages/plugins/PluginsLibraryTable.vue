@@ -29,7 +29,7 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<LibraryPlugin>(()
 <template>
 
   <div class=" mt-[2vh] mx-[1%] w-98/100 relative overflow-auto max-h-[77vh]   ">
-    <Table id="alert-table" class="w-99/100 text-md lg:text-lg xl:text-xl 2xl:text:3xl  mx-auto  table-fixed">
+    <Table id="plugins-library-table" class="w-99/100 text-md lg:text-lg xl:text-xl 2xl:text:3xl  mx-auto  table-fixed">
       <TableCaption class="bg-secondary border-b border-t text-foreground sticky z-9 py-2 bottom-0  text-md lg:text-lg xl:text-xl 2xl:text:3xl">Current Alerts:
         <span class="font-extrabold">{{ props.data.length}}</span>
       </TableCaption>
