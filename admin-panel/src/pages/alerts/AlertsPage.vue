@@ -35,12 +35,37 @@ import {
 import SortableHead from "@/helpers/SortableHead.vue";
 import {useSort} from "@/composables/sorting.ts";
 import {useSearchFilter} from "@/composables/useSearchFilter.ts";
+import { useAlertStore } from "@/stores/alertStore";
+import {onMounted} from "vue";
+import {generateRandomString} from "ts-randomstring/lib";
+
+
+const alertStore = useAlertStore();
+onMounted(() => {
+  alertStore.getCurrentAlertsRequest()
+})
 
 const { updatePage, filteredData, tableData, updateData, updateSearchData, currentPage, searchFilter } =
-  useSearchFilter<AlertObject>(() => dashboardData,(item) => item.header)
+  useSearchFilter<AlertObject>(() => alertStore.currentAlerts,(item) => item.header)
 
 const { sortedData, sortKey, sortOrder, toggleSort } = useSort<AlertObject>(() => tableData.value as AlertObject[], 'createdAt')
 
+const randomString = (length: number): string => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
+}
+
+function randomAlert() {
+  alertStore.addCurrentAlert( {
+    id: Math.floor(Math.random() * 10000000000),
+    header: randomString(10),
+    source: randomString(10),
+    status: "Sent" ,
+    severity: 0 ,
+    technicianGroups: [randomString(10), randomString(7), randomString(5),],
+    createdAt: new Date(Date.now()),
+  })
+}
 
 
 </script>
@@ -52,10 +77,13 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<AlertObject>(() =
 
       <div class="absolute left-4 top-0 flex  ">
         <ButtonGroup>
-          <ButtonGroup>
+
             <Button variant="outline" size="icon" aria-label="Go Back">
               <ArrowLeftIcon />
             </Button>
+          <Button
+            @click="randomAlert"
+            variant="cyan_outline">Add new mocked</Button>
             <InputGroup >
               <InputGroupInput
                 v-model="searchFilter"
@@ -66,7 +94,6 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<AlertObject>(() =
               </InputGroupAddon>
             </InputGroup>
 
-          </ButtonGroup>
         </ButtonGroup>
       </div>
     </div>
@@ -108,12 +135,12 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<AlertObject>(() =
             </TableCell>
             <TableCell class=""
                        :class="{
-                      'text-sky-500': [Severity.NOT_CLASSIFIED, Severity.UNKNOWN].includes(alert.severity),
-                      'text-badge1': [Severity.LOW, Severity.OK, Severity.INFORMATION].includes(alert.severity),
-                      'text-yellow-500': [Severity.MEDIUM, Severity.WARNING].includes(alert.severity),
-                      'text-amber-500': alert.severity === Severity.AVERAGE,
-                      'text-orange-500': alert.severity === Severity.HIGH,
-                      'text-red-500': [Severity.CRITICAL, Severity.DISASTER].includes(alert.severity),
+                      'text-sky-500': alert.severity === 0,
+                      'text-badge1': alert.severity === 1,
+                      'text-yellow-500': alert.severity === 2,
+                      'text-amber-500': alert.severity === 3,
+                      'text-orange-500': alert.severity === 4,
+                      'text-badge2': alert.severity === 5,
                     }"
             >{{alert.severity}}
             </TableCell>
