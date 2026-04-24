@@ -6,7 +6,7 @@ export interface AlertObject
   header: string,
   source: string,
   status: "Sent" | "In Process" | "Done",
-  severity: Severity,
+  severity: 0 | 1 | 2 | 3 | 4 | 5,
   technicianGroups?: string[],
   createdAt: Date,
   closedAt?: Date,
@@ -37,14 +37,14 @@ export interface MyPlugin
   cronExpression: string
   updatedAt: Date,
   active: boolean,
-  severity: Severity,
+  severity: 0 | 1 | 2 | 3 | 4 | 5,
 }
 
 export interface MyPluginsFromApi
 {
   active: boolean
   creator: string,
-  severity: Severity,
+  severity: 0 | 1 | 2 | 3 | 4 | 5,
   name: string,
   fileName: string,
   language: Language,
@@ -107,19 +107,6 @@ export interface ApiResponse {
   code: number,
 }
 
-export enum Severity {
-  UNKNOWN = 'Unknown',
-  NOT_CLASSIFIED = 'Not classified',
-  OK = 'Ok',
-  INFORMATION = 'Information',
-  LOW = 'Low',
-  WARNING = 'Warning',
-  MEDIUM = 'Medium',
-  AVERAGE = 'Average',
-  HIGH = 'High',
-  DISASTER = 'Disaster',
-  CRITICAL = 'Critical'
-}
 
 export enum Language {
   PYTHON = ".py",

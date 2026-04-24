@@ -3,13 +3,18 @@ import { RouterView } from 'vue-router'
 import TopRightButtons from "@/pages/globals/topRightButtons.vue";
 import NavBar from "@/pages/navbar/NavBar.vue";
 import {Toaster} from "vue-sonner";
+import {useAlertStore} from "@/stores/alertStore.ts";
+import {useSSEstore} from "@/stores/SSEstore.ts";
+
+useSSEstore()
 </script>
 
 <template>
   <Toaster
     theme="system"
     richColors
-    position="top-center"
+    position="top-right"
+    :expand="true"
   />
   <div class="h-screen flex flex-col  ">
     <header class="relative w-full">
