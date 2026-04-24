@@ -6,21 +6,10 @@ export interface AlertObject
   header: string,
   source: string,
   status: "Sent" | "In Process" | "Done",
-  severity: string,
+  severity: 0 | 1 | 2 | 3 | 4 | 5,
   technicianGroups?: string[],
   createdAt: Date,
   closedAt?: Date,
-}
-
-export interface LogObject
-{
-  id: number
-  header: string,
-  content: string,
-  source: string,
-  severity: string,
-  technicianGroups?: string[],
-  createdAt: Date,
 }
 
 export interface User
@@ -40,7 +29,7 @@ export interface MyPlugin
   name: string,
   fileName: string
   creator: string,
-  language: ".py" | ".sh" | ".bash" | ".ps1"  | ".psm1",
+  language: Language
   description?: string,
   code?: string,
   weight: number,
@@ -48,17 +37,17 @@ export interface MyPlugin
   cronExpression: string
   updatedAt: Date,
   active: boolean,
-  log: boolean
+  severity: 0 | 1 | 2 | 3 | 4 | 5,
 }
 
 export interface MyPluginsFromApi
 {
   active: boolean
   creator: string,
-  isLog: boolean,
+  severity: 0 | 1 | 2 | 3 | 4 | 5,
   name: string,
   fileName: string,
-  language: string,
+  language: Language,
   updatedAt: Date,
   weight: number,
   tags: string[],
@@ -74,7 +63,7 @@ export interface PluginDetails
 export interface ImportPlugin {
   name: string,
   creator: string,
-  language: ".py" | ".sh" | ".bash" | ".ps1"  | ".psm1",
+  language: Language,
   code: string,
   description: string,
   tags: string[],
@@ -86,7 +75,7 @@ export interface LibraryPlugin
   id: number,
   name: string,
   creator: string,
-  language: "python" | "bash" | "PowerShell",
+  language: Language,
   description?: string,
   code?: string,
   weight: number,
@@ -112,3 +101,17 @@ export interface fileType
   progress:number
 }
 
+export interface ApiResponse {
+  success: boolean,
+  message: string,
+  code: number,
+}
+
+
+export enum Language {
+  PYTHON = ".py",
+  SH = ".sh",
+  BASH = ".bash",
+  POWERSHELL = ".ps1",
+  POWERSHELL_MODULE = ".psm1"
+}

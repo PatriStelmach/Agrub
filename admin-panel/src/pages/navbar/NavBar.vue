@@ -40,13 +40,6 @@ const navItems = [
     ]
   },
   {
-    label: 'Logs',
-    links: [
-      { label: 'Active logs', to: 'logs', icon: IconLogs },
-      { label: 'History', to: 'logs_history', icon: IconHistory },
-    ]
-  },
-  {
     label: 'Plugins',
     links: [
       { label: 'My plugins', to: 'my_plugins', icon: IconScript },

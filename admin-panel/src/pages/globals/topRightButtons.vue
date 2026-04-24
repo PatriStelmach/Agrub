@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { useColorMode } from '@vueuse/core'
 import { Button } from '@/components/ui/button'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import {IconSunFilled, IconMoonFilled, IconHelpCircleFilled, IconSettingsFilled} from "@tabler/icons-vue";
+import {IconSunFilled, IconMoonFilled, IconHelpCircleFilled, IconSettingsFilled, IconBellFilled} from "@tabler/icons-vue";
 
 const mode = useColorMode()
 
@@ -10,6 +9,7 @@ const mode = useColorMode()
 
 <template>
   <div class="flex absolute items-center right-[1vh] z-9999 gap-x-4">
+    <IconBellFilled class="cursor-pointer size-[2vh] hover:animate-pulse hover:animation-duration-[2s] hover:scale-115 duration-100"/>
     <IconHelpCircleFilled class="cursor-pointer size-[2vh] hover:animate-pulse hover:animation-duration-[2s] hover:scale-115 duration-100"/>
     <IconSettingsFilled class="rounded-full cursor-pointer size-[2vh] hover:animate-spin hover:animation-duration-[6s] hover:scale-115 duration-100"/>
         <Button
