@@ -10,30 +10,46 @@ class UserScreen extends StatelessWidget {
 
         final userViewModel = context.watch<UserViewModel>();
 
-    return Column(
-      children: [
-        Icon(Icons.account_circle_rounded,size: 100),
-        Row(
-          children: [
-            Text('Username'),
-            Spacer(),
-            Text(userViewModel.user.login)
+    return Padding(
+      padding: const EdgeInsets.all(18.0),
+      child: Column(
+        children: [
+          Icon(Icons.account_circle_rounded,size: 100),
+          Row(
+            children: [
+              Text('Username', style: TextStyle(fontSize: 30)),
+              Spacer(),
+              Text(userViewModel.user.login, style: TextStyle(fontSize: 30))
+      
+            ],),
 
-          ],),
-            Row(
-          children: [
-            Text('Role'),
-            Spacer(),
-            Text(userViewModel.user.role)
 
-          ],),
-            Row(
-          children: [
-            Text('Group'),
-            Spacer(),
-            Text(userViewModel.user.group)
+              Row(
+            children: [
+              Text('E-mail', style: TextStyle(fontSize: 30)),
+              Spacer(),
+              Text(userViewModel.user.email, style: TextStyle(fontSize: 30))
+      
+            ],),
 
-          ],)
-    ],);
+
+
+
+              Row(
+            children: [
+              Text('Role', style: TextStyle(fontSize: 30)),
+              Spacer(),
+              Text(userViewModel.user.role, style: TextStyle(fontSize: 30))
+      
+            ],),
+              Row(
+            children: [
+              Text('Group', style: TextStyle(fontSize: 30)),
+              Spacer(),
+              Text(userViewModel.user.group, style: TextStyle(fontSize: 30))
+      
+            ],)
+      ],),
+    );
   }
 }
