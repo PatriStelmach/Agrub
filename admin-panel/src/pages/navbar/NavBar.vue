@@ -67,7 +67,7 @@ const navItems = [
         </div>
       </SidebarHeader>
       <Accordion class="mt-10" type="single" collapsible>
-        <AccordionItem class="" v-for="item in navItems" :key="item.label" :value="item.label">
+        <AccordionItem  v-for="item in navItems" :key="item.label" :value="item.label">
           <AccordionTrigger class=" cursor-pointer lg:text-lg xl:text-xl">
             <div class="flex items-center text-center space-x-2 xl:space-x-4">
               {{ item.label }}

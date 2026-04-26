@@ -357,29 +357,26 @@ const savePlugin = async () => {
 
               </TableCell>
 
-              <TableCell v-if="isUnwrapped(plugin.fileName) && unwrappedItem" class="">
+              <TableCell v-if="isUnwrapped(plugin.fileName) && unwrappedItem" >
                 <Select
                   v-model="unwrappedItem.severity"
                 >
-                  <SelectTrigger class="w-full text-lg lg:text-xl xl:text-2xl 2xl:text-3xl">
+                  <SelectTrigger class="cursor-pointer w-full text-md lg:text-lg xl:text-xl 2xl:text-xl">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem v-for="value in [1,2,3,4,5]" :key="value" :value="value">{{value}}</SelectItem>
+                    <SelectItem
+                      :class='`cursor-pointer hover:bg-severity-${value}/50! text-md lg:text-lg xl:text-xl 2xl:text-xl`'
+                      v-for="value in [0,1,2,3,4,5]" :key="value" :value="value">{{value}}</SelectItem>
                   </SelectContent>
                 </Select>
               </TableCell>
-              <TableCell v-else  class="">
-                <div class=" bg-linear-to-l w-2/3 text-center font-bold text-xl " :class="{
-                      'from-badge/50 via-badge to-badge/50': plugin.severity === 0,
-                      'from-badge1/50 via-badge1 to-badge1/50': plugin.severity === 1,
-                      'from-yellow-400/50 via-yellow-400 to-yellow-400/50': plugin.severity === 2,
-                      'from-amber-500/50 via-amber-500 to-amber-500/50': plugin.severity === 3,
-                      'from-orange-500/50 via-orange-500 to-orange-500/50': plugin.severity === 4,
-                      'from-badge2/50 via-badge2 to-badge2/50': plugin.severity === 5,
-                    }">{{plugin.severity}}</div>
+              <TableCell v-else  >
+                <div
+                  :class="`bg-linear-to-l w-2/3 text-center font-bold text-xl
+                   from-severity-${plugin.severity}/50 via-severity-${plugin.severity} to-severity-${plugin.severity}/50`">{{plugin.severity}}</div>
               </TableCell>
-              <TableCell class="">
+              <TableCell >
                 <img
                   v-if="plugin.language === Language.PYTHON"
                   alt="python_icon"
@@ -400,7 +397,7 @@ const savePlugin = async () => {
                 />
               </TableCell>
               <DateCell class=" text-md lg:text-lg xl:text-xl 2xl:text-2xl " v-if="plugin.updatedAt" :date="plugin.updatedAt"></DateCell>
-              <TableCell v-if="isUnwrapped(plugin.fileName) && unwrappedItem" class="">
+              <TableCell v-if="isUnwrapped(plugin.fileName) && unwrappedItem" >
                 <RadioGroup
                   @update:model-value="unwrappedItem.active = $event === 'on'"
                   :model-value="unwrappedItem.active ? 'on' : 'off'"

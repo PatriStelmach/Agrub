@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {Textarea} from "@/components/ui/textarea";
 import {ref, watch} from "vue";
+import CodeEditor from "@/helpers/CodeEditor.vue";
 
 const props = defineProps<{
   description: string,
@@ -37,11 +38,11 @@ const emits = defineEmits<{
 
 <template>
   <Dialog>
-    <form >
+    <form>
       <DialogTrigger as-child>
         <slot/>
       </DialogTrigger>
-      <DialogContent >
+      <DialogContent class="max-w-[60vw]! min-h-1/4 max-h-4/5">
         <DialogHeader>
           <DialogTitle>Plugin details</DialogTitle>
 
@@ -49,11 +50,11 @@ const emits = defineEmits<{
         <div class="grid gap-4">
           <div class="grid gap-3">
             <Label for="my-plugin-description">Description</Label>
-            <Input id="my-plugin-description" name="description" v-model="newDescription" :default-value="description" />
+            <Input class="m-2 badge-focus max-w-95/100" id="my-plugin-description" name="description" v-model="newDescription" :default-value="description" />
           </div>
-          <div class="grid gap-3 overflow-y-auto max-h-[60vh]">
+          <div class="grid gap-3  h-full">
             <Label for="my-plugin-code">Code</Label>
-            <Textarea id="my-plugin-code" name="code" v-model="newCode" :default-value="code" />
+            <CodeEditor  id="my-plugin-code" name="code" v-model="newCode" :default-value="code" />
           </div>
         </div>
         <DialogFooter>

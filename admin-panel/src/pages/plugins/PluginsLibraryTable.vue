@@ -52,7 +52,7 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<LibraryPlugin>(()
           v-for="plugin in sortedData"
           :key="plugin.id">
           <TableCell class="pl-4 ">{{plugin.name}}</TableCell>
-          <TableCell class="">{{plugin.creator}}</TableCell>
+          <TableCell >{{plugin.creator}}</TableCell>
           <TableCell class="whitespace-break-spaces">
             <Badge
               v-for="(tag, index) in plugin.tags"
@@ -62,7 +62,7 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<LibraryPlugin>(()
           <TableCell>
             <component class="text-badge size-7 lg:size-8 xl:size-10 2xl:size-16" :class="{'text-yellow-500' : !plugin.log }" :is="plugin.log ? IconLogs : IconAlertTriangleFilled "/>
           </TableCell>
-          <TableCell class="">
+          <TableCell >
             <img
               v-if="plugin.language === Language.PYTHON"
               alt="python_icon"
@@ -82,8 +82,8 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<LibraryPlugin>(()
               class="size-7 lg:size-8 xl:size-10 2xl:size-16"
             />
           </TableCell>
-          <DateCell class="" :date="plugin.createdAt as Date"></DateCell>
-          <TableCell class="">{{plugin.weight}} Kb</TableCell>
+          <DateCell  :date="plugin.createdAt as Date"></DateCell>
+          <TableCell >{{plugin.weight}} Kb</TableCell>
           <TableCell>
             <ButtonGroup>
               <Button

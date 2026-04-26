@@ -155,22 +155,19 @@ const mouseLeave = () => {
               :key="alert.id"
             >
               <TableCell class="pl-4  whitespace-nowrap">{{alert.subject}}</TableCell>
-              <TableCell class=""
+              <TableCell
 
-              ><div class=" bg-linear-to-l w-2/3 text-center font-bold text-xl " :class="{
-                      'from-badge/50 via-badge to-badge/50': alert.severity === 0,
-                      'from-badge1/50 via-badge1 to-badge1/50': alert.severity === 1,
-                      'from-yellow-400/50 via-yellow-400 to-yellow-400/50': alert.severity === 2,
-                      'from-amber-500/50 via-amber-500 to-amber-500/50': alert.severity === 3,
-                      'from-orange-500/50 via-orange-500 to-orange-500/50': alert.severity === 4,
-                      'from-badge2/50 via-badge2 to-badge2/50': alert.severity === 5,
-                    }">{{alert.severity}}</div>
+              ><div
+                :class="` bg-linear-to-l w-2/3 text-center font-bold text-xl
+                from-severity-${alert.severity}/50 via-severity-${alert.severity} to-severity-${alert.severity}/50`">
+                {{alert.severity}}
+              </div>
               </TableCell>
               <TableCell
                 @mouseenter="mouseEnter(alert.id)"
                 @mouseleave="mouseLeave"
                 class="truncate">{{alert.message}}</TableCell>
-              <TableCell class="">
+              <TableCell >
                 <Badge
                   variant="source"
                 >{{alert.source}}</Badge>
@@ -183,10 +180,7 @@ const mouseLeave = () => {
                             class="size-4 text-badge1"/>
                 </div>
               </TableCell>
-              <DateCell v-if="alert.createdAt" class="" :date="alert.createdAt "></DateCell>
-
-
-
+              <DateCell v-if="alert.createdAt"  :date="alert.createdAt "></DateCell>
             </TableRow>
           </TransitionGroup>
 

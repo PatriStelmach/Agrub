@@ -57,7 +57,7 @@ const { badgeSearch, availableBadges, addBadge, badgeListOpen, matchedBadges, ex
 </script>
 
 <template>
-<div class="">
+<div >
 
   <div class="relative ">
     <h1 class="text-center my-[2vh] text-xl xl:text-2xl 2xl:text-4xl border-b pb-[2vh]">Team</h1>
