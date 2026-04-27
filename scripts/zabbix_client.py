@@ -1,3 +1,7 @@
+# Description: dupa dupa test.
+# Tags: network, icmp, latency
+# IsLog: false
+
 import os
 import sys
 from pyzabbix import ZabbixAPI
