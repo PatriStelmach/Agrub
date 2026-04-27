@@ -23,16 +23,19 @@ public class PythonScriptService {
     private final GlobalProblemRepository problemRepository;
     private final TaskExecutionLogRepository logRepository;
     private final SseNotifService sseService;
+    private final AlertRoutingService routingService; // Nasz nowy router widoczności
 
     @Value("${app.scripts.path}")
     private String scriptsPath;
 
     public PythonScriptService(TaskExecutionLogRepository logRepository,
                                GlobalProblemRepository problemRepository,
-                               SseNotifService sseService) {
+                               SseNotifService sseService,
+                               AlertRoutingService routingService) {
         this.problemRepository = problemRepository;
         this.logRepository = logRepository;
         this.sseService = sseService;
+        this.routingService = routingService;
     }
 
     /**
@@ -93,55 +96,64 @@ public class PythonScriptService {
         } finally {
             saveLogToDatabase(task, outputCollector.toString(), status);
 
-            // Wywołujemy mechanizm alertowania unconditionally - wewnątrz on sam sprawdzi,
-            // czy zignorować (severity 1), utworzyć (severity >= 2), czy rozwiązać stary alert
+            // Wywołujemy mechanizm alertowania
             handleAlerting(task, exitCode, outputCollector.toString());
         }
     }
 
     private void handleAlerting(ScheduledTask task, int exitCode, String output) {
-        Optional<GlobalProblem> existingProblem = problemRepository.findByTaskId(task.getId());
+        // Unikalny klucz dla skryptu to np. "[SCRIPT] 12"
+        String uniqueKey = "[SCRIPT] " + task.getId();
+
+        // Szukamy otwartego problemu po kluczu
+        Optional<GlobalProblem> existingProblem = problemRepository.findFirstByUniqueKeyOrderByIdDesc(uniqueKey)
+                .filter(p -> !"Done".equals(p.getStatus()));
 
         if (exitCode != 0) {
             // SCENARIUSZ: BŁĄD SKRYPTU
             if (task.getSeverity() >= 2) {
-                // Severity 2-5 -> Traktujemy jako ERROR (GlobalProblem)
                 GlobalProblem problem = existingProblem.orElse(new GlobalProblem());
-                problem.setUniqueKey("SCRIPT-" + task.getId());
-                problem.setSubject(task.getTaskName());
-                problem.setSource("Local System");
-                problem.setContent(output);
-                problem.setStatus("Sent"); // Domyślnie
-                problem.setCreatedAt(LocalDateTime.now());
+
+                // Jeśli to nowy problem, ustawiamy podstawowe dane
+                if (problem.getId() == null) {
+                    problem.setUniqueKey(uniqueKey);
+                    problem.setSubject(task.getTaskName());
+                    problem.setSource("Local Script");
+                    problem.setOriginType("PYTHON");
+                    problem.setStatus("Sent");
+                    problem.setCreatedAt(LocalDateTime.now());
+                }
+
+                // Aktualizujemy błąd (przycinamy do 255 znaków, żeby baza MySQL nie rzuciła błędem)
+                problem.setMessage(output.length() > 255 ? output.substring(0, 252) + "..." : output);
+                problem.setSeverity(task.getSeverity());
+
+                // --- MAGIA SILNIKA REGUŁ ---
+                // Oceniamy, które grupy techników powinny zobaczyć ten alert (oraz czy ma grać dźwięk)
+                routingService.processVisibility(problem);
 
                 GlobalProblem saved = problemRepository.save(problem);
 
+                // Wysyłamy do frontendu tylko jeśli to nowe zdarzenie
                 if (existingProblem.isEmpty()) {
                     sseService.sendAlert("NEW_ALERT", saved);
                 }
             } else {
-                // Severity 1 -> Traktujemy jako LOG
-                // Na razie tutaj nic nie robimy (docelowo: zapis do ogólnego logu systemowego)
+                // Severity 1 traktujemy tylko jako informację w logach serwera
                 System.out.println("[LOG] Skrypt " + task.getTaskName() + " zakończył się błędem, ale ma severity 1.");
             }
         } else {
-        // SCENARIUSZ: SKRYPT OK
-        if (existingProblem.isPresent()) {
-            GlobalProblem problemToResolve = existingProblem.get();
-
-            // Zamykamy tylko, jeśli nie jest już zamknięty
-            if (!"Done".equals(problemToResolve.getStatus())) {
+            // SCENARIUSZ: SKRYPT OK (Miękkie usuwanie / Recovery)
+            existingProblem.ifPresent(problemToResolve -> {
                 problemToResolve.setStatus("Done");
                 problemToResolve.setClosedAt(LocalDateTime.now());
 
                 problemRepository.save(problemToResolve);
-
-                // SSE nadal wysyła info, żeby Vue usunęło czerwoną belkę z ekranu!
                 sseService.sendAlert("ALERT_RESOLVED", problemToResolve);
+
                 System.out.println("[PYTHON] Skrypt naprawiony. Alert zamknięty: " + task.getTaskName());
-            }
+            });
         }
-    }
     }
 
     private void saveLogToDatabase(ScheduledTask task, String output, String status) {

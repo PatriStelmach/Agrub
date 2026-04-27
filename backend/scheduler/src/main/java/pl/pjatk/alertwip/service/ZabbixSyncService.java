@@ -20,6 +20,7 @@ public class ZabbixSyncService {
     private final GlobalProblemRepository problemRepository;
     private final SseNotifService sseService;
     private final SystemSettingService settingService;
+    private final AlertRoutingService routingService; // NOWOŚĆ: Nasz Router Regexów
 
     // Klucz dla naszego wewnętrznego alertu o awarii komunikacji z Zabbixem
     private static final String API_ERROR_UNIQUE_KEY = "[SYSTEM] Zabbix API Offline";
@@ -27,114 +28,99 @@ public class ZabbixSyncService {
     public ZabbixSyncService(ZabbixApiService zabbixApiService,
                              GlobalProblemRepository problemRepository,
                              SseNotifService sseService,
-                             SystemSettingService settingService) {
+                             SystemSettingService settingService,
+                             AlertRoutingService routingService) {
         this.zabbixApiService = zabbixApiService;
         this.problemRepository = problemRepository;
         this.sseService = sseService;
         this.settingService = settingService;
+        this.routingService = routingService;
     }
 
-    @Scheduled(fixedRate = 60000) // Uruchamia się co 60 sekund
+    @Scheduled(fixedRate = 60000)
     @Transactional
     public void syncAlerts() {
         if (!settingService.getBoolean("zabbix_enabled", false)) {
-            // Zabbix jest wyłączony, wychodzimy
             return;
         }
 
+        List<Map<String, Object>> currentProblems;
+
+        // 1. ZWĘŻONY TRY-CATCH: Łapiemy tylko i wyłącznie błędy z API Zabbixa
         try {
-            // Próba pobrania danych z API Zabbixa
-            List<Map<String, Object>> currentProblems = zabbixApiService.getActiveProblems();
-
+            currentProblems = zabbixApiService.getActiveProblems();
             if (currentProblems == null) {
-                // Jeśli zwraca null, traktujemy to jako błąd komunikacji i zrzucamy do catcha
-                throw new RuntimeException("Zabbix API zwróciło pustą odpowiedź (null).");
+                throw new RuntimeException("Zabbix API zwróciło null.");
             }
-
-            // Połączenie działa - zamykamy ewentualny alert systemowy
-            resolveSystemAlert(API_ERROR_UNIQUE_KEY);
-
-            System.out.println("[ZABBIX SYNC] Synchronizacja. Aktywne problemy w Zabbix: " + currentProblems.size());
-
-            // 1. Zbieramy unikalne klucze trwających problemów do późniejszego porównania
-            Set<String> activeZabbixProblemKeys = new HashSet<>();
-
-            for (Map<String, Object> problemData : currentProblems) {
-                Object nameObj = problemData.get("name");
-                String name = (nameObj != null) ? nameObj.toString() : "Nieznany błąd";
-
-                int severity = 0;
-                Object severityObj = problemData.get("severity");
-                if (severityObj != null) {
-                    try {
-                        severity = Integer.parseInt(severityObj.toString());
-                    } catch (NumberFormatException ignored) {}
-                }
-
-                // Bezpieczne wyciąganie nazwy hosta z zagnieżdżonej tablicy "hosts"
-                String hostName = "Nieznany host";
-                Object hostsObj = problemData.get("hosts");
-
-                if (hostsObj instanceof List<?> hostList && !hostList.isEmpty()) {
-                    Object firstHostObj = hostList.get(0);
-                    if (firstHostObj instanceof Map<?, ?> hostMap) {
-                        Object hostValue = hostMap.get("host");
-                        if (hostValue != null) {
-                            hostName = hostValue.toString();
-                        }
-                    }
-                }
-
-                // Budujemy unikalny klucz identyczny z tym z Webhooka (łączymy host i problem)
-                String uniqueProblemKey = "[ZABBIX] " + hostName + " - " + name;
-                activeZabbixProblemKeys.add(uniqueProblemKey);
-
-                // 2. SZUKANIE ZGUBIONYCH ALERTÓW (Są w Zabbixie, a nie ma ich u nas JAKO OTWARTE)
-                Optional<GlobalProblem> existingProblem = problemRepository.findByUniqueKey(uniqueProblemKey)
-                        .filter(p -> !"Done".equals(p.getStatus())); // Szukamy tylko wśród NIEZAMKNIĘTYCH
-
-                if (existingProblem.isEmpty()) {
-                    GlobalProblem newProblem = new GlobalProblem();
-                    newProblem.setUniqueKey(uniqueProblemKey);
-                    newProblem.setSubject(name);
-                    newProblem.setSource(hostName);
-                    newProblem.setContent("Problem dodany przez Sync API.");
-                    newProblem.setStatus("Sent"); // Nowy alert
-                    newProblem.setSeverity(severity);
-                    newProblem.setCreatedAt(LocalDateTime.now());
-
-                    GlobalProblem saved = problemRepository.save(newProblem);
-
-                    sseService.sendAlert("NEW_ALERT", saved);
-                    System.out.println("[ZABBIX SYNC] Dodano zgubiony alert: " + uniqueProblemKey + " (Severity: " + severity + ")");
-                }
-            }
-
-            // 3. SZUKANIE ZGUBIONYCH ROZWIĄZAŃ (Są otwarte u nas, ale zniknęły już z Zabbixa)
-            List<GlobalProblem> dbZabbixProblems = problemRepository.findAll().stream()
-                    .filter(p -> p.getUniqueKey() != null && p.getUniqueKey().startsWith("[ZABBIX]"))
-                    .filter(p -> !"Done".equals(p.getStatus())) // Patrzymy tylko na otwarte
-                    .toList();
-
-            for (GlobalProblem dbProblem : dbZabbixProblems) {
-                // Jeśli problem z bazy NIE ZNAJDUJE SIĘ już na liście pobranej z Zabbixa...
-                if (!activeZabbixProblemKeys.contains(dbProblem.getUniqueKey())) {
-
-                    // Zamiast usuwać, ZAMYKAMY ALERT (Soft Delete)
-                    dbProblem.setStatus("Done");
-                    dbProblem.setClosedAt(LocalDateTime.now());
-                    problemRepository.save(dbProblem);
-
-                    // Informujemy Vue, że alert został rozwiązany
-                    sseService.sendAlert("ALERT_RESOLVED", dbProblem);
-                    System.out.println("[ZABBIX SYNC] Wykryto rozwiązanie. Alert zamknięty: " + dbProblem.getUniqueKey());
-                }
-            }
-
         } catch (Exception e) {
-            // --- AWARIA POŁĄCZENIA ---
-            System.err.println("[ZABBIX SYNC] Awaria połączenia. Generuję alert systemowy dla Vue...");
+            System.err.println("[ZABBIX SYNC] Awaria połączenia API. Generuję alert systemowy...");
             triggerSystemAlert(API_ERROR_UNIQUE_KEY, "Brak komunikacji z Zabbix API: " + e.getMessage());
+            return; // Przewany proces, nie idziemy dalej!
+        }
+
+        // Jeśli tu doszliśmy, Zabbix API działa w 100%.
+        resolveSystemAlert(API_ERROR_UNIQUE_KEY);
+        System.out.println("[ZABBIX SYNC] Synchronizacja. Aktywne problemy w Zabbix: " + currentProblems.size());
+
+        Set<String> activeZabbixProblemKeys = new HashSet<>();
+
+        // 2. PRZETWARZANIE ALERTÓW (Bez obaw, że błąd SSE wywoła awarię Zabbixa)
+        for (Map<String, Object> problemData : currentProblems) {
+            Object nameObj = problemData.get("name");
+            String name = (nameObj != null) ? nameObj.toString() : "Nieznany błąd";
+
+            int severity = 0;
+            Object severityObj = problemData.get("severity");
+            if (severityObj != null) {
+                try { severity = Integer.parseInt(severityObj.toString()); } catch (NumberFormatException ignored) {}
+            }
+
+            String hostName = "Nieznany host";
+            Object hostsObj = problemData.get("hosts");
+            if (hostsObj instanceof List<?> hostList && !hostList.isEmpty()) {
+                if (hostList.get(0) instanceof Map<?, ?> hostMap && hostMap.get("host") != null) {
+                    hostName = hostMap.get("host").toString();
+                }
+            }
+
+            String uniqueProblemKey = "[ZABBIX] " + hostName + " - " + name;
+            activeZabbixProblemKeys.add(uniqueProblemKey);
+
+            // Używamy nowej metody zabezpieczającej przed duplikatami!
+            Optional<GlobalProblem> existingProblem = problemRepository.findFirstByUniqueKeyOrderByIdDesc(uniqueProblemKey)
+                    .filter(p -> !"Done".equals(p.getStatus()));
+
+            if (existingProblem.isEmpty()) {
+                GlobalProblem newProblem = new GlobalProblem();
+                newProblem.setUniqueKey(uniqueProblemKey);
+                newProblem.setSubject(name);
+                newProblem.setSource(hostName);     // konkretna maszyna
+                newProblem.setOriginType("ZABBIX");
+                newProblem.setMessage("Problem zsynchronizowany z API Zabbix.");
+                newProblem.setStatus("Sent");
+                newProblem.setSeverity(severity);
+                newProblem.setCreatedAt(LocalDateTime.now());
+
+                routingService.processVisibility(newProblem);
+                GlobalProblem saved = problemRepository.save(newProblem);
+
+                sseService.sendAlert("NEW_ALERT", saved);
+            }
+        }
+
+        // 3. ZAMYKANIE STARYCH ALERTÓW
+        List<GlobalProblem> dbZabbixProblems = problemRepository.findAll().stream()
+                .filter(p -> p.getUniqueKey() != null && p.getUniqueKey().startsWith("[ZABBIX]"))
+                .filter(p -> !"Done".equals(p.getStatus()))
+                .toList();
+
+        for (GlobalProblem dbProblem : dbZabbixProblems) {
+            if (!activeZabbixProblemKeys.contains(dbProblem.getUniqueKey())) {
+                dbProblem.setStatus("Done");
+                dbProblem.setClosedAt(LocalDateTime.now());
+                problemRepository.save(dbProblem);
+                sseService.sendAlert("ALERT_RESOLVED", dbProblem);
+            }
         }
     }
 
@@ -145,7 +131,7 @@ public class ZabbixSyncService {
 
     private void triggerSystemAlert(String uniqueKey, String message) {
         // Szukamy, czy nie mamy już OTWARTEGO alertu systemowego
-        Optional<GlobalProblem> existingProblem = problemRepository.findByUniqueKey(uniqueKey)
+        Optional<GlobalProblem> existingProblem = problemRepository.findFirstByUniqueKeyOrderByIdDesc(uniqueKey)
                 .filter(p -> !"Done".equals(p.getStatus()));
 
         if (existingProblem.isEmpty()) {
@@ -153,11 +139,15 @@ public class ZabbixSyncService {
             problem.setUniqueKey(uniqueKey);
             problem.setSubject("Błąd połączenia z Zabbix API");
             problem.setSource("Local System");
+            problem.setOriginType("ZABBIX");
             // Ucinamy wiadomość, jeśli błąd stosu jest za długi
-            problem.setContent(message.length() > 255 ? message.substring(0, 252) + "..." : message);
+            problem.setMessage(message.length() > 255 ? message.substring(0, 252) + "..." : message);
             problem.setStatus("Sent");
             problem.setSeverity(5); // Zakładamy najwyższy priorytet dla błędu całego systemu
             problem.setCreatedAt(LocalDateTime.now());
+
+            // --- MAGIA SILNIKA REGUŁ DLA ALERTU SYSTEMOWEGO ---
+            routingService.processVisibility(problem);
 
             GlobalProblem saved = problemRepository.save(problem);
             sseService.sendAlert("NEW_ALERT", saved);
@@ -166,7 +156,7 @@ public class ZabbixSyncService {
 
     private void resolveSystemAlert(String uniqueKey) {
         // Zamykamy alert systemowy, jeśli jakiś jest otwarty
-        Optional<GlobalProblem> existingProblem = problemRepository.findByUniqueKey(uniqueKey)
+        Optional<GlobalProblem> existingProblem = problemRepository.findFirstByUniqueKeyOrderByIdDesc(uniqueKey)
                 .filter(p -> !"Done".equals(p.getStatus()));
 
         existingProblem.ifPresent(problem -> {
