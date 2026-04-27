@@ -24,6 +24,11 @@ const router = createRouter({
       component: () => import('@/pages/alerts/AlertsPage.vue'),
     },
     {
+      path: '/alerts_history',
+      name: 'alerts_history',
+      component: () => import('@/pages/alerts/AlertsHistory.vue'),
+    },
+    {
       path: '/plugins_library',
       name: 'plugins_library',
       component: () => import('../pages/plugins/PluginsLibrary.vue'),

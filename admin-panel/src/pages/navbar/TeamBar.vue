@@ -18,7 +18,7 @@ import NavUser from "@/pages/navbar/NavUser.vue";
 
 <template>
 
-  <div class=" bottom-4 flex-1 min-h-0 sm:max-h-40! md:max-h-60! lg:max-h-90! xl:max-h-130! 2xl:max-h-150! overflow-auto">
+  <div class=" bottom-4 flex-1 min-h-0 sm:max-h-60! md:max-h-90! lg:max-h-130! xl:max-h-150! 2xl:max-h-250! overflow-auto">
     <SidebarMenuItem
       v-for="user in usersData"
       :key="user.id"
