@@ -20,14 +20,12 @@ public class SseNotifService {
         // Ustawiamy timeout na -1 (nieskończoność), aby połączenie nie wygasło samo z siebie
         SseEmitter emitter = new SseEmitter(-1L);
 
-        // Usuwamy subskrypcję przy błędzie lub zakończeniu
         emitter.onCompletion(() -> userSubscriptions.remove(emitter));
         emitter.onTimeout(() -> userSubscriptions.remove(emitter));
         emitter.onError((e) -> userSubscriptions.remove(emitter));
 
         userSubscriptions.put(emitter, groups);
 
-        // Wysyłamy wiadomość powitalną, aby natychmiast otworzyć "rurę" w przeglądarce
         try {
             emitter.send(SseEmitter.event()
                     .name("INIT")
@@ -44,20 +42,19 @@ public class SseNotifService {
         List<SseEmitter> deadEmitters = new ArrayList<>();
 
         userSubscriptions.forEach((emitter, userGroups) -> {
-            // Sprawdzamy, czy grupy użytkownika pokrywają się z grupami alertu
             boolean hasAccess = alert.getTechnicianGroups().stream()
                     .anyMatch(userGroups::contains);
 
             if (hasAccess) {
                 try {
-                    // Używamy SseEventBuilder, aby wymusić poprawny format i brak buforowania
                     SseEmitter.SseEventBuilder event = SseEmitter.event()
                             .id(String.valueOf(alert.getId()))
                             .name("message") // Vue onmessage reaguje na ten typ
                             .data(Map.of(
-                                    "status", status,
+                                    "status", "success",
+                                    "eventType", status,       // "NEW_ALERT" lub "ALERT_RESOLVED"
                                     "notification", alert.isRequiresNotification(),
-                                    "message", alert
+                                    "message", alert           // Obiekt alertu
                             ), MediaType.APPLICATION_JSON);
 
                     emitter.send(event);

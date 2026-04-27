@@ -1,16 +1,22 @@
 package pl.pjatk.alertwip.controller;
 
 import org.springframework.web.bind.annotation.*;
+import pl.pjatk.alertwip.service.ZabbixSyncService;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api/mock/zabbix")
 public class MockZabbixController {
 
-    // Zmienne sterujące naszym sztucznym Zabbixem
+    private final ZabbixSyncService zabbixSyncService;
+
+    public MockZabbixController(ZabbixSyncService zabbixSyncService){
+        this.zabbixSyncService = zabbixSyncService;
+    }
     private boolean simulateOutage = false;
 
     // Generujemy listę początkowych, sztucznych problemów
@@ -52,16 +58,32 @@ public class MockZabbixController {
         return "Symulacja awarii serwera: " + (this.simulateOutage ? "WŁĄCZONA" : "WYŁĄCZONA");
     }
 
+    @GetMapping("/add-problem")
+    public String addProblem() {
+        this.mockProblems.add(createMockProblem(
+                String.valueOf(System.currentTimeMillis()), // Unikalne ID
+                "Temperatura procesora przekracza 95C",
+                4,
+                "Sztuczny-Host-XYZ"
+        ));
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                zabbixSyncService.syncAlerts();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        return "Dodano nowy problem. Synchronizacja uruchomiona natychmiastowo!";
+    }
+
     @GetMapping("/clear-problems")
     public String clearProblems() {
         this.mockProblems.clear();
-        return "Usunięto wszystkie problemy w Mocku. Następny cykl (co 60s) wyśle ALERT_RESOLVED.";
-    }
+        CompletableFuture.runAsync(zabbixSyncService::syncAlerts);
 
-    @GetMapping("/add-problem")
-    public String addProblem() {
-        this.mockProblems.add(createMockProblem("1003", "Temperatura procesora przekracza 95C", 4, "Sztuczny-Host-XYZ"));
-        return "Dodano nowy problem. Następny cykl (co 60s) wyśle NEW_ALERT.";
+        return "Wyczyszczono problemy. Synchronizacja uruchomiona natychmiastowo!";
     }
 
     // Pomocnicza metoda generująca JSON-a zgodnego ze strukturą Zabbixa

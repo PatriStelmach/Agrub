@@ -39,8 +39,8 @@ export function useSSEstore()   {
       if (nVal.status === 'error')
         toast.error(nVal.msg, { icon: h(IconAlertTriangle, { class:'animate-ping duration-100'})})
       if (nVal.status === 'success'){
-        toast.success(nVal.msg, { icon: h(IconCircleDashedCheck, {class:'animate-pulse duration-100'})})
-          alertStore.addCurrentAlert(nVal.msg)
+        toast.success(nVal.message, { icon: h(IconCircleDashedCheck, {class:'animate-pulse duration-100'})})
+          alertStore.addCurrentAlert(nVal.message)
       }
     }
   })
