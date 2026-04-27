@@ -14,7 +14,7 @@ import {
 } from "@tabler/icons-vue";
 import TeamBar from "@/pages/navbar/TeamBar.vue";
 import {
-  Sidebar, SidebarHeader,
+  Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader,
   SidebarInput,
   SidebarInset, SidebarMenu,
   SidebarMenuButton, SidebarMenuItem,
@@ -59,41 +59,47 @@ const navItems = [
 
 <template>
 
-  <SidebarProvider class="  border-none px-4 w-60 ">
-    <SidebarInset class="  flex flex-col w-40 xl:w-50 bg-card">
-      <SidebarHeader>
-        <div class="text-xl space-x-2 flex pl-2 pt-4"><IconPhoneRinging/>
-          <span>Alert</span>
-        </div>
-      </SidebarHeader>
-      <Accordion class="mt-10" type="single" collapsible>
-        <AccordionItem  v-for="item in navItems" :key="item.label" :value="item.label">
-          <AccordionTrigger class=" cursor-pointer lg:text-lg xl:text-xl">
-            <div class="flex items-center text-center space-x-2 xl:space-x-4">
-              {{ item.label }}
+  <Sidebar class="">
+          <SidebarHeader>
+            <div class="text-xl space-x-2 flex pl-2 pt-4"><IconPhoneRinging/>
+              <span>Alert</span>
             </div>
-          </AccordionTrigger>
-          <AccordionContent class="grid gap-y-2 ">
-            <RouterLink class="hover:bg-input py-2 px-1 rounded-md xl:text-lg" v-for="link in item.links" :key="link.to" :to="link.to">
-              <div class="flex items-center gap-x-2"><component class="size-4  xl:size-6" :is="link.icon"/> {{link.label}} </div></RouterLink>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
-      <div class="mb-4  mt-auto bg-card">
-        <SidebarMenu class=" ">
-          <SidebarMenuItem class="border-y-4">
-            <SidebarMenuButton class="flex items-center text-center justify-center my-2 text-lg">
-              <IconUsers class="xl:size-5! 2xl:size-6!"/>
-              <RouterLink to="/team">
-                Team
-              </RouterLink>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <TeamBar  />
-          <NavUser class="border-t-4 pt-2" :user="sidebarData.loggedUser"/>
-        </SidebarMenu>
-      </div>
-    </SidebarInset>
-</SidebarProvider>
+          </SidebarHeader>
+    <SidebarContent>
+      <SidebarGroup>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            <SidebarMenuItem v-for="item in navItems" :key="item.label" :value="item.label">
+              <SidebarMenuButton as-child>
+                <SidebarGroupLabel class="pl-1 flex items-center text-center" >
+                  {{ item.label }}
+                </SidebarGroupLabel>
+                <div class="ml-3 border-l-3 ">
+                  <RouterLink class="rounded-md xl:text-lg" v-for="link in item.links" :key="link.to" :to="link.to">
+                    <div class="flex items-center gap-x-2 p-2 ml-1 rounded-lg hover:bg-input "><component class="size-4  xl:size-6" :is="link.icon"/> {{link.label}} </div></RouterLink>
+                </div>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+      <SidebarGroupContent class="mt-auto mb-3">
+        <SidebarMenu>
 
+            <SidebarMenuItem class="border-y-4">
+              <SidebarMenuButton class="flex items-center text-center justify-center my-2 text-lg">
+                <IconUsers class="xl:size-5! 2xl:size-6!"/>
+                <RouterLink to="/team">
+                  Team
+                </RouterLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem >
+            <TeamBar  />
+            <NavUser class="border-t-4 pt-2" :user="sidebarData.loggedUser"/>
+
+
+        </SidebarMenu>
+      </SidebarGroupContent>
+    </SidebarContent>
+  </Sidebar>
 </template>
