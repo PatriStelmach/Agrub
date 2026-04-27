@@ -47,6 +47,7 @@ export const useMyPluginStore = defineStore('my-plugins', () => {
   }
 
   const changeStatus = async (fileNames: string[]) => {
+    console.log(fileNames)
     const response = await axios.post(`${api_url}/local-scripts/change-status`, fileNames)
     return response.data as ApiResponse
   }

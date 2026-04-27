@@ -24,7 +24,7 @@ useSSEstore()
   </header>
   <SidebarProvider>
     <NavBar class="border-none bg-card"/>
-    <div class="h-screen flex flex-col  ">
+    <div class="h-screen w-full flex flex-col  ">
 
 
       <main class="bg-card flex flex-1 ">

@@ -9,6 +9,7 @@ export const useNotificationStore = defineStore('notification', () => {
   const removeNotification = () => { notificationAmount.value-- }
 
 
+
   return {
     notificationAmount,
     getNotificationAmount,

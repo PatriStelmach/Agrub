@@ -11,6 +11,7 @@ import {
 import {Badge} from "@/components/ui/badge";
 import {Language, type LibraryPlugin, type MyPlugin} from "@/types/types.ts"
 import SortableHead from "@/helpers/SortableHead.vue";
+import {tableCaption, dataTable, tableHeaders} from "@/assets/cssFunctions.ts";
 import {useSort} from "@/composables/sorting.ts";
 import {IconAlertTriangleFilled, IconLogs} from "@tabler/icons-vue";
 import {ButtonGroup, ButtonGroupSeparator} from "@/components/ui/button-group";
@@ -29,12 +30,12 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<LibraryPlugin>(()
 <template>
 
   <div class=" mt-[2vh] mx-[1%] w-98/100 relative overflow-auto max-h-[77vh]   ">
-    <Table id="plugins-library-table" class="w-99/100 text-md lg:text-lg xl:text-xl 2xl:text:3xl  mx-auto  table-fixed">
-      <TableCaption class="bg-secondary border-b border-t text-foreground sticky z-9 py-2 bottom-0  text-md lg:text-lg xl:text-xl 2xl:text:3xl">Current Alerts:
+    <Table id="plugins-library-table" :class="dataTable">
+      <TableCaption :class="tableCaption">Plugins Library:
         <span class="font-extrabold">{{ props.data.length}}</span>
       </TableCaption>
       <TableHeader class="h-10">
-        <TableRow class="bg-secondary hover:bg-secondary **:text-md! *: **:lg:text-lg! **:xl:text-xl! **:2xl:text-3xl!">
+        <TableRow :class="tableHeaders">
           <SortableHead keyName="name" label="Name" :sort-key="sortKey" class="pl-4 w-21/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
           <SortableHead keyName="creator" label="Creator" :sort-key="sortKey" class=" w-15/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
           <SortableHead keyName="tags" label="Tags" :sort-key="sortKey" class=" w-20/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>

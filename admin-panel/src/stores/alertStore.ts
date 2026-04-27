@@ -16,36 +16,27 @@ export const useAlertStore = defineStore('useAlertStore', () => {
   const deleteCurrentAlert  = (index: number) => {
     currentAlerts.value = currentAlerts.value.filter(a => a.id !== index)
   }
-  const getCurrentAlertsRequest = async () => {
+  const getCurrentAlertsRequest = async (interval?: number) => {
     try {
       const response = await axios.get<OpenAlert[]>(`${api_url}/alerts/active`)
-      if(response.status === 200 && response.data.length) {
+      if(response.status === 200) {
         currentAlerts.value = response.data
         currentAlertsIds.value = response.data.map(a => a.id)
-        toast.success('Alerts from db loaded!')
+      }
+      else {
+        toast.error('Error while fetching current alerts')
       }
     }
     catch {
-      currentAlerts.value = dashboardData
-      toast.error('Mocked alerts loaded!')
+      toast.error('Error getting current alerts')
+    }
+    if(interval) {
+      setTimeout(() => {
+        getCurrentAlertsRequest(interval)
+      }, interval)
     }
   }
 
-  const checkCurrentAlertsRequest = async (interval?: number) => {
-      if (!currentAlerts.value.length && !currentAlertsIds.value.length) {
-        await getCurrentAlertsRequest()
-      }
-      else {
-        const diff = await axios.post(`${api_url}/alerts/check-active`, {
-          body: currentAlertsIds.value
-        })
-        if (diff.status === 204)
-          return
-        else {
-          await getCurrentAlertsRequest()
-        }
-      }
-  }
 
   const ackAlertRequest = async (alertId: number) => {
     try {
@@ -71,7 +62,7 @@ export const useAlertStore = defineStore('useAlertStore', () => {
     addCurrentAlert,
     deleteCurrentAlert,
     getCurrentAlertsRequest,
-    checkCurrentAlertsRequest
+    ackAlertRequest,
   }
 })
 

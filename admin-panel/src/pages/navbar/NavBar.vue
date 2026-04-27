@@ -30,6 +30,10 @@ import {Avatar, AvatarFallback} from "@/components/ui/avatar";
 import {usersData} from "@/data/usersData.ts";
 import {sidebarData} from "@/data/sidebarData.ts";
 import NavUser from "@/pages/navbar/NavUser.vue";
+import {useRoute} from "vue-router";
+
+const route = useRoute()
+
 
 const navItems = [
   {
@@ -69,15 +73,21 @@ const navItems = [
       <SidebarGroup>
         <SidebarGroupContent>
           <SidebarMenu>
-            <SidebarMenuItem v-for="item in navItems" :key="item.label" :value="item.label">
+            <SidebarMenuItem  v-for="item in navItems" :key="item.label" :value="item.label">
               <SidebarMenuButton as-child>
-                <SidebarGroupLabel class="pl-1 flex items-center text-center" >
+                <SidebarGroupLabel class="hover:bg-transparent pl-1 flex items-center text-center" >
                   {{ item.label }}
                 </SidebarGroupLabel>
-                <div class="ml-3 border-l-3 ">
-                  <RouterLink class="rounded-md xl:text-lg" v-for="link in item.links" :key="link.to" :to="link.to">
-                    <div class="flex items-center gap-x-2 p-2 ml-1 rounded-lg hover:bg-input "><component class="size-4  xl:size-6" :is="link.icon"/> {{link.label}} </div></RouterLink>
-                </div>
+
+                  <RouterLink
+                    :class="{'bg-badge/50' : route.name === link.to}"
+                    class="flex xl:text-lg ml-3 border-l-3 w-full hover:bg-input rounded-[0_1rem_1rem_0]"
+                    v-for="link in item.links" :key="link.to" :to="link.to">
+                    <div class="flex items-center gap-x-2 p-2 ml-1 ">
+                      <component class="size-4  xl:size-6" :is="link.icon"/> {{link.label}}
+                    </div>
+                  </RouterLink>
+
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>

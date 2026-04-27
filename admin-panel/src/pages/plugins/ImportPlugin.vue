@@ -24,6 +24,8 @@ import {ArrowLeftIcon} from "lucide-vue-next";
 import type {fileType} from "@/types/types.ts";
 import { Label } from "@/components/ui/label"
 import {Progress} from "@/components/ui/progress";
+import {topButtonGroup, topH1} from "@/assets/cssFunctions.ts";
+import GoBackButton from "@/helpers/GoBackButton.vue";
 
 const idCounter = ref(0)
 const files = ref<fileType[]>()
@@ -107,16 +109,13 @@ else {
 <template>
   <div>
     <div class="relative">
-      <h1 class="text-center my-[2vh] text-xl xl:text-2xl 2xl:text-4xl border-b pb-[2vh]">Logs Dashboard</h1>
-      <div class="absolute top-0 left-4 flex">
+      <h1 :class="topH1">Import plugin</h1>
 
-  <ButtonGroup >
+  <ButtonGroup :class="topButtonGroup">
     <ButtonGroup>
-      <Button variant="outline" size="icon" aria-label="Go Back">
-        <ArrowLeftIcon />
-      </Button>
+      <GoBackButton/>
     </ButtonGroup>
-    <ButtonGroup>
+    <ButtonGroup >
       <Button
         @click="toggleAllChecked"
         variant="orange_outline"
@@ -138,7 +137,6 @@ else {
       </Button>
     </ButtonGroup>
   </ButtonGroup>
-    </div>
   </div>
 
   <Empty class=" ">

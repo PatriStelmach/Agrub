@@ -30,6 +30,13 @@ import {
 import {computed, ref, watch} from "vue";
 import {useSort} from "@/composables/sorting.ts";
 import SortableHead from "@/helpers/SortableHead.vue";
+import {
+  tableCaption,
+  dataTable,
+  tableHeaders,
+  topH1,
+  topButtonGroup
+} from "@/assets/cssFunctions.ts";
 import {useWrapping} from "@/composables/unwrapping.ts";
 import {Button} from "@/components/ui/button";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
@@ -51,6 +58,7 @@ import {useMyPluginStore} from "@/stores/myPluginStore.ts";
 import PluginDetailsDialog from "@/pages/plugins/PluginDetailsDialog.vue";
 import {useBadgeFilter} from "@/composables/useBadgeFilter.ts";
 import {inputText} from "@/assets/cssFunctions.ts";
+import GoBackButton from "@/helpers/GoBackButton.vue";
 
 const props = defineProps<{
   data: MyPlugin[];
@@ -169,15 +177,12 @@ const savePlugin = async () => {
 
 <template>
 <div class="relative">
-  <h1 class="text-center my-[2vh] text-xl xl:text-2xl 2xl:text-4xl border-b pb-[2vh]">Your plugins</h1>
-  <div class="flex absolute top-0 left-4">
-    <ButtonGroup>
+  <h1 :class="topH1">Your plugins</h1>
+    <ButtonGroup :class="topButtonGroup">
       <ButtonGroup class=" flex">
-        <Button variant="outline" size="icon" aria-label="Go Back">
-          <ArrowLeftIcon />
-        </Button>
+        <GoBackButton/>
       </ButtonGroup>
-      <ButtonGroup>
+      <ButtonGroup >
         <Button
           :disabled="blockedEdit"
           @click="unwrap(checkedPlugins[0]!); getDetails(checkedPlugins[0]!)"
@@ -189,7 +194,7 @@ const savePlugin = async () => {
           @click="changeStatus"
           :disabled="blockedRemoveAndChange"
           variant="orange_outline">
-          Change Status
+          On/Off
           <IconStatusChange/>
         </Button>
         <Button
@@ -199,7 +204,7 @@ const savePlugin = async () => {
           Delete
           <IconTrash/>
         </Button>
-        <InputGroup class=" w-[14vw] border-l-2! " >
+        <InputGroup class=" border-l-2! " >
           <InputGroupInput
             v-model="searchFilter"
             type="search"
@@ -210,17 +215,15 @@ const savePlugin = async () => {
         </InputGroup>
       </ButtonGroup>
     </ButtonGroup>
-  </div>
 </div>
 
-
   <div class="  mt-[2vh] mx-[1%] w-98/100 relative overflow-auto max-h-[77vh]   ">
-    <Table id="my-plugin-table" class="w-99/100  text-md lg:text-lg xl:text-xl 2xl:text-2xl  mx-auto  table-fixed border-collapse border-spacing-0">
-      <TableCaption class="bg-secondary border-b border-t text-foreground sticky z-9 bottom-0 py-2 text-md lg:text-lg xl:text-xl 2xl:text:3xl "> Your plugins:
+    <Table id="my-plugin-table" :class="dataTable">
+      <TableCaption :class="tableCaption">My Plugins:
         <span class="font-extrabold">{{ sortedData.length}}</span>
       </TableCaption>
-      <TableHeader class="h-10  ">
-      <TableRow class="bg-secondary hover:bg-secondary **:text-md! **:lg:text-xl! **:xl:text-2xl! **:2xl:text-4xl! ">
+      <TableHeader class="h-10">
+        <TableRow :class="tableHeaders">
         <TableHead class="w-3/100 px-4 ">
           <input
             :disabled="blockedCheckbox"

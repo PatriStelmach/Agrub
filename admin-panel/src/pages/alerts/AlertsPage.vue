@@ -41,6 +41,15 @@ import {generateRandomString} from "ts-randomstring/lib";
 import {useMouse} from "@vueuse/core";
 import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import {Label} from "@/components/ui/label";
+import {
+  tableCaption,
+  dataTable,
+  tableHeaders,
+  tableDiv,
+  topH1,
+  topDiv, topButtonGroup
+} from "@/assets/cssFunctions.ts";
+import GoBackButton from "@/helpers/GoBackButton.vue";
 
 
 const alertStore = useAlertStore();
@@ -100,18 +109,12 @@ const mouseLeave = () => {
 
 <template>
   <div>
-    <div class="relative max-h-[10vh] items-center align-middle">
-      <h1 class="text-center my-[2vh] text-xl xl:text-2xl 2xl:text-4xl border-b pb-[2vh]">Alerts dashboard</h1>
+    <div :class="topDiv">
+      <h1 :class="topH1">Alerts dashboard</h1>
 
-      <div class="absolute left-4 top-0 flex  ">
-        <ButtonGroup>
+        <ButtonGroup :class="topButtonGroup">
 
-            <Button variant="outline" size="icon" aria-label="Go Back">
-              <ArrowLeftIcon />
-            </Button>
-          <Button
-            @click="randomAlert"
-            variant="cyan_outline">Add new mocked</Button>
+            <GoBackButton/>
             <InputGroup >
               <InputGroupInput
                 v-model="searchFilter"
@@ -123,9 +126,8 @@ const mouseLeave = () => {
             </InputGroup>
 
         </ButtonGroup>
-      </div>
     </div>
-    <div class=" mt-[2vh] mx-[1%] w-98/100 relative overflow-auto max-h-[77vh]   ">
+    <div :class="tableDiv">
       <Card
         v-if="isAlertHovered"
         v-model="hoveredData"
@@ -134,12 +136,12 @@ const mouseLeave = () => {
         <CardHeader><Label class=" font-extrabold ">Subject: </Label> {{ hoveredData?.subject }}</CardHeader>
         <CardContent class="max-w-full wrap-break-word"><Label class="pb-2 grid font-extrabold">Message:</Label> {{ hoveredData?.message}}</CardContent>
       </Card>
-      <Table id="alert-table" class="w-99/100 text-md lg:text-lg xl:text-xl 2xl:text:3xl  mx-auto  table-fixed">
-        <TableCaption class="bg-secondary border-b border-t text-foreground sticky z-9 bottom-0 py-2 text-md lg:text-lg xl:text-xl 2xl:text:3xl">Active Alerts:
+      <Table id="alert-table" :class="dataTable">
+        <TableCaption :class="tableCaption">Active Alerts:
           <span class="font-extrabold">{{ sortedData.length}}</span>
         </TableCaption>
         <TableHeader class="h-10">
-          <TableRow class="bg-secondary hover:bg-secondary **:text-md! *: **:lg:text-xl! **:xl:text-2xl! **:2xl:text-4xl!">
+          <TableRow :class="tableHeaders">
             <SortableHead keyName="subject" label="Alert" :sort-key="sortKey" class="w-15/100 pl-4" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
             <SortableHead keyName="severity" label="Severity" :sort-key="sortKey" class="w-8/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
             <SortableHead keyName="message" label="Message" :sort-key="sortKey" class="w-38/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
@@ -159,7 +161,7 @@ const mouseLeave = () => {
               <TableCell
 
               ><div
-                :class="` bg-linear-to-l w-2/3 text-center font-bold text-xl
+                :class="` bg-linear-to-l w-full h-full text-md lg:text-lg xl:text-xl text-center font-bold
                 from-severity-${alert.severity}/50 via-severity-${alert.severity} to-severity-${alert.severity}/50`">
                 {{alert.severity}}
               </div>

@@ -5,8 +5,9 @@ import {toast} from "vue-sonner";
 import {IconAlertTriangle, IconCircleDashedCheck, IconRefresh} from "@tabler/icons-vue";
 import {useAlertStore} from "@/stores/alertStore.ts";
 import {useNotificationStore} from "@/stores/notificationStore.ts";
+import {defineStore} from "pinia";
 
-export function useSSEstore()   {
+export const useSSEstore = defineStore('SSE', () =>   {
   const alertStore = useAlertStore()
   const notificationStore = useNotificationStore()
   const { status, data, error, close } = useEventSource(
@@ -24,11 +25,6 @@ export function useSSEstore()   {
       }
     })
 
-
-  watch(status, (newStatus) => {
-    toast.info(`SSE STATUS: ${newStatus}`);
-    console.log(newStatus)
-  })
 
   watch(data, (nVal) => {
     if (!nVal)
@@ -63,4 +59,4 @@ export function useSSEstore()   {
       }
     }
   })
-}
+})

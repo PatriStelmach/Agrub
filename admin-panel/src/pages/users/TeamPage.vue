@@ -33,7 +33,8 @@ import {Label} from "@/components/ui/label";
 import {Select} from "@/components/ui/select";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import {useBadgeFilter} from "@/composables/useBadgeFilter.ts";
-import {inputText, nameLabel} from "@/assets/cssFunctions.ts";
+import {inputText, nameLabel, topButtonGroup, topH1} from "@/assets/cssFunctions.ts";
+import GoBackButton from "@/helpers/GoBackButton.vue";
 
 // const { updatePage, filteredData, tableData, updateData, updateSearchData, currentPage } = use
 const users = computed(() => {
@@ -60,13 +61,10 @@ const { badgeSearch, availableBadges, addBadge, badgeListOpen, matchedBadges, ex
 <div >
 
   <div class="relative ">
-    <h1 class="text-center my-[2vh] text-xl xl:text-2xl 2xl:text-4xl border-b pb-[2vh]">Team</h1>
-    <div class="flex absolute top-0 left-4">
-      <ButtonGroup>
+    <h1 :class="topH1">Team</h1>
+      <ButtonGroup :class="topButtonGroup">
         <ButtonGroup class="flex">
-          <Button variant="outline" size="icon" aria-label="Go Back">
-            <ArrowLeftIcon />
-          </Button>
+          <GoBackButton/>
         </ButtonGroup>
         <ButtonGroup>
           <Button
@@ -86,7 +84,6 @@ const { badgeSearch, availableBadges, addBadge, badgeListOpen, matchedBadges, ex
           </InputGroup>
         </ButtonGroup>
       </ButtonGroup>
-    </div>
   </div>
     <TransitionGroup
       class=" px-6 py-2 pr-3 grid sm:grid-cols-2 md:grid-cols-4  xl:grid-cols-5 gap-6 max-h-[80vh] overflow-y-auto"
