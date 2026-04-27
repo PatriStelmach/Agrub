@@ -4,9 +4,11 @@ import {h, watch} from "vue";
 import {toast} from "vue-sonner";
 import {IconAlertTriangle, IconCircleDashedCheck, IconRefresh} from "@tabler/icons-vue";
 import {useAlertStore} from "@/stores/alertStore.ts";
+import {useNotificationStore} from "@/stores/notificationStore.ts";
 
 export function useSSEstore()   {
   const alertStore = useAlertStore()
+  const notificationStore = useNotificationStore()
   const { status, data, error, close } = useEventSource(
     `${api_url}/alerts/stream`,
     [],
@@ -21,13 +23,11 @@ export function useSSEstore()   {
 
       }
     })
-  setTimeout(() =>{
 
-    toast.info(`SSE STATUS: ${status.value}`)
-  }, 1000)
 
   watch(status, (newStatus) => {
     toast.info(`SSE STATUS: ${newStatus}`);
+    console.log(newStatus)
   })
 
   watch(data, (nVal) => {
@@ -35,12 +35,31 @@ export function useSSEstore()   {
       return
     else {
       if (nVal.status === 'loading') {
-        toast.info(nVal.msg, { icon: h(IconRefresh, { class:'animate-spin '})})}
-      if (nVal.status === 'error')
-        toast.error(nVal.msg, { icon: h(IconAlertTriangle, { class:'animate-ping duration-100'})})
-      if (nVal.status === 'success'){
-        toast.success(nVal.msg, { icon: h(IconCircleDashedCheck, {class:'animate-pulse duration-100'})})
-          alertStore.addCurrentAlert(nVal.msg)
+        toast.info(nVal.message, { icon: h(IconRefresh, { class:'animate-spin '})})
+        console.log(nVal.message)
+      }
+      if (nVal.status === 'error') {
+        toast.error(nVal.message, { icon: h(IconAlertTriangle, { class:'animate-ping duration-100'})})
+        console.log(nVal.message)
+      }
+      if (nVal.status === 'success') {
+        switch (nVal.eventType) {
+          case 'NEW_ALERT': {
+            toast.error(nVal.message.subject, { icon: h(IconAlertTriangle, {class:'animate-pulse duration-100'})})
+            alertStore.addCurrentAlert(nVal.message)
+            notificationStore.addNotification()
+            break;
+          }
+          case 'ALERT_RESOLVED': {
+            toast.success(`Resolved: ${nVal.message.subject}`, { icon: IconCircleDashedCheck})
+            alertStore.deleteCurrentAlert(nVal.message.id)
+            notificationStore.removeNotification()
+            break;
+          }
+
+
+        }
+
       }
     }
   })

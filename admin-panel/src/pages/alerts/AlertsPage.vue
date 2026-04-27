@@ -1,5 +1,5 @@
 <script setup lang="ts" >
-import {type AlertObject} from "@/types/types.ts";
+import {type OpenAlert} from "@/types/types.ts";
 import {dashboardData} from "@/data/dashboardData.ts"
 import MyPagination from "@/helpers/MyPagination.vue";
 import {
@@ -40,6 +40,7 @@ import {computed, onMounted, ref} from "vue";
 import {generateRandomString} from "ts-randomstring/lib";
 import {useMouse} from "@vueuse/core";
 import {Card, CardContent, CardHeader} from "@/components/ui/card";
+import {Label} from "@/components/ui/label";
 
 
 const alertStore = useAlertStore();
@@ -64,9 +65,9 @@ const descriptionBox = computed(() => {
 })
 
 const { updatePage, filteredData, tableData, updateData, updateSearchData, currentPage, searchFilter } =
-  useSearchFilter<AlertObject>(() => alertStore.getAllCurrentAlerts,(item) => item.subject)
+  useSearchFilter<OpenAlert>(() => alertStore.getAllCurrentAlerts,(item) => item.subject)
 const { x, y } = useMouse()
-const { sortedData, sortKey, sortOrder, toggleSort } = useSort<AlertObject>(() => tableData.value as AlertObject[], 'createdAt')
+const { sortedData, sortKey, sortOrder, toggleSort } = useSort<OpenAlert>(() => tableData.value as OpenAlert[], 'createdAt')
 
 const randomString = (length: number): string => {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
@@ -98,7 +99,7 @@ const mouseLeave = () => {
 </script>
 
 <template>
-  <div >
+  <div>
     <div class="relative max-h-[10vh] items-center align-middle">
       <h1 class="text-center my-[2vh] text-xl xl:text-2xl 2xl:text-4xl border-b pb-[2vh]">Alerts dashboard</h1>
 
@@ -134,8 +135,8 @@ const mouseLeave = () => {
         <CardContent class="max-w-full wrap-break-word"><Label class="pb-2 grid font-extrabold">Message:</Label> {{ hoveredData?.message}}</CardContent>
       </Card>
       <Table id="alert-table" class="w-99/100 text-md lg:text-lg xl:text-xl 2xl:text:3xl  mx-auto  table-fixed">
-        <TableCaption class="bg-secondary border-b border-t text-foreground sticky z-9 bottom-0 py-2 text-md lg:text-lg xl:text-xl 2xl:text:3xl">Current Alerts:
-          <span class="font-extrabold">{{ dashboardData.length}}</span>
+        <TableCaption class="bg-secondary border-b border-t text-foreground sticky z-9 bottom-0 py-2 text-md lg:text-lg xl:text-xl 2xl:text:3xl">Active Alerts:
+          <span class="font-extrabold">{{ sortedData.length}}</span>
         </TableCaption>
         <TableHeader class="h-10">
           <TableRow class="bg-secondary hover:bg-secondary **:text-md! *: **:lg:text-xl! **:xl:text-2xl! **:2xl:text-4xl!">
@@ -154,7 +155,7 @@ const mouseLeave = () => {
               v-for="alert in sortedData"
               :key="alert.id"
             >
-              <TableCell class="pl-4  whitespace-nowrap">{{alert.subject}}</TableCell>
+              <TableCell class="pl-4  whitespace-break-spaces">{{alert.subject}}</TableCell>
               <TableCell
 
               ><div

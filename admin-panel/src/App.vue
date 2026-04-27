@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import TopRightButtons from "@/pages/globals/topRightButtons.vue";
+import TopRightButtons from "@/pages/globals/TopRightButtons.vue";
 import NavBar from "@/pages/navbar/NavBar.vue";
 import {Toaster} from "vue-sonner";
 import {useAlertStore} from "@/stores/alertStore.ts";

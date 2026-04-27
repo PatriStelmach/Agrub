@@ -1,6 +1,6 @@
-import type {AlertObject} from "@/types/types.ts";
+import type {OpenAlert} from "@/types/types.ts";
 
-export const dashboardData: AlertObject[] = [
+export const dashboardData: OpenAlert[] = [
   {
     id: 1,
     subject: "CPU usage over 80%",

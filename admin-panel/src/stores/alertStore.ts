@@ -1,36 +1,28 @@
 import {defineStore} from "pinia";
 import {computed, h, ref, watch} from "vue";
-import {type AlertObject, api_url} from "@/types/types.ts";
+import {type OpenAlert, api_url} from "@/types/types.ts";
 import axios from "axios";
 import {toast} from "vue-sonner";
 import {dashboardData} from "@/data/dashboardData.ts";
 
 export const useAlertStore = defineStore('useAlertStore', () => {
-  const currentAlerts = ref<AlertObject[]>([])
+  const currentAlerts = ref<OpenAlert[]>([])
   const currentAlertsIds = ref<number[]>([])
 
-  const getAllCurrentAlerts = computed(() =>
-    currentAlerts.value.filter(a => a.status !== "Done"))
+  const getAllCurrentAlerts = computed(() =>currentAlerts.value)
 
-  const setCurrentAlerts = (newAlerts: AlertObject[]) => {
-    currentAlerts.value = newAlerts;
+  const setCurrentAlerts = (newAlerts: OpenAlert[]) => { currentAlerts.value = newAlerts }
+  const addCurrentAlert  = (newAlert: OpenAlert) => { currentAlerts.value.push(newAlert) }
+  const deleteCurrentAlert  = (index: number) => {
+    currentAlerts.value = currentAlerts.value.filter(a => a.id !== index)
   }
-
-  const addCurrentAlert  = (newAlert: AlertObject) => {
-    currentAlerts.value.push(newAlert);
-  }
-
   const getCurrentAlertsRequest = async () => {
     try {
-      const response = await axios.get<AlertObject[]>(`${api_url}/alerts/active`)
+      const response = await axios.get<OpenAlert[]>(`${api_url}/alerts/active`)
       if(response.status === 200 && response.data.length) {
         currentAlerts.value = response.data
         currentAlertsIds.value = response.data.map(a => a.id)
         toast.success('Alerts from db loaded!')
-      }
-      else {
-        currentAlerts.value = dashboardData
-        toast.error('Mocked alerts loaded!')
       }
     }
     catch {
@@ -77,6 +69,7 @@ export const useAlertStore = defineStore('useAlertStore', () => {
     getAllCurrentAlerts,
     setCurrentAlerts,
     addCurrentAlert,
+    deleteCurrentAlert,
     getCurrentAlertsRequest,
     checkCurrentAlertsRequest
   }
