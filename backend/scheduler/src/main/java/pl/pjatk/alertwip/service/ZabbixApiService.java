@@ -43,7 +43,7 @@ public class ZabbixApiService {
                     .uri(apiUrl)
                     .body(request)
                     .retrieve()
-                    .body(Map.class); // Automatyczne mapowanie JSONa
+                    .body(Map.class);
 
             if (response != null && response.containsKey("result")) {
                 return (List<Map<String, Object>>) response.get("result");
