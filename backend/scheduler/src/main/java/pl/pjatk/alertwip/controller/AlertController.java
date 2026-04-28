@@ -49,7 +49,7 @@ public class AlertController {
         return sseService.subscribe(groups);
     }
 
-    @PostMapping("/{id}/action")
+    @PostMapping("/{id}/ack")
     public ResponseEntity<ProblemAction> performAction(
             @PathVariable Long id,
             @RequestBody ActionRequestDTO request) {
