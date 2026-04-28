@@ -22,8 +22,8 @@ public class SettingsSeeder implements CommandLineRunner {
         // TODO: zmienić to potem z tego mocka
         Map<String, String> defaultSettings = Map.of(
                 "zabbix_enabled", "true",
-                "zabbix_url", "http://localhost:10000/api/mockk/zabbix",
-                "zabbix_api_token", ""
+                "zabbix_url", "http://localhost:10000/api/mock/zabbix",
+                "zabbix_api_token", "asdasd"
                 //  Tu dodawać nowe ustawienia
                 // "email_notifications_enabled", "false",
                 // "system_language", "PL"

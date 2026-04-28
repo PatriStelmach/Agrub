@@ -20,21 +20,22 @@ public class ZabbixSyncService {
     private final GlobalProblemRepository problemRepository;
     private final SseNotifService sseService;
     private final SystemSettingService settingService;
-    private final AlertRoutingService routingService; // NOWOŚĆ: Nasz Router Regexów
-
-    // Klucz dla naszego wewnętrznego alertu o awarii komunikacji z Zabbixem
+    private final AlertRoutingService routingService;
+    private final ActiveAlertCache alertCache;
     private static final String API_ERROR_UNIQUE_KEY = "[SYSTEM] Zabbix API Offline";
 
     public ZabbixSyncService(ZabbixApiService zabbixApiService,
                              GlobalProblemRepository problemRepository,
                              SseNotifService sseService,
                              SystemSettingService settingService,
-                             AlertRoutingService routingService) {
+                             AlertRoutingService routingService,
+                             ActiveAlertCache alertCache) {
         this.zabbixApiService = zabbixApiService;
         this.problemRepository = problemRepository;
         this.sseService = sseService;
         this.settingService = settingService;
         this.routingService = routingService;
+        this.alertCache = alertCache;
     }
 
     @Scheduled(fixedRate = 60000)
@@ -105,7 +106,7 @@ public class ZabbixSyncService {
 
                 routingService.processVisibility(newProblem);
                 GlobalProblem saved = problemRepository.save(newProblem);
-
+                alertCache.updateAlert(saved);
                 sseService.sendAlert("NEW_ALERT", saved);
             }
         }
@@ -121,6 +122,7 @@ public class ZabbixSyncService {
                 dbProblem.setStatus("Done");
                 dbProblem.setClosedAt(LocalDateTime.now());
                 problemRepository.save(dbProblem);
+                alertCache.removeAlert(dbProblem.getId());
                 sseService.sendAlert("ALERT_RESOLVED", dbProblem);
             }
         }
@@ -147,10 +149,8 @@ public class ZabbixSyncService {
             problem.setStatus("Sent");
             problem.setSeverity(5); // Zakładamy najwyższy priorytet dla błędu całego systemu
             problem.setCreatedAt(LocalDateTime.now());
-
-            // --- MAGIA SILNIKA REGUŁ DLA ALERTU SYSTEMOWEGO ---
             routingService.processVisibility(problem);
-
+            alertCache.updateAlert(problem);
             GlobalProblem saved = problemRepository.save(problem);
             sseService.sendAlert("NEW_ALERT", saved);
         }
@@ -165,7 +165,7 @@ public class ZabbixSyncService {
             problem.setStatus("Done");
             problem.setClosedAt(LocalDateTime.now());
             problemRepository.save(problem);
-
+            alertCache.removeAlert(problem.getId());
             sseService.sendAlert("ALERT_RESOLVED", problem);
             System.out.println("[ZABBIX SYNC] Odzyskano połączenie z Zabbixem. Alert usunięty.");
         });

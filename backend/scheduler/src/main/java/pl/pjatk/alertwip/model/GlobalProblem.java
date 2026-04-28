@@ -30,6 +30,8 @@ public class GlobalProblem {
     private boolean requiresNotification = false; // Flaga dla dźwięku/popupu
     private LocalDateTime createdAt;
     private LocalDateTime closedAt;
+    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<ProblemAction> actions = new ArrayList<>();
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "alert_technician_groups", joinColumns = @JoinColumn(name = "alert_id"))
     @Column(name = "group_name")
@@ -40,6 +42,14 @@ public class GlobalProblem {
     public String getSubject() { return subject; }
     public void setSubject(String subject) { this.subject = subject; }
     public String getMessage() { return message; }
+
+    public List<ProblemAction> getActions() {
+        return actions;
+    }
+
+    public void setActions(List<ProblemAction> actions) {
+        this.actions = actions;
+    }
 
     public boolean isAcknowledged() {
         return isAcknowledged;

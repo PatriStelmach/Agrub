@@ -3,7 +3,7 @@ package pl.pjatk.alertwip.service;
 import org.springframework.stereotype.Service;
 import pl.pjatk.alertwip.model.*;
 import pl.pjatk.alertwip.dto.ActionRequestDTO;
-import pl.pjatk.alertwip.repository.GlobalProblemRepository; // Zmień na nazwę swojego repozytorium alertów
+import pl.pjatk.alertwip.repository.GlobalProblemRepository;
 import pl.pjatk.alertwip.repository.ProblemActionRepository;
 import pl.pjatk.alertwip.service.adapter.AlertSourceAdapter;
 
@@ -14,17 +14,20 @@ public class AlertActionService {
 
     private final GlobalProblemRepository problemRepository;
     private final ProblemActionRepository actionRepository;
-    private final List<AlertSourceAdapter> adapters; // Spring automatycznie wstrzyknie tu ZabbixAdapter i DummyAdapter!
+    private final List<AlertSourceAdapter> adapters;
     private final SseNotifService sseService;
+    private final ActiveAlertCache alertCache;
 
     public AlertActionService(GlobalProblemRepository problemRepository,
                               ProblemActionRepository actionRepository,
                               List<AlertSourceAdapter> adapters,
-                              SseNotifService sseService) {
+                              SseNotifService sseService,
+                              ActiveAlertCache alertCache) {
         this.problemRepository = problemRepository;
         this.actionRepository = actionRepository;
         this.adapters = adapters;
         this.sseService = sseService;
+        this.alertCache = alertCache;
     }
 
     public ProblemAction processAction(Long problemId, ActionRequestDTO request) {
@@ -32,11 +35,10 @@ public class AlertActionService {
         GlobalProblem problem = problemRepository.findById(problemId)
                 .orElseThrow(() -> new RuntimeException("Nie znaleziono problemu o ID: " + problemId));
 
-        // 2. Utwórz wpis w historii (ProblemAction)
+        // 2. Utwórz wpis w historii
         ProblemAction action = new ProblemAction();
         action.setProblem(problem);
 
-        // ZMIENIONE: Usunięto przedrostki "get"
         action.setAuthor(request.author());
         action.setActionType(request.actionType());
         action.setMessage(request.message());
@@ -48,16 +50,19 @@ public class AlertActionService {
             problem.setAcknowledged(true);
         } else if (request.actionType() == ActionType.UNACK) {
             problem.setAcknowledged(false);
+        } else if (request.actionType() == ActionType.SEVERITY_CHANGE && request.newSeverity() != null) {
+            problem.setSeverity(request.newSeverity());
         }
-
-        // Zapisujemy najpierw lokalnie
         problemRepository.save(problem);
         ProblemAction savedAction = actionRepository.save(action);
+        problem.getActions().add(savedAction);
+        alertCache.updateAlert(problem);
 
-        // 3. Natychmiastowe powiadomienie Vue.js przez SSE (żeby reszta zespołu widziała zmianę)
+        // 3. Natychmiastowe powiadomienie
         sseService.sendAlert("ALERT_UPDATED", problem);
+        sseService.sendAlert("NEW_ACTION", savedAction);
 
-        // 4. Wyszukanie odpowiedniego adaptera (Zabbix, Nagios, Dummy) i wysłanie do źródła
+        // 4. Wyszukanie odpowiedniego adaptera
         AlertSourceAdapter matchedAdapter = adapters.stream()
                 .filter(a -> a.supports(problem.getOriginType()))
                 .findFirst()

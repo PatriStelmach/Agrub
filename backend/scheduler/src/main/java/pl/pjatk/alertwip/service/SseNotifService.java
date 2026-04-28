@@ -4,6 +4,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import pl.pjatk.alertwip.model.GlobalProblem;
+import pl.pjatk.alertwip.model.ProblemAction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +60,7 @@ public class SseNotifService {
 
                     emitter.send(event);
 
-                    // Opcjonalnie logujemy sukces w konsoli IntelliJ
+                    // Opcjonalnie logujemy sukces w konsoli
                     System.out.println("[SSE] Wysłano " + status + " dla alertu: " + alert.getUniqueKey());
 
                 } catch (Exception e) {
@@ -70,6 +71,38 @@ public class SseNotifService {
         });
 
         // Sprzątamy połączenia, które rzuciły błędem
+        deadEmitters.forEach(userSubscriptions::remove);
+    }
+
+    public void sendAlert(String status, ProblemAction action) {
+        GlobalProblem alert = action.getProblem(); // Wyciągamy alert z akcji, żeby sprawdzić grupy!
+        List<SseEmitter> deadEmitters = new ArrayList<>();
+
+        userSubscriptions.forEach((emitter, userGroups) -> {
+            boolean hasAccess = alert.getTechnicianGroups().stream()
+                    .anyMatch(userGroups::contains);
+
+            if (hasAccess) {
+                try {
+                    SseEmitter.SseEventBuilder event = SseEmitter.event()
+                            .id(String.valueOf(action.getId()))
+                            .name("message")
+                            .data(Map.of(
+                                    "status", "success",
+                                    "eventType", status,       // np. "NEW_ACTION"
+                                    "notification", false,     // Nie chcemy głośnego dźwięku na każdy komentarz
+                                    "message", action          // Wysyłamy sam obiekt akcji
+                            ), MediaType.APPLICATION_JSON);
+
+                    emitter.send(event);
+                    System.out.println("[SSE] Wysłano nową akcję (" + status + ") do alertu: " + alert.getUniqueKey());
+
+                } catch (Exception e) {
+                    deadEmitters.add(emitter);
+                }
+            }
+        });
+
         deadEmitters.forEach(userSubscriptions::remove);
     }
 }

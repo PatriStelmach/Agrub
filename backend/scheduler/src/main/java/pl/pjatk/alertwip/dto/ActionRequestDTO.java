@@ -6,6 +6,7 @@ public record ActionRequestDTO (
 
     String author,
     ActionType actionType,
-    String message
+    String message,
+    Integer newSeverity
 
 ) {}

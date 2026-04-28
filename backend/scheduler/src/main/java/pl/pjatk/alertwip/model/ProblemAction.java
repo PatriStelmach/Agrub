@@ -1,5 +1,6 @@
 package pl.pjatk.alertwip.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -13,6 +14,7 @@ public class ProblemAction {
 
     @ManyToOne
     @JoinColumn(name = "problem_id", nullable = false)
+    @JsonIgnore
     private GlobalProblem problem;
 
     private String author; // Kto wykonał akcję
