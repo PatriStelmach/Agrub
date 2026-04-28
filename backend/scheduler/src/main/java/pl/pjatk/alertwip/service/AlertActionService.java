@@ -35,43 +35,56 @@ public class AlertActionService {
         GlobalProblem problem = problemRepository.findById(problemId)
                 .orElseThrow(() -> new RuntimeException("Nie znaleziono problemu o ID: " + problemId));
 
-        // 2. Utwórz wpis w historii
+        boolean stateChanged = false;
+        ActionType inferredActionType = ActionType.COMMENT; // Domyślny typ akcji dla historii
+
+        // 2. Dynamiczna aktualizacja stanu alertu na podstawie przesłanych danych
+        if (request.acknowledge() != null && problem.isAcknowledged() != request.acknowledge()) {
+            problem.setAcknowledged(request.acknowledge());
+            stateChanged = true;
+            inferredActionType = request.acknowledge() ? ActionType.ACK : ActionType.UNACK;
+        }
+
+        if (request.newSeverity() != null && !request.newSeverity().equals(problem.getSeverity())) {
+            problem.setSeverity(request.newSeverity());
+            stateChanged = true;
+            inferredActionType = ActionType.SEVERITY_CHANGE;
+        }
+
+        // Jeśli zmienił się stan głównego alertu, nadpisujemy go w bazie i powiadamiamy RAM/SSE
+        if (stateChanged) {
+            problem = problemRepository.save(problem);
+            alertCache.updateAlert(problem);
+            sseService.sendAlert("ALERT_UPDATE", problem);
+        }
+
+        // 3. Utworzenie wpisu w historii operacji (Audyt)
         ProblemAction action = new ProblemAction();
         action.setProblem(problem);
-
-        action.setAuthor(request.author());
-        action.setActionType(request.actionType());
+        action.setAuthor(request.author() != null && !request.author().isBlank() ? request.author() : "System");
         action.setMessage(request.message());
-
+        action.setActionType(inferredActionType); // Zapisujemy wywnioskowany typ
         action.setSyncStatus(SyncStatus.PENDING);
 
-        // Aktualizacja stanu samego alertu
-        if (request.actionType() == ActionType.ACK) {
-            problem.setAcknowledged(true);
-        } else if (request.actionType() == ActionType.UNACK) {
-            problem.setAcknowledged(false);
-        } else if (request.actionType() == ActionType.SEVERITY_CHANGE && request.newSeverity() != null) {
-            problem.setSeverity(request.newSeverity());
-        }
-        problemRepository.save(problem);
         ProblemAction savedAction = actionRepository.save(action);
         problem.getActions().add(savedAction);
-        alertCache.updateAlert(problem);
 
-        // 3. Natychmiastowe powiadomienie
-        sseService.sendAlert("ALERT_UPDATED", problem);
+        // Zawsze powiadamiamy frontend o nowym komentarzu/akcji w historii
         sseService.sendAlert("NEW_ACTION", savedAction);
 
-        // 4. Wyszukanie odpowiedniego adaptera
+        // 4. Delegacja do odpowiedniego adaptera (Zabbix, Wazuh)
+        String originType = problem.getOriginType();
+
         AlertSourceAdapter matchedAdapter = adapters.stream()
-                .filter(a -> a.supports(problem.getOriginType()))
+                .filter(a -> a.supports(originType))
                 .findFirst()
                 .orElse(null);
 
         if (matchedAdapter != null) {
-            boolean success = matchedAdapter.sendAction(savedAction, problem);
+            // Przekazujemy oryginalne DTO (request) oraz stan alertu, dokładnie tak jak wymaga zaktualizowany interfejs
+            boolean success = matchedAdapter.sendAction(request, problem);
             savedAction.setSyncStatus(success ? SyncStatus.SYNCED : SyncStatus.FAILED);
-            actionRepository.save(savedAction); // Aktualizacja statusu synchronizacji
+            actionRepository.save(savedAction);
         } else {
             System.err.println("Brak adaptera obsługującego typ źródła: " + problem.getOriginType());
             savedAction.setSyncStatus(SyncStatus.FAILED);

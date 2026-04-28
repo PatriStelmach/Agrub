@@ -85,4 +85,9 @@ public class ProblemAction {
     public void setSyncStatus(SyncStatus syncStatus) {
         this.syncStatus = syncStatus;
     }
+
+    @com.fasterxml.jackson.annotation.JsonProperty("problemId")
+    public Long getProblemId() {
+        return problem != null ? problem.getId() : null;
+    }
 }

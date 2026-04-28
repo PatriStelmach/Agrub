@@ -23,10 +23,12 @@ public class SettingsSeeder implements CommandLineRunner {
         Map<String, String> defaultSettings = Map.of(
                 "zabbix_enabled", "true",
                 "zabbix_url", "http://localhost:10000/api/mock/zabbix",
-                "zabbix_api_token", "asdasd"
+                "zabbix_api_token", "asdasd",
+
+                "wazuh_enabled", "true",
+                "wazuh_url", ""
+
                 //  Tu dodawać nowe ustawienia
-                // "email_notifications_enabled", "false",
-                // "system_language", "PL"
         );
 
         // 2. Przechodzimy przez każdy klucz
