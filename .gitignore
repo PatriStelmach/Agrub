@@ -13,3 +13,4 @@ zabbix_data/
 mysql_data/
 
 .env
+/backend/scheduler/target
