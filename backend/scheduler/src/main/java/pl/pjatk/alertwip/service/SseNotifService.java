@@ -4,7 +4,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import pl.pjatk.alertwip.model.GlobalProblem;
-import pl.pjatk.alertwip.model.ProblemAction;
+import pl.pjatk.alertwip.dto.AlertUpdateEventDTO; // <--- Nowy import!
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,11 +14,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class SseNotifService {
 
-    // Mapa przechowująca aktywne połączenia oraz przypisane do nich grupy uprawnień
     private final Map<SseEmitter, List<String>> userSubscriptions = new ConcurrentHashMap<>();
 
     public SseEmitter subscribe(List<String> groups) {
-        // Ustawiamy timeout na -1 (nieskończoność), aby połączenie nie wygasło samo z siebie
         SseEmitter emitter = new SseEmitter(-1L);
 
         emitter.onCompletion(() -> userSubscriptions.remove(emitter));
@@ -39,6 +37,7 @@ public class SseNotifService {
         return emitter;
     }
 
+    // 1. Zostawiamy tę metodę bez zmian - Zabbix i Wazuh z niej korzystają (NEW_ALERT, ALERT_RESOLVED)
     public void sendAlert(String status, GlobalProblem alert) {
         List<SseEmitter> deadEmitters = new ArrayList<>();
 
@@ -50,52 +49,49 @@ public class SseNotifService {
                 try {
                     SseEmitter.SseEventBuilder event = SseEmitter.event()
                             .id(String.valueOf(alert.getId()))
-                            .name("message") // Vue onmessage reaguje na ten typ
+                            .name("message")
                             .data(Map.of(
                                     "status", "success",
-                                    "eventType", status,       // "NEW_ALERT" lub "ALERT_RESOLVED"
+                                    "eventType", status,
                                     "notification", alert.isRequiresNotification(),
-                                    "message", alert           // Obiekt alertu
+                                    "message", alert
                             ), MediaType.APPLICATION_JSON);
 
                     emitter.send(event);
-
-                    // Opcjonalnie logujemy sukces w konsoli
                     System.out.println("[SSE] Wysłano " + status + " dla alertu: " + alert.getUniqueKey());
 
                 } catch (Exception e) {
-                    // Jeśli wysyłanie się nie uda (np. przeglądarka zamknięta), oznaczamy jako martwe
                     deadEmitters.add(emitter);
                 }
             }
         });
 
-        // Sprzątamy połączenia, które rzuciły błędem
         deadEmitters.forEach(userSubscriptions::remove);
     }
 
-    public void sendAlert(String status, ProblemAction action) {
-        GlobalProblem alert = action.getProblem(); // Wyciągamy alert z akcji, żeby sprawdzić grupy!
+    // 2. NOWA METODA - Wysyłanie tylko "Diffa" (zmian) dla istniejących alertów
+    public void sendAlertUpdate(String status, AlertUpdateEventDTO payload, GlobalProblem alertContext) {
         List<SseEmitter> deadEmitters = new ArrayList<>();
 
         userSubscriptions.forEach((emitter, userGroups) -> {
-            boolean hasAccess = alert.getTechnicianGroups().stream()
+            // Używamy "alertContext", żeby sprawdzić, czy użytkownik ma uprawnienia do tego konkretnego alertu
+            boolean hasAccess = alertContext.getTechnicianGroups().stream()
                     .anyMatch(userGroups::contains);
 
             if (hasAccess) {
                 try {
                     SseEmitter.SseEventBuilder event = SseEmitter.event()
-                            .id(String.valueOf(action.getId()))
+                            .id(String.valueOf(payload.alertId())) // ID głównego alertu
                             .name("message")
                             .data(Map.of(
                                     "status", "success",
-                                    "eventType", status,       // np. "NEW_ACTION"
-                                    "notification", false,     // Nie chcemy głośnego dźwięku na każdy komentarz
-                                    "message", action          // Wysyłamy sam obiekt akcji
+                                    "eventType", status,       // "ALERT_UPDATE"
+                                    "notification", false,     // Aktualizacje nie robią hałasu w przeglądarce
+                                    "message", payload         // <--- Wysyłamy nasz lekki DTO ze zmianami
                             ), MediaType.APPLICATION_JSON);
 
                     emitter.send(event);
-                    System.out.println("[SSE] Wysłano nową akcję (" + status + ") do alertu: " + alert.getUniqueKey());
+                    System.out.println("[SSE] Wysłano aktualizację (Diff) do alertu ID: " + payload.alertId());
 
                 } catch (Exception e) {
                     deadEmitters.add(emitter);

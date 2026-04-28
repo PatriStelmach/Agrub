@@ -50,12 +50,37 @@ public class AlertController {
     }
 
     @PostMapping("/{id}/ack")
-    public ResponseEntity<ProblemAction> performAction(
+    public ResponseEntity<?> performAction(
             @PathVariable Long id,
-            @RequestBody ActionRequestDTO request) {
-        ProblemAction action = alertActionService.processAction(id, request);
+            @RequestBody String rawBody) { // Odbieramy surowy tekst (String)
 
-        return ResponseEntity.ok(action);
+        System.out.println("====== DEBUG: SUROWY JSON Z SIECI ======");
+        System.out.println(rawBody);
+        System.out.println("========================================");
+
+        try {
+            // Ręcznie parsujemy JSONa na Twoje DTO, żeby sprawdzić co się przypisze
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            // Konfiguracja, żeby nie wywalało błędu przy nieznanych polach
+            mapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+            pl.pjatk.alertwip.dto.ActionRequestDTO request = mapper.readValue(rawBody, pl.pjatk.alertwip.dto.ActionRequestDTO.class);
+
+            System.out.println("====== DEBUG: PO MAPOWANIU NA DTO ======");
+            System.out.println("Author: " + request.author());
+            System.out.println("Acknowledge (zmienna acknowledge): " + request.acknowledge());
+            System.out.println("New Severity: " + request.newSeverity());
+            System.out.println("Message: " + request.message());
+            System.out.println("==========================================");
+
+            // Wywołanie serwisu
+            pl.pjatk.alertwip.model.ProblemAction action = alertActionService.processAction(id, request);
+            return ResponseEntity.ok(action);
+
+        } catch (Exception e) {
+            System.err.println("Błąd parsowania: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Niepoprawny format danych");
+        }
     }
     @GetMapping("/{id}/actions")
     public ResponseEntity<List<ProblemAction>> getAlertActions(@PathVariable Long id) {

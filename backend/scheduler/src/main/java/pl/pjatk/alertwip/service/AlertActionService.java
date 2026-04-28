@@ -3,6 +3,7 @@ package pl.pjatk.alertwip.service;
 import org.springframework.stereotype.Service;
 import pl.pjatk.alertwip.model.*;
 import pl.pjatk.alertwip.dto.ActionRequestDTO;
+import pl.pjatk.alertwip.dto.AlertUpdateEventDTO;
 import pl.pjatk.alertwip.repository.GlobalProblemRepository;
 import pl.pjatk.alertwip.repository.ProblemActionRepository;
 import pl.pjatk.alertwip.service.adapter.AlertSourceAdapter;
@@ -30,6 +31,7 @@ public class AlertActionService {
         this.alertCache = alertCache;
     }
 
+    @org.springframework.transaction.annotation.Transactional
     public ProblemAction processAction(Long problemId, ActionRequestDTO request) {
         // 1. Znajdź problem w bazie
         GlobalProblem problem = problemRepository.findById(problemId)
@@ -51,11 +53,11 @@ public class AlertActionService {
             inferredActionType = ActionType.SEVERITY_CHANGE;
         }
 
-        // Jeśli zmienił się stan głównego alertu, nadpisujemy go w bazie i powiadamiamy RAM/SSE
+        // Jeśli zmienił się stan głównego alertu, nadpisujemy go w bazie i aktualizujemy Cache
         if (stateChanged) {
             problem = problemRepository.save(problem);
             alertCache.updateAlert(problem);
-            sseService.sendAlert("ALERT_UPDATE", problem);
+            // Uwaga: Nie wysyłamy tu całego obiektu przez SSE. Zrobimy to niżej przez lekki DTO.
         }
 
         // 3. Utworzenie wpisu w historii operacji (Audyt)
@@ -69,10 +71,22 @@ public class AlertActionService {
         ProblemAction savedAction = actionRepository.save(action);
         problem.getActions().add(savedAction);
 
-        // Zawsze powiadamiamy frontend o nowym komentarzu/akcji w historii
-        sseService.sendAlert("NEW_ACTION", savedAction);
+        // 4. Budowanie i wysyłka lekkiego DTO z "Diffem" na frontend
+        AlertUpdateEventDTO eventPayload = new AlertUpdateEventDTO(
+                savedAction.getId(),
+                problem.getId(),
+                savedAction.getAuthor(),
+                request.acknowledge(), // null jeśli nie zmieniono w żądaniu
+                request.message(),     // null jeśli brak wiadomości
+                savedAction.getCreatedAt(),
+                request.newSeverity()  // null jeśli nie zmieniono w żądaniu
+        );
 
-        // 4. Delegacja do odpowiedniego adaptera (Zabbix, Wazuh)
+        // Wysyłamy wyłącznie naszą paczkę ze zmianami (eventPayload).
+        // Obiekt 'problem' przekazujemy tylko jako kontekst do sprawdzenia uprawnień wewnątrz SseNotifService.
+        sseService.sendAlertUpdate("ALERT_UPDATE", eventPayload, problem);
+
+        // 5. Delegacja do odpowiedniego adaptera (Zabbix, Wazuh)
         String originType = problem.getOriginType();
 
         AlertSourceAdapter matchedAdapter = adapters.stream()
