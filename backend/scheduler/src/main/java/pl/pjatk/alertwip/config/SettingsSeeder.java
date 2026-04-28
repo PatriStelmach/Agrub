@@ -19,9 +19,10 @@ public class SettingsSeeder implements CommandLineRunner {
     @Override
     public void run(String... args) {
         // 1. Definiujemy nasz słownik wartości domyślnych
+        // TODO: zmienić to potem z tego mocka
         Map<String, String> defaultSettings = Map.of(
-                "zabbix_enabled", "false",
-                "zabbix_url", "http://192.168.1.100/zabbix/api_jsonrpc.php",
+                "zabbix_enabled", "true",
+                "zabbix_url", "http://localhost:10000/api/mockk/zabbix",
                 "zabbix_api_token", ""
                 //  Tu dodawać nowe ustawienia
                 // "email_notifications_enabled", "false",
