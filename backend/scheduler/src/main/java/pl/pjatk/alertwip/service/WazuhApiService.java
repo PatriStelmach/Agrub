@@ -1,6 +1,5 @@
 package pl.pjatk.alertwip.service;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -9,26 +8,28 @@ import java.util.Map;
 @Service
 public class WazuhApiService {
 
-    private final String apiUrl;
-    private final String user;
-    private final String pass;
     private final RestTemplate restTemplate;
+    private final SystemSettingService settings;
 
-    public WazuhApiService(
-            @Value("${wazuh.api.url}") String apiUrl,
-            @Value("${wazuh.api.user}") String user,
-            @Value("${wazuh.api.password}") String pass,
-            RestTemplate restTemplate) {
-        this.apiUrl = apiUrl;
-        this.user = user;
-        this.pass = pass;
+    public WazuhApiService(RestTemplate restTemplate, SystemSettingService settings) {
         this.restTemplate = restTemplate;
+        this.settings = settings;
     }
 
     @SuppressWarnings("unchecked")
     public String getAuthToken() {
+        String apiUrl = settings.getValue("wazuh_url", "");
+        String user = settings.getValue("wazuh_user", "admin");
+        String pass = settings.getValue("wazuh_password", "");
+
+        if (apiUrl.isBlank() || pass.isBlank()) {
+            System.err.println("[WAZUH API] Niepełna konfiguracja w bazie (wazuh_url lub wazuh_password jest puste)!");
+            return null;
+        }
+
         HttpHeaders headers = new HttpHeaders();
         headers.setBasicAuth(user, pass);
+
         try {
             ResponseEntity<Map> response = restTemplate.exchange(
                     apiUrl + "/security/user/authenticate",
@@ -48,6 +49,8 @@ public class WazuhApiService {
     }
 
     public String fetchAlerts(String token) {
+        String apiUrl = settings.getValue("wazuh_url", "");
+
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(token);
         try {
@@ -60,6 +63,8 @@ public class WazuhApiService {
     }
 
     public String fetchAgents(String token) {
+        String apiUrl = settings.getValue("wazuh_url", "");
+
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(token);
         try {

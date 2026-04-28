@@ -25,8 +25,10 @@ public class SettingsSeeder implements CommandLineRunner {
                 "zabbix_url", "http://localhost:10000/api/mock/zabbix",
                 "zabbix_api_token", "asdasd",
 
-                "wazuh_enabled", "true",
-                "wazuh_url", ""
+                "wazuh_enabled", "false",
+                "wazuh_url", "https://localhost:55000",
+                "wazuh_user", "admin",
+                "wazuh_password", ""
 
                 //  Tu dodawać nowe ustawienia
         );
