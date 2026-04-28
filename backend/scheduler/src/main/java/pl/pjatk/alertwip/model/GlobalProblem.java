@@ -26,32 +26,43 @@ public class GlobalProblem {
     private String status = "Sent"; // "Sent" | "In Process" | "Done"
     private int severity = 1;
 
-    // NOWOŚĆ: Memoizacja ról i powiadomień
+    private String externalEventId;
+    private boolean requiresNotification = false; // Flaga dla dźwięku/popupu
+    private LocalDateTime createdAt;
+    private LocalDateTime closedAt;
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "alert_technician_groups", joinColumns = @JoinColumn(name = "alert_id"))
     @Column(name = "group_name")
     private List<String> technicianGroups = new ArrayList<>();
-
-    private boolean requiresNotification = false; // Flaga dla dźwięku/popupu
-
-    private LocalDateTime createdAt;
-    private LocalDateTime closedAt;
-
-    // --- GETTERY I SETTERY ---
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    private boolean isAcknowledged = false; // Nowa flaga
     public String getUniqueKey() { return uniqueKey; }
     public void setUniqueKey(String uniqueKey) { this.uniqueKey = uniqueKey; }
     public String getSubject() { return subject; }
     public void setSubject(String subject) { this.subject = subject; }
     public String getMessage() { return message; }
 
+    public boolean isAcknowledged() {
+        return isAcknowledged;
+    }
+
+    public void setAcknowledged(boolean acknowledged) {
+        isAcknowledged = acknowledged;
+    }
     public String getOriginType() {
         return originType;
     }
 
     public void setOriginType(String originType) {
         this.originType = originType;
+    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getExternalEventId() {
+        return externalEventId;
+    }
+
+    public void setExternalEventId(String externalEventId) {
+        this.externalEventId = externalEventId;
     }
 
     public void setMessage(String content) { this.message = content; }

@@ -46,7 +46,6 @@ public class ZabbixSyncService {
 
         List<Map<String, Object>> currentProblems;
 
-        // 1. ZWĘŻONY TRY-CATCH: Łapiemy tylko i wyłącznie błędy z API Zabbixa
         try {
             currentProblems = zabbixApiService.getActiveProblems();
             if (currentProblems == null) {
@@ -55,19 +54,20 @@ public class ZabbixSyncService {
         } catch (Exception e) {
             System.err.println("[ZABBIX SYNC] Awaria połączenia API. Generuję alert systemowy...");
             triggerSystemAlert(API_ERROR_UNIQUE_KEY, "Brak komunikacji z Zabbix API: " + e.getMessage());
-            return; // Przewany proces, nie idziemy dalej!
+            return;
         }
 
-        // Jeśli tu doszliśmy, Zabbix API działa w 100%.
         resolveSystemAlert(API_ERROR_UNIQUE_KEY);
         System.out.println("[ZABBIX SYNC] Synchronizacja. Aktywne problemy w Zabbix: " + currentProblems.size());
 
         Set<String> activeZabbixProblemKeys = new HashSet<>();
 
-        // 2. PRZETWARZANIE ALERTÓW (Bez obaw, że błąd SSE wywoła awarię Zabbixa)
         for (Map<String, Object> problemData : currentProblems) {
             Object nameObj = problemData.get("name");
             String name = (nameObj != null) ? nameObj.toString() : "Nieznany błąd";
+
+            Object eventIdObj = problemData.get("eventid");
+            String zabbixEventId = (eventIdObj != null) ? eventIdObj.toString() : null;
 
             int severity = 0;
             Object severityObj = problemData.get("severity");
@@ -86,7 +86,6 @@ public class ZabbixSyncService {
             String uniqueProblemKey = "[ZABBIX] " + hostName + " - " + name;
             activeZabbixProblemKeys.add(uniqueProblemKey);
 
-            // Używamy nowej metody zabezpieczającej przed duplikatami!
             Optional<GlobalProblem> existingProblem = problemRepository.findFirstByUniqueKeyOrderByIdDesc(uniqueProblemKey)
                     .filter(p -> !"Done".equals(p.getStatus()));
 
@@ -94,8 +93,11 @@ public class ZabbixSyncService {
                 GlobalProblem newProblem = new GlobalProblem();
                 newProblem.setUniqueKey(uniqueProblemKey);
                 newProblem.setSubject(name);
-                newProblem.setSource(hostName);     // konkretna maszyna
+                newProblem.setSource(hostName);
                 newProblem.setOriginType("ZABBIX");
+
+                newProblem.setExternalEventId(zabbixEventId);
+
                 newProblem.setMessage("Problem zsynchronizowany z API Zabbix.");
                 newProblem.setStatus("Sent");
                 newProblem.setSeverity(severity);

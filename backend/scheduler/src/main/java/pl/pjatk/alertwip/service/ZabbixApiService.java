@@ -53,4 +53,33 @@ public class ZabbixApiService {
             throw new RuntimeException("Błąd pobierania problemów: " + e.getMessage());
         }
     }
+
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> callZabbixApi(String method, Map<String, Object> params) {
+        String apiUrl = settingService.getValue("zabbix_url", "");
+        String apiToken = settingService.getValue("zabbix_api_token", "");
+
+        if (apiUrl.isBlank() || apiToken.isBlank()) {
+            throw new IllegalStateException("Konfiguracja Zabbixa jest niekompletna. Skonfiguruj API Token w panelu.");
+        }
+
+        Map<String, Object> request = Map.of(
+                "jsonrpc", "2.0",
+                "method", method,
+                "auth", apiToken,
+                "params", params,
+                "id", System.currentTimeMillis() // unikalne ID zapytania
+        );
+
+        try {
+            return restClient.post()
+                    .uri(apiUrl)
+                    .body(request)
+                    .retrieve()
+                    .body(Map.class);
+        } catch (Exception e) {
+            throw new RuntimeException("Błąd komunikacji z Zabbix API (" + method + "): " + e.getMessage());
+        }
+    }
+
 }

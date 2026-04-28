@@ -87,12 +87,13 @@ public class MockZabbixController {
     }
 
     // Pomocnicza metoda generująca JSON-a zgodnego ze strukturą Zabbixa
-    private Map<String, Object> createMockProblem(String id, String name, int severity, String host) {
+    private Map<String, Object> createMockProblem(String eventId, String name, int severity, String hostName) {
         return Map.of(
-                "eventid", id,
+                "eventid", eventId, // To pole jest KLUCZOWE dla ACK
                 "name", name,
-                "severity", severity,
-                "hosts", List.of(Map.of("host", host))
+                "severity", String.valueOf(severity),
+                "hosts", List.of(Map.of("host", hostName)),
+                "clock", String.valueOf(System.currentTimeMillis() / 1000)
         );
     }
 }
