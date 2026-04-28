@@ -10,4 +10,13 @@ public interface GlobalProblemRepository extends JpaRepository<GlobalProblem, Lo
 
     Optional<GlobalProblem> findFirstByUniqueKeyOrderByIdDesc(String uniqueKey);
     List<GlobalProblem> findAllByStatusNot(String status);
+
+    boolean existsByUniqueKey(String uniqueKey);
+
+    List<GlobalProblem> findBySource(String sourceName);
+
+    long countByStatus(String status);
+    long countBySeverityGreaterThanEqual(int severity);
+
+    List<GlobalProblem> findByStatusNot(String status);
 }
