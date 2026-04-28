@@ -7,3 +7,4 @@ export const tableDiv = " mt-[2vh] mx-[1%] w-98/100 relative overflow-auto max-h
 export const topDiv = "relative max-h-[10vh] items-center align-middle"
 export const topH1 = "text-center my-[2vh] text-xl xl:text-2xl 2xl:text-4xl border-b pb-[2vh]"
 export const topButtonGroup = "absolute left-4 top-0 flex max-w-2/5 "
+export const unwrappedItemClass = "bg-selected [&_td]:align-top  sticky h-26! [&_td]:pt-4! top-11 bottom-11 hover:bg-card z-9 cursor-auto"

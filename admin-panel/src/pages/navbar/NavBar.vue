@@ -39,8 +39,8 @@ const navItems = [
   {
     label: 'Alerts',
     links: [
-      { label: 'Active alerts', to: 'alerts', icon: IconAlertTriangle },
-      { label: 'Prime', to: 'prime', icon: IconHistory },
+      { label: 'Active', to: 'alerts', icon: IconAlertTriangle },
+      { label: 'Hstory', to: 'alerts_history', icon: IconHistory },
     ]
   },
   {
@@ -54,7 +54,7 @@ const navItems = [
   {
     label: 'Systems',
     links: [
-      { label: 'My systems', to: 'my_systems', icon: IconSitemap },
+      { label: 'Connected', to: 'my_systems', icon: IconSitemap },
       { label: 'All systems', to: 'all_systems', icon: IconSitemapOff },
     ]
   },

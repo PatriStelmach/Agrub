@@ -8,16 +8,17 @@ export interface ActiveAlert {
   source: string,
   originType: string,
   acknowledged: boolean,
-  actions: Actions[]
-  severity: 0 | 1 | 2 | 3 | 4 | 5,
   createdAt: Date,
+  actions: Actions[],
+  severity: 0 | 1 | 2 | 3 | 4 | 5,
 }
 
 export interface Actions {
   id: number
-  actionType: "SEVERITY_CHANGE" | "ACK" | "UNACK" | "COMMENT"
+  alertId?: number
   author: string,
-  message: string,
+  ack?: boolean,
+  message?: string,
   createdAt?: Date,
   newSeverity?: 0 | 1 | 2 | 3 | 4 | 5,
 }
@@ -27,9 +28,6 @@ export interface ClosedAlert extends ActiveAlert {
   closedAt: Date
 }
 
-export interface ReceivedAlert {
-
-}
 
 export interface User {
   id: number,

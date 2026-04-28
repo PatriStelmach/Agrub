@@ -27,7 +27,7 @@ export const badgeVariants = cva(
           " hover:shadow-badge1 hover:shadow-md text-xs md:text-sm lg:text-md 2xl:text-lg ",
         origin:
           "border-transparent text-primary bg-badge/70 hover:bg-badge/50 cursor-pointer  transition-all duration-50" +
-          " hover:shadow-badge hover:shadow-md mr-1 my-1 text-xs md:text-sm lg:text-md 2xl:text-lg ",
+          " hover:shadow-badge hover:shadow-md text-xs md:text-sm lg:text-md 2xl:text-lg ",
       },
     },
     defaultVariants: {
