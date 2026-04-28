@@ -305,7 +305,7 @@ const savePlugin = async () => {
                     <Transition name="fade" class="w-full">
                   <span
                     v-if="existingBadge"
-                    class="text-sm lg:text-md xl:text-xl 2xl:text-3xl text-destructive cursor-text w-full">
+                    class="text-destructive cursor-text w-full">
                   Tag already exists</span>
                     </Transition>
                   </div>
@@ -350,7 +350,7 @@ const savePlugin = async () => {
                 </InputGroup>
 
                 <span
-                  class="grid gap-y-2 w-full text-center whitespace-break-spaces text-sm lg:text-md xl:text-lg 2xl:text:2xl"
+                  class="grid gap-y-2 w-full text-center whitespace-break-spaces t"
                   :class="{'text-destructive' : !cronDescription[2]}"
                 >
                   <span>{{ cronDescription[0]}}</span>
@@ -364,12 +364,12 @@ const savePlugin = async () => {
                 <Select
                   v-model="unwrappedItem.severity"
                 >
-                  <SelectTrigger class="cursor-pointer w-full text-md lg:text-lg xl:text-xl 2xl:text-xl">
+                  <SelectTrigger class="cursor-pointer w-full ">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem
-                      :class='`cursor-pointer hover:bg-severity-${value}/50! text-md lg:text-lg xl:text-xl 2xl:text-xl`'
+                      :class='`cursor-pointer hover:bg-severity-${value}/50! `'
                       v-for="value in [0,1,2,3,4,5]" :key="value" :value="value">{{value}}</SelectItem>
                   </SelectContent>
                 </Select>
@@ -399,13 +399,13 @@ const savePlugin = async () => {
                   class="size-7 lg:size-8 xl:size-10 2xl:size-16"
                 />
               </TableCell>
-              <DateCell class=" text-md lg:text-lg xl:text-xl 2xl:text-2xl " v-if="plugin.updatedAt" :date="plugin.updatedAt"></DateCell>
+              <DateCell class="" v-if="plugin.updatedAt" :date="plugin.updatedAt"></DateCell>
               <TableCell v-if="isUnwrapped(plugin.fileName) && unwrappedItem" >
                 <RadioGroup
                   @update:model-value="unwrappedItem.active = $event === 'on'"
                   :model-value="unwrappedItem.active ? 'on' : 'off'"
                   :default-value="plugin.active ? 'on' : 'off'"
-                  class=" **:text-lg **:lg:text-xl **:xl:text-2xl **:2xl:text-3xl">
+                  class="">
                   <div class="flex items-center space-x-2">
                     <RadioGroupItem class="size-4 lg:size-5 xl:size-6 2xl:size-8" id=radio-on value="on" />
                     <Label class="cursor-pointer text-green-500"  for="radio-on">On</Label>
@@ -417,7 +417,7 @@ const savePlugin = async () => {
                 </RadioGroup>
               </TableCell>
               <TableCell v-else class=" text-green-500" :class="{'text-destructive' : !plugin.active}">{{ plugin.active ? 'On' : 'Off'}}</TableCell>
-              <TableCell class=" text-md lg:text-lg xl:text-xl 2xl:text-2xl ">{{plugin.weight}} KB</TableCell>
+              <TableCell class="">{{plugin.weight}} KB</TableCell>
               <ButtonGroup v-if="isUnwrapped(plugin.fileName) && unwrappedItem" class="flex  absolute bottom-4 right-3 *:items-center *:align-middle *:flex">
                 <Button
                   @click="closePlugin"

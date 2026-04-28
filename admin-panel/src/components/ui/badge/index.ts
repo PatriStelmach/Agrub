@@ -17,14 +17,17 @@ export const badgeVariants = cva(
         outline:
           "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
         groups:
-          "border-transparent text-primary bg-badge/80 hover:bg-badge/50 cursor-pointer hover:scale-105 transition-all duration-50" +
+          "border-transparent text-primary bg-badge/80 hover:bg-badge/50 cursor-pointer  transition-all duration-50" +
           " hover:shadow-badge hover:shadow-md mr-1 my-1 text-xs md:text-sm lg:text-md 2xl:text-lg ",
         tags:
-          "border-transparent text-primary bg-accent hover:bg-badge2 cursor-pointer hover:scale-105 transition-all duration-50" +
+          "border-transparent text-primary bg-accent hover:bg-badge2 cursor-pointer  transition-all duration-50" +
           " hover:shadow-badge2 hover:shadow-md mr-1 my-1 text-xs md:text-sm lg:text-md 2xl:text-lg",
         source:
-          "border-transparent text-primary bg-accent hover:bg-badge1 cursor-pointer hover:scale-105 transition-all duration-50" +
-          " hover:shadow-badge1 hover:shadow-md text-xs md:text-sm lg:text-md 2xl:text-lg "
+          "border-transparent text-primary bg-badge1/70 hover:bg-badge1/50 cursor-pointer  transition-all duration-50" +
+          " hover:shadow-badge1 hover:shadow-md text-xs md:text-sm lg:text-md 2xl:text-lg ",
+        origin:
+          "border-transparent text-primary bg-badge/70 hover:bg-badge/50 cursor-pointer  transition-all duration-50" +
+          " hover:shadow-badge hover:shadow-md text-xs md:text-sm lg:text-md 2xl:text-lg ",
       },
     },
     defaultVariants: {

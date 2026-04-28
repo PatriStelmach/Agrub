@@ -10,7 +10,7 @@ export function useWrapping<T extends object>(
   const originalItem = ref<T | null>(null)
 
 
-  const isUnwrapped = (keyValue: string | number) => {
+  const isUnwrapped = (keyValue: string | number | null) => {
     return unwrappedItem.value?.[key] === keyValue
   }
 

@@ -1,16 +1,12 @@
 <script setup lang="ts" >
-import {type OpenAlert} from "@/types/types.ts";
+import {type ActiveAlert} from "@/types/types.ts";
 import {dashboardData} from "@/data/dashboardData.ts"
 import MyPagination from "@/helpers/MyPagination.vue";
 import {
-  IconSend,
-  IconLoader,
-  IconBellCog,
-  IconChevronDown,
-  IconEyeCog,
-  IconLock,
-  IconStatusChange,
-  IconUser, IconListDetails
+  IconEdit,
+  IconCircleDashedCheck,
+  IconCircleDashedX,
+  IconSend2, IconMessageCode
 } from "@tabler/icons-vue";
 import {ArrowLeftIcon, Search} from "lucide-vue-next";
 import { Badge } from '@/components/ui/badge'
@@ -50,7 +46,17 @@ import {
   topDiv, topButtonGroup
 } from "@/assets/cssFunctions.ts";
 import GoBackButton from "@/helpers/GoBackButton.vue";
-
+import {useWrapping} from "@/composables/unwrapping.ts";
+import {unwrappedItemClass} from "@/assets/cssFunctions.ts";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
+import PluginDetailsDialog from "@/pages/plugins/PluginDetailsDialog.vue";
+import EditAlertDialog from "@/pages/alerts/EditAlertDialog.vue";
 
 const alertStore = useAlertStore();
 onMounted(() => {
@@ -74,26 +80,10 @@ const descriptionBox = computed(() => {
 })
 
 const { updatePage, filteredData, tableData, updateData, updateSearchData, currentPage, searchFilter } =
-  useSearchFilter<OpenAlert>(() => alertStore.getAllCurrentAlerts,(item) => item.subject)
+  useSearchFilter<ActiveAlert>(() => alertStore.getAllCurrentAlerts,(item) => item.subject)
 const { x, y } = useMouse()
-const { sortedData, sortKey, sortOrder, toggleSort } = useSort<OpenAlert>(() => tableData.value as OpenAlert[], 'createdAt')
-
-const randomString = (length: number): string => {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-  return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
-}
-
-function randomAlert() {
-  alertStore.addCurrentAlert( {
-    id: Math.floor(Math.random() * 10000000000),
-    subject: randomString(10),
-    source: randomString(10),
-    message: randomString(100),
-    status: "Sent" ,
-    severity: 0 ,
-    createdAt: new Date(Date.now()),
-  })
-}
+const { sortedData, sortKey, sortOrder, toggleSort } = useSort<ActiveAlert>(() => tableData.value as ActiveAlert[], 'createdAt')
+const { wrap, isUnwrapped, unwrap, unwrappedItem } = useWrapping(sortedData, 'id')
 
 const mouseEnter = (id: number) => {
   isAlertHovered.value = true
@@ -113,23 +103,21 @@ const mouseLeave = () => {
       <h1 :class="topH1">Alerts dashboard</h1>
 
         <ButtonGroup :class="topButtonGroup">
-
-            <GoBackButton/>
+          <GoBackButton/>
             <InputGroup >
               <InputGroupInput
                 v-model="searchFilter"
                 type="search"
-                placeholder="Search for alert"/>
+                placeholder="Search..."/>
               <InputGroupAddon>
                 <Search/>
               </InputGroupAddon>
             </InputGroup>
-
         </ButtonGroup>
     </div>
     <div :class="tableDiv">
       <Card
-        v-if="isAlertHovered"
+        v-if="isAlertHovered && !isUnwrapped(hoveredId)"
         v-model="hoveredData"
         :style="descriptionBox"
         class="z-9999 max-w-120 border-2 border-badge shadow-sm shadow-badge">
@@ -142,48 +130,66 @@ const mouseLeave = () => {
         </TableCaption>
         <TableHeader class="h-10">
           <TableRow :class="tableHeaders">
-            <SortableHead keyName="subject" label="Alert" :sort-key="sortKey" class="w-15/100 pl-4" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-            <SortableHead keyName="severity" label="Severity" :sort-key="sortKey" class="w-8/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-            <SortableHead keyName="message" label="Message" :sort-key="sortKey" class="w-38/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-            <SortableHead keyName="source" label="Source" :sort-key="sortKey" class="w-15/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-            <SortableHead keyName="status" label="Status" :sort-key="sortKey" class="w-10/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-            <SortableHead keyName="createdAt" label="Timestamp" :sort-key="sortKey" class="w-14/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="subject" label="Alert" :sort-key="sortKey" class="w-fit pl-4" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="severity" label="Severity" :sort-key="sortKey" class="max-md:w-1/8 max-lg:w-9/100 w-6/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="message" label="Message" :sort-key="sortKey" class="w-fit md:min-w-1/5" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="source" label="Source" :sort-key="sortKey" class="w-fit " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="originType" label="Origin" :sort-key="sortKey" class="w-1/10 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="acknowledge" label="ACK" :sort-key="sortKey" class="w-8/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="createdAt" label="Timestamp" :sort-key="sortKey" class="w-fit md:w-14/100 lg:w-1/10" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <TableHead class="max-md:w-9/100 w-6/100 lg:w-4/100 font-bold text-sm lg:text-md xl:text-lg 2xl:text:xl">Actions</TableHead>
           </TableRow>
         </TableHeader>
           <TransitionGroup tag="tbody" name="slide-fade">
             <TableRow
               :id="`${alert.id}_row`"
-              class="relative cursor-pointer duration-0  hover:bg-chart-1/30"
+              class="relative cursor-pointer duration-0  hover:bg-accent/50"
               v-for="alert in sortedData"
               :key="alert.id"
-            >
-              <TableCell class="pl-4  whitespace-break-spaces">{{alert.subject}}</TableCell>
-              <TableCell
+              @dblclick="unwrap(alert.id)">
 
-              ><div
-                :class="` bg-linear-to-l w-full h-full text-md lg:text-lg xl:text-xl text-center font-bold
-                from-severity-${alert.severity}/50 via-severity-${alert.severity} to-severity-${alert.severity}/50`">
-                {{alert.severity}}
-              </div>
+              <TableCell class="pl-4  whitespace-break-spaces">{{alert.subject}}</TableCell>
+              <TableCell>
+                <div
+                  :class="` bg-linear-to-l w-full h-full text-center font-extrabold
+                  from-severity-${alert.severity}/50 via-severity-${alert.severity} to-severity-${alert.severity}/50`">
+                  {{alert.severity}}
+                </div>
               </TableCell>
               <TableCell
                 @mouseenter="mouseEnter(alert.id)"
                 @mouseleave="mouseLeave"
-                class="truncate">{{alert.message}}</TableCell>
+                :class="{'truncate' : !isUnwrapped(alert.id), 'whitespace-break-spaces' : isUnwrapped(alert.id)}">{{alert.message}}</TableCell>
               <TableCell >
-                <Badge
+                <Badge class="whitespace-break-spaces"
                   variant="source"
                 >{{alert.source}}</Badge>
               </TableCell>
+              <TableCell >
+                <Badge class="whitespace-break-spaces"
+                  variant="origin"
+                >{{alert.originType}}</Badge>
+              </TableCell>
+
               <TableCell class=" gap-x-2 items-center">
-                <div class="flex gap-x-2 items-center">{{alert.status}}
-                  <IconLoader v-if="alert.status === 'In Process'"
-                              class="size-4 animate-spin text-muted-foreground"/>
-                  <IconSend v-if="alert.status === 'Sent'"
-                            class="size-4 text-badge1"/>
-                </div>
+                <IconCircleDashedCheck v-if="alert.acknowledged" class="text-badge1"/>
+                <IconCircleDashedX v-else class="text-badge2"/>
               </TableCell>
               <DateCell v-if="alert.createdAt"  :date="alert.createdAt "></DateCell>
+              <TableCell>
+                <EditAlertDialog
+                  :id="alert.id"
+                  :ack="alert.acknowledged"
+                  :severity="alert.severity"
+                  :alertMessage="alert.message"
+                  :subject="alert.subject"
+                >
+                  <Button size="icon-lg" variant="green_outline">
+                    <IconEdit class="size-5"/>
+                  </Button>
+                </EditAlertDialog>
+
+              </TableCell>
             </TableRow>
           </TransitionGroup>
 

@@ -13,9 +13,10 @@ const parsed = computed(() => dateParser(props.date))
 </script>
 
 <template>
-  <TableCell class="px-2">
+  <TableCell class="px-2 relative">
     {{ parsed.day }}/{{ parsed.month }}/{{ parsed.year }} -
     {{ parsed.hours + ":" + parsed.minutes   }}
+    <slot/>
   </TableCell>
 </template>
 
