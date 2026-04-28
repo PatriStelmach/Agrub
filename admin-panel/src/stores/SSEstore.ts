@@ -52,6 +52,10 @@ export const useSSEstore = defineStore('SSE', () =>   {
             notificationStore.removeNotification()
             break;
           }
+          case 'ALERT_UPDATE' : {
+            toast.success(`Updated: ${nVal.message.alertId}`)
+            alertStore.updateAlert(nVal.message)
+          }
 
 
         }

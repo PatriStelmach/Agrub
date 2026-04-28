@@ -39,8 +39,8 @@ const navItems = [
   {
     label: 'Alerts',
     links: [
-      { label: 'Active alerts', to: 'alerts', icon: IconAlertTriangle },
-      { label: 'History', to: 'alerts_history', icon: IconHistory },
+      { label: 'Active', to: 'alerts', icon: IconAlertTriangle },
+      { label: 'Hstory', to: 'alerts_history', icon: IconHistory },
     ]
   },
   {
@@ -54,7 +54,7 @@ const navItems = [
   {
     label: 'Systems',
     links: [
-      { label: 'My systems', to: 'my_systems', icon: IconSitemap },
+      { label: 'Connected', to: 'my_systems', icon: IconSitemap },
       { label: 'All systems', to: 'all_systems', icon: IconSitemapOff },
     ]
   },
@@ -65,13 +65,13 @@ const navItems = [
 
   <Sidebar class="">
           <SidebarHeader>
-            <div class="text-xl space-x-2 flex pl-2 pt-4"><IconPhoneRinging/>
+            <div class="text-xl space-x-2 flex pt-4"><IconPhoneRinging/>
               <span>Alert</span>
             </div>
           </SidebarHeader>
     <SidebarContent>
       <SidebarGroup>
-        <SidebarGroupContent>
+        <SidebarGroupContent class="w-fit">
           <SidebarMenu>
             <SidebarMenuItem  v-for="item in navItems" :key="item.label" :value="item.label">
               <SidebarMenuButton as-child>
@@ -81,7 +81,7 @@ const navItems = [
 
                   <RouterLink
                     :class="{'bg-badge/50' : route.name === link.to}"
-                    class="flex xl:text-lg ml-3 border-l-3 w-full hover:bg-input rounded-[0_1rem_1rem_0]"
+                    class="flex xl:text-lg ml-3 border-l-3 w-full hover:bg-input rounded-[0_0.5rem_0.5rem_0]"
                     v-for="link in item.links" :key="link.to" :to="link.to">
                     <div class="flex items-center gap-x-2 p-2 ml-1 ">
                       <component class="size-4  xl:size-6" :is="link.icon"/> {{link.label}}

@@ -1,24 +1,33 @@
-import {Alert} from "@/components/ui/alert";
-
 export const api_url = 'http://localhost:10000/api'
 
-export interface OpenAlert {
+export interface ActiveAlert {
   id: number
+  externalEventId: string
   subject: string,
   message: string,
   source: string,
-  status: "Sent" | "In Process",
-  severity: 0 | 1 | 2 | 3 | 4 | 5,
+  originType: string,
+  acknowledged: boolean,
   createdAt: Date,
+  actions: Actions[],
+  severity: 0 | 1 | 2 | 3 | 4 | 5,
 }
 
-export interface ClosedAlert extends OpenAlert {
+export interface Actions {
+  id: number
+  alertId?: number
+  author: string,
+  ack?: boolean,
+  message?: string,
+  createdAt?: Date,
+  newSeverity?: 0 | 1 | 2 | 3 | 4 | 5,
+}
+
+
+export interface ClosedAlert extends ActiveAlert {
   closedAt: Date
 }
 
-export interface ReceivedAlert {
-
-}
 
 export interface User {
   id: number,

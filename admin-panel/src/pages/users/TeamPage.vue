@@ -25,7 +25,7 @@ import {Badge} from "@/components/ui/badge";
 import {useWrapping} from "@/composables/unwrapping.ts";
 import {computed, onMounted, ref, watch} from "vue";
 import {useSearchFilter} from "@/composables/useSearchFilter.ts";
-import type {OpenAlert, User} from "@/types/types.ts";
+import type {ActiveAlert, User} from "@/types/types.ts";
 import {dashboardData} from "@/data/dashboardData.ts";
 import {Input} from "@/components/ui/input";
 import gsap from "gsap";
