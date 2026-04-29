@@ -13,3 +13,6 @@ zabbix_data/
 mysql_data/
 
 .env
+/backend/scheduler/target
+admin-panel/package-lock.json
+admin-panel/package-lock.json

@@ -24,6 +24,8 @@ import {Input} from "@/components/ui/input";
 import {ButtonGroup} from "@/components/ui/button-group";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
 import {ArrowLeftIcon, Search} from "lucide-vue-next";
+import {topButtonGroup, topDiv, topH1} from "@/assets/cssFunctions.ts";
+import GoBackButton from "@/helpers/GoBackButton.vue";
 
 const isOpen = ref(false);
 const openSystem = ref<System | null | undefined>(null);
@@ -42,12 +44,12 @@ const closeDialog = () => {
 
 
 <template>
-  <div>
-    <div class="relative max-h-[10vh] items-center">
-      <Button class="absolute left-4" variant="outline" size="icon" aria-label="Go Back">
-        <ArrowLeftIcon />
-      </Button>
-      <h1 class="text-center my-[2vh] text-[3vh] border-b pb-[2vh]    ">Available systems</h1>
+  <div class="relative">
+    <div :class="topDiv">
+      <h1 :class="topH1">Available systems</h1>
+      <ButtonGroup :class="topButtonGroup">
+      <GoBackButton/>
+      </ButtonGroup>
     </div>
 
     <div class="pt-4 grid grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 overflow-auto max-h-[85vh]">

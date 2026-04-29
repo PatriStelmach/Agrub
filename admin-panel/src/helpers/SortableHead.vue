@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import {IconArrowNarrowDown, IconArrowNarrowUp} from "@tabler/icons-vue";
 import {TableHead} from "@/components/ui/table";
 import type {HTMLAttributes} from "vue";
+
 
 const props = defineProps<{
   keyName: string,
@@ -16,9 +16,12 @@ const props = defineProps<{
 
 <template>
   <TableHead :class="props.class" >
-    <div  class="flex items-center gap-1  text-lg lg:text-xl xl:text-2xl 2xl:text:4xl">
-      <span @click="$emit('update:toggle-sort', props.keyName)" class="cursor-pointer">{{props.label}}</span>
-      <IconArrowNarrowUp  v-if="sortKey === props.keyName && sortOrder === 'asc'" />
-      <IconArrowNarrowDown v-if="sortKey === props.keyName && sortOrder === 'desc'" /></div>
+    <div @click="$emit('update:toggle-sort', props.keyName)"  class="flex items-center h-full px-1 gap-2 cursor-pointer "
+         :class="{'bg-foreground/70 text-secondary' : sortKey === props.keyName}">
+      <span
+
+        class="font-bold text-sm lg:text-md xl:text-lg 2xl:text:xl">{{props.label}}</span>
+      <i class="pi pi-sort-amount-up" v-if="sortKey === props.keyName && sortOrder === 'asc'" />
+      <i class="pi pi-sort-amount-down-alt" v-if="sortKey === props.keyName && sortOrder === 'desc'" /></div>
   </TableHead>
 </template>

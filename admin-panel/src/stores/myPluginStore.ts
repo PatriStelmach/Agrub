@@ -1,24 +1,41 @@
 import {defineStore} from "pinia";
-import {api_url, type MyPlugin, type MyPluginsFromApi, type PluginDetails} from "@/types/types.ts";
+import {
+  api_url,
+  type ApiResponse,
+  type MyPlugin,
+  type MyPluginsFromApi,
+  type PluginDetails
+} from "@/types/types.ts";
 import {computed, ref} from "vue";
 import axios from "axios";
 
 export const useMyPluginStore = defineStore('my-plugins', () => {
   const allMyPlugins = ref<MyPlugin[]>([]);
-  // const changePluginStatus = async (fileName: string) => {
-  //   await axios.put(`${api_url}/local-scripts/${fileName}/`)
-  // }
+
+  const editMyPlugin = async (plugin: MyPlugin) => {
+    console.log(plugin)
+    const response = await axios.put(`${api_url}/local-scripts/${plugin.fileName}/edit`, {
+      fileName: plugin.fileName,
+      code: plugin.code,
+      description: plugin.description,
+      severity: plugin.severity,
+      cronExpression: plugin.cronExpression,
+      tags: plugin.tags,
+      active: plugin.active
+    })
+    return response.data as ApiResponse
+  }
   const getMyPluginDetails = async (fileName: string) => {
-    return await axios.get(`${api_url}/local-scripts/${fileName}/details`)
-      .then((res) => res.data as PluginDetails )
+    const response = await axios.get(`${api_url}/local-scripts/${fileName}/details`)
+    return response.data as PluginDetails
   }
 
   const getAllMyPlugins = async () => {
-    allMyPlugins.value = await axios.get(`${api_url}/local-scripts/list`)
-      .then((res) => res.data.map((item: MyPluginsFromApi) => ({
+    const response= await axios.get(`${api_url}/local-scripts/list`)
+    allMyPlugins.value = response.data.map((item: MyPluginsFromApi) => ({
         active: item.active,
         creator: item.creator,
-        log: item.isLog,
+        severity: item.severity,
         name: item.fileName,
         fileName: item.fileName + item.language,
         language: item.language,
@@ -26,31 +43,18 @@ export const useMyPluginStore = defineStore('my-plugins', () => {
         weight: item.weight,
         tags: item.tags,
         cronExpression: item.cronExpression,
-      })))
+      }))
   }
 
-  // const getAllMyPlugins = async () => {
-  //   allMyPlugins.value = await axios.get(`${api_url}/local-scripts/list`)
-  //     .then((res) => res.data.map((item: MyPluginsFromApi) => ({
-  //       active: item.active,
-  //       creator: item.creator,
-  //       log: item.isLog,
-  //       name: item.name,
-  //       fileName: item.fileName,
-  //       language: item.language,
-  //       updatedAt: new Date(item.updatedAt),
-  //       weight: item.weight,
-  //       tags: item.tags,
-  //       cronExpression: item.cronExpression,
-  //     })))
-  // }
-
   const changeStatus = async (fileNames: string[]) => {
-    return await axios.post(`${api_url}/local-scripts/change-status`, fileNames).then((res) => res.data)
+    console.log(fileNames)
+    const response = await axios.post(`${api_url}/local-scripts/change-status`, fileNames)
+    return response.data as ApiResponse
   }
 
   const deleteMyPlugins = async (fileNames: string[]) => {
-    return await axios.delete(`${api_url}/local-scripts/delete`, {params: {fileNames: fileNames}}).then((res) => res.data)
+    const response = await axios.delete(`${api_url}/local-scripts/delete`, {params: {fileNames: fileNames}})
+    return response.data as ApiResponse
   }
 
   return {
@@ -58,6 +62,7 @@ export const useMyPluginStore = defineStore('my-plugins', () => {
     getAllMyPlugins,
     getMyPluginDetails,
     changeStatus,
-    deleteMyPlugins
+    deleteMyPlugins,
+    editMyPlugin,
   }
 })

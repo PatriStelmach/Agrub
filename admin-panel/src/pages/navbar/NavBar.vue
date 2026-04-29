@@ -14,7 +14,7 @@ import {
 } from "@tabler/icons-vue";
 import TeamBar from "@/pages/navbar/TeamBar.vue";
 import {
-  Sidebar, SidebarHeader,
+  Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader,
   SidebarInput,
   SidebarInset, SidebarMenu,
   SidebarMenuButton, SidebarMenuItem,
@@ -30,20 +30,17 @@ import {Avatar, AvatarFallback} from "@/components/ui/avatar";
 import {usersData} from "@/data/usersData.ts";
 import {sidebarData} from "@/data/sidebarData.ts";
 import NavUser from "@/pages/navbar/NavUser.vue";
+import {useRoute} from "vue-router";
+
+const route = useRoute()
+
 
 const navItems = [
   {
     label: 'Alerts',
     links: [
-      { label: 'Active alerts', to: 'alerts', icon: IconAlertTriangle },
-      { label: 'History', to: 'alerts_history', icon: IconHistory },
-    ]
-  },
-  {
-    label: 'Logs',
-    links: [
-      { label: 'Active logs', to: 'logs', icon: IconLogs },
-      { label: 'History', to: 'logs_history', icon: IconHistory },
+      { label: 'Active', to: 'alerts', icon: IconAlertTriangle },
+      { label: 'Hstory', to: 'alerts_history', icon: IconHistory },
     ]
   },
   {
@@ -57,7 +54,7 @@ const navItems = [
   {
     label: 'Systems',
     links: [
-      { label: 'My systems', to: 'my_systems', icon: IconSitemap },
+      { label: 'Connected', to: 'my_systems', icon: IconSitemap },
       { label: 'All systems', to: 'all_systems', icon: IconSitemapOff },
     ]
   },
@@ -66,41 +63,53 @@ const navItems = [
 
 <template>
 
-  <SidebarProvider class="  border-none px-4 w-60 ">
-    <SidebarInset class="  flex flex-col w-40 xl:w-50 bg-card">
-      <SidebarHeader>
-        <div class="text-xl space-x-2 flex pl-2 pt-4"><IconPhoneRinging/>
-          <span>Alert</span>
-        </div>
-      </SidebarHeader>
-      <Accordion class="mt-10" type="single" collapsible>
-        <AccordionItem class="" v-for="item in navItems" :key="item.label" :value="item.label">
-          <AccordionTrigger class=" cursor-pointer lg:text-lg xl:text-xl">
-            <div class="flex items-center text-center space-x-2 xl:space-x-4">
-              {{ item.label }}
+  <Sidebar class="">
+          <SidebarHeader>
+            <div class="text-xl space-x-2 flex pt-4"><IconPhoneRinging/>
+              <span>Alert</span>
             </div>
-          </AccordionTrigger>
-          <AccordionContent class="grid gap-y-2 ">
-            <RouterLink class="hover:bg-input py-2 px-1 rounded-md xl:text-lg" v-for="link in item.links" :key="link.to" :to="link.to">
-              <div class="flex items-center gap-x-2"><component class="size-4  xl:size-6" :is="link.icon"/> {{link.label}} </div></RouterLink>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
-      <div class="mb-4  mt-auto bg-card">
-        <SidebarMenu class=" ">
-          <SidebarMenuItem class="border-y-4">
-            <SidebarMenuButton class="flex items-center text-center justify-center my-2 text-lg">
-              <IconUsers class="xl:size-5! 2xl:size-6!"/>
-              <RouterLink to="/team">
-                Team
-              </RouterLink>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <TeamBar  />
-          <NavUser class="border-t-4 pt-2" :user="sidebarData.loggedUser"/>
-        </SidebarMenu>
-      </div>
-    </SidebarInset>
-</SidebarProvider>
+          </SidebarHeader>
+    <SidebarContent>
+      <SidebarGroup>
+        <SidebarGroupContent class="w-fit">
+          <SidebarMenu>
+            <SidebarMenuItem  v-for="item in navItems" :key="item.label" :value="item.label">
+              <SidebarMenuButton as-child>
+                <SidebarGroupLabel class="hover:bg-transparent pl-1 flex items-center text-center" >
+                  {{ item.label }}
+                </SidebarGroupLabel>
 
+                  <RouterLink
+                    :class="{'bg-badge/50' : route.name === link.to}"
+                    class="flex xl:text-lg ml-3 border-l-3 w-full hover:bg-input rounded-[0_0.5rem_0.5rem_0]"
+                    v-for="link in item.links" :key="link.to" :to="link.to">
+                    <div class="flex items-center gap-x-2 p-2 ml-1 ">
+                      <component class="size-4  xl:size-6" :is="link.icon"/> {{link.label}}
+                    </div>
+                  </RouterLink>
+
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+      <SidebarGroupContent class="mt-auto mb-3">
+        <SidebarMenu>
+
+            <SidebarMenuItem class="border-y-4">
+              <SidebarMenuButton class="flex items-center text-center justify-center my-2 text-lg">
+                <IconUsers class="xl:size-5! 2xl:size-6!"/>
+                <RouterLink to="/team">
+                  Team
+                </RouterLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem >
+            <TeamBar  />
+            <NavUser class="border-t-4 pt-2" :user="sidebarData.loggedUser"/>
+
+
+        </SidebarMenu>
+      </SidebarGroupContent>
+    </SidebarContent>
+  </Sidebar>
 </template>

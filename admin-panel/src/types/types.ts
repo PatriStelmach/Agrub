@@ -1,30 +1,35 @@
 export const api_url = 'http://localhost:10000/api'
 
-export interface AlertObject
-{
+export interface ActiveAlert {
   id: number
-  header: string,
+  externalEventId: string
+  subject: string,
+  message: string,
   source: string,
-  status: "Sent" | "In Process" | "Done",
-  severity: string,
-  technicianGroups?: string[],
+  originType: string,
+  acknowledged: boolean,
   createdAt: Date,
-  closedAt?: Date,
+  actions: Actions[],
+  severity: 0 | 1 | 2 | 3 | 4 | 5,
 }
 
-export interface LogObject
-{
+export interface Actions {
   id: number
-  header: string,
-  content: string,
-  source: string,
-  severity: string,
-  technicianGroups?: string[],
-  createdAt: Date,
+  alertId?: number
+  author: string,
+  ack?: boolean,
+  message?: string,
+  createdAt?: Date,
+  newSeverity?: 0 | 1 | 2 | 3 | 4 | 5,
 }
 
-export interface User
-{
+
+export interface ClosedAlert extends ActiveAlert {
+  closedAt: Date
+}
+
+
+export interface User {
   id: number,
   firstname: string,
   surname: string,
@@ -40,7 +45,7 @@ export interface MyPlugin
   name: string,
   fileName: string
   creator: string,
-  language: ".py" | ".sh" | ".bash" | ".ps1"  | ".psm1",
+  language: Language
   description?: string,
   code?: string,
   weight: number,
@@ -48,17 +53,17 @@ export interface MyPlugin
   cronExpression: string
   updatedAt: Date,
   active: boolean,
-  log: boolean
+  severity: 0 | 1 | 2 | 3 | 4 | 5,
 }
 
 export interface MyPluginsFromApi
 {
   active: boolean
   creator: string,
-  isLog: boolean,
+  severity: 0 | 1 | 2 | 3 | 4 | 5,
   name: string,
   fileName: string,
-  language: string,
+  language: Language,
   updatedAt: Date,
   weight: number,
   tags: string[],
@@ -74,7 +79,7 @@ export interface PluginDetails
 export interface ImportPlugin {
   name: string,
   creator: string,
-  language: ".py" | ".sh" | ".bash" | ".ps1"  | ".psm1",
+  language: Language,
   code: string,
   description: string,
   tags: string[],
@@ -86,7 +91,7 @@ export interface LibraryPlugin
   id: number,
   name: string,
   creator: string,
-  language: "python" | "bash" | "PowerShell",
+  language: Language,
   description?: string,
   code?: string,
   weight: number,
@@ -112,3 +117,17 @@ export interface fileType
   progress:number
 }
 
+export interface ApiResponse {
+  success: boolean,
+  message: string,
+  code: number,
+}
+
+
+export enum Language {
+  PYTHON = ".py",
+  SH = ".sh",
+  BASH = ".bash",
+  POWERSHELL = ".ps1",
+  POWERSHELL_MODULE = ".psm1"
+}
