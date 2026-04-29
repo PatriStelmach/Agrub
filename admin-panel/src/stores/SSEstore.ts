@@ -21,7 +21,6 @@ export const useSSEstore = defineStore('SSE', () =>   {
         onFailed() {
           alert(`Error connecting to API: ${error}`);
         },
-
       }
     })
 
@@ -57,10 +56,7 @@ export const useSSEstore = defineStore('SSE', () =>   {
             console.log(nVal.message)
             alertStore.updateAlert(nVal.message)
           }
-
-
         }
-
       }
     }
   })
