@@ -3,6 +3,7 @@ import 'package:alert_app/data/repositories/plugin_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:alert_app/logic/debug_view_model.dart';
 import 'package:provider/provider.dart';
+import 'package:alert_app/services/push_notification_service.dart';
 
 class DebugScreen extends StatelessWidget {
   const DebugScreen({super.key});
@@ -13,8 +14,23 @@ class DebugScreen extends StatelessWidget {
     final debugViewModel = DebugViewModel();
     return Column(
       children: [ 
-        Text("DEBUG FUNCTIONS", style: TextStyle(fontSize: 30)),
+        Text("BACKEND DEBUG", style: TextStyle(fontSize: 30)),
+
         Row(children: [
+          Expanded(
+          
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(onPressed: () {context.read<PushNotificationService>().pingBackend();}, child: Text('Ping server') ),
+          ),
+          )
+        ],),
+        
+        Text("MOCK DEBUG FUNCTIONS", style: TextStyle(fontSize: 30)),
+
+        Row(children: [
+
+          
           Expanded(
           
           child: Padding(

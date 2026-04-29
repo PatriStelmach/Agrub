@@ -4,6 +4,7 @@ import 'package:alert_app/data/models/alert_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:alert_app/services/navigation_service.dart';
+import 'package:http/http.dart' as http;
 
 
 
@@ -12,7 +13,9 @@ import 'package:alert_app/services/navigation_service.dart';
 class AlertRepository extends ChangeNotifier {
 
 
-final Map<String, Alert> alertsCache = {};
+final Map<int, Alert> alertsCache = {};
+//remembering extreme alerts that triggered alert screen
+final Set<int> notifiedAlertIds = {};
 
 DateTime lastPing = DateTime.now();
 
@@ -20,8 +23,14 @@ DateTime lastPing = DateTime.now();
 //FINAL: updating full list via REST when opening the app
 Future<void> updateAllAlerts() async {
 
-     final String response = await rootBundle.loadString('assets/mocks/alerts.json');
-    final List<dynamic> decodedData = jsonDecode(response);
+  final url = Uri.parse('http://10.0.2.2:10000/api/alerts/active');
+
+  final response = await http.get(url);
+
+
+  //Used for mock:
+  //final String response = await rootBundle.loadString('assets/mocks/alerts.json');
+    final List<dynamic> decodedData = jsonDecode(response.body);
     final List<Alert> parsedAlerts = decodedData.map((item) {
       return Alert.fromJson(item as Map<String, dynamic>);
     }).toList();
@@ -29,10 +38,20 @@ Future<void> updateAllAlerts() async {
   for (var alert in parsedAlerts) {
       alertsCache[alert.id] = alert;
 
-      if(alert.severity == AlertSeverity.extreme) {
+      final newExtremeAlerts = parsedAlerts.where((alert) => 
+      alert.severity == AlertSeverity.extreme && 
+      !notifiedAlertIds.contains(alert.id)
+    ).toList();
+
+      if (newExtremeAlerts.isNotEmpty) {
+      
+      for (var alert in newExtremeAlerts) {
+        notifiedAlertIds.add(alert.id);
+      }
         navigationService.showEmergencyOverlay();
       }
-    }
+    
+  }
 
   notifyListeners();
 
@@ -46,7 +65,7 @@ void ping() {
 
 
 // very simple placehold for sending ack
-Future<void> sendAcknowledge(String id) async {
+Future<void> sendAcknowledge(int id) async {
   
 
   

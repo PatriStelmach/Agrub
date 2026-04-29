@@ -69,8 +69,8 @@ else {
                 return Card (
                   color: alert?.severityColor,
                    child: ExpansionTile(
-                   title: Text(alert?.title ?? 'No Title'),
-                  subtitle: Text(alert?.hostName ?? 'Unknown Host'),
+                   title: Text(alert?.subject ?? 'No Title'),
+                  subtitle: Text(alert?.source ?? 'Unknown Host'),
                   leading: Icon(Icons.warning, color: Colors.black),
                   children: [
                     Column(
@@ -90,7 +90,7 @@ else {
                      
                         SizedBox(
                           width: double.infinity,
-                          child:ElevatedButton(onPressed:() { alertsViewModel.acknowledgeAlert(alert!.id);}, child: Text('Acknowledge')) 
+                          child:ElevatedButton(onPressed:() { alertsViewModel.acknowledgeAlert(alert.id);}, child: Text('Acknowledge')) 
                           )
                         
                       ]

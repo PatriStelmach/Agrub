@@ -22,7 +22,7 @@ enum PluginLanguage {
 
 class Plugin {
 
-final String name;
+  final int id;
   final String fileName;
   final String creator;
   final PluginLanguage language;
@@ -34,7 +34,7 @@ final String name;
   final bool log;
 
   Plugin({
-    required this.name,
+    required this.id,
     required this.fileName,
     required this.creator,
     required this.language,
@@ -59,16 +59,16 @@ final String name;
 
   factory Plugin.fromJson(Map<String, dynamic> json) {
     return Plugin(
-      name: json['name'] as String,
-      fileName: json['fileName'] as String,
-      creator: json['creator'] as String,
-      language: PluginLanguage.fromString(json['language'] as String),
-      weight: json['weight'] as int,
+      id: json['name'] ?? 0,
+      fileName: json['fileName'] ?? 'No fileName',
+      creator: json['creator'] ?? 'No creator',
+      language: PluginLanguage.fromString(json['language'] ?? 'No language'),
+      weight: json['weight'] ?? 0,
       tags: List<String>.from(json['tags'] ?? []),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
-      active: json['active'] as bool,
-      log: json['log'] as bool,
-      cronExpression: json['cronExpression'] as String,
+      updatedAt: DateTime.parse(json['updatedAt'] ?? DateTime.now().toIso8601String()),
+      active: json['active'] ?? false,
+      log: json['log'] ?? false,
+      cronExpression: json['cronExpression'] ?? ' ',
     );
   }
 }

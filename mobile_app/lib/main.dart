@@ -8,6 +8,7 @@ import 'package:alert_app/logic/alerts_view_model.dart';
 import 'package:alert_app/logic/home_view_model.dart';
 import 'package:alert_app/logic/user_view_model.dart';
 import 'package:alert_app/screens/general_layout_screen.dart';
+import 'package:alert_app/services/push_notification_service.dart';
 import 'package:alert_app/themes/app_theme_default.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +32,7 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => AlertRepository()),
         ChangeNotifierProvider(create: (_) => PluginsRepository()),
         ChangeNotifierProvider(create: (_) => UserRepository()),
+        ChangeNotifierProvider(create: (_) => PushNotificationService()),
         
         //Creation of view models
         ChangeNotifierProvider<PluginsViewModel>(
@@ -83,11 +85,9 @@ class MainApp extends StatelessWidget {
 
 T0D0:
 
-ASAP
-2. Mockup pushowania alertów pod FCM ( underway)
-3. Logika alarmu przy nowym extreme
-4. Mockup skryptów
+SPRAWDZIĆ REGUŁY ALERTÓW W BACKENDZIE, potencjalnie wziąć alarm triggering
 
+Mam dwa sposoby na handling enumów ze stringów - wybrać jeden, żeby kod był spójny.
 
 
 App Theme:

@@ -17,9 +17,12 @@ void sortPluginsBy(String property) {
 
 final Map<String, Comparable Function(Plugin)> pluginGetters = {
   // fileName traktujemy jako unikalny identyfikator (zamiast id)
+ 
+   'id': (plugin) => plugin.id,
+
   'fileName': (plugin) => plugin.fileName,
   
-  'name': (plugin) => plugin.name,
+ 
   
   'creator': (plugin) => plugin.creator,
   
