@@ -8,7 +8,7 @@ import {dashboardData} from "@/data/dashboardData.ts";
 export const useAlertStore = defineStore('useAlertStore', () => {
   const currentAlerts = ref<ActiveAlert[]>([])
 
-  const getAllCurrentAlerts = computed(() =>currentAlerts.value)
+  const getAllCurrentAlerts = computed(() => currentAlerts.value)
 
   const setCurrentAlerts = (newAlerts: ActiveAlert[]) => { currentAlerts.value = newAlerts }
   const addCurrentAlert  = (newAlert: ActiveAlert) => { currentAlerts.value.push(newAlert) }
@@ -17,11 +17,12 @@ export const useAlertStore = defineStore('useAlertStore', () => {
     currentAlerts.value = currentAlerts.value.filter(a => a.id !== index)
   }
   const updateAlert = (action: Actions)=> {
-    const alert = currentAlerts.value.find(a => a.id !== action.alertId)
+    const alert = currentAlerts.value.find(a => a.id === action.alertId)
+    console.log(alert)
     if (alert) {
       alert.actions.push(action)
-      alert.acknowledged = action.ack ? action.ack : alert.acknowledged
-      alert.severity = action.newSeverity ? action.newSeverity : alert.severity
+      alert.acknowledged = action.ack ??  alert.acknowledged
+      alert.severity = action.newSeverity ?? alert.severity
     }
   }
   const getCurrentAlertsRequest = async (interval?: number) => {
@@ -56,7 +57,7 @@ export const useAlertStore = defineStore('useAlertStore', () => {
           author: action.author,
       })
       if(response.status === 200) {
-        await getCurrentAlertsRequest()
+        //await getCurrentAlertsRequest()
         toast.success(response.data.message)
       }
       else {

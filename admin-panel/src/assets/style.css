@@ -48,6 +48,10 @@
   --color-severity-3: var(--color-amber-500);
   --color-severity-4: var(--color-orange-500);
   --color-severity-5: var(--badge2);
+  --color-list-hover: var(--list-hover);
+  --color-comment: var(--comment);
+  --color-date: var(--date);
+  --color-label: var(--label);
 }
 @source inline("hover:bg-severity-{0,1,2,3,4,5}{/90,80,/70,/60,/50,/40,/30,/20,/10,}{!,}");
 @source inline("{from,via,to}-severity-{0,1,2,3,4,5}{/90,80,/70,/60,/50,/40,/30,/20,/10,}{!,}");
@@ -92,8 +96,11 @@
   --badge: oklch(0.59 0.14 242);
   --badge1: oklch(0.731 0.205 132.694);
   --badge2: oklch(54.5% 0.246 16.439);
+  --list-hover: var(--color-slate-900);
+  --date: var(--color-slate-500);
+  --comment: var(--color-slate-400);
+  --label: var(--color-slate-300);
 }
-
 .light {
   --background: oklch(1 0 0);
   --selected: oklch(98.6% 0.006 261.531);
@@ -129,6 +136,10 @@
   --sidebar-border: oklch(0.928 0.006 264.531);
   --sidebar-ring: oklch(0.707 0.022 261.325);
   --badge: oklch(0.79 0.14 242);
+  --list-hover: var(--color-slate-100);
+  --date: var(--color-slate-400);
+  --comment: var(--color-slate-500);
+  --label: var(--color-slate-600);
 }
 
 
