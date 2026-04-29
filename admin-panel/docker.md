@@ -127,3 +127,25 @@
             error_page 404 /index.html;
         }
     }
+
+## .DOCKERIGNORE
+
+    # Dependency directories
+    # -------------------------------
+    front/node_modules/
+    
+    # -------------------------------
+    # Production and build outputs
+    # -------------------------------
+    dist/
+    out/
+    build/
+    public/build/
+    
+    # -------------------------------
+    # Vite, VuePress, and cache dirs
+    # -------------------------------
+    .vite/
+    .vitepress/
+    .cache/
+    .tmp/
