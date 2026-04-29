@@ -69,8 +69,8 @@ else {
                 return Card (
                   color: plugin.activeColor,
                    child: ExpansionTile(
-                   title: Text(plugin?.name ?? 'No Title'),
-                  subtitle: Text(plugin?.fileName ?? 'Unknown Host'),
+                   title: Text(plugin?.fileName ?? 'No name'),
+                  subtitle: Text(plugin?.creator ?? 'Unknown creator'),
                   leading: Icon(Icons.warning, color: Colors.black),
                   children: [
                     Column(

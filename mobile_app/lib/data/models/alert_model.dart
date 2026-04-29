@@ -7,25 +7,23 @@ enum AlertSeverity { info, low, medium, high, extreme }
 enum AlertStatus { sent, inProgress, done}
 
 class Alert {
-  final String id;
-  final String title;
-  final String hostName;
-
+final int id;
+  final String subject;       
+  final String source;    
   final AlertSeverity severity;
   final AlertStatus status;
   final DateTime createdAt;
-  final String description;
-  final String source;
+  final String message; 
+  
 
   Alert({
     required this.id,
-    required this.title,
-    required this.hostName,
+    required this.subject,
+    required this.source,
     required this.severity,
     required this.status,
     required this.createdAt,
-    this.description = '',
-    required this.source,
+    this.message = '',
   });
 
 
@@ -42,15 +40,33 @@ class Alert {
 
   factory Alert.fromJson(Map<String,dynamic> json) {
 
+//severity int to severity enum
+int sevInt = json['severity'] ?? 0;
+int sevIndex = json['severity'] is int ? json['severity'] : 0;
+  if (sevIndex >= AlertSeverity.values.length) {
+    sevIndex = AlertSeverity.values.length - 1; // Ustaw extreme jeśli wyjdzie poza zakres
+  }
+  final sev = AlertSeverity.values[sevIndex];
+
+  // String status to enum status
+  String rawStatus = (json['status'] ?? 'sent').toString().toLowerCase();
+  AlertStatus stat = AlertStatus.sent;
+  if (rawStatus == 'sent') stat = AlertStatus.sent;
+  if (rawStatus == 'inprogress') stat = AlertStatus.inProgress;
+  if (rawStatus == 'done') stat = AlertStatus.done;
+
+
+
+
     return Alert(
     id: json['id'],
-    title: json['title'],
-    hostName: json['hostName'],
-    severity: AlertSeverity.values.byName(json['severity']),
+    subject: json['subject'],
+    source: json['source'],
+    severity: sev,
     createdAt: DateTime.parse(json['createdAt']),
-    status: AlertStatus.values.byName(json['status']),
-    description: json['description'],
-    source: json['source']
+    status: stat,
+    message: json['message'],
+  
 
     );
   } 

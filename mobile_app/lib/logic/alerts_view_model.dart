@@ -22,12 +22,12 @@ void sortAlertsBy(String property) {
 
 final Map<String, Comparable Function(Alert)> getters = {
   'id': (alert) => alert.id,
-  'title': (alert) => alert.title,
-  'hostName': (alert) => alert.hostName,
+  'title': (alert) => alert.subject,
+  'hostName': (alert) => alert.source,
   'severity': (alert) => alert.severity as Comparable,
   'status': (alert) => alert.status as Comparable,
   'createdAt': (alert) => alert.createdAt,
-  'description': (alert) => alert.description,
+  'description': (alert) => alert.message,
   'source': (alert) => alert.source
 };
 
@@ -45,7 +45,7 @@ notifyListeners();
 
 
 
-Future<void> acknowledgeAlert(String alertId) async {
+Future<void> acknowledgeAlert(int alertId) async {
 
 // VERY simple function for sending ack via repository function. rudimentary error hadling
   try {

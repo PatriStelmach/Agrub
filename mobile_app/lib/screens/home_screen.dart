@@ -61,8 +61,8 @@ class HomeScreen extends StatelessWidget {
                   return Card (
                     color: alert.severityColor,
                      child: ListTile(
-                     title: Text(alert.title),
-                    subtitle: Text(alert.hostName),
+                     title: Text(alert.subject),
+                    subtitle: Text(alert.source),
                     leading: Icon(Icons.warning, color: Colors.black),
                     )
               );
@@ -91,8 +91,8 @@ class HomeScreen extends StatelessWidget {
                   return Card (
                     color: alert.severityColor,
                      child: ListTile(
-                     title: Text(alert.title),
-                    subtitle: Text(alert.hostName),
+                     title: Text(alert.subject),
+                    subtitle: Text(alert.source),
                     leading: Icon(Icons.warning, color: Colors.black),
                     )
               );
