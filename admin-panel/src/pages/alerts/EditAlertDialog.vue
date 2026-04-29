@@ -13,7 +13,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {Textarea} from "@/components/ui/textarea";
-import {ref, watch} from "vue";
+import {onUnmounted, ref, watch} from "vue";
 import {IconCircleDashedX, IconCircleDashedCheck, IconSend2} from "@tabler/icons-vue";
 import {
   Select,
@@ -47,7 +47,13 @@ const sentAction = async () => {
       message: newMessage.value ?? undefined,
       newSeverity: newSeverity.value === props.severity ? undefined : newSeverity.value,
     })
-  } return
+  } onClose()
+}
+
+const onClose = () => {
+  newAck.value = props.ack
+  newSeverity.value = props.severity
+  newMessage.value = ""
 }
 
 </script>
@@ -57,9 +63,9 @@ const sentAction = async () => {
       <DialogTrigger as-child>
         <slot/>
       </DialogTrigger>
-      <DialogContent class=" min-h-1/4 max-h-4/5 border-2 shadow-[0_0_1rem_2px]  shadow-badge1 border-badge1 duration-500" :class="{'border-badge2 shadow-badge2' : newAck}">
+      <DialogContent class=" min-h-1/4 max-h-4/5 border-2 shadow-[0_0_1rem_2px]  shadow-badge2 border-badge2 duration-500" :class="{'border-badge1 shadow-badge1' : newAck}">
         <DialogHeader>
-          <DialogTitle class="border-b-2 pb-2 border-badge1 duration-500" :class="{'border-badge2 ' : newAck}">Alert actions</DialogTitle>
+          <DialogTitle class="border-b-2 pb-2 border-badge2 duration-500" :class="{'border-badge1 ' : newAck}">Alert actions</DialogTitle>
 
         </DialogHeader>
         <div class="grid gap-3">
@@ -77,15 +83,15 @@ const sentAction = async () => {
             <Textarea id="my-message" v-model="newMessage"/>
           </div>
           <div class="grid grid-cols-8 items-center space-x-2">
-            <Label for="ack" class="col-span-1" >{{ newAck ? 'UNACK' : 'ACK' }}</Label>
-              <IconCircleDashedX
-                @click="newAck = !newAck"
-                v-if="newAck"
-                class="size-8 cursor-pointer text-badge2 hover:scale-120 duration-300"/>
-              <IconCircleDashedCheck
+            <Label for="ack" class="col-span-1" >{{ newAck ? 'ACK' : 'UNACK' }}</Label>
+            <IconCircleDashedCheck
+              @click="newAck = !newAck"
+              v-if="newAck"
+              class="size-8 cursor-pointer text-badge1 hover:scale-120 duration-300"/>
+            <IconCircleDashedX
                 @click="newAck = !newAck"
                 v-else
-                class="size-8 cursor-pointer text-badge1 hover:scale-120 duration-300"/>
+                class="size-8 cursor-pointer text-badge2 hover:scale-120 duration-300"/>
           </div>
           <div class="flex items-center space-x-2">
             <Label for="severity">Severity</Label>
@@ -105,7 +111,8 @@ const sentAction = async () => {
         </div>
         <DialogFooter>
           <DialogClose as-child>
-            <Button variant="destructive">
+            <Button variant="destructive"
+              @click="onClose">
               Cancel
             </Button>
           </DialogClose>

@@ -50,12 +50,10 @@ export const useAlertStore = defineStore('useAlertStore', () => {
     console.log(action)
     try {
       const response = await axios.post(`${api_url}/alerts/${action.id}/ack`, {
-        body: {
           ack: action.ack,
           newSeverity: action.newSeverity,
           message: action.message,
           author: action.author,
-        }
       })
       if(response.status === 200) {
         await getCurrentAlertsRequest()
