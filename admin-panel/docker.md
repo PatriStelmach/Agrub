@@ -132,7 +132,7 @@
 
     # Dependency directories
     # -------------------------------
-    front/node_modules/
+    admin-panel/node_modules/
     
     # -------------------------------
     # Production and build outputs
