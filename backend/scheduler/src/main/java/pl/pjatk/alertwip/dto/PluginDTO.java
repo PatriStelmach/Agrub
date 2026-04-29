@@ -14,6 +14,6 @@ public record PluginDTO(
         String cronExpression,
         LocalDateTime updatedAt,
         boolean active,
-        boolean isLog,
+        int severity,
         boolean isInstalled
 ) {}

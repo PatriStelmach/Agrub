@@ -2,60 +2,92 @@ package pl.pjatk.alertwip.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
+@Table(name = "global_problem", indexes = {
+        @Index(name = "idx_unique_key_id", columnList = "uniqueKey, id DESC")
+})
 public class GlobalProblem {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // taskId służy jako klucz do powiązania problemu z konkretnym zadaniem
-    private Long taskId;
-    private String taskName;
+    private String uniqueKey;
+    private String subject;
 
-    // Zmieniono z description na lastErrorMessage
-    @Column(length = 255)
-    private String lastErrorMessage;
+    @Column(columnDefinition = "TEXT")
+    private String message;
 
-    // Zmieniono z startTime na occurrenceTime
-    private LocalDateTime occurrenceTime;
+    private String source;
+    private String originType;
+    private String status = "Sent"; // "Sent" | "In Process" | "Done"
+    private int severity = 1;
 
-    // Konstruktor bezargumentowy dla JPA
-    public GlobalProblem() {}
+    private String externalEventId;
+    private boolean requiresNotification = false; // Flaga dla dźwięku/popupu
+    private LocalDateTime createdAt;
+    private LocalDateTime closedAt;
+    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<ProblemAction> actions = new ArrayList<>();
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "alert_technician_groups", joinColumns = @JoinColumn(name = "alert_id"))
+    @Column(name = "group_name")
+    private List<String> technicianGroups = new ArrayList<>();
+    private boolean isAcknowledged = false; // Nowa flaga
+    public String getUniqueKey() { return uniqueKey; }
+    public void setUniqueKey(String uniqueKey) { this.uniqueKey = uniqueKey; }
+    public String getSubject() { return subject; }
+    public void setSubject(String subject) { this.subject = subject; }
+    public String getMessage() { return message; }
 
-    public Long getId() {
-        return id;
+    public List<ProblemAction> getActions() {
+        return actions;
     }
 
-    public Long getTaskId() {
-        return taskId;
+    public void setActions(List<ProblemAction> actions) {
+        this.actions = actions;
     }
 
-    public void setTaskId(Long taskId) {
-        this.taskId = taskId;
+    public boolean isAcknowledged() {
+        return isAcknowledged;
     }
 
-    public String getTaskName() {
-        return taskName;
+    public void setAcknowledged(boolean acknowledged) {
+        isAcknowledged = acknowledged;
+    }
+    public String getOriginType() {
+        return originType;
     }
 
-    public void setTaskName(String taskName) {
-        this.taskName = taskName;
+    public void setOriginType(String originType) {
+        this.originType = originType;
+    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getExternalEventId() {
+        return externalEventId;
     }
 
-    public String getLastErrorMessage() {
-        return lastErrorMessage;
+    public void setExternalEventId(String externalEventId) {
+        this.externalEventId = externalEventId;
     }
 
-    public void setLastErrorMessage(String lastErrorMessage) {
-        this.lastErrorMessage = lastErrorMessage;
-    }
-
-    public LocalDateTime getOccurrenceTime() {
-        return occurrenceTime;
-    }
-
-    public void setOccurrenceTime(LocalDateTime occurrenceTime) {
-        this.occurrenceTime = occurrenceTime;
-    }
+    public void setMessage(String content) { this.message = content; }
+    public String getSource() { return source; }
+    public void setSource(String source) { this.source = source; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+    public int getSeverity() { return severity; }
+    public void setSeverity(int severity) { this.severity = severity; }
+    public List<String> getTechnicianGroups() { return technicianGroups; }
+    public void setTechnicianGroups(List<String> technicianGroups) { this.technicianGroups = technicianGroups; }
+    public boolean isRequiresNotification() { return requiresNotification; }
+    public void setRequiresNotification(boolean requiresNotification) { this.requiresNotification = requiresNotification; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public LocalDateTime getClosedAt() { return closedAt; }
+    public void setClosedAt(LocalDateTime closedAt) { this.closedAt = closedAt; }
 }

@@ -1,59 +1,85 @@
 package pl.pjatk.alertwip.service;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
+
 import java.util.List;
 import java.util.Map;
 
 @Service
 public class ZabbixApiService {
 
-    @Value("${zabbix.api.url}")
-    private String apiUrl;
+    private final RestClient restClient;
+    private final SystemSettingService settingService;
 
-    @Value("${zabbix.api.user}")
-    private String username;
-
-    @Value("${zabbix.api.password}")
-    private String password;
-
-    private String authToken;
-    private final RestTemplate restTemplate = new RestTemplate();
-
-    /**
-     * Logowanie do Zabbix API w celu uzyskania tokena sesji.
-     */
-    public String login() {
-        Map<String, Object> request = Map.of(
-                "jsonrpc", "2.0",
-                "method", "user.login",
-                "params", Map.of("user", username, "password", password),
-                "id", 1,
-                "auth", null
-        );
-        Map<String, Object> response = restTemplate.postForObject(apiUrl, request, Map.class);
-        if (response != null && response.containsKey("result")) {
-            this.authToken = (String) response.get("result");
-        }
-        return authToken;
+    public ZabbixApiService(RestClient restClient, SystemSettingService settingService) {
+        this.restClient = restClient;
+        this.settingService = settingService;
     }
 
-    /**
-     * Pobieranie aktualnie trwających problemów.
-     */
+    @SuppressWarnings("unchecked")
     public List<Map<String, Object>> getActiveProblems() {
-        if (authToken == null) login();
+        String apiUrl = settingService.getValue("zabbix_url", "");
+        String apiToken = settingService.getValue("zabbix_api_token", "");
+
+        if (apiUrl.isBlank() || apiToken.isBlank()) {
+            throw new IllegalStateException("Konfiguracja Zabbixa jest niekompletna. Skonfiguruj API Token w panelu.");
+        }
 
         Map<String, Object> request = Map.of(
                 "jsonrpc", "2.0",
                 "method", "problem.get",
-                "params", Map.of("recent", "true", "sortfield", "eventid", "sortorder", "DESC"),
-                "id", 2,
-                "auth", authToken
+                "auth", apiToken,
+                "params", Map.of(
+                        "output", List.of("eventid", "name", "severity"),
+                        "selectHosts", List.of("host"),
+                        "recent", false
+                ),
+                "id", 1
         );
 
-        Map<String, Object> response = restTemplate.postForObject(apiUrl, request, Map.class);
-        return (List<Map<String, Object>>) response.get("result");
+        try {
+            Map<String, Object> response = restClient.post()
+                    .uri(apiUrl)
+                    .body(request)
+                    .retrieve()
+                    .body(Map.class);
+
+            if (response != null && response.containsKey("result")) {
+                return (List<Map<String, Object>>) response.get("result");
+            }
+            return List.of();
+        } catch (Exception e) {
+            throw new RuntimeException("Błąd pobierania problemów: " + e.getMessage());
+        }
     }
+
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> callZabbixApi(String method, Map<String, Object> params) {
+        String apiUrl = settingService.getValue("zabbix_url", "");
+        String apiToken = settingService.getValue("zabbix_api_token", "");
+
+        if (apiUrl.isBlank() || apiToken.isBlank()) {
+            throw new IllegalStateException("Konfiguracja Zabbixa jest niekompletna. Skonfiguruj API Token w panelu.");
+        }
+
+        Map<String, Object> request = Map.of(
+                "jsonrpc", "2.0",
+                "method", method,
+                "auth", apiToken,
+                "params", params,
+                "id", System.currentTimeMillis() // unikalne ID zapytania
+        );
+
+        try {
+            return restClient.post()
+                    .uri(apiUrl)
+                    .body(request)
+                    .retrieve()
+                    .body(Map.class);
+        } catch (Exception e) {
+            throw new RuntimeException("Błąd komunikacji z Zabbix API (" + method + "): " + e.getMessage());
+        }
+    }
+
 }

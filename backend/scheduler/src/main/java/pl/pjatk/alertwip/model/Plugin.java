@@ -11,7 +11,7 @@ public class Plugin {
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private Long id;
 
-    private boolean isLog;
+    private int severity;
 
     private String description;
 
@@ -38,13 +38,14 @@ public class Plugin {
     private List<String> tags;
 
 
-    public boolean isLog() {
-        return isLog;
+    public int getSeverity() {
+        return severity;
     }
 
-    public void setLog(boolean log) {
-        isLog = log;
+    public void setSeverity(int severity) {
+        this.severity = severity;
     }
+
 
     public boolean isActive() {
         return isActive;

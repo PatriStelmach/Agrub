@@ -55,6 +55,7 @@ export const useAlertStore = defineStore('useAlertStore', () => {
           newSeverity: action.newSeverity,
           message: action.message,
           author: action.author,
+
       })
       if(response.status === 200) {
         //await getCurrentAlertsRequest()

@@ -1,17 +1,29 @@
 package pl.pjatk.alertwip.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 import pl.pjatk.alertwip.model.GlobalProblem;
+import org.springframework.data.jpa.repository.Query;
+import java.util.Set;
 
+import java.util.List;
 import java.util.Optional;
 
-@Repository
 public interface GlobalProblemRepository extends JpaRepository<GlobalProblem, Long> {
 
-    Optional<GlobalProblem> findByTaskId(Long taskId);
+    Optional<GlobalProblem> findFirstByUniqueKeyOrderByIdDesc(String uniqueKey);
+    List<GlobalProblem> findAllByStatusNot(String status);
 
-    boolean existsByTaskId(Long taskId);
+    boolean existsByUniqueKey(String uniqueKey);
 
-    void deleteByTaskId(Long taskId);
+    List<GlobalProblem> findBySource(String sourceName);
+
+    long countByStatus(String status);
+    long countBySeverityGreaterThanEqual(int severity);
+
+    List<GlobalProblem> findByStatusNot(String status);
+
+    @Query("SELECT p.uniqueKey FROM GlobalProblem p WHERE p.originType = 'WAZUH'")
+    Set<String> findAllWazuhUniqueKeys();
+
+    List<GlobalProblem> findByOriginTypeAndStatusNot(String originType, String status);
 }

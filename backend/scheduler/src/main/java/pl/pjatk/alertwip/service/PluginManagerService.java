@@ -2,8 +2,11 @@ package pl.pjatk.alertwip.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import pl.pjatk.alertwip.config.DynamicSchedulerConfig;
 import pl.pjatk.alertwip.dto.PluginDTO;
 import pl.pjatk.alertwip.dto.PluginDetailsDTO;
+import pl.pjatk.alertwip.dto.PluginSaveDTO;
 import pl.pjatk.alertwip.model.Plugin;
 import pl.pjatk.alertwip.model.ScheduledTask;
 import pl.pjatk.alertwip.repository.ScheduledTaskRepository;
@@ -24,21 +27,23 @@ import java.util.stream.Stream;
 public class PluginManagerService {
 
     private final ScheduledTaskRepository taskRepository;
+    private final DynamicSchedulerConfig dynamicSchedulerConfig;
 
     @Value("${app.scripts.path}")
     private String scriptsPath;
 
-    public PluginManagerService(ScheduledTaskRepository taskRepository) {
+    public PluginManagerService(ScheduledTaskRepository taskRepository,
+                                DynamicSchedulerConfig dynamicSchedulerConfig) {
         this.taskRepository = taskRepository;
+        this.dynamicSchedulerConfig = dynamicSchedulerConfig;
     }
 
     // --- KLASY I METODY POMOCNICZE DO PLIKÓW ---
-
     private static class ParsedHeaders {
         String description = "Brak opisu w pliku";
         String creator = "Nieznany";
         List<String> tags = new ArrayList<>();
-        boolean isLog = true;
+        int severity = 1; // Domyślnie traktujemy jako Log
     }
 
     private ParsedHeaders parseFileHeaders(Path path) {
@@ -49,13 +54,20 @@ public class PluginManagerService {
             while ((line = reader.readLine()) != null && count < 15) {
                 count++;
                 String trimmed = line.trim();
-                if (trimmed.startsWith("# Description:")) headers.description = trimmed.substring(14).trim();
-                else if (trimmed.startsWith("# Creator:")) headers.creator = trimmed.substring(10).trim();
-                else if (trimmed.startsWith("# Tags:")) {
+                if (trimmed.startsWith("# Description:")) {
+                    headers.description = trimmed.substring(14).trim();
+                } else if (trimmed.startsWith("# Creator:")) {
+                    headers.creator = trimmed.substring(10).trim();
+                } else if (trimmed.startsWith("# Tags:")) {
                     String tagsRaw = trimmed.substring(7).trim();
                     if (!tagsRaw.isEmpty()) headers.tags = Arrays.asList(tagsRaw.split(",\\s*"));
+                } else if (trimmed.toLowerCase().startsWith("# severity:")) {
+                    try {
+                        headers.severity = Integer.parseInt(trimmed.substring(11).trim());
+                    } catch (NumberFormatException e) {
+                        headers.severity = 1; // Bezpieczny domyślny poziom w razie błędu parsowania
+                    }
                 }
-                else if (trimmed.startsWith("# IsLog:")) headers.isLog = Boolean.parseBoolean(trimmed.substring(8).trim());
             }
         } catch (IOException e) {
             System.err.println("[SYSTEM] Nie udało się odczytać nagłówków: " + path.getFileName());
@@ -99,23 +111,94 @@ public class PluginManagerService {
 
     public PluginDetailsDTO getPluginDetailsByFileName(String fileName) {
         Path path = Paths.get(scriptsPath).resolve(fileName).toAbsolutePath();
-        if (!Files.exists(path)) throw new RuntimeException("Plik nie został znaleziony: " + fileName);
+        if (!Files.exists(path)) throw new RuntimeException("Plik nie istnieje: " + fileName);
 
         try {
-            String code = Files.readString(path);
+            List<String> lines = Files.readAllLines(path);
             ParsedHeaders headers = parseFileHeaders(path);
-            return new PluginDetailsDTO(headers.description, code);
+
+            List<String> cleanCodeLines = new ArrayList<>();
+            boolean passedSystemHeaders = false;
+
+            for (String line : lines) {
+                if (!passedSystemHeaders) {
+                    String trimmed = line.trim();
+
+                    // Sprawdzamy, czy to jest jeden z NASZYCH nagłówków (ignorując wielkość liter dla severity)
+                    boolean isSystemHeader = trimmed.startsWith("# Creator:") ||
+                            trimmed.startsWith("# Description:") ||
+                            trimmed.startsWith("# Tags:") ||
+                            trimmed.toLowerCase().startsWith("# severity:");
+
+                    if (isSystemHeader) {
+                        continue;
+                    } else if (trimmed.isEmpty() && cleanCodeLines.isEmpty()) {
+                        // Ignorujemy puste linie zaraz po nagłówkach
+                        continue;
+                    } else {
+                        passedSystemHeaders = true;
+                        cleanCodeLines.add(line);
+                    }
+                } else {
+                    cleanCodeLines.add(line);
+                }
+            }
+
+            return new PluginDetailsDTO(headers.description, String.join("\n", cleanCodeLines));
         } catch (IOException e) {
-            throw new RuntimeException("Nie udało się odczytać zawartości: " + e.getMessage());
+            throw new RuntimeException("Błąd odczytu pliku: " + e.getMessage());
         }
     }
 
-    public boolean isLogScript(String fileName) {
+    @Transactional
+    public void saveFullConfig(PluginSaveDTO dto) throws Exception {
+        String oldFileName = dto.oldName() + dto.extension();
+        String newFileName = dto.name() + dto.extension();
+        Path oldPath = Paths.get(scriptsPath).resolve(oldFileName);
+        Path newPath = Paths.get(scriptsPath).resolve(newFileName);
+
+        // 1. Obsługa zmiany nazwy pliku (Rename)
+        if (!oldFileName.equals(newFileName) && Files.exists(oldPath)) {
+            Files.move(oldPath, newPath, StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        // 2. Budowanie nowej zawartości pliku (Nagłówki + Czysty Kod)
+        StringBuilder content = new StringBuilder();
+        content.append("# Creator: System\n");
+        content.append("# Description: ").append(dto.description()).append("\n");
+        content.append("# Tags: ").append(String.join(", ", dto.tags())).append("\n");
+        content.append("# Severity: ").append(dto.severity()).append("\n\n");
+        content.append(dto.code());
+
+        Files.writeString(newPath, content.toString());
+
+        // 3. Aktualizacja bazy danych (ScheduledTask)
+        ScheduledTask task = taskRepository.findByScriptName(oldFileName)
+                .orElse(new ScheduledTask());
+
+        task.setTaskName(dto.name());
+        task.setScriptName(newFileName);
+        task.setCronExpression(dto.cronExpression());
+        task.setSeverity(dto.severity());
+        task.setActive(dto.active());
+
+        ScheduledTask savedTask = taskRepository.save(task);
+
+        // 4. Odświeżenie Schedulera
+        dynamicSchedulerConfig.updateSchedule(savedTask);
+
+        // Jeśli nazwa się zmieniła, musimy zatrzymać stary proces w schedulerze
+        if (!oldFileName.equals(newFileName)) {
+            dynamicSchedulerConfig.stopTask(task.getId());
+        }
+    }
+
+    public int getScriptSeverity(String fileName) {
         Path path = Paths.get(scriptsPath).resolve(fileName);
         if (!Files.exists(path)) {
-            throw new RuntimeException("Nie można utworzyć zadania. Plik nie istnieje: " + fileName);
+            throw new RuntimeException("Nie można odczytać zadania. Plik nie istnieje: " + fileName);
         }
-        return parseFileHeaders(path).isLog;
+        return parseFileHeaders(path).severity;
     }
 
     public void savePluginToDisk(Plugin plugin) throws Exception {
@@ -133,7 +216,7 @@ public class PluginManagerService {
         if (plugin.getTags() != null && !plugin.getTags().isEmpty()) {
             fileContent.append("# Tags: ").append(String.join(", ", plugin.getTags())).append("\n");
         }
-        fileContent.append("# IsLog: ").append(plugin.isLog()).append("\n\n");
+        fileContent.append("# Severity: ").append(plugin.getSeverity()).append("\n\n");
 
         if (plugin.getCode() != null) {
             String unescaped = plugin.getCode()
@@ -147,6 +230,50 @@ public class PluginManagerService {
         Files.writeString(filePath, fileContent.toString());
     }
 
+    @Transactional
+    public void deletePlugins(List<String> fileNames) {
+        for (String fileName : fileNames) {
+            deletePluginByFileName(fileName);
+        }
+    }
+
+    @Transactional
+    public void deletePluginByFileName(String fileName) {
+        Path path = Paths.get(scriptsPath).resolve(fileName).toAbsolutePath();
+        Optional<ScheduledTask> taskOpt = taskRepository.findByScriptName(fileName);
+        if (taskOpt.isPresent()) {
+            ScheduledTask task = taskOpt.get();
+            dynamicSchedulerConfig.stopTask(task.getId());
+            taskRepository.delete(task);
+        }
+        try {
+            if (Files.exists(path)) {
+                Files.delete(path);
+            } else {
+                System.out.println("Plik nie istniał na dysku, usunięto tylko wpis z bazy: " + fileName);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Nie udało się usunąć pliku z dysku: " + e.getMessage());
+        }
+    }
+
+    @Transactional
+    public void togglePlugins(List<String> fileNames) {
+        for (String fileName : fileNames) {
+            togglePluginStatus(fileName);
+        }
+    }
+
+    @Transactional
+    public boolean togglePluginStatus(String fileName) {
+        ScheduledTask task = taskRepository.findByScriptName(fileName)
+                .orElseThrow(() -> new RuntimeException("Zadanie dla pliku " + fileName + " nie jest jeszcze skonfigurowane w bazie. Zapisz je najpierw."));
+        task.setActive(!task.isActive());
+        ScheduledTask savedTask = taskRepository.save(task);
+        dynamicSchedulerConfig.updateSchedule(savedTask);
+        return savedTask.isActive();
+    }
+
     // --- MAPOWANIE DTO ---
 
     public PluginDTO mapStorePluginToDTO(Plugin p) {
@@ -156,7 +283,7 @@ public class PluginManagerService {
 
         return new PluginDTO(
                 p.getId(), p.getName(), p.getCreator(), p.getDescription(),
-                ext, 0, p.getTags(), null, null, false, p.isLog(), installed
+                ext, 0, p.getTags(), null, null, false, p.getSeverity(), installed
         );
     }
 
@@ -167,7 +294,10 @@ public class PluginManagerService {
         String ext = (dotIdx == -1) ? "" : fileName.substring(dotIdx);
 
         long weightKb = 0;
-        try { weightKb = Files.size(path) / 1024; } catch (IOException ignored) {}
+        try {
+            weightKb = Files.size(path) / 1024;
+        } catch (IOException ignored) {
+        }
 
         ParsedHeaders headers = parseFileHeaders(path);
 
@@ -177,7 +307,7 @@ public class PluginManagerService {
                 taskOpt.map(ScheduledTask::getCronExpression).orElse(null),
                 getFileUpdatedAt(path),
                 taskOpt.map(ScheduledTask::isActive).orElse(false),
-                taskOpt.map(ScheduledTask::isLog).orElse(headers.isLog),
+                taskOpt.map(ScheduledTask::getSeverity).orElse(headers.severity),
                 true
         );
     }

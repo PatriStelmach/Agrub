@@ -10,7 +10,6 @@ import pl.pjatk.alertwip.service.PluginManagerService;
 
 @RestController
 @RequestMapping("/api/tasks")
-@CrossOrigin(origins = "*") // Zawsze warto pamiętać o CORS dla frontendu
 public class TaskController {
 
     private final ScheduledTaskRepository repository;
@@ -32,9 +31,10 @@ public class TaskController {
         task.setTaskName(dto.taskName());
         task.setScriptName(dto.scriptName());
 
-        // Magia dzieje się tutaj - serwer sam decyduje na podstawie pliku!
-        boolean isLog = pluginManagerService.isLogScript(dto.scriptName());
-        task.setLog(isLog);
+        // --- ZMIANA TUTAJ ---
+        // Magia dzieje się tutaj - serwer sam decyduje na podstawie zawartości pliku!
+        int severity = pluginManagerService.getScriptSeverity(dto.scriptName());
+        task.setSeverity(severity);
 
         // Logika tłumaczenia interwału na Crona
         if (dto.seconds() != null) {
@@ -53,8 +53,10 @@ public class TaskController {
 
     @PutMapping("/edit")
     public ScheduledTask editTask(@RequestBody ScheduledTask task) {
-        boolean realIsLog = pluginManagerService.isLogScript(task.getScriptName());
-        task.setLog(realIsLog);
+        // --- ZMIANA TUTAJ ---
+        // Nadpisujemy severity tym, co faktycznie jest w pliku, żeby zapobiec oszustwom z frontu
+        int realSeverity = pluginManagerService.getScriptSeverity(task.getScriptName());
+        task.setSeverity(realSeverity);
 
         ScheduledTask saved = repository.save(task);
         schedulerConfig.updateSchedule(saved);
