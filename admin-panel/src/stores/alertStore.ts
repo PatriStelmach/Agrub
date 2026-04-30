@@ -1,6 +1,6 @@
 import {defineStore} from "pinia";
 import {computed, h, ref, watch} from "vue";
-import {type Actions, type ActiveAlert, api_url} from "@/types/types.ts";
+import {type ActionResponse, type Actions, type ActiveAlert, api_url} from "@/types/types.ts";
 import axios from "axios";
 import {toast} from "vue-sonner";
 import {dashboardData} from "@/data/dashboardData.ts";
@@ -16,11 +16,26 @@ export const useAlertStore = defineStore('useAlertStore', () => {
   const deleteCurrentAlert  = (index: number) => {
     currentAlerts.value = currentAlerts.value.filter(a => a.id !== index)
   }
-  const updateAlert = (action: Actions)=> {
-    const alert = currentAlerts.value.find(a => a.id === action.alertId)
+
+  const findAlert = (id: number | undefined) => {
+    return currentAlerts.value.find(a => a.id === id)
+  }
+
+  const getAlertActions = async (id: number) => {
+    const response = await axios.get<ActionResponse[]>(`${api_url}/alerts/${id}/actions`)
+    console.log(id)
+    console.log(response.data)
+    if (response.status === 200 && response.data) {
+      return response.data
+    }
+    return []
+  }
+
+  const updateAlert = (action: ActionResponse)=> {
+    const alert = findAlert(action.alertId)
     console.log(alert)
     if (alert) {
-      alert.actions.push(action)
+      //alert.actions.push(action)
       alert.acknowledged = action.ack ??  alert.acknowledged
       alert.severity = action.newSeverity ?? alert.severity
     }
@@ -79,7 +94,9 @@ export const useAlertStore = defineStore('useAlertStore', () => {
     deleteCurrentAlert,
     getCurrentAlertsRequest,
     updateAlertRequest,
-    updateAlert
+    updateAlert,
+    findAlert,
+    getAlertActions
   }
 })
 

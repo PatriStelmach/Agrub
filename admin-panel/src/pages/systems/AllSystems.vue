@@ -16,14 +16,11 @@ import
 } from "@tabler/icons-vue";
 import {Button} from "@/components/ui/button";
 import {Item, ItemContent} from "@/components/ui/item";
-import AddNew from "@/pages/systems/AddNew.vue";
 import {ref} from "vue";
 import type {System} from "@/types/types.ts";
 import {Field, FieldGroup, FieldLabel} from "@/components/ui/field";
 import {Input} from "@/components/ui/input";
 import {ButtonGroup} from "@/components/ui/button-group";
-import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
-import {ArrowLeftIcon, Search} from "lucide-vue-next";
 import {topButtonGroup, topDiv, topH1} from "@/assets/cssFunctions.ts";
 import GoBackButton from "@/helpers/GoBackButton.vue";
 

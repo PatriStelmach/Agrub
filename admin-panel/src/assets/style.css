@@ -54,6 +54,8 @@
   --color-label: var(--label);
 }
 @source inline("hover:bg-severity-{0,1,2,3,4,5}{/90,80,/70,/60,/50,/40,/30,/20,/10,}{!,}");
+@source inline("shadow-severity-{0,1,2,3,4,5}{/90,80,/70,/60,/50,/40,/30,/20,/10,}{!,}");
+@source inline("border-severity-{0,1,2,3,4,5}{/90,80,/70,/60,/50,/40,/30,/20,/10,}{!,}");
 @source inline("{from,via,to}-severity-{0,1,2,3,4,5}{/90,80,/70,/60,/50,/40,/30,/20,/10,}{!,}");
 
 :root {

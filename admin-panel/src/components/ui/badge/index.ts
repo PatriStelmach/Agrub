@@ -28,8 +28,7 @@ export const badgeVariants = cva(
         origin:
           "border-transparent text-primary bg-badge/70 hover:bg-badge/50 cursor-pointer  transition-all duration-50" +
           " hover:shadow-badge hover:shadow-md text-xs md:text-sm lg:text-md 2xl:text-lg ",
-        ack_type:"border-transparent text-blue-400  bg-blue-400/20 hover:bg-vlue/50 cursor-pointer  transition-all duration-50" +
-        " hover:shadow-badge  text-xs  ",
+        ack_type:"border-transparent text-blue-400  bg-blue-400/20  transition-all duration-50 text-xs",
       },
     },
     defaultVariants: {

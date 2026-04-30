@@ -9,7 +9,7 @@ export interface ActiveAlert {
   originType: string,
   acknowledged: boolean,
   createdAt: Date,
-  actions: ActionResponse[],
+  //actions: ActionResponse[],
   severity: 0 | 1 | 2 | 3 | 4 | 5,
 }
 
@@ -23,7 +23,7 @@ export interface Actions {
 }
 
 export interface ActionResponse extends Actions {
-  actionType: 'ACK' | 'UNACK' | 'MESSAGE',
+  actionType: string
   problemId: number,
   createdAt: Date,
 }

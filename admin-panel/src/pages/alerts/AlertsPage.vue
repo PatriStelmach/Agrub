@@ -1,18 +1,16 @@
 <script setup lang="ts" >
 import {type ActiveAlert} from "@/types/types.ts";
-import {dashboardData} from "@/data/dashboardData.ts"
 import MyPagination from "@/helpers/MyPagination.vue";
 import {
   IconEdit,
   IconCircleDashedCheck,
   IconCircleDashedX,
-  IconSend2, IconMessageCode
 } from "@tabler/icons-vue";
-import {ArrowLeftIcon, Search} from "lucide-vue-next";
+import {Search} from "lucide-vue-next";
 import { Badge } from '@/components/ui/badge'
 import {
   Table,
-  TableBody, TableCaption,
+  TableCaption,
   TableCell, TableFooter,
   TableHead,
   TableHeader,
@@ -22,18 +20,12 @@ import DateCell from "@/helpers/DateCell.vue";
 import {ButtonGroup} from "@/components/ui/button-group";
 import {Button} from "@/components/ui/button";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
+
 import SortableHead from "@/helpers/SortableHead.vue";
 import {useSort} from "@/composables/sorting.ts";
 import {useSearchFilter} from "@/composables/useSearchFilter.ts";
 import { useAlertStore } from "@/stores/alertStore";
 import {computed, onMounted, ref} from "vue";
-import {generateRandomString} from "ts-randomstring/lib";
 import {useMouse} from "@vueuse/core";
 import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import {Label} from "@/components/ui/label";
@@ -47,15 +39,6 @@ import {
 } from "@/assets/cssFunctions.ts";
 import GoBackButton from "@/helpers/GoBackButton.vue";
 import {useWrapping} from "@/composables/unwrapping.ts";
-import {unwrappedItemClass} from "@/assets/cssFunctions.ts";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from "@/components/ui/select";
-import PluginDetailsDialog from "@/pages/plugins/PluginDetailsDialog.vue";
 import EditAlertDialog from "@/pages/alerts/EditAlertDialog.vue";
 
 const alertStore = useAlertStore();

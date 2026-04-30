@@ -4,17 +4,14 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import {Textarea} from "@/components/ui/textarea";
-import {onUnmounted, ref, watch} from "vue";
-import {IconCircleDashedX, IconCircleDashedCheck, IconSend2} from "@tabler/icons-vue";
+import { ref} from "vue";
+import {IconX, IconCheck, IconSend2} from "@tabler/icons-vue";
 import {
   Select,
   SelectContent,
@@ -24,16 +21,21 @@ import {
 } from "@/components/ui/select";
 import {useAlertStore} from "@/stores/alertStore.ts";
 import DialogLabel from "@/helpers/DialogLabel.vue";
-import {Alert} from "@/components/ui/alert";
-import type {ActiveAlert} from "@/types/types.ts";
+import type {ActionResponse, ActiveAlert} from "@/types/types.ts";
 import {Badge} from "@/components/ui/badge";
-import {Card, CardHeader, CardTitle} from "@/components/ui/card";
-import {dateParser} from "@/composables/dateParser.ts";
+import ActionsTable from "@/helpers/ActionsTable.vue";
 
 const props = defineProps<{
   alert: ActiveAlert
 }>()
 
+const isLoading = ref(true);
+
+const actions = ref<ActionResponse[]>([])
+const getActions = async () => {
+    actions.value = await alertStore.getAlertActions(props.alert.id)
+    isLoading.value = false
+}
 const alertStore = useAlertStore()
 
 const newAck = ref(props.alert.acknowledged)
@@ -64,16 +66,16 @@ const onClose = () => {
 
 <template>
   <Dialog >
-      <DialogTrigger as-child>
-        <slot/>
+      <DialogTrigger as-child @click="getActions">
+        <slot />
       </DialogTrigger>
-      <DialogContent class=" h-fit   border-2 shadow-[0_0_1rem_2px]  shadow-badge2 border-badge2 duration-500" :class="{'border-badge1 shadow-badge1' : newAck}">
+      <DialogContent :class="` h-fit border-2 shadow-[0_0_1rem_2px] max-md:max-w-4/5! md:max-w-2/5! shadow-severity-${newSeverity}/70 border-severity-${newSeverity}/70 duration-500`" >
         <DialogHeader>
-          <DialogTitle class="border-b-2 pb-2 border-badge2 duration-500" :class="{'border-badge1 ' : newAck}">Alert actions</DialogTitle>
+          <DialogTitle :class="`border-b-2 pb-2 border-severity-${newSeverity}/70 duration-500`">Alert actions</DialogTitle>
 
         </DialogHeader>
-        <div class="flex flex-col px-2 max-h-[50vh] overflow-hidden ">
-          <div class="grid gap-2  shrink-0 border-b-2 pb-2 [&_p]:text-comment">
+        <div class="flex flex-col max-h-[35vh] md:max-h-[50vh]">
+          <div class="grid gap-1 [&_p]:text-comment border-b-2 pb-2">
             <div class="grid  ">
               <DialogLabel for="alert-subject" text="Subject"/>
               <p id="subject"  class="text-sm"> {{ props.alert.subject}}</p>
@@ -94,77 +96,45 @@ const onClose = () => {
             </div>
           </div>
 
-          <div class="grid flex-1 gap-2 p-2 h-1/2 overflow-y-auto">
+          <div class="grid flex-1 gap-1 p-2 overflow-scroll ">
             <div class="grid  h-full">
               <DialogLabel for="my-message " text="Your comment"/>
               <Textarea class="mb-2" id="my-message"  v-model="newMessage"/>
             </div>
             <div class="flex items-center ">
-              <DialogLabel for="ack" class="w-15 mb-0 pb-0" :text="newAck ? 'ACK' : 'UNACK' "/>
-              <IconCircleDashedCheck
-                @click="newAck = !newAck"
-                v-if="newAck"
-                class="size-8 cursor-pointer mb-0 pb-0  text-badge1 hover:scale-120 duration-300"/>
-              <IconCircleDashedX
-                @click="newAck = !newAck"
-                v-else
-                class="size-8 cursor-pointer text-badge2 hover:scale-120 duration-300"/>
+              <DialogLabel for="ack" class="w-15  mb-0 pb-0" :text="newAck ? 'ACK' : 'UNACK' "/>
+              <Button  @click="newAck = !newAck" variant="outline"  class="size-8 duration-100">
+                <IconCheck
+                  v-if="newAck"
+                  class="size-6 text-badge1 "/>
+                <IconX
+                  v-else
+                  class="size-6  text-badge2 "/>
+              </Button>
             </div>
             <div class="flex items-center ">
               <DialogLabel for="severity" class="w-15 " text="Severity"/>
               <Select
                 v-model="newSeverity"
               >
-                <SelectTrigger class="cursor-pointer h-3/4! w-1/3 ">
+                <SelectTrigger class="cursor-pointer h-8! w-16 ">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem
-                    :class='`cursor-pointer hover:bg-severity-${value}/50! `'
+                    :class='`cursor-pointer hover:bg-severity-${value}/70! `'
                     v-for="value in [0,1,2,3,4,5]" :key="value" :value="value">{{value}}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
         </div>
-
-        <div class="rounded-md border-2  w-full border-secondary">
-          <div class="sticky top-0 z-10 mx-0 w-full flex items-center
-            bg-secondary px-2 py-2 text-xs font-semibold uppercase tracking-wider text-comment">
-            <span class="w-3/10">Type</span>
-            <span class="w-3/10">Comment</span>
-            <span class="w-2/10">User</span>
-            <span class="w-2/10 text-right">Date</span>
-          </div>
-          <ul class="overflow-y-auto overflow-x-hidden max-h-[25vh] w-full divide-y text-sm">
-
-
-            <li
-              v-for="action in alert.actions"
-              :key="action.id"
-              class="flex items-center pl-2 py-3 transition-colors hover:bg-list-hover"
-            >
-              <div class="w-3/10">
-                <Badge variant="ack_type">
-                  {{ action.actionType }}
-                </Badge>
-              </div>
-              <p class="w-3/10  px-2 break-all text-comment" :title="action.message">
-                {{ action.message || '—' }}
-              </p>
-              <p class="w-2/10 font-medium text-comment">
-                {{ action.author }}
-              </p>
-              <p class="w-2/10 text-right text-xs tabular-nums text-date">
-                {{ dateParser(action.createdAt).fullDate }}
-              </p>
-            </li>
-            <li v-if="!alert.actions?.length" class="px-4 py-8 text-center text-slate-400 italic">
-              No actions recorded yet.
-            </li>
-          </ul>
-        </div>
-
+        <ActionsTable
+          :actions="actions"
+          :isLoading="isLoading"
+          >
+          <DialogLabel text="Actions" for="actions-history" />
+        </ActionsTable>
         <DialogFooter class=" items-center">
           <DialogClose as-child>
             <Button variant="destructive"

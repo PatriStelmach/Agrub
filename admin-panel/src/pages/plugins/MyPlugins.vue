@@ -1,6 +1,5 @@
 <script setup lang="ts" >
 import MyPluginsTable from "@/pages/plugins/MyPluginsTable.vue";
-import {myPluginsData} from "@/data/myPlugins.ts";
 import MyPagination from "@/helpers/MyPagination.vue";
 import type { MyPlugin } from "@/types/types.ts";
 import {useSearchFilter} from "@/composables/useSearchFilter.ts";
