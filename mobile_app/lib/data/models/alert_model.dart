@@ -38,37 +38,48 @@ final int id;
   }
 
 
-  factory Alert.fromJson(Map<String,dynamic> json) {
+factory Alert.fromJson(Map<String,dynamic> json) {
 
-//severity int to severity enum
-int sevInt = json['severity'] ?? 0;
-int sevIndex = json['severity'] is int ? json['severity'] : 0;
-  if (sevIndex >= AlertSeverity.values.length) {
-    sevIndex = AlertSeverity.values.length - 1; // Ustaw extreme jeśli wyjdzie poza zakres
+// Pomocnicza funkcja do bezpiecznego wyciągania int (obsługuje int i String)
+  int asInt(dynamic value, {int defaultValue = 0}) {
+    if (value == null) return defaultValue;
+    if (value is int) return value;
+    return int.tryParse(value.toString()) ?? defaultValue;
+  }
+
+  // 1. Obsługa Severity (Index -> Enum)
+  int sevIndex = asInt(json['severity']);
+  if (sevIndex < 0 || sevIndex >= AlertSeverity.values.length) {
+    sevIndex = AlertSeverity.values.length - 1; // Fallback na Extreme
   }
   final sev = AlertSeverity.values[sevIndex];
 
-  // String status to enum status
+  // 2. Obsługa Statusu (String -> Enum)
   String rawStatus = (json['status'] ?? 'sent').toString().toLowerCase();
-  AlertStatus stat = AlertStatus.sent;
-  if (rawStatus == 'sent') stat = AlertStatus.sent;
-  if (rawStatus == 'inprogress') stat = AlertStatus.inProgress;
-  if (rawStatus == 'done') stat = AlertStatus.done;
+  AlertStatus stat;
+  switch (rawStatus) {
+    case 'inprogress':
+    case 'in_progress': // Na wypadek literówek w backendzie
+      stat = AlertStatus.inProgress;
+      break;
+    case 'done':
+      stat = AlertStatus.done;
+      break;
+    default:
+      stat = AlertStatus.sent;
+  }
 
-
-
-
-    return Alert(
-    id: json['id'],
-    subject: json['subject'],
-    source: json['source'],
+  // 3. Budowa obiektu
+  return Alert(
+    id: asInt(json['id']),
+    subject: json['subject']?.toString() ?? '',
+    source: json['source']?.toString() ?? 'System',
     severity: sev,
-    createdAt: DateTime.parse(json['createdAt']),
+    // createdAt z FCM też przyjdzie jako String, DateTime.parse sobie z tym poradzi
+    createdAt: DateTime.tryParse(json['createdAt']?.toString() ?? '') ?? DateTime.now(),
     status: stat,
-    message: json['message'],
-  
-
-    );
+    message: json['message']?.toString() ?? '',
+  );
   } 
 }
 

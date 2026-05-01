@@ -55,8 +55,6 @@ class Plugin {
     }
   }
 
-
-
   factory Plugin.fromJson(Map<String, dynamic> json) {
     return Plugin(
       id: json['name'] ?? 0,
