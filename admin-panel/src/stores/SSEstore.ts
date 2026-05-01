@@ -21,7 +21,6 @@ export const useSSEstore = defineStore('SSE', () =>   {
         onFailed() {
           alert(`Error connecting to API: ${error}`);
         },
-
       }
     })
 
@@ -54,12 +53,10 @@ export const useSSEstore = defineStore('SSE', () =>   {
           }
           case 'ALERT_UPDATE' : {
             toast.success(`Updated: ${nVal.message.alertId}`)
+            console.log(nVal.message)
             alertStore.updateAlert(nVal.message)
           }
-
-
         }
-
       }
     }
   })

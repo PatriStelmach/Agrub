@@ -15,8 +15,8 @@ const props = defineProps<{
 </script>
 
 <template>
-  <TableHead :class="props.class" >
-    <div @click="$emit('update:toggle-sort', props.keyName)"  class="flex items-center h-full px-1 gap-2 cursor-pointer "
+  <TableHead :class="props.class" class="px-0">
+    <div @click="$emit('update:toggle-sort', props.keyName)"  class="flex items-center h-full mx-0 px-1 gap-2 cursor-pointer "
          :class="{'bg-foreground/70 text-secondary' : sortKey === props.keyName}">
       <span
 

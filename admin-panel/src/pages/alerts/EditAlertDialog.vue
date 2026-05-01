@@ -13,7 +13,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {Textarea} from "@/components/ui/textarea";
-import {ref, watch} from "vue";
+import {onUnmounted, ref, watch} from "vue";
 import {IconCircleDashedX, IconCircleDashedCheck, IconSend2} from "@tabler/icons-vue";
 import {
   Select,
@@ -23,89 +23,152 @@ import {
   SelectValue
 } from "@/components/ui/select";
 import {useAlertStore} from "@/stores/alertStore.ts";
+import DialogLabel from "@/helpers/DialogLabel.vue";
+import {Alert} from "@/components/ui/alert";
+import type {ActiveAlert} from "@/types/types.ts";
+import {Badge} from "@/components/ui/badge";
+import {Card, CardHeader, CardTitle} from "@/components/ui/card";
+import {dateParser} from "@/composables/dateParser.ts";
 
 const props = defineProps<{
-  id: number,
-  subject: string,
-  alertMessage: string,
-  ack: boolean,
-  severity: 0 | 1 | 2 | 3 | 4 | 5 ,
+  alert: ActiveAlert
 }>()
 
 const alertStore = useAlertStore()
 
-const newAck = ref(props.ack)
-const newSeverity = ref(props.severity)
+const newAck = ref(props.alert.acknowledged)
+const newSeverity = ref(props.alert.severity)
 const newMessage = ref("")
 
 const sentAction = async () => {
-  if(newAck.value !== props.ack || newSeverity.value !== props.severity || newMessage.value) {
+  if(newAck.value !== props.alert.acknowledged || newSeverity.value !== props.alert.severity || newMessage.value) {
     await alertStore.updateAlertRequest({
-      id: props.id,
+      id: props.alert.id,
       author: 'Błażej chuj',
-      ack: newAck.value === props.ack ? undefined : newAck.value,
+      ack: newAck.value === props.alert.acknowledged ? undefined : newAck.value,
       message: newMessage.value ?? undefined,
-      newSeverity: newSeverity.value === props.severity ? undefined : newSeverity.value,
+      newSeverity: newSeverity.value === props.alert.severity ? undefined : newSeverity.value,
     })
-  } return
+  } onClose()
+}
+
+const onClose = () => {
+  setTimeout(() => {
+    newAck.value = props.alert.acknowledged
+    newSeverity.value = props.alert.severity
+    newMessage.value = ""
+  }, 500)
 }
 
 </script>
 
 <template>
-  <Dialog>
+  <Dialog >
       <DialogTrigger as-child>
         <slot/>
       </DialogTrigger>
-      <DialogContent class=" min-h-1/4 max-h-4/5 border-2 shadow-[0_0_1rem_2px]  shadow-badge1 border-badge1 duration-500" :class="{'border-badge2 shadow-badge2' : newAck}">
+      <DialogContent class=" h-fit   border-2 shadow-[0_0_1rem_2px]  shadow-badge2 border-badge2 duration-500" :class="{'border-badge1 shadow-badge1' : newAck}">
         <DialogHeader>
-          <DialogTitle class="border-b-2 pb-2 border-badge1 duration-500" :class="{'border-badge2 ' : newAck}">Alert actions</DialogTitle>
+          <DialogTitle class="border-b-2 pb-2 border-badge2 duration-500" :class="{'border-badge1 ' : newAck}">Alert actions</DialogTitle>
 
         </DialogHeader>
-        <div class="grid gap-3">
-          <div class="grid gap-2  h-full">
-            <Label for="alertMessage" class="text-md">Alert</Label>
-            <p id="alertMessage"  class="text-sm"> {{ props.subject}}</p>
+        <div class="flex flex-col px-2 max-h-[50vh] overflow-hidden ">
+          <div class="grid gap-2  shrink-0 border-b-2 pb-2 [&_p]:text-comment">
+            <div class="grid  ">
+              <DialogLabel for="alert-subject" text="Subject"/>
+              <p id="subject"  class="text-sm"> {{ props.alert.subject}}</p>
+            </div>
+            <div class="grid   ">
+              <DialogLabel text="Message" for="alert-message"/>
+              <p id="alert-message" class="text-sm"> {{ props.alert.message}}</p>
+            </div>
+            <div class="flex space-x-2 ">
+              <div>
+                <DialogLabel text="Source" for="alert-source" />
+                <Badge variant="source" >{{ props.alert.source }}</Badge>
+              </div>
+              <div>
+                <DialogLabel text="Origin"  for="alert-origin"/>
+                <Badge variant="origin">{{ props.alert.originType}}</Badge>
+              </div>
+            </div>
           </div>
-        <div class="grid gap-2  h-full">
-          <Label class="text-md" for="alertMessage">Alert message</Label>
-          <p id="alertMessage" class="text-sm"> {{ props.alertMessage}}</p>
-        </div>
 
-          <div class="grid gap-3  h-full">
-            <Label for="my-message">Your message</Label>
-            <Textarea id="my-message" v-model="newMessage"/>
-          </div>
-          <div class="grid grid-cols-8 items-center space-x-2">
-            <Label for="ack" class="col-span-1" >{{ newAck ? 'UNACK' : 'ACK' }}</Label>
-              <IconCircleDashedX
-                @click="newAck = !newAck"
-                v-if="newAck"
-                class="size-8 cursor-pointer text-badge2 hover:scale-120 duration-300"/>
+          <div class="grid flex-1 gap-2 p-2 h-1/2 overflow-y-auto">
+            <div class="grid  h-full">
+              <DialogLabel for="my-message " text="Your comment"/>
+              <Textarea class="mb-2" id="my-message"  v-model="newMessage"/>
+            </div>
+            <div class="flex items-center ">
+              <DialogLabel for="ack" class="w-15 mb-0 pb-0" :text="newAck ? 'ACK' : 'UNACK' "/>
               <IconCircleDashedCheck
                 @click="newAck = !newAck"
+                v-if="newAck"
+                class="size-8 cursor-pointer mb-0 pb-0  text-badge1 hover:scale-120 duration-300"/>
+              <IconCircleDashedX
+                @click="newAck = !newAck"
                 v-else
-                class="size-8 cursor-pointer text-badge1 hover:scale-120 duration-300"/>
-          </div>
-          <div class="flex items-center space-x-2">
-            <Label for="severity">Severity</Label>
-            <Select
-              v-model="newSeverity"
-            >
-              <SelectTrigger class="cursor-pointer w-1/3 ">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem
-                  :class='`cursor-pointer hover:bg-severity-${value}/50! `'
-                  v-for="value in [0,1,2,3,4,5]" :key="value" :value="value">{{value}}</SelectItem>
-              </SelectContent>
-            </Select>
+                class="size-8 cursor-pointer text-badge2 hover:scale-120 duration-300"/>
+            </div>
+            <div class="flex items-center ">
+              <DialogLabel for="severity" class="w-15 " text="Severity"/>
+              <Select
+                v-model="newSeverity"
+              >
+                <SelectTrigger class="cursor-pointer h-3/4! w-1/3 ">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem
+                    :class='`cursor-pointer hover:bg-severity-${value}/50! `'
+                    v-for="value in [0,1,2,3,4,5]" :key="value" :value="value">{{value}}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
-        <DialogFooter>
+
+        <div class="rounded-md border-2  w-full border-secondary">
+          <div class="sticky top-0 z-10 mx-0 w-full flex items-center
+            bg-secondary px-2 py-2 text-xs font-semibold uppercase tracking-wider text-comment">
+            <span class="w-3/10">Type</span>
+            <span class="w-3/10">Comment</span>
+            <span class="w-2/10">User</span>
+            <span class="w-2/10 text-right">Date</span>
+          </div>
+          <ul class="overflow-y-auto overflow-x-hidden max-h-[25vh] w-full divide-y text-sm">
+
+
+            <li
+              v-for="action in alert.actions"
+              :key="action.id"
+              class="flex items-center pl-2 py-3 transition-colors hover:bg-list-hover"
+            >
+              <div class="w-3/10">
+                <Badge variant="ack_type">
+                  {{ action.actionType }}
+                </Badge>
+              </div>
+              <p class="w-3/10  px-2 break-all text-comment" :title="action.message">
+                {{ action.message || '—' }}
+              </p>
+              <p class="w-2/10 font-medium text-comment">
+                {{ action.author }}
+              </p>
+              <p class="w-2/10 text-right text-xs tabular-nums text-date">
+                {{ dateParser(action.createdAt).fullDate }}
+              </p>
+            </li>
+            <li v-if="!alert.actions?.length" class="px-4 py-8 text-center text-slate-400 italic">
+              No actions recorded yet.
+            </li>
+          </ul>
+        </div>
+
+        <DialogFooter class=" items-center">
           <DialogClose as-child>
-            <Button variant="destructive">
+            <Button variant="destructive"
+              @click="onClose">
               Cancel
             </Button>
           </DialogClose>
@@ -115,7 +178,7 @@ const sentAction = async () => {
               type="submit"
               @click="sentAction"
             >
-              Update <IconSend2/>
+              Update <IconSend2 class="text-badge1"/>
             </Button>
           </DialogClose>
 
