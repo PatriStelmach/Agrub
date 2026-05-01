@@ -10,6 +10,7 @@ dependencies:
   audioplayers: ^6.6.0
   firebase_core: ^4.7.0
   firebase_messaging: ^16.2.0
+  flutter_client_sse: 2.0.3
   flutter:
     sdk: flutter
   http: ^1.2.0

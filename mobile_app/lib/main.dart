@@ -11,28 +11,47 @@ import 'package:alert_app/screens/general_layout_screen.dart';
 import 'package:alert_app/services/push_notification_service.dart';
 import 'package:alert_app/themes/app_theme_default.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+
+//This process is responsible for handling notifications coming when app is not running.
+//Must be top-level, out of main 
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  
+  debugPrint("Handling a background message: ${message.messageId}");
+
+}
 
 Future<void> main() async {
 
 //checking if flutter engine is ready
   WidgetsFlutterBinding.ensureInitialized();
 
-  // To inicjalizuje Firebase
+  // Firebase initialization
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  final alertRepository = AlertRepository();
+  final notificationService = PushNotificationService(alertRepository);
 
+  await alertRepository.updateAllAlerts();
+  alertRepository.initSseConnection();
+  await notificationService.initNotificationHandling();
   runApp(
     MultiProvider(
       providers: [
+
+        ChangeNotifierProvider.value(value: alertRepository),
+        ChangeNotifierProvider.value(value: notificationService),
+
         //Single source of truth
-        ChangeNotifierProvider(create: (_) => AlertRepository()),
         ChangeNotifierProvider(create: (_) => PluginsRepository()),
         ChangeNotifierProvider(create: (_) => UserRepository()),
-        ChangeNotifierProvider(create: (_) => PushNotificationService()),
         
         //Creation of view models
         ChangeNotifierProvider<PluginsViewModel>(
@@ -84,6 +103,7 @@ class MainApp extends StatelessWidget {
 
 
 T0D0:
+
 
 SPRAWDZIĆ REGUŁY ALERTÓW W BACKENDZIE, potencjalnie wziąć alarm triggering
 

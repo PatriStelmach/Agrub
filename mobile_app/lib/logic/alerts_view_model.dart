@@ -6,41 +6,43 @@ import 'package:alert_app/data/repositories/alert_repository.dart';
 class AlertsViewModel extends ChangeNotifier {
 
 final AlertRepository alertsRepository;
+String _currentSortProperty = 'id';
 AlertsViewModel({required this.alertsRepository}) {
   alertsRepository.addListener(notifyListeners);
 
 }
 
-
-
-List<Alert> sortedAlerts = [];
-
 List<Alert> get alertsList => alertsRepository.alertsCache.values.toList();
 
 
+List<Alert> get sortedAlerts {
+    final list = List<Alert>.from(alertsList);
+    
+    final Map<String, Comparable Function(Alert)> getters = {
+      'id': (alert) => alert.id,
+      'title': (alert) => alert.subject,
+      'hostName': (alert) => alert.source,
+      'severity': (alert) => alert.severity.index,
+      'status': (alert) => alert.status.index,
+      'createdAt': (alert) => alert.createdAt,
+      'description': (alert) => alert.message,
+      'source': (alert) => alert.source
+    };
+
+    final getter = getters[_currentSortProperty] ?? (alert) => alert.id;
+    list.sort((a, b) => getter(a).compareTo(getter(b)));
+    return list;
+  }
+
 void sortAlertsBy(String property) {
+    _currentSortProperty = property;
+    notifyListeners(); 
+  }
 
-final Map<String, Comparable Function(Alert)> getters = {
-  'id': (alert) => alert.id,
-  'title': (alert) => alert.subject,
-  'hostName': (alert) => alert.source,
-  'severity': (alert) => alert.severity as Comparable,
-  'status': (alert) => alert.status as Comparable,
-  'createdAt': (alert) => alert.createdAt,
-  'description': (alert) => alert.message,
-  'source': (alert) => alert.source
-};
-
-
-final getter = getters[property]!;
-
-final newList = List<Alert>.from(alertsList);
-newList.sort((a,b) => getter(a).compareTo(getter(b)));
-sortedAlerts = newList;
-
-notifyListeners();
-}
-
+void handleRepoChange() {
+    debugPrint("ViewModel: Repo wysłało sygnał, odświeżam widok.");
+    notifyListeners(); 
+  }
 
 
 
@@ -58,4 +60,9 @@ Future<void> acknowledgeAlert(int alertId) async {
   }
 }
 
+@override
+  void dispose() {
+    alertsRepository.removeListener(handleRepoChange);
+    super.dispose();
+  }
 }
