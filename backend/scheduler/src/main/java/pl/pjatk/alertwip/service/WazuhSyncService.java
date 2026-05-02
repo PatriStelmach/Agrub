@@ -77,6 +77,13 @@ public class WazuhSyncService {
 
                 Set<String> existingKeys = problemRepository.findAllWazuhUniqueKeys();
 
+                int minActiveLevel;
+                try {
+                    minActiveLevel = Integer.parseInt(settingService.getValue("wazuh_min_active_level", "8"));
+                } catch (Exception e) {
+                    minActiveLevel = 8; // Fallback w przypadku błędu
+                }
+
                 for (JsonNode logNode : logs) {
                     String timestamp = logNode.path("timestamp").asText("");
                     String tag = logNode.path("tag").asText("");
@@ -105,9 +112,28 @@ public class WazuhSyncService {
                             problem.setSeverity(2);
                         }
 
-                        problem.setStatus("New");
-                        problem.setCreatedAt(LocalDateTime.now());
+                        // sprawdzamy poziom alertu z wazuha (0-15)
+                        int wazuhRuleLevel = 0;
+                        try {
+                            wazuhRuleLevel = Integer.parseInt(level);
+                        } catch (NumberFormatException ignored) {}
 
+                        // sprawdzamy czy więcej niż nasz próg alertowania
+                        if (wazuhRuleLevel > 0 && wazuhRuleLevel < minActiveLevel) {
+                            // Jeśli nie to nie powiadamiamy
+                            problem.setStatus("Done");
+                            problem.setAcknowledged(true);
+                            problem.setClosedAt(LocalDateTime.now());
+
+                            // Zapisujemy TYLKO do bazy (na potrzeby zakładki Historia)
+                            problemRepository.save(problem);
+                            existingKeys.add(uniqueKey);
+                            added++;
+                            continue; // Przerywamy dalsze instrukcje dla tego loga - brak cache i SSE!
+                        }
+
+                        // Standardowe przetwarzanie dla alertów powiększych od progu
+                        problem.setStatus("New");
                         routingService.processVisibility(problem);
 
                         GlobalProblem saved = problemRepository.save(problem);

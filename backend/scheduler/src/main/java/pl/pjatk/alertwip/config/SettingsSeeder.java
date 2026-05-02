@@ -28,8 +28,9 @@ public class SettingsSeeder implements CommandLineRunner {
                 "wazuh_enabled", "false",
                 "wazuh_url", "https://localhost:55000",
                 "wazuh_user", "admin",
-                "wazuh_password", ""
+                "wazuh_password", "",
 
+                "wazuh_min_active_level", "8"
                 //  Tu dodawać nowe ustawienia
         );
 

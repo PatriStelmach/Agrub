@@ -10,6 +10,7 @@ import pl.pjatk.alertwip.repository.GlobalProblemRepository;
 import pl.pjatk.alertwip.repository.ProblemActionRepository;
 import pl.pjatk.alertwip.service.ActiveAlertCache;
 import pl.pjatk.alertwip.service.AlertActionService;
+import pl.pjatk.alertwip.service.AlertHistoryService;
 import pl.pjatk.alertwip.service.SseNotifService;
 
 import java.util.List;
@@ -23,23 +24,26 @@ public class AlertController {
     private final AlertActionService alertActionService;
     private final ActiveAlertCache alertCache;
     private final ProblemActionRepository actionRepository;
+    private final AlertHistoryService alertHistoryService;
 
     public AlertController(GlobalProblemRepository problemRepository,
                            SseNotifService sseService,
                            AlertActionService alertActionService,
                            ActiveAlertCache alertCache,
-                           ProblemActionRepository actionRepository) {
+                           ProblemActionRepository actionRepository,
+                           AlertHistoryService alertHistoryService) {
         this.problemRepository = problemRepository;
         this.sseService = sseService;
         this.alertActionService = alertActionService;
         this.alertCache = alertCache;
         this.actionRepository = actionRepository;
+        this.alertHistoryService = alertHistoryService;
     }
 
     // Pobieranie otwartych alertów (Filtrowane po uprawnieniach usera z URL)
     @GetMapping("/active")
     public List<GlobalProblem> getActiveAlerts(@RequestParam(defaultValue = "ADMIN") List<String> groups) {
-        // Odpytujemy naszą strukturę w pamięci!
+        // Odpytujemy naszą strukturę w pamięci
         return alertCache.getActiveAlertsForGroups(groups);
     }
 
@@ -47,6 +51,25 @@ public class AlertController {
     @GetMapping("/stream")
     public SseEmitter streamAlerts(@RequestParam(defaultValue = "ADMIN") List<String> groups) {
         return sseService.subscribe(groups);
+    }
+
+    @GetMapping("/history")
+    public ResponseEntity<List<GlobalProblem>> getHistory(
+            @RequestParam(defaultValue = "50") int pageSize,
+            @RequestParam(required = false) Long lastItemId,
+            @RequestParam(required = false) Long firstItemId,
+            @RequestParam(required = false) String searchQuery,
+            @RequestParam(required = false) List<String> systems,
+            @RequestParam(required = false) String origin,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime dateFrom,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime dateTo
+    ) {
+
+        List<GlobalProblem> history = alertHistoryService.getAlertHistory(
+                pageSize, lastItemId, firstItemId, searchQuery, systems, origin, dateFrom, dateTo
+        );
+
+        return ResponseEntity.ok(history);
     }
 
     @PostMapping("/{id}/ack")
