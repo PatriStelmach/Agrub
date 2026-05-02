@@ -27,4 +27,6 @@ public interface GlobalProblemRepository extends JpaRepository<GlobalProblem, Lo
     Set<String> findAllWazuhUniqueKeys();
 
     List<GlobalProblem> findByOriginTypeAndStatusNot(String originType, String status);
+
+    List<GlobalProblem> findByOriginType(String nagios);
 }

@@ -108,7 +108,8 @@ public class AlertController {
     @GetMapping("/{id}/actions")
     public ResponseEntity<List<ProblemAction>> getAlertActions(@PathVariable Long id) {
         // Zwracamy całą historię od najstarszego do najnowszego
-        List<ProblemAction> history = actionRepository.findAllByProblemIdOrderByCreatedAtAsc(id);
+        List<ProblemAction> history = actionRepository.findAllByProblemIdOrderByCreatedAtDesc(id);
+        System.out.println(history.toString());
         return ResponseEntity.ok(history);
     }
 }

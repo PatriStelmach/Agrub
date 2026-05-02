@@ -20,17 +20,22 @@ public class SettingsSeeder implements CommandLineRunner {
     public void run(String... args) {
         // 1. Definiujemy nasz słownik wartości domyślnych
         // TODO: zmienić to potem z tego mocka
-        Map<String, String> defaultSettings = Map.of(
-                "zabbix_enabled", "true",
-                "zabbix_url", "http://localhost:10000/api/mock/zabbix",
-                "zabbix_api_token", "asdasd",
+        Map<String, String> defaultSettings = Map.ofEntries(
+                Map.entry("zabbix_enabled", "true"),
+                Map.entry("zabbix_url", "http://localhost:10000/api/mock/zabbix"),
+                Map.entry("zabbix_api_token", "asdasd"),
 
-                "wazuh_enabled", "false",
-                "wazuh_url", "https://localhost:55000",
-                "wazuh_user", "admin",
-                "wazuh_password", "",
+                Map.entry("wazuh_enabled", "false"),
+                Map.entry("wazuh_url", "https://localhost:55000"),
+                Map.entry("wazuh_user", "admin"),
+                Map.entry("wazuh_password", ""),
+                Map.entry("wazuh_min_active_level", "8"),
 
-                "wazuh_min_active_level", "8"
+                Map.entry("nagios_enabled", "true"),
+                Map.entry("nagios_url", "http://localhost:8080/nagios/cgi-bin/statusjson.cgi"),
+                Map.entry("nagios_user", "nagiosadmin"),
+                Map.entry("nagios_pass", "nagiosadmin")
+
                 //  Tu dodawać nowe ustawienia
         );
 
