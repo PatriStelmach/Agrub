@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
 
 enum PluginLanguage {
   py(".py"),
@@ -57,7 +56,7 @@ class Plugin {
 
   factory Plugin.fromJson(Map<String, dynamic> json) {
     return Plugin(
-      id: json['name'] ?? 0,
+      id: json['id'] ?? 0,
       fileName: json['fileName'] ?? 'No fileName',
       creator: json['creator'] ?? 'No creator',
       language: PluginLanguage.fromString(json['language'] ?? 'No language'),

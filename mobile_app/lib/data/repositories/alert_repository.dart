@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:alert_app/data/models/alert_model.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:alert_app/services/navigation_service.dart';
 import 'package:flutter_client_sse/constants/sse_request_type_enum.dart';
 import 'package:http/http.dart' as http;
@@ -16,6 +15,24 @@ final Set<int> notifiedAlertIds = {};
 
 DateTime lastPing = DateTime.now();
 
+AlertSeverity _mapIntToSeverity(int value) {
+  switch (value) {
+    case 5:
+      return AlertSeverity.extreme;
+    case 4:
+      return AlertSeverity.high;
+    case 3:
+      return AlertSeverity.medium;
+    case 2:
+      return AlertSeverity.low;
+    default:
+      return AlertSeverity.info;
+  }
+}
+
+
+
+
 void initSseConnection() {
   const String sseUrl = 'http://10.0.2.2:10000/api/alerts/stream?groups=ADMIN';
 
@@ -27,12 +44,30 @@ SSEClient.subscribeToSSE(
         "Cache-Control": "no-cache",
       },
     ).listen((event) {
+      debugPrint("SSE Raw Event: ${event.data}");
       if (event.data != null && event.data!.isNotEmpty) {
-        debugPrint("SSE Otrzymano dane: ${event.data}");
+        try {
+        // Parsing String -> Map
+        final Map<String, dynamic> decodedData = jsonDecode(event.data!);
+        final String eventType = decodedData['eventType'] ?? '';
+        final dynamic message = decodedData['message'];
 
+        // 2. Logika "Dystrybutora" zdarzeń
+        if (eventType == 'ALERT_UPDATE') {
+          handleSingleAlertUpdate(message);
+        } else {
+          debugPrint("Otrzymano inny typ zdarzenia: $eventType");
+        }
+        
+      } catch (e) {
+        debugPrint("DEBUG: SSE prasing error: $e");
       }
-      });
-      }
+    }
+  });
+}
+
+      
+   
 
 //MOCK: getting alerts from local JSON
 //FINAL: updating full list via REST when opening the app
@@ -54,18 +89,52 @@ Future<void> updateAllAlerts() async {
 }
 
 
-void handleSingleAlertUpdate(Map<String, dynamic> rawData) {
-    try {
-      // Mapujemy pojedynczy obiekt
-      final alert = Alert.fromJson(rawData);
-      
-      _processAlerts([alert]);
-      
-      debugPrint("DEBUG: FCM/SSE: Alert processed: ${alert.id}");
-    } catch (e) {
-      debugPrint("DEBUG: FCM Mapping Error $e");
+void handleSingleAlertUpdate(dynamic message) {
+  debugPrint("SSE Message content: $message");
+
+    // Severity update
+    if (message.containsKey('alertId') && message.containsKey('newSeverity')) {
+      int id = message['alertId'];
+      int newSeverityValue = message['newSeverity'];
+
+      if (alertsCache.containsKey(id)) {
+        debugPrint("SSE: Aktualizuję tylko severity dla alertu $id");
+        
+        // Update of the object in cache
+        final existingAlert = alertsCache[id]!;
+        alertsCache[id] = existingAlert.copyWith(
+          severity: _mapIntToSeverity(newSeverityValue), 
+        );
+        notifyListeners();
+      } else {
+        // Jeśli nie mamy go w cache, pobierzmy wszystko od nowa
+        updateAllAlerts();
+      }
     }
-  }
+
+    // ACK update
+    if (message.containsKey('alertId') && message.containsKey('ack')) {
+      final int id = message['alertId'];
+      final bool isAck = message['ack'];
+
+      if (alertsCache.containsKey(id)) {
+        debugPrint("SSE: ACK status change for $id to $isAck");
+        
+        alertsCache[id] = alertsCache[id]!.copyWith(
+          acknowledged: isAck,
+        );
+        notifyListeners();
+      }
+    } 
+
+
+    // Full alert update
+    else if (message.containsKey('subject')) { 
+      final alert = Alert.fromJson(message);
+      _processAlerts([alert]);
+    }
+}
+
 
 void _processAlerts(List<Alert> incomingAlerts) {
     debugPrint("Repo: Procesuję ${incomingAlerts.length} alertów");
@@ -74,13 +143,12 @@ void _processAlerts(List<Alert> incomingAlerts) {
 
 
     for (var alert in incomingAlerts) {
-      //cache synchronization ( multiple alarm overlays prevention)
-      if (notifiedAlertIds.contains(alert.id)) continue;
+
       alertsCache[alert.id] = alert;
 
     debugPrint("DEBUG: Analysis of Alert ID: ${alert.id}");
     debugPrint(" DEBUG: Show severity: ${alert.severity}");
-    debugPrint(" DEBUG: Is ID already in notifedAlertsIds list>? ${notifiedAlertIds.contains(alert.id)}");
+    debugPrint(" DEBUG: Is ID already in notifedAlertIds list>? ${notifiedAlertIds.contains(alert.id)}");
 
       if (alert.severity == AlertSeverity.extreme && !notifiedAlertIds.contains(alert.id)) {
         debugPrint("DEBUG: Alert is new");
@@ -105,12 +173,12 @@ void _processAlerts(List<Alert> incomingAlerts) {
   notifyListeners();
   debugPrint("--- [DEBUG END] ---");
 
-  }
+}
 
 // very simple placehold for sending ack
 Future<void> sendAcknowledge(int id) async {
   
- print("ACK sent");
+ debugPrint("ACK sent");
   }
 
 }

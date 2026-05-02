@@ -17,6 +17,7 @@ final Map<String, Plugin> pluginsCache = {};
 //FINAL: updating full list via REST when opening the app
 Future<void> updateAllPlugins() async {
 
+  try {
     final url = Uri.parse('http://10.0.2.2:10000/api/plugins/all');
 
     final response = await http.get(url);
@@ -36,6 +37,12 @@ Future<void> updateAllPlugins() async {
     }
 
   notifyListeners();
+  debugPrint("PLUGIN DEBUG: Loaded ${pluginsCache.length} plugin(s)");
+  }
+  
+  catch (e) {
+    debugPrint("PLUGIN DEBUG: Error when connecting to API $e");
+  }
 
 }
 

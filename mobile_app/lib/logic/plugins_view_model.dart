@@ -65,7 +65,7 @@ Future<void> startPlugin(String pluginFileName) async {
     
     notifyListeners();
   } catch (e) {
-      print('Placeholder error: $e');
+      debugPrint('Placeholder error: $e');
 
   }
 }
