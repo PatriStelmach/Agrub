@@ -15,6 +15,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
   @override
   Widget build(BuildContext context) {
 
+
     final alertsViewModel = context.watch<AlertsViewModel>();
     
 if (alertsViewModel.alertsList.isEmpty) {
@@ -24,10 +25,8 @@ if (alertsViewModel.alertsList.isEmpty) {
       ),
     );
 }
-else {
-  alertsViewModel.sortAlertsBy(dropDownValue);
-}
 
+final sortedList = alertsViewModel.sortedAlerts;
     
     return Column(
       
@@ -62,7 +61,7 @@ else {
 
             Expanded(
               child: ListView.builder(
-              itemCount: alertsViewModel.sortedAlerts.length,
+              itemCount: sortedList.length,
               itemBuilder: (context, index) {
                 final alert = alertsViewModel.sortedAlerts[index];
               
@@ -70,7 +69,7 @@ else {
                   color: alert?.severityColor,
                    child: ExpansionTile(
                    title: Text(alert?.subject ?? 'No Title'),
-                  subtitle: Text(alert?.source ?? 'Unknown Host'),
+                  subtitle: Text(alert.acknowledged ? 'ACKNOWLEDGED' : 'NOT ACKNOWLEDGED'),
                   leading: Icon(Icons.warning, color: Colors.black),
                   children: [
                     Column(

@@ -18,20 +18,18 @@ PushNotificationService(this.alertRepository);
 final FirebaseMessaging fcm = FirebaseMessaging.instance;
 
  Future<void> initNotificationHandling() async {
-    // 1. SCENARIUSZ: Aplikacja była CAŁKOWICIE WYŁĄCZONA (Terminated)
-    // Sprawdzamy, czy aplikacja "wstała" dzięki kliknięciu w powiadomienie
+    //Aplication not running at all
     RemoteMessage? initialMessage = await fcm.getInitialMessage();
     if (initialMessage != null) {
       _handleMessage(initialMessage);
     }
 
-    // 2. SCENARIUSZ: Aplikacja była ZMINIMALIZOWANA (Background)
-    // Stream nasłuchujący na kliknięcie w powiadomienie w zasobniku
+    //Application minimized
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       _handleMessage(message);
     });
 
-    // 3. SCENARIUSZ: Aplikacja jest OTWARTA (Foreground) - Krytyczne dla Emergency!
+    // Application open
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       debugPrint("FCM: Otrzymano powiadomienie w trybie Foreground");
       _handleMessage(message);

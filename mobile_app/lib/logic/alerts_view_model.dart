@@ -8,7 +8,7 @@ class AlertsViewModel extends ChangeNotifier {
 final AlertRepository alertsRepository;
 String _currentSortProperty = 'id';
 AlertsViewModel({required this.alertsRepository}) {
-  alertsRepository.addListener(notifyListeners);
+  alertsRepository.addListener(handleRepoChange);
 
 }
 

@@ -37,9 +37,13 @@ Future<void> main() async {
   );
 
   final alertRepository = AlertRepository();
+  final pluginRepository = PluginsRepository();
   final notificationService = PushNotificationService(alertRepository);
 
+
+//TO DO - małpowane rozwiązanie alerts dla plugins, sprawdzić czy dobre podejście
   await alertRepository.updateAllAlerts();
+  await pluginRepository.updateAllPlugins();
   alertRepository.initSseConnection();
   await notificationService.initNotificationHandling();
   runApp(
@@ -47,10 +51,11 @@ Future<void> main() async {
       providers: [
 
         ChangeNotifierProvider.value(value: alertRepository),
+        ChangeNotifierProvider.value(value: pluginRepository),
         ChangeNotifierProvider.value(value: notificationService),
 
         //Single source of truth
-        ChangeNotifierProvider(create: (_) => PluginsRepository()),
+        //ChangeNotifierProvider(create: (_) => PluginsRepository()),
         ChangeNotifierProvider(create: (_) => UserRepository()),
         
         //Creation of view models
@@ -105,20 +110,22 @@ class MainApp extends StatelessWidget {
 T0D0:
 
 
-SPRAWDZIĆ REGUŁY ALERTÓW W BACKENDZIE, potencjalnie wziąć alarm triggering
-
-Mam dwa sposoby na handling enumów ze stringów - wybrać jeden, żeby kod był spójny.
-
+DONE: Dlaczego odświeża się dopiero po kliknięciu??? Do naprawy
+2. Ogarnięcie komentarzy, snippetów itd. 
+4. Ackowanie i komentowanie alertów
+5. Co z tymi pluginami? Gdzie biblioteka pluginów? ( Debug pokazuje że przychodzi pusta lista, investigate)
+6. Uruchamianie pluginów/logi itd w tle
+7. ekran logowanie na potem
+8. Czy notifications z zamockowanymi alertami działają dobrze?
+9. Jak dodać takie z updatem, żeby robiły się w tle?
+10. FCM - co jest potrzebne na backendzie żeby wysyłać notifications?
+???. Ogarnięcie logowania do backendu
+??? Odpalić poprawnie Wazuha
+??? Zmiana mapowania kolorów
+??? Mam dwa sposoby na handling enumów ze stringów - wybrać jeden, żeby kod był spójny.
 
 App Theme:
 - odpicowanie elementów stałych, żeby nie wyglądały tak szkolnie
 - uporządkowanie obramowań containerów/usunięcie jak będzie lepiej
-
-
-Login screen/authorization screen?
-- Layout
-- przygotowanie logiki pod autoryzację z serwerem
-
-
 
   */
