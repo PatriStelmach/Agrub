@@ -243,18 +243,18 @@ const onCancel = () => {
           <MyDateRangePicker label-text="Created at - range" label-for="created-at"/>
           <MyDateRangePicker label-text="Closed at - range" label-for="closed-at"/>
         </div>
-        <SheetFooter>
-          <Button
-            variant="outline">Submit<IconFilterShare class="text-green-badge"/></Button>
-          <SheetClose as-child>
-            <Button
-              @click="onCancel"
-              variant="red_outline"
-            >Cancel<IconFilterOff/></Button>
-          </SheetClose>
-        </SheetFooter>
-      </div>
 
+      </div>
+      <SheetFooter class="mb-2">
+        <Button
+          variant="outline">Submit<IconFilterShare class="text-green-badge"/></Button>
+        <SheetClose as-child>
+          <Button
+            @click="onCancel"
+            variant="red_outline"
+          >Cancel<IconFilterOff/></Button>
+        </SheetClose>
+      </SheetFooter>
     </SheetContent>
   </Sheet>
 </template>
