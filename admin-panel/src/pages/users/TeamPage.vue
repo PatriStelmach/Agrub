@@ -105,8 +105,8 @@ const { badgeSearch, availableBadges, addBadge, badgeListOpen, matchedBadges, ex
               </AvatarFallback>
             </Avatar>
             <span
-              class="absolute bottom-0 right-0 size-2.5 rounded-full  bg-badge1"
-              :class="{'bg-badge2' : !user.active}"
+              class="absolute bottom-0 right-0 size-2.5 rounded-full  bg-green-badge"
+              :class="{'bg-red-badge' : !user.active}"
             />
           </div>
 
@@ -149,7 +149,7 @@ const { badgeSearch, availableBadges, addBadge, badgeListOpen, matchedBadges, ex
           </div>
           <component :is="isUnwrapped(user.id) ? IconEditOff : IconEdit"
                      @click="isUnwrapped(user.id) ? wrap(false) : unwrap(user.id)"
-                     class="text-badge1 cursor-pointer hover:scale-115 " :class="{'text-badge2' : isUnwrapped(user.id)}" />
+                     class="text-green-badge cursor-pointer hover:scale-115 " :class="{'text-red-badge' : isUnwrapped(user.id)}" />
         </CardHeader>
         <CardDescription class="px-3 ">
             <RadioGroup v-if="isUnwrapped(user.id)"

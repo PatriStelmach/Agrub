@@ -27,7 +27,7 @@ import {
   IconTrash,
   IconX
 } from "@tabler/icons-vue"
-import {computed, ref, watch} from "vue";
+import {computed, defineAsyncComponent, ref, watch} from "vue";
 import {useSort} from "@/composables/sorting.ts";
 import SortableHead from "@/helpers/SortableHead.vue";
 import {
@@ -52,10 +52,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {ButtonGroup} from "@/components/ui/button-group";
-import {Input} from "@/components/ui/input";
 import {dateParser} from "@/composables/dateParser.ts";
 import {useMyPluginStore} from "@/stores/myPluginStore.ts";
-import PluginDetailsDialog from "@/pages/plugins/PluginDetailsDialog.vue";
 import {useBadgeFilter} from "@/composables/useBadgeFilter.ts";
 import {inputText} from "@/assets/cssFunctions.ts";
 import GoBackButton from "@/helpers/GoBackButton.vue";
@@ -68,10 +66,12 @@ const emit = defineEmits<{
   'update:search-data': [data:string]
 }>()
 
+const PluginDetailsDialog = defineAsyncComponent( () => import ("@/pages/plugins/PluginDetailsDialog.vue"))
+
 const store = useMyPluginStore()
 const { sortedData, sortKey, sortOrder, toggleSort } = useSort<MyPlugin>(() => props.data, 'updatedAt')
 const { wrap, isUnwrapped, unwrap, unwrappedItem } = useWrapping(sortedData, 'fileName')
-const { badgeListOpen, addBadge, availableBadges, existingBadge, matchedBadges, badgeSearch } = useBadgeFilter<MyPlugin | null>(
+const { badgeListOpen, addBadge, existingBadge, matchedBadges, badgeSearch } = useBadgeFilter<MyPlugin | null>(
   unwrappedItem,
   availableTags,
   () => unwrappedItem.value?.tags ?? []
@@ -168,8 +168,6 @@ const savePlugin = async () => {
       badgeSearch.value = ''
     }
     showInfoDialog.value = true
-
-
   }
 }
 
@@ -245,7 +243,7 @@ const savePlugin = async () => {
         </TableHeader>
           <TransitionGroup tag="tbody" name="slide-fade">
             <TableRow
-              class="cursor-pointer duration-0 border-radius-0  [&_td]:py-2 [&_td]:pr-4 hover:bg-badge1/20 "
+              class="cursor-pointer duration-0 border-radius-0  [&_td]:py-2 [&_td]:pr-4 hover:bg-green-badge/20 "
               v-for="plugin in sortedData"
               :key="plugin.fileName"
               @click="blockedCheckbox ? true: check(plugin.fileName)"
@@ -273,7 +271,6 @@ const savePlugin = async () => {
                 </InputGroup>
               </TableCell>
               <TableCell v-else class=" whitespace-break-spaces">{{plugin.name}}</TableCell>
-
               <TableCell v-if="!isUnwrapped(plugin.fileName)"  class=" whitespace-break-spaces">
                 <Badge
                   v-for="(tag, index) in plugin.tags"
@@ -328,15 +325,12 @@ const savePlugin = async () => {
                     <component stroke="2" class=" size-4 lg:size-5 xl:size-6 2xl:size-10" :is=" badgeListOpen ? IconX: IconPlus" />
                   </Button>
                 </div>
-
               </TableCell>
-
               <TableCell v-if="!isUnwrapped(plugin.fileName)" class="whitespace-break-spaces">
                 {{ plugin.cronExpression ? cronstrue.toString(plugin.cronExpression) : ''}}
                 <br>
                 <span>Next run: {{ nextRun(plugin) }}
               </span>
-
               </TableCell>
               <TableCell v-else class="grid space-y-2">
                 <InputGroup class="relative w-full xl:h-10 2xl:h-12 mb-2">
@@ -348,7 +342,6 @@ const savePlugin = async () => {
                   />
                   <InputGroupAddon><IconClockBolt class="absolute left-4 size-4 lg:size-5 xl:size-6 2xl:size-8"/></InputGroupAddon>
                 </InputGroup>
-
                 <span
                   class="grid gap-y-2 w-full text-center whitespace-break-spaces t"
                   :class="{'text-destructive' : !cronDescription[2]}"
@@ -357,9 +350,7 @@ const savePlugin = async () => {
                   <span v-if="cronDescription[2]">
                     Next run: {{ cronDescription[1]}}</span>
                 </span>
-
               </TableCell>
-
               <TableCell v-if="isUnwrapped(plugin.fileName) && unwrappedItem" >
                 <Select
                   v-model="unwrappedItem.severity"
@@ -384,19 +375,19 @@ const savePlugin = async () => {
                   v-if="plugin.language === Language.PYTHON"
                   alt="python_icon"
                   src="@/components/icons/python_icon.png"
-                  class="size-7 lg:size-8 xl:size-10 2xl:size-16"
+                  class="size-7 lg:size-8"
                 />
                 <img
                   v-if="[Language.BASH, Language.SH].includes(plugin.language)"
                   alt="bash_icon"
                   src="@/components/icons/bash_icon.png"
-                  class="size-7 lg:size-8 xl:size-10 2xl:size-16"
+                  class="size-7 lg:size-8 "
                 />
                 <img
                   v-if="[Language.POWERSHELL, Language.POWERSHELL_MODULE].includes(plugin.language)"
                   alt="powershell_icon"
                   src="@/components/icons/powershell_icon.png"
-                  class="size-7 lg:size-8 xl:size-10 2xl:size-16"
+                  class="size-7 lg:size-8 "
                 />
               </TableCell>
               <DateCell class="" v-if="plugin.updatedAt" :date="plugin.updatedAt"></DateCell>
@@ -408,7 +399,7 @@ const savePlugin = async () => {
                   class="">
                   <div class="flex items-center space-x-2">
                     <RadioGroupItem class="size-4 lg:size-5 xl:size-6 2xl:size-8" id=radio-on value="on" />
-                    <Label class="cursor-pointer text-green-500"  for="radio-on">On</Label>
+                    <Label class="cursor-pointer text-green-badge"  for="radio-on">On</Label>
                   </div>
                   <div class="flex items-center space-x-2">
                     <RadioGroupItem class="size-4 lg:size-5 xl:size-6 2xl:size-8" id="radio-off" value="off" />
@@ -416,7 +407,7 @@ const savePlugin = async () => {
                   </div>
                 </RadioGroup>
               </TableCell>
-              <TableCell v-else class=" text-green-500" :class="{'text-destructive' : !plugin.active}">{{ plugin.active ? 'On' : 'Off'}}</TableCell>
+              <TableCell v-else class=" text-green-badge" :class="{'text-destructive' : !plugin.active}">{{ plugin.active ? 'On' : 'Off'}}</TableCell>
               <TableCell class="">{{plugin.weight}} KB</TableCell>
               <ButtonGroup v-if="isUnwrapped(plugin.fileName) && unwrappedItem" class="flex  absolute bottom-4 right-3 *:items-center *:align-middle *:flex">
                 <Button
@@ -431,7 +422,7 @@ const savePlugin = async () => {
                     @update:save-changes="updateDetails"
                   >
                     <Button
-                      class="border-0! m-0 rounded-none bg-transparent! text-amber-500 hover:text-primary"
+                      class="border-0! m-0 rounded-none bg-transparent! text-severity-3 hover:text-primary"
                     >
                       Details<IconMessageCode class="size-4 xl:size-5"/>
                     </Button>

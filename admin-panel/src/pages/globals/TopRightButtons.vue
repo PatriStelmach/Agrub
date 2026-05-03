@@ -6,7 +6,6 @@ import {useNotificationStore} from "@/stores/notificationStore.ts";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 
 const mode = useColorMode()
-const store = useNotificationStore()
 </script>
 
 <template>

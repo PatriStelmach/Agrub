@@ -28,7 +28,7 @@ useSSEstore()
 
 
       <main class="bg-card flex flex-1 ">
-        <SidebarTrigger class="mt-4 z-99999"/>
+        <SidebarTrigger class="mt-4 z-9"/>
         <RouterView class="bg-background mt-10 border-3 flex-1 overflow-auto rounded-[1rem_0_0_0] " />
 
       </main>

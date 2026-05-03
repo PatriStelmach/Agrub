@@ -16,17 +16,17 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: () => import('@/pages/alerts/AlertsPage.vue'),
+      component: () => import('../pages/alerts/active/AlertsPage.vue'),
     },
     {
       path: '/alerts',
       name: 'alerts',
-      component: () => import('@/pages/alerts/AlertsPage.vue'),
+      component: () => import('../pages/alerts/active/AlertsPage.vue'),
     },
     {
       path: '/alerts_history',
       name: 'alerts_history',
-      component: () => import('@/pages/alerts/AlertsHistory.vue'),
+      component: () => import('../pages/alerts/history/AlertsHistory.vue'),
     },
     {
       path: '/plugins_library',

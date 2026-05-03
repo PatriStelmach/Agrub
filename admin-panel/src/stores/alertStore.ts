@@ -62,6 +62,7 @@ export const useAlertStore = defineStore('useAlertStore', () => {
   }
 
 
+
   const updateAlertRequest = async (action: Actions) => {
     console.log(action)
     try {
@@ -85,6 +86,36 @@ export const useAlertStore = defineStore('useAlertStore', () => {
     }
   }
 
+  const getAlertsHistory =
+    async (pageSize: number, sortBy: string = 'createdAt', descending: boolean = true, firstId?: number, pagesBehind?:number, lastId?: number, pagesAhead?: number,
+           searchQuery?: string, systems?: string, origin?: string, dateFrom?: Date, dateTo?: Date) => {
+    try {
+      const response = await axios.get(`${api_url}/alerts/history`, {
+        params: {
+          pageSize: pageSize,
+          sortBy: sortBy,
+          descending: descending,
+          firstId: firstId,
+          pagesBehind: pagesBehind,
+          lastId: lastId,
+          pagesAhead: pagesAhead,
+          searchQuery: searchQuery,
+          systems: systems,
+          origin: origin,
+          dateFrom: dateFrom,
+          dateTo: dateTo,
+        }
+      })
+      if (response.status === 200) {
+        toast.info('Alerts history fetched')
+        console.log(response.data)
+        return response.data;
+      }
+    }
+    catch {
+      toast.error('Error getting alerts history');
+    }
+  }
 
   return {
     currentAlerts,
@@ -96,7 +127,8 @@ export const useAlertStore = defineStore('useAlertStore', () => {
     updateAlertRequest,
     updateAlert,
     findAlert,
-    getAlertActions
+    getAlertActions,
+    getAlertsHistory
   }
 })
 

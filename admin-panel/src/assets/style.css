@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@custom-variant light (&:where([data-theme="light"]), [data-theme="light"]) ;
+
+
+@variant light ([data-theme="light"] &);
+
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
@@ -39,24 +42,27 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-selected: var(--selected);
-  --color-badge: var(--badge);
-  --color-badge1: var(--badge1);
-  --color-badge2: var(--badge2);
-  --color-severity-0: var(--badge);
-  --color-severity-1: var(--badge1);
+  --color-blue-badge: var(--blue-badge);
+  --color-red-badge: var(--red-badge);
+  --color-yellow-badge: var(--yellow-badge);
+  --color-green-badge: var(--green-badge);
+  --color-orange-badge: var(--orange-badge);
+  --color-severity-0: var(--blue-badge);
+  --color-severity-1: var(--green-badge);
   --color-severity-2: var(--color-yellow-300);
   --color-severity-3: var(--color-amber-500);
   --color-severity-4: var(--color-orange-500);
-  --color-severity-5: var(--badge2);
+  --color-severity-5: var(--red-badge);
   --color-list-hover: var(--list-hover);
   --color-comment: var(--comment);
   --color-date: var(--date);
   --color-label: var(--label);
 }
-@source inline("hover:bg-severity-{0,1,2,3,4,5}{/90,80,/70,/60,/50,/40,/30,/20,/10,}{!,}");
-@source inline("shadow-severity-{0,1,2,3,4,5}{/90,80,/70,/60,/50,/40,/30,/20,/10,}{!,}");
-@source inline("border-severity-{0,1,2,3,4,5}{/90,80,/70,/60,/50,/40,/30,/20,/10,}{!,}");
-@source inline("{from,via,to}-severity-{0,1,2,3,4,5}{/90,80,/70,/60,/50,/40,/30,/20,/10,}{!,}");
+@source inline("hover:bg-severity-{0,1,2,3,4,5}{/90,/80,/70,/60,/50,/40,/30,/20,/10,}{!,}");
+@source inline("bg-severity-{0,1,2,3,4,5}{/90,/80,/70,/60,/50,/40,/30,/20,/10,}{!,}");
+@source inline("shadow-severity-{0,1,2,3,4,5}{/90,/80,/70,/60,/50,/40,/30,/20,/10,}{!,}");
+@source inline("border-severity-{0,1,2,3,4,5}{/90,/80,/70,/60,/50,/40,/30,/20,/10,}{!,}");
+@source inline("{from,via,to}-severity-{0,1,2,3,4,5}{/90,/80,/70,/60,/50,/40,/30,/20,/10,}{!,}");
 
 :root {
   --checkbox-border-color: #8b8c89;
@@ -94,10 +100,12 @@
   --sidebar-accent: oklch(0.278 0.033 256.848);
   --sidebar-accent-foreground: oklch(0.985 0.002 247.839);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.551 0.027 264.364);
-  --badge: oklch(0.59 0.14 242);
-  --badge1: oklch(0.731 0.205 132.694);
-  --badge2: oklch(54.5% 0.246 16.439);
+  --sidebar-ring: oklch(0.707 0.022 261.325);
+  --blue-badge: oklch(0.70 0.14 242);
+  --green-badge: oklch(0.731 0.255 137.694);
+  --red-badge: oklch(54.5% 0.246 16.439);
+  --yellow-badge: var(--color-yellow-300);
+  --orange-badge: var(--color-amber-500);
   --list-hover: var(--color-slate-900);
   --date: var(--color-slate-500);
   --comment: var(--color-slate-400);
@@ -137,12 +145,13 @@
   --sidebar-accent-foreground: oklch(0.21 0.034 264.665);
   --sidebar-border: oklch(0.928 0.006 264.531);
   --sidebar-ring: oklch(0.707 0.022 261.325);
-  --badge: oklch(0.79 0.14 242);
+  --blue-badge: oklch(0.79 0.14 242);
   --list-hover: var(--color-slate-100);
   --date: var(--color-slate-400);
-  --comment: var(--color-slate-500);
+  --comment: var(--color-slate-600);
   --label: var(--color-slate-600);
 }
+
 
 
 
@@ -175,21 +184,21 @@ input[type="checkbox"] {
   padding: 4px;
   border: 2px solid var(--primary);
   appearance: none;
-  background-color: transparent;
   outline: none;
   transition: all 0.2s;
-  border-radius: 25%;
+  border-radius: 20%;
 }
 input[type="checkbox"]:checked {
   background-size: cover;
   padding: 4px;
 }
 
+
 input[type="checkbox"]:not(:disabled):checked
 {
-  border-color: var(--primary);
+  border-color: var(--green-badge);
   mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="20" height="20" viewBox="0 0 32 32" xml:space="preserve"><path  d="M11.941,28.877l-11.941-11.942l5.695-5.696l6.246,6.246l14.364-14.364L32,8.818"/></svg>');
-  background-color: var(--primary);
+  background-color: var(--green-badge);
 }
 input[type="checkbox"]:disabled
 {
@@ -207,9 +216,9 @@ input[type="checkbox"]:disabled:checked
 {
   input[type="checkbox"]:not(:disabled):hover
   {
-    box-shadow: 0 0 10px 2px var(--primary);
+    box-shadow: 0 0 10px 2px var(--green-badge);
     transform: scale(1.08);
-    border: 2px solid var(--primary);
+    border: 2px solid var(--green-badge);
   }
 }
 input[type="checkbox"]:focus-visible
@@ -249,32 +258,27 @@ input[type="checkbox"]:focus-visible
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: all 0.5s linear;
-  transform: scale(1);
+  transition: all 0.4s ease-in-out;
   opacity: 1;
 }
 
 .fade-enter-from,
 .fade-leave-to {
-  transform: scale(0.1);
   opacity: 0;
 }
 
-.slide-fade-enter-active {
-  transition: all 0.7s ease-in-out ;
-}
-
+.slide-fade-enter-active,
 .slide-fade-leave-active {
-  transition: all 1s cubic-bezier(1, 0.5, 0.8, 1);
+  transition: all 0.5s cubic-bezier(1, 0.5, 0.8, 1);
 }
 
 .slide-fade-enter-from {
-  transform: translateX(-100rem);
+  transform: translateX(-50rem);
   opacity: 0;
 }
 
 .slide-fade-leave-to {
-  transform: translateX(100rem);
+  transform: translateX(50rem);
   opacity: 0;
 }
 
@@ -327,20 +331,20 @@ input[type=number] {
   outline: none;
   resize: vertical;
 }
-.badge-focus:focus {
+.blue-badge-focus:focus {
   border-width: 2px;
-  border-color: var(--badge);
-  box-shadow: 0 0 10px 2px var(--badge);
+  border-color: var(--blue-badge);
+  box-shadow: 0 0 10px 1px var(--blue-badge);
 }
-.badge1-focus:focus {
+.green-badge-focus:focus {
   border-width: 2px;
-  border-color: var(--badge1);
-  box-shadow: 0 0 10px 2px var(--badge1);
+  border-color: var(--green-badge);
+  box-shadow: 0 0 10px 1px var(--green-badge);
 }
-.badge2-focus:focus {
+.red-badge-focus:focus {
   border-width: 2px;
-  border-color: var(--badge2);
-  box-shadow: 0 0 10px 2px var(--badge2);
+  border-color: var(--red-badge);
+  box-shadow: 0 0 10px 2px var(--red-badge);
 }
 
 

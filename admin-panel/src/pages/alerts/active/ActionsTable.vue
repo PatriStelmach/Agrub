@@ -1,10 +1,7 @@
 <script setup lang="ts">
-
-import DialogLabel from "@/helpers/DialogLabel.vue";
 import {Badge} from "@/components/ui/badge";
-import type {ActionResponse} from "@/types/types.ts";
-import {dateParser} from "@/composables/dateParser.ts";
-import {useAlertStore} from "@/stores/alertStore.ts";
+import type {ActionResponse} from "@/types/types.js";
+import {dateParser} from "@/composables/dateParser.js";
 import {Skeleton} from "@/components/ui/skeleton";
 
 const props = defineProps<{
@@ -20,13 +17,15 @@ const props = defineProps<{
 
       <div class="sticky top-0 z-10 mx-0 w-full flex items-center
             bg-secondary px-2 py-2 text-xs font-semibold uppercase tracking-wider text-comment">
-        <span class="w-2/10">Type</span>
-        <span class="w-4/10">Comment</span>
-        <span class="w-2/10">User</span>
-        <span class="w-2/10 text-right">Date</span>
+        <span class="w-25/100">Type</span>
+        <span class="w-40/100">Comment</span>
+        <span class="w-20/100">User</span>
+        <span class="w-15/100 text-right pr-2">Date</span>
       </div>
       <ul class="overflow-y-auto overflow-x-hidden max-h-[20vh] w-full divide-y text-sm">
-        <li v-for="i in [1,2,3,4]" v-if="isLoading"><Skeleton  class=" m-2 h-2 w-full"/></li>
+        <li v-if="isLoading"><Skeleton  class=" m-2 h-2 w-full"/></li>
+        <li v-if="isLoading"><Skeleton  class=" m-2 h-2 w-full"/></li>
+        <li v-if="isLoading"><Skeleton  class=" m-2 h-2 w-full"/></li>
 
         <li v-else-if=" !isLoading && !actions?.length" class="px-4 py-8 text-center text-slate-400 italic">
           No actions recorded yet.
@@ -35,20 +34,20 @@ const props = defineProps<{
         <li v-else
           v-for="action in actions"
           :key="action.id"
-          class="flex items-center px-2 py-3 transition-colors hover:bg-list-hover"
+          class="flex items-center px-2 space-x-2 py-3 transition-colors hover:bg-list-hover"
         >
-          <div class="w-2/10">
+          <div class="w-25/100">
             <Badge variant="ack_type">
               {{ action.actionType }}
             </Badge>
           </div>
-          <p class="w-4/10  whitespace-break-spaces text-comment" :title="action.message">
+          <p class="w-40/100  whitespace-break-spaces text-comment" :title="action.message">
             {{ action.message || '—' }}
           </p>
-          <p class="w-2/10 font-medium text-comment">
+          <p class="w-20/100 font-medium text-comment">
             {{ action.author }}
           </p>
-          <p class="w-2/10 text-right pr-1 text-xs tabular-nums text-date">
+          <p class="w-15/100 text-right pr-2 text-xs tabular-nums text-date">
             {{ dateParser(action.createdAt).fullDate }}
           </p>
         </li>

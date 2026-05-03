@@ -19,11 +19,11 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
-import {useAlertStore} from "@/stores/alertStore.ts";
+import {useAlertStore} from "@/stores/alertStore.js";
 import DialogLabel from "@/helpers/DialogLabel.vue";
-import type {ActionResponse, ActiveAlert} from "@/types/types.ts";
+import type {ActionResponse, ActiveAlert} from "@/types/types.js";
 import {Badge} from "@/components/ui/badge";
-import ActionsTable from "@/helpers/ActionsTable.vue";
+import ActionsTable from "@/pages/alerts/active/ActionsTable.vue";
 
 const props = defineProps<{
   alert: ActiveAlert
@@ -33,8 +33,8 @@ const isLoading = ref(true);
 
 const actions = ref<ActionResponse[]>([])
 const getActions = async () => {
-    actions.value = await alertStore.getAlertActions(props.alert.id)
-    isLoading.value = false
+  actions.value = await alertStore.getAlertActions(props.alert.id)
+  isLoading.value = false
 }
 const alertStore = useAlertStore()
 
@@ -75,7 +75,7 @@ const onClose = () => {
 
         </DialogHeader>
         <div class="flex flex-col max-h-[35vh] md:max-h-[50vh]">
-          <div class="grid gap-1 [&_p]:text-comment border-b-2 pb-2">
+          <div class="grid gap-y-2 [&_p]:text-comment border-b-2 pb-2">
             <div class="grid  ">
               <DialogLabel for="alert-subject" text="Subject"/>
               <p id="subject"  class="text-sm"> {{ props.alert.subject}}</p>
@@ -96,28 +96,28 @@ const onClose = () => {
             </div>
           </div>
 
-          <div class="grid flex-1 gap-1 p-2 overflow-scroll ">
+          <div class="grid flex-1 gap-y-3 p-2 overflow-scroll ">
             <div class="grid  h-full">
               <DialogLabel for="my-message " text="Your comment"/>
               <Textarea class="mb-2" id="my-message"  v-model="newMessage"/>
             </div>
-            <div class="flex items-center ">
-              <DialogLabel for="ack" class="w-15  mb-0 pb-0" :text="newAck ? 'ACK' : 'UNACK' "/>
-              <Button  @click="newAck = !newAck" variant="outline"  class="size-8 duration-100">
+            <div class="flex items-end ">
+              <DialogLabel for="ack" class="w-36  mb-0 pb-0" :text="newAck ? 'Acknowledged' : 'Unacknowledged' "/>
+              <Button  @click="newAck = !newAck" variant="outline"  class="size-7 duration-100">
                 <IconCheck
                   v-if="newAck"
-                  class="size-6 text-badge1 "/>
+                  class="size-5 text-green-badge "/>
                 <IconX
                   v-else
-                  class="size-6  text-badge2 "/>
+                  class="size-5  text-red-badge "/>
               </Button>
             </div>
-            <div class="flex items-center ">
-              <DialogLabel for="severity" class="w-15 " text="Severity"/>
+            <div class="flex items-end">
+              <DialogLabel for="severity" class="w-36 pb-0 " text="Severity level"/>
               <Select
                 v-model="newSeverity"
               >
-                <SelectTrigger class="cursor-pointer h-8! w-16 ">
+                <SelectTrigger class="cursor-pointer h-7! w-16 ">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -129,6 +129,7 @@ const onClose = () => {
             </div>
           </div>
         </div>
+        <!-- zmienić na tabs z shadcn dla actions -->
         <ActionsTable
           :actions="actions"
           :isLoading="isLoading"
@@ -148,7 +149,7 @@ const onClose = () => {
               type="submit"
               @click="sentAction"
             >
-              Update <IconSend2 class="text-badge1"/>
+              Update <IconSend2 class="text-green-badge"/>
             </Button>
           </DialogClose>
 

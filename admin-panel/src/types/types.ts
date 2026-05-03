@@ -13,6 +13,11 @@ export interface ActiveAlert {
   severity: 0 | 1 | 2 | 3 | 4 | 5,
 }
 
+
+export interface HistoryAlert extends ActiveAlert {
+  closedAt: Date
+}
+
 export interface Actions {
   id: number
   alertId?: number
@@ -28,10 +33,13 @@ export interface ActionResponse extends Actions {
   createdAt: Date,
 }
 
-
-export interface ClosedAlert extends ActiveAlert {
-  closedAt: Date
+export interface AlertDetails {
+  message?: string,
+  subject?: string,
+  severity?: 0 | 1 | 2 | 3 | 4 | 5
 }
+
+
 
 
 export interface User {
