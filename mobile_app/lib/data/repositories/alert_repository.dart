@@ -175,10 +175,33 @@ void _processAlerts(List<Alert> incomingAlerts) {
 
 }
 
-// very simple placehold for sending ack
-Future<void> sendAcknowledge(int id) async {
+Future<void> sendAcknowledge(int alertId, {String? comment}) async {
   
- debugPrint("ACK sent");
-  }
+final String baseUrl = 'http://10.0.2.2:10000';
+  final url = Uri.parse('$baseUrl/api/alerts/$alertId/ack');
 
+
+  try {
+    final response = await http.post(
+      url,
+headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+
+      body: (comment == null || comment.isEmpty) 
+          ? jsonEncode({}) 
+          : jsonEncode(comment),
+    );
+    
+    if (response.statusCode == 200) {
+      debugPrint('ACK DEBUG: Alert $alertId acknowledged.');
+    } else {
+      debugPrint('ACK DEBUG: Server error ${response.statusCode}');
+      debugPrint('ACK DEBUG: ${response.body}');
+    }
+  } catch (e) {
+    debugPrint('ACK DEBUG: $e');
+  }
+}
 }

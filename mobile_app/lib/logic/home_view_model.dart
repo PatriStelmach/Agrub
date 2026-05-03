@@ -9,7 +9,8 @@ class HomeViewModel extends ChangeNotifier {
 
 void getMyToken() async {
   String? token = await FirebaseMessaging.instance.getToken();
-  print("Mój FCM Token: $token"); // Skopiuj to z konsoli VS Code!
+  //
+  debugPrint("Mój FCM Token: $token"); 
 }
 
 

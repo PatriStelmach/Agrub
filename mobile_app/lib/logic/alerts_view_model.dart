@@ -35,7 +35,6 @@ List<Alert> get sortedAlerts {
   }
 
 void sortAlertsBy(String property) {
-    _currentSortProperty = property;
     notifyListeners(); 
   }
 
@@ -47,11 +46,11 @@ void handleRepoChange() {
 
 
 
-Future<void> acknowledgeAlert(int alertId) async {
+Future<void> acknowledgeAlert(int alertId, {String? comment}) async {
 
 // VERY simple function for sending ack via repository function. rudimentary error hadling
   try {
-    await alertsRepository.sendAcknowledge(alertId);
+    await alertsRepository.sendAcknowledge(alertId, comment: comment);
     
     notifyListeners();
   } catch (e) {

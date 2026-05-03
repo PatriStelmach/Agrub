@@ -110,9 +110,6 @@ class MainApp extends StatelessWidget {
 T0D0:
 
 
-DONE: Dlaczego odświeża się dopiero po kliknięciu??? Do naprawy
-2. Ogarnięcie komentarzy, snippetów itd. 
-4. Ackowanie i komentowanie alertów
 5. Co z tymi pluginami? Gdzie biblioteka pluginów? ( Debug pokazuje że przychodzi pusta lista, investigate)
 6. Uruchamianie pluginów/logi itd w tle
 7. ekran logowanie na potem
@@ -120,7 +117,6 @@ DONE: Dlaczego odświeża się dopiero po kliknięciu??? Do naprawy
 9. Jak dodać takie z updatem, żeby robiły się w tle?
 10. FCM - co jest potrzebne na backendzie żeby wysyłać notifications?
 ???. Ogarnięcie logowania do backendu
-??? Odpalić poprawnie Wazuha
 ??? Zmiana mapowania kolorów
 ??? Mam dwa sposoby na handling enumów ze stringów - wybrać jeden, żeby kod był spójny.
 
