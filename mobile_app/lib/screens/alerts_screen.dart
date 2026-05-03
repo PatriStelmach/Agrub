@@ -10,15 +10,17 @@ class AlertsScreen extends StatefulWidget {
 }
 
 class _AlertsScreenState extends State<AlertsScreen> {
+
+  
   String dropDownValue = 'id';
   
   @override
   Widget build(BuildContext context) {
 
-
+    debugPrint("--- REBUILD ---");
     final alertsViewModel = context.watch<AlertsViewModel>();
     
-if (alertsViewModel.alertsList.isEmpty) {
+    if (alertsViewModel.alertsList.isEmpty) {
     return const Scaffold( 
       body: Center(
         child: Text("No alerts found. Consider checking the button in Debug Screen!"),
@@ -89,7 +91,7 @@ final sortedList = alertsViewModel.sortedAlerts;
                      
                         SizedBox(
                           width: double.infinity,
-                          child:ElevatedButton(onPressed:() { alertsViewModel.acknowledgeAlert(alert.id);}, child: Text('Acknowledge')) 
+                          child:ElevatedButton(onPressed:() { _openAckDialog(context, alert.id);}, child: Text('Acknowledge')) 
                           )
                         
                       ]
@@ -112,4 +114,61 @@ final sortedList = alertsViewModel.sortedAlerts;
   
 
   }
+
+
+  
+}
+
+
+class AckDialog extends StatefulWidget {
+  final int alertId;
+  const AckDialog({super.key, required this.alertId});
+
+  @override
+  State<AckDialog> createState() => _AckDialogState();
+}
+
+class _AckDialogState extends State<AckDialog> {
+  late TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose(); 
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(' Actions for Alert ${widget.alertId}'),
+      content: TextField(controller: _controller),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+
+        ElevatedButton(
+          onPressed: () {
+            final String commentValue = _controller.text;
+            context.read<AlertsViewModel>().acknowledgeAlert(widget.alertId, comment: commentValue );
+            Navigator.pop(context);
+          },
+          child: const Text('ACK'),
+        ),
+      ],
+    );
+  }
+}
+
+
+void _openAckDialog(BuildContext context, int alertId) {
+
+  showDialog(
+    context: context,
+    builder: (context) => AckDialog(alertId: alertId),
+  );
 }

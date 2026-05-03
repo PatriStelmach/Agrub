@@ -18,7 +18,7 @@ final Map<String, Plugin> pluginsCache = {};
 Future<void> updateAllPlugins() async {
 
   try {
-    final url = Uri.parse('http://10.0.2.2:10000/api/plugins/all');
+    final url = Uri.parse('http://10.0.2.2:10000/api/plugins/library');
 
     final response = await http.get(url);
 
