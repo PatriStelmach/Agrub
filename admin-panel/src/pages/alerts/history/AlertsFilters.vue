@@ -11,12 +11,11 @@ import {
 } from '@/components/ui/sheet'
 import {Button} from "@/components/ui/button";
 import {
-  IconCheck, IconEye, IconEyeOff,
+  IconEye, IconEyeOff,
   IconFilterOff,
   IconFilterShare,
   IconTrash,
-  IconLockOpen, IconLockOpen2,
-  IconX
+  IconFilterX
 } from "@tabler/icons-vue";
 import DialogLabel from "@/helpers/DialogLabel.vue";
 import {Input} from "@/components/ui/input";
@@ -27,7 +26,7 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
-import {onMounted, onUnmounted, type Ref, ref, watch, watchEffect} from "vue";
+import {onMounted,  type Ref, ref, watch, watchEffect} from "vue";
 import {
   TagsInput,
   TagsInputInput,
@@ -36,16 +35,9 @@ import {
 } from "@/components/ui/tags-input";
 import {Badge} from "@/components/ui/badge";
 import {useBadgeFilter} from "@/composables/useBadgeFilter.ts";
-import type {MyPlugin} from "@/types/types.ts";
-import {availableTags} from "@/data/tags.ts";
-import {alertSources} from "@/data/alertSources.ts";
 import {badgesContainer, inputText} from "@/assets/cssFunctions.ts";
-import { getLocalTimeZone, today } from '@internationalized/date'
 import type {DateRange} from "reka-ui";
-import {
-  DateRangeFieldInput,
-  DateRangeFieldRoot,
-} from 'reka-ui'
+import {alertSources} from "@/data/alertSources.ts";
 import MyDateRangePicker from "@/helpers/MyDateRangePicker.vue";
 
 const severity = ref<number[]>([0,1,2,3,4,5]);
@@ -53,18 +45,10 @@ const message = ref("")
 const subject = ref("")
 const source = ref("")
 const origins = ref<string[]>([])
-
-const end = today(getLocalTimeZone())
-const start = end.subtract({ days: 2 })
-const createdDateRange = ref({
-  start,
-  end,
-}) as Ref<DateRange>
-const closedDateRange = ref({
-  start,
-  end,
-}) as Ref<DateRange>
-
+const createdDateRange = ref<DateRange>
+({ start: undefined, end: undefined })
+const closedDateRange = ref<DateRange>
+({ start: undefined, end: undefined })
 
 const { badgeListOpen, addBadge, existingBadge, matchedBadges, badgeSearch, availableBadges } = useBadgeFilter<string[] | null>(
   origins,
@@ -100,17 +84,24 @@ const originToggle = () => {
   clearOriginInput()
 }
 
+const clearFilters = () => {
+  severity.value = [0,1,2,3,4,5]
+  message.value = ""
+  subject.value = ""
+  source.value = ""
+  origins.value = []
+  badgeListOpen.value = false
+  clearOriginInput()
+  createdDateRange.value = {start: undefined, end: undefined}
+  closedDateRange.value = {start: undefined, end: undefined}
+}
+
 const onCancel = () => {
   setTimeout(() => {
-    severity.value = [0,1,2,3,4,5]
-    message.value = ""
-    subject.value = ""
-    source.value = ""
-    origins.value = []
-    badgeListOpen.value = false
-    clearOriginInput()
+    clearFilters()
   }, 200)
 }
+
 
 const updateCreatedRange = (data: DateRange) => {
   createdDateRange.value = data
@@ -128,11 +119,12 @@ const updateClosedRange = (data: DateRange) => {
     <SheetTrigger as-child>
       <slot/>
     </SheetTrigger>
-    <SheetContent side="left" >
-      <div class="mx-auto w-full ">
+    <SheetContent side="left">
+      <div class="w-full ">
         <SheetHeader >
           <SheetTitle>Filters</SheetTitle>
           <SheetDescription>Set search filters for alerts history</SheetDescription>
+          <Button @click="clearFilters" variant="red_outline" class="text-md *:size-5!">Clear Filters<IconFilterOff/></Button>
         </SheetHeader>
         <div class="grid space-y-3 pl-4">
           <div>
@@ -150,7 +142,6 @@ const updateClosedRange = (data: DateRange) => {
               <Select
                 multiple
                 v-model="severity"
-
               >
                 <SelectTrigger id="severity-select" class="cursor-pointer w-2/5">
                   <SelectValue />
@@ -193,9 +184,7 @@ const updateClosedRange = (data: DateRange) => {
               </Button>
               <Button v-if="badgeListOpen" @click="clearOrigins" size="icon-sm" variant="red_outline"><IconTrash/></Button>
             </div>
-
               <div  class="flex space-x-2">
-
                 <Transition name="fade">
                   <TagsInput
                     v-show="badgeListOpen"
@@ -214,7 +203,6 @@ const updateClosedRange = (data: DateRange) => {
                       placeholder="Origins..." />
                   </TagsInput>
                 </Transition>
-
               </div>
             <Transition name="fade">
               <div
@@ -241,40 +229,30 @@ const updateClosedRange = (data: DateRange) => {
               </div>
             </Transition>
           </div>
-          <div>
-            <DialogLabel text="Status" for=""/>
-            <div class="flex **:cursor-pointer *:flex *:items-center *:space-x-2">
-              <div>
-                <input type="checkbox" id="acknowledged"  :default-value="true"/>
-                <DialogLabel class="pb-0 mb-0 text-comment text-sm" text="Acknowledged" for="acknowledged"/>
-              </div>
-              <div>
-                <input type="checkbox" id="unacknowledged" :default-value="true"/>
-                <DialogLabel class="pb-0 mb-0 text-comment text-sm" text="Unacknowledged" for="unacknowledged"/>
-              </div>
-            </div>
-          </div>
           <MyDateRangePicker
+            :range="createdDateRange"
             @update:range="updateCreatedRange"
             label-text="Created at - range"
             label-for="created-at"/>
           <MyDateRangePicker
+            :range="closedDateRange"
             @update:range="updateClosedRange"
             label-text="Closed at - range"
             label-for="closed-at"/>
         </div>
-
       </div>
       <SheetFooter>
         <Button
+          class="text-md"
           variant="outline"
-          type="submit">Submit<IconFilterShare class="text-green-badge"/></Button>
+          type="submit">Submit<IconFilterShare class="text-green-badge size-5"/></Button>
         <SheetClose as-child>
           <Button
+            class="text-md"
             type="reset"
             @click="onCancel"
             variant="red_outline"
-          >Cancel<IconFilterOff/></Button>
+          >Cancel<IconFilterX class="size-5"/></Button>
         </SheetClose>
       </SheetFooter>
     </SheetContent>
