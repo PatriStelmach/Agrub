@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
 import {
+  type DateRange,
   DateRangePickerArrow,
   DateRangePickerCalendar,
   DateRangePickerCell,
@@ -22,6 +23,7 @@ import {
 } from 'reka-ui'
 import { getLocalTimeZone } from '@internationalized/date'
 import DialogLabel from "@/helpers/DialogLabel.vue";
+import {watchEffect} from "vue";
 
 const props = defineProps<{
   labelText: string;
@@ -29,9 +31,14 @@ const props = defineProps<{
 }>()
 
 const emits = defineEmits<{
-  'update-from': [Date],
-  'update-to': [Date],
+  'update:range': [DateRange]
 }>()
+
+const updateRange = (range: DateRange) => {
+  emits('update:range', range)
+}
+
+const locale = navigator.language
 
 const tz = getLocalTimeZone()
 const now = new Date();
@@ -45,12 +52,16 @@ const now = new Date();
       Booking
     </DialogLabel>
     <DateRangePickerRoot
+      @update:modelValue="updateRange"
+      :locale="locale"
+      :granularity="'minute'"
+      :numberOfMonths="1"
       :id="props.labelFor"
       :is-date-unavailable="date => date.toDate(tz) > now"
     >
       <DateRangePickerField
         v-slot="{ segments }"
-        class="flex w-4/5 select-none bg-input/60 items-center rounded-lg text-center text-comment border shadow-sm p-1 data-invalid:border-red-badge"
+        class="flex w-95/100 select-none bg-input/60 items-center rounded-lg text-center text-comment border shadow-sm p-1 data-invalid:border-red-badge"
       >
         <template
           v-for="item in segments.start"
@@ -66,14 +77,13 @@ const now = new Date();
           <DateRangePickerInput
             v-else
             :part="item.part"
-            class="rounded-md p-0.5 focus:outline-none focus:shadow-[0_0_5px_2px] focus:shadow-secondary data-placeholder:text-green-badge"
+            class="rounded-md p-0.5 focus:outline-none focus:shadow-[0_0_5px_2px] focus:shadow-green-badge data-placeholder:text-green-badge"
             type="start"
           >
             {{ item.value }}
           </DateRangePickerInput>
         </template>
         <span class="mx-2">
-
           -
         </span>
         <template
@@ -90,7 +100,7 @@ const now = new Date();
           <DateRangePickerInput
             v-else
             :part="item.part"
-            class="rounded-md p-0.5 focus:outline-none focus:shadow-[0_0_5px_2px] focus:shadow-secondary data-placeholder:text-green-badge"
+            class="rounded-md p-0.5 focus:outline-none focus:shadow-[0_0_5px_2px] focus:shadow-green-badge data-placeholder:text-green-badge"
             type="end"
           >
             {{ item.value }}

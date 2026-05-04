@@ -54,12 +54,17 @@ const subject = ref("")
 const source = ref("")
 const origins = ref<string[]>([])
 
-const start = today(getLocalTimeZone())
-const end = start.add({ days: 7 })
-const dateRange = ref({
+const end = today(getLocalTimeZone())
+const start = end.subtract({ days: 2 })
+const createdDateRange = ref({
   start,
   end,
 }) as Ref<DateRange>
+const closedDateRange = ref({
+  start,
+  end,
+}) as Ref<DateRange>
+
 
 const { badgeListOpen, addBadge, existingBadge, matchedBadges, badgeSearch, availableBadges } = useBadgeFilter<string[] | null>(
   origins,
@@ -107,6 +112,15 @@ const onCancel = () => {
   }, 200)
 }
 
+const updateCreatedRange = (data: DateRange) => {
+  createdDateRange.value = data
+  console.log(data)
+}
+
+const updateClosedRange = (data: DateRange) => {
+  closedDateRange.value = data
+  console.log(data)
+}
 </script>
 
 <template>
@@ -240,16 +254,24 @@ const onCancel = () => {
               </div>
             </div>
           </div>
-          <MyDateRangePicker label-text="Created at - range" label-for="created-at"/>
-          <MyDateRangePicker label-text="Closed at - range" label-for="closed-at"/>
+          <MyDateRangePicker
+            @update:range="updateCreatedRange"
+            label-text="Created at - range"
+            label-for="created-at"/>
+          <MyDateRangePicker
+            @update:range="updateClosedRange"
+            label-text="Closed at - range"
+            label-for="closed-at"/>
         </div>
 
       </div>
-      <SheetFooter class="mb-2">
+      <SheetFooter>
         <Button
-          variant="outline">Submit<IconFilterShare class="text-green-badge"/></Button>
+          variant="outline"
+          type="submit">Submit<IconFilterShare class="text-green-badge"/></Button>
         <SheetClose as-child>
           <Button
+            type="reset"
             @click="onCancel"
             variant="red_outline"
           >Cancel<IconFilterOff/></Button>
