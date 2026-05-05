@@ -54,22 +54,25 @@ public class AlertController {
     }
 
     @GetMapping("/history")
-    public ResponseEntity<List<GlobalProblem>> getHistory(
+    public ResponseEntity<org.springframework.data.domain.Page<GlobalProblem>> getHistory(
+            @RequestParam(defaultValue = "0") int page, // Numer strony (0 to pierwsza strona)
             @RequestParam(defaultValue = "50") int pageSize,
-            @RequestParam(required = false) Long lastItemId,
-            @RequestParam(required = false) Long firstItemId,
-            @RequestParam(required = false) String searchQuery,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "true") boolean descending,
+            @RequestParam(required = false) String searchQueryMessage,
+            @RequestParam(required = false) String searchQuerySubject,
             @RequestParam(required = false) List<String> systems,
             @RequestParam(required = false) String origin,
             @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime dateFrom,
             @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime dateTo
     ) {
 
-        List<GlobalProblem> history = alertHistoryService.getAlertHistory(
-                pageSize, lastItemId, firstItemId, searchQuery, systems, origin, dateFrom, dateTo
+        org.springframework.data.domain.Page<GlobalProblem> historyPage = alertHistoryService.getAlertHistory(
+                page, pageSize, sortBy, descending,
+                searchQueryMessage, searchQuerySubject, systems, origin, dateFrom, dateTo
         );
 
-        return ResponseEntity.ok(history);
+        return ResponseEntity.ok(historyPage);
     }
 
     @PostMapping("/{id}/ack")
