@@ -38,23 +38,28 @@ import {useBadgeFilter} from "@/composables/useBadgeFilter.ts";
 import {badgesContainer, inputText} from "@/assets/cssFunctions.ts";
 import type {DateRange} from "reka-ui";
 import {alertSources} from "@/data/alertSources.ts";
+import { getLocalTimeZone } from '@internationalized/date'
 import MyDateRangePicker from "@/helpers/MyDateRangePicker.vue";
+import type {AlertHistoryFilters} from "@/types/types.ts";
 
 const severity = ref<number[]>([0,1,2,3,4,5]);
 const message = ref("")
 const subject = ref("")
 const source = ref("")
 const origins = ref<string[]>([])
-const createdDateRange = ref<DateRange>
-({ start: undefined, end: undefined })
-const closedDateRange = ref<DateRange>
-({ start: undefined, end: undefined })
-
+const createdDateRange = ref({ start: undefined, end: undefined }) as Ref<DateRange>
+const closedDateRange = ref({ start: undefined, end: undefined }) as Ref<DateRange>
+const tz = getLocalTimeZone()
 const { badgeListOpen, addBadge, existingBadge, matchedBadges, badgeSearch, availableBadges } = useBadgeFilter<string[] | null>(
   origins,
   alertSources,
   () => origins.value ?? []
 )
+
+const emit = defineEmits<{
+  'update-filters': [AlertHistoryFilters]
+}>()
+
 onMounted(() => {
   badgeListOpen.value = false
 })
@@ -102,15 +107,27 @@ const onCancel = () => {
   }, 200)
 }
 
-
 const updateCreatedRange = (data: DateRange) => {
   createdDateRange.value = data
-  console.log(data)
 }
 
 const updateClosedRange = (data: DateRange) => {
   closedDateRange.value = data
-  console.log(data)
+}
+
+const onSubmit = () => {
+  emit("update-filters", {
+    severity: severity.value,
+    message: message.value,
+    subject: subject.value,
+    origin: origins.value,
+    source: source.value,
+    createdDateFrom: createdDateRange.value.start?.toDate(tz).toISOString(),
+    createdDateTo: createdDateRange.value.end?.toDate(tz).toISOString(),
+    closedDateFrom: closedDateRange.value.start?.toDate(tz).toISOString(),
+    closedDateTo: createdDateRange.value.end?.toDate(tz).toISOString(),
+
+  })
 }
 </script>
 
@@ -242,14 +259,16 @@ const updateClosedRange = (data: DateRange) => {
         </div>
       </div>
       <SheetFooter>
-        <Button
-          class="text-md"
-          variant="outline"
-          type="submit">Submit<IconFilterShare class="text-green-badge size-5"/></Button>
+        <SheetClose as-child>
+          <Button
+            @click="onSubmit"
+            class="text-md"
+            variant="outline">
+            Submit<IconFilterShare class="text-green-badge size-5"/></Button>
+        </SheetClose>
         <SheetClose as-child>
           <Button
             class="text-md"
-            type="reset"
             @click="onCancel"
             variant="red_outline"
           >Cancel<IconFilterX class="size-5"/></Button>

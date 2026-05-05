@@ -10,36 +10,40 @@ import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/inpu
 import {Button} from "@/components/ui/button";
 import {Search} from "lucide-vue-next";
 import {ButtonGroup} from "@/components/ui/button-group";
-import {type AlertDetails, type HistoryAlert} from "@/types/types.js";
-import {defineAsyncComponent, onMounted, ref} from "vue";
+import {type AlertDetails, type AlertHistoryFilters, type HistoryAlert} from "@/types/types.js";
+import {defineAsyncComponent, onMounted, type Ref, ref} from "vue";
 import { IconFilterCog} from "@tabler/icons-vue";
 import GoBackButton from "@/helpers/GoBackButton.vue";
 import {useAlertStore} from "@/stores/alertStore.ts";
 import AlertsHistoryTable from "@/pages/alerts/history/AlertsHistoryTable.vue";
 import MyServerPagination from "@/helpers/MyServerPagination.vue";
 import AlertsFilters from "@/pages/alerts/history/AlertsFilters.vue";
+import type {DateRange} from "reka-ui";
 const DetailsCard = defineAsyncComponent(() => import('@/pages/alerts/active/DetailsCard.vue'))
 
 const alertStore = useAlertStore()
 
 onMounted(async () => {
-  alerts.value = await alertStore.getAlertsHistory(pageSize.value)
+  alerts.value = await alertStore.getAlertsHistory(currentPage.value, pageSize.value, filters.value)
 })
 
 const hoveredAlert = ref<AlertDetails | null>(null)
 const alerts = ref<HistoryAlert[]>([])
 const searchFilter = ref<string | null>(null);
-const pageSize = ref<number>(50);
+const pageSize = ref<number>(20);
 const currentPage = ref<number>(1);
+const filters = ref<AlertHistoryFilters>({
+  severity:[0,1,2,3,4,5]
+});
 
 
 const updateCurrentPage = async (page: number) => {
   currentPage.value = page;
-  await alertStore.getAlertsHistory(pageSize.value)
+  await alertStore.getAlertsHistory(currentPage.value, pageSize.value, filters.value)
 }
 const updatePageSize = async (size: number) => {
   pageSize.value = size;
-  alerts.value = await alertStore.getAlertsHistory(pageSize.value)
+  alerts.value = await alertStore.getAlertsHistory(currentPage.value, pageSize.value, filters.value)
 }
 const updateHovered = (data: AlertDetails | null) => {
   hoveredAlert.value = data

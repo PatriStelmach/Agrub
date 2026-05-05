@@ -1,5 +1,3 @@
-import { CalendarDateTime  } from '@internationalized/date';
-
 export const api_url = 'http://localhost:10000/api'
 
 export interface ActiveAlert {
@@ -41,7 +39,17 @@ export interface AlertDetails {
   severity?: 0 | 1 | 2 | 3 | 4 | 5
 }
 
-
+export interface AlertHistoryFilters {
+  severity: number[]
+  message?: string
+  subject?: string
+  source?: string
+  origin?: string[]
+  createdDateFrom?: string
+  createdDateTo?: string
+  closedDateFrom?: string
+  closedDateTo?: string
+}
 
 
 export interface User {

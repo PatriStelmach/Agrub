@@ -1,6 +1,12 @@
 import {defineStore} from "pinia";
 import {computed, h, ref, watch} from "vue";
-import {type ActionResponse, type Actions, type ActiveAlert, api_url} from "@/types/types.ts";
+import {
+  type ActionResponse,
+  type Actions,
+  type ActiveAlert, type AlertHistoryFilters,
+  api_url,
+  type HistoryAlert
+} from "@/types/types.ts";
 import axios from "axios";
 import {toast} from "vue-sonner";
 import {dashboardData} from "@/data/dashboardData.ts";
@@ -87,29 +93,32 @@ export const useAlertStore = defineStore('useAlertStore', () => {
   }
 
   const getAlertsHistory =
-    async (pageSize: number, sortBy: string = 'createdAt', descending: boolean = true, firstId?: number, pagesBehind?:number, lastId?: number, pagesAhead?: number,
-           searchQuery?: string, systems?: string, origin?: string, dateFrom?: Date, dateTo?: Date) => {
-    try {
-      const response = await axios.get(`${api_url}/alerts/history`, {
-        params: {
-          pageSize: pageSize,
-          sortBy: sortBy,
-          descending: descending,
-          firstId: firstId,
-          pagesBehind: pagesBehind,
-          lastId: lastId,
-          pagesAhead: pagesAhead,
-          searchQuery: searchQuery,
-          systems: systems,
-          origin: origin,
-          dateFrom: dateFrom,
-          dateTo: dateTo,
-        }
-      })
+    async (page: number, pageSize: number, filters: AlertHistoryFilters, sortBy: string = 'createdAt', descending: boolean = true) => {
+      try {
+        const response = await axios.get(`${api_url}/alerts/history`, {
+          params: {
+            page: page - 1,
+            pageSize: pageSize,
+            sortBy: sortBy,
+            descending: descending,
+            severity: filters.severity,
+            searchQueryMessage: filters.message,
+            searchQuerySubject: filters.subject,
+            systems: filters.source,
+            origin: filters.origin,
+            createdDateFrom: filters.createdDateFrom,
+            createdDateTo: filters.createdDateTo,
+            closedDateFrom: filters.closedDateFrom,
+            closedDateTo: filters.closedDateTo
+          }
+        })
       if (response.status === 200) {
         toast.info('Alerts history fetched')
-        console.log(response.data)
-        return response.data;
+        console.log(response.data.content.forEach((a:HistoryAlert) => {
+          a.createdAt = new Date (a.createdAt)
+          a.closedAt = new Date (a.closedAt)
+        }))
+        return response.data.content;
       }
     }
     catch {
