@@ -11,31 +11,15 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem, DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import {Button} from "@/components/ui/button";
-import {Label} from "@/components/ui/label";
-import {ref} from "vue";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 
 const props = defineProps<{
   total: number
 }>()
 
-const emit = defineEmits<{
-  'update:current-page': [current: number],
-  'update:page-size': [size: number],
-}>()
-
-const currentPage = ref<number>(1)
-const pageSize = ref<number>(20)
-
-const updatePageSize = (size: number) => {
-  pageSize.value = size
-  emit('update:page-size', size)
-}
-
-const updateCurrentPage = (page: number) => {
-  currentPage.value = page
-  emit('update:current-page', page)
-}
+const currentPage = defineModel<number>('pageIndex', { default: 1 })
+const pageSize = defineModel<number>('pageSize', { default: 20 })
 
 </script>
 
@@ -45,38 +29,42 @@ const updateCurrentPage = (page: number) => {
     v-slot="{ page }"
     :items-per-page="pageSize"
     :total="total"
-    :default-page="1"
-    v-model:page="currentPage">
+    v-model:page="currentPage"
+  >
     <PaginationContent v-slot="{ items }">
-      <PaginationPrevious @click="updateCurrentPage(page-1)" />
+      <PaginationPrevious />
+
       <template v-for="(item, index) in items" :key="index">
         <PaginationItem
           v-if="item.type === 'page'"
           :value="item.value"
           :is-active="item.value === page"
-          @click="updateCurrentPage(item.value)"
         >
           {{ item.value }}
         </PaginationItem>
       </template>
-      <PaginationNext @click="updateCurrentPage(page+1)"/>
+
+      <PaginationNext />
     </PaginationContent>
-    <Label style="white-space: nowrap"  class="flex items-center mr-2">
+
+    <Label style="white-space: nowrap" class="flex items-center mr-2">
       Page size:
     </Label>
+
     <DropdownMenu>
       <DropdownMenuTrigger as-child>
         <Button variant="outline">
-          {{pageSize}}
+          {{ pageSize }}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent v-model="pageSize" align="start">
+      <DropdownMenuContent align="start">
         <DropdownMenuGroup>
           <DropdownMenuItem
-            v-for="(size, index) in [1, 5, 10, 20, 30, 50]"
-            :key="index"
-            @select="updatePageSize(size)">
-            {{size}}
+            v-for="size in [1, 5, 10, 20, 30, 50]"
+            :key="size"
+            @select="pageSize = size"
+          >
+            {{ size }}
           </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import {
   tableDiv,
   topButtonGroup,
@@ -10,44 +9,65 @@ import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/inpu
 import {Button} from "@/components/ui/button";
 import {Search} from "lucide-vue-next";
 import {ButtonGroup} from "@/components/ui/button-group";
-import {type AlertDetails, type AlertHistoryFilters, type HistoryAlert} from "@/types/types.js";
-import {defineAsyncComponent, onMounted, type Ref, ref} from "vue";
+import {
+  type AlertDetails,
+  type AlertHistoryFilters,
+  undefinedFilters,
+  type HistoryAlert
+} from "@/types/types.js";
+import {defineAsyncComponent, onMounted, ref, watch} from "vue";
 import { IconFilterCog} from "@tabler/icons-vue";
 import GoBackButton from "@/helpers/GoBackButton.vue";
 import {useAlertStore} from "@/stores/alertStore.ts";
 import AlertsHistoryTable from "@/pages/alerts/history/AlertsHistoryTable.vue";
 import MyServerPagination from "@/helpers/MyServerPagination.vue";
 import AlertsFilters from "@/pages/alerts/history/AlertsFilters.vue";
-import type {DateRange} from "reka-ui";
 const DetailsCard = defineAsyncComponent(() => import('@/pages/alerts/active/DetailsCard.vue'))
 
 const alertStore = useAlertStore()
 
-onMounted(async () => {
-  alerts.value = await alertStore.getAlertsHistory(currentPage.value, pageSize.value, filters.value)
-})
 
-const hoveredAlert = ref<AlertDetails | null>(null)
 const alerts = ref<HistoryAlert[]>([])
 const searchFilter = ref<string | null>(null);
 const pageSize = ref<number>(20);
 const currentPage = ref<number>(1);
-const filters = ref<AlertHistoryFilters>({
-  severity:[0,1,2,3,4,5]
-});
+const filters = ref<AlertHistoryFilters>(undefinedFilters);
+const totalElements = ref<number>(0);
+const hoveredAlert = ref<AlertDetails | null>(null)
+const sortedHead = ref<{ sortKey: string; sortOrder: string }>({
+  sortKey: 'createdAt',
+  sortOrder: 'desc'
+})
 
+onMounted(async () => {
+  await getCurrentStateRequest()
+})
 
-const updateCurrentPage = async (page: number) => {
-  currentPage.value = page;
-  await alertStore.getAlertsHistory(currentPage.value, pageSize.value, filters.value)
+const getCurrentStateRequest = async () => {
+  const response = await alertStore.getAlertsHistory(
+    currentPage.value,
+    pageSize.value,
+    filters.value,
+    sortedHead.value.sortKey,
+    sortedHead.value.sortOrder
+  )
+  alerts.value = response?.alerts
+  totalElements.value = response?.totalElements
 }
-const updatePageSize = async (size: number) => {
-  pageSize.value = size;
-  alerts.value = await alertStore.getAlertsHistory(currentPage.value, pageSize.value, filters.value)
+
+const updateFilters = async (data: AlertHistoryFilters) => {
+  filters.value = data
+  currentPage.value = 1
+  await getCurrentStateRequest()
 }
-const updateHovered = (data: AlertDetails | null) => {
-  hoveredAlert.value = data
-}
+
+watch([currentPage, pageSize], async () => {
+  await getCurrentStateRequest()
+})
+
+watch(sortedHead, async () => {
+  await getCurrentStateRequest()
+}, { deep: true })
 
 </script>
 
@@ -71,7 +91,9 @@ const updateHovered = (data: AlertDetails | null) => {
               <Search/>
             </InputGroupAddon>
           </InputGroup>
-          <AlertsFilters>
+          <AlertsFilters
+            @update:filters="updateFilters"
+          >
             <Button  variant="outline">
               Filters <IconFilterCog/>
             </Button>
@@ -86,13 +108,15 @@ const updateHovered = (data: AlertDetails | null) => {
         :data=hoveredAlert
       />
       <AlertsHistoryTable
+        v-model:hovered-alert="hoveredAlert"
+        v-model:sorted-head="sortedHead"
         :alerts="alerts"
-        @update:hovered-alert="updateHovered"
+        :totalElements="totalElements"
       >
         <MyServerPagination
-          :total="alerts.length"
-          @update:current-page="updateCurrentPage"
-          @update:page-size="updatePageSize"
+          :total="totalElements"
+          v-model:page-index="currentPage"
+          v-model:page-size="pageSize"
         />
       </AlertsHistoryTable>
     </div>

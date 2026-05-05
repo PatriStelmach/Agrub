@@ -93,32 +93,31 @@ export const useAlertStore = defineStore('useAlertStore', () => {
   }
 
   const getAlertsHistory =
-    async (page: number, pageSize: number, filters: AlertHistoryFilters, sortBy: string = 'createdAt', descending: boolean = true) => {
+    async (page: number, pageSize: number, filters: AlertHistoryFilters, sortKey: string = 'createdAt', sortOrder: string = 'desc') => {
+    console.log({
+      page: page - 1,
+      pageSize: pageSize,
+      sortKey: sortKey,
+      sortOrder: sortOrder,
+      filters: filters,
+    })
       try {
         const response = await axios.get(`${api_url}/alerts/history`, {
           params: {
             page: page - 1,
             pageSize: pageSize,
-            sortBy: sortBy,
-            descending: descending,
-            severity: filters.severity,
-            searchQueryMessage: filters.message,
-            searchQuerySubject: filters.subject,
-            systems: filters.source,
-            origin: filters.origin,
-            createdDateFrom: filters.createdDateFrom,
-            createdDateTo: filters.createdDateTo,
-            closedDateFrom: filters.closedDateFrom,
-            closedDateTo: filters.closedDateTo
+            sortKey: sortKey,
+            sortOrder: sortOrder,
+            filters: filters,
           }
         })
       if (response.status === 200) {
         toast.info('Alerts history fetched')
-        console.log(response.data.content.forEach((a:HistoryAlert) => {
+        response.data.content.forEach((a:HistoryAlert) => {
           a.createdAt = new Date (a.createdAt)
           a.closedAt = new Date (a.closedAt)
-        }))
-        return response.data.content;
+        })
+        return {alerts: response.data.content, totalElements: response.data.totalElements}
       }
     }
     catch {

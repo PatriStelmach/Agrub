@@ -20,9 +20,17 @@ export function useBadgeFilter<T>(
       .filter(t => !filter(item.value!).includes(t))
     else return []
   })
-  const addBadge = () => {
+  const addNonExistingBadge = () => {
     if(!existingBadge.value && badgeSearch.value && item.value) {
       filter(item.value).push(badgeSearch.value)
+      badgeSearch.value = ''
+    }
+  }
+
+  const addExistingBadge = () => {
+    if(badgeSearch.value && item.value) {
+      const matchedBadge = matchedBadges.value.find(b => b.toLowerCase() === badgeSearch.value.toLowerCase())
+      if(matchedBadge) filter(item.value).push(matchedBadge)
       badgeSearch.value = ''
     }
   }
@@ -33,7 +41,8 @@ export function useBadgeFilter<T>(
     badgeListOpen,
     matchedBadges,
     existingBadge,
-    addBadge,
+    addNonExistingBadge,
+    addExistingBadge
   }
 
 }

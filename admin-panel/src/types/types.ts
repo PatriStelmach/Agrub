@@ -39,12 +39,28 @@ export interface AlertDetails {
   severity?: 0 | 1 | 2 | 3 | 4 | 5
 }
 
+export const undefinedFilters = {
+  severity: undefined,
+  message: undefined,
+  subject: undefined,
+  source: undefined,
+  origin: undefined,
+  ack: undefined,
+  unack: undefined,
+  createdDateFrom: undefined,
+  createdDateTo: undefined,
+  closedDateFrom: undefined,
+  closedDateTo: undefined
+}
+
 export interface AlertHistoryFilters {
-  severity: number[]
+  severity?: number[]
   message?: string
   subject?: string
   source?: string
   origin?: string[]
+  ack? : boolean
+  unack? : boolean
   createdDateFrom?: string
   createdDateTo?: string
   closedDateFrom?: string

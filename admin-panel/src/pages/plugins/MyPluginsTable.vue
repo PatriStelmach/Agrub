@@ -71,7 +71,7 @@ const PluginDetailsDialog = defineAsyncComponent( () => import ("@/pages/plugins
 const store = useMyPluginStore()
 const { sortedData, sortKey, sortOrder, toggleSort } = useSort<MyPlugin>(() => props.data, 'updatedAt')
 const { wrap, isUnwrapped, unwrap, unwrappedItem } = useWrapping(sortedData, 'fileName')
-const { badgeListOpen, addBadge, existingBadge, matchedBadges, badgeSearch } = useBadgeFilter<MyPlugin | null>(
+const { badgeListOpen, addNonExistingBadge, existingBadge, matchedBadges, badgeSearch } = useBadgeFilter<MyPlugin | null>(
   unwrappedItem,
   availableTags,
   () => unwrappedItem.value?.tags ?? []
@@ -288,10 +288,10 @@ const savePlugin = async () => {
                         :class="inputText"
                         v-model="badgeSearch"
                         type="search"
-                        @keyup.enter="addBadge"
+                        @keyup.enter="addNonExistingBadge"
                         @keyup.esc="badgeListOpen=!badgeListOpen"
                         placeholder="Add new tags"/>
-                      <InputGroupAddon><IconPlus class="size-4 lg:size-5 xl:size-6 2xl:size-8 cursor-pointer" @click="addBadge"/></InputGroupAddon>
+                      <InputGroupAddon><IconPlus class="size-4 lg:size-5 xl:size-6 2xl:size-8 cursor-pointer" @click="addNonExistingBadge"/></InputGroupAddon>
                     </InputGroup>
                     <div class="max-h-30 w-full mb-2  overflow-y-auto border-2 border-t-0! border-input p-2 rounded-b-md" v-if="matchedBadges.length ">
                       <Badge

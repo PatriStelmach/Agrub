@@ -3,10 +3,8 @@
 import {
   dataTable,
   tableCaption,
-  tableDiv, tableHeaders,
-  topButtonGroup,
-  topDiv,
-  topH1
+  tableHeaders,
+
 } from "@/assets/cssFunctions.ts";
 import {
   Table,
@@ -17,34 +15,43 @@ import {
   TableRow
 } from "@/components/ui/table";
 import SortableHead from "@/helpers/SortableHead.vue";
-import {defineAsyncComponent, ref, watch} from "vue";
+import {computed, defineAsyncComponent, ref, watch, watchEffect} from "vue";
 import {type AlertDetails, type HistoryAlert} from "@/types/types.ts";
-import { useSort } from "@/composables/sorting";
 import {Badge} from "@/components/ui/badge";
 import {IconCircleDashedCheck, IconCircleDashedX, IconHistory} from "@tabler/icons-vue";
 import {Button} from "@/components/ui/button";
 import DateCell from "@/helpers/DateCell.vue";
+import {useSortRequests} from "@/composables/useSortRequests.ts";
 const AlertHistoryDialog = defineAsyncComponent(
   () => import('@/pages/alerts/history/AlertHistoryDialog.vue')
 )
 
-const props = defineProps <{
+const props = defineProps<{
   alerts: HistoryAlert[];
+  totalElements: number
 }>()
 
-const { sortedData, sortKey, sortOrder, toggleSort } = useSort<HistoryAlert>(() => props.alerts, 'closedAt')
+const hoveredAlert = defineModel<AlertDetails | null>('hoveredAlert')
+const sortedHead = defineModel<{ sortKey: string; sortOrder: string }>('sortedHead')
 
-const emit = defineEmits<{
-  'update:hovered-alert': [AlertDetails | null]
-}>()
+const { sortKey, sortOrder, toggleSort } = useSortRequests<HistoryAlert>(() => props.alerts, 'createdAt')
 
 const hoveredId = ref<number | null>(null);
 
-watch(hoveredId, (newId) => {
-  const alert = props.alerts.find(a => a.id === newId);
-  emit('update:hovered-alert',
-    newId ? {message: alert?.message, subject: alert?.subject, severity: alert?.severity} : null)
-})
+const computedHoveredAlert = computed(() => {
+  const alert = props.alerts.find(a => a.id === hoveredId.value);
+  return hoveredId.value
+    ? { message: alert?.message, subject: alert?.subject, severity: alert?.severity }
+    : null;
+});
+
+watchEffect(() => {
+  hoveredAlert.value = computedHoveredAlert.value;
+});
+
+watchEffect(() => {
+  sortedHead.value = { sortKey: sortKey.value, sortOrder: sortOrder.value };
+});
 
 
 </script>
@@ -53,7 +60,7 @@ watch(hoveredId, (newId) => {
       <Table id="alert-history-table" :class="dataTable">
         <TableCaption :class="tableCaption">
             <slot/>
-          <span>Matched alerts: <span  class="font-extrabold">{{ sortedData.length}}</span></span>
+          <span>Matched alerts: <span  class="font-extrabold">{{ totalElements}}</span></span>
         </TableCaption>
         <TableHeader class="h-10">
           <TableRow :class="tableHeaders">
@@ -68,11 +75,10 @@ watch(hoveredId, (newId) => {
             <TableHead class="max-md:w-9/100 w-6/100 lg:w-4/100 font-bold text-sm lg:text-md xl:text-lg 2xl:text:xl">Actions</TableHead>
           </TableRow>
         </TableHeader>
-        <TransitionGroup tag="tbody" name="fade">
           <TableRow
             :id="`${alert.id}_row`"
             class="relative cursor-pointer duration-0  hover:bg-accent/50"
-            v-for="alert in sortedData"
+            v-for="alert in alerts"
             :key="alert.id">
 
             <TableCell class="pl-4  whitespace-break-spaces">{{alert.subject}}</TableCell>
@@ -116,6 +122,5 @@ watch(hoveredId, (newId) => {
 
             </TableCell>
           </TableRow>
-        </TransitionGroup>
       </Table>
 </template>

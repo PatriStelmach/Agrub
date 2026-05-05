@@ -5,7 +5,7 @@ import type {HTMLAttributes} from "vue";
 
 const props = defineProps<{
   text: string
-  for: string
+  for?: string
   class?: HTMLAttributes["class"]
 }>()
 </script>
