@@ -46,15 +46,15 @@ void handleRepoChange() {
 
 
 
-Future<void> acknowledgeAlert(int alertId, {String? comment}) async {
+Future<void> acknowledgeAlert(int alertId, {String? comment, bool isAck = true}) async {
 
 // VERY simple function for sending ack via repository function. rudimentary error hadling
   try {
-    await alertsRepository.sendAcknowledge(alertId, comment: comment);
+    await alertsRepository.sendAcknowledge(alertId, comment: comment, isAck: isAck);
     
     notifyListeners();
   } catch (e) {
-      print('Placeholder error: $e');
+      debugPrint('Placeholder error: $e');
 
   }
 }

@@ -18,14 +18,17 @@ final Map<String, Plugin> pluginsCache = {};
 Future<void> updateAllPlugins() async {
 
   try {
-    final url = Uri.parse('http://10.0.2.2:10000/api/plugins/library');
-
-    final response = await http.get(url);
-
+    
+    //Backend connection version:
+    //final url = Uri.parse('http://10.0.2.2:10000/api/plugins/library');
+    //final response = await http.get(url);
+    //final List<dynamic> decodedData = jsonDecode(response.body);
 
     //mock version:
-   // final String response = await rootBundle.loadString('assets/mocks/plugins.json');
-    final List<dynamic> decodedData = jsonDecode(response.body);
+    final String response = await rootBundle.loadString('assets/mocks/plugins.json');
+    final List<dynamic> decodedData = jsonDecode(response);
+
+
     final List<Plugin> parsedPlugins = decodedData.map((item) {
       return Plugin.fromJson(item as Map<String, dynamic>);
     }).toList();
@@ -56,6 +59,15 @@ Future<void> startPlugin(String id) async {
 
   
  print("Plugin started");
+  
+
+}
+
+Future<void> stopPlugin(String id) async {
+  
+
+  
+ print("Plugin stopped");
   
 
 }

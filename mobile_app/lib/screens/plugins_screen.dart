@@ -71,7 +71,7 @@ else {
                    child: ExpansionTile(
                    title: Text(plugin?.fileName ?? 'No name'),
                   subtitle: Text(plugin?.creator ?? 'Unknown creator'),
-                  leading: Icon(Icons.warning, color: Colors.black),
+                  leading: Icon(plugin.active ? Icons.play_arrow : Icons.pause_circle, color: Colors.black),
                   children: [
                     Column(
                       children: [
@@ -104,7 +104,17 @@ else {
                             
                             child: Text(
                               plugin.active ? 'Stop plugin' : 'Start plugin')) 
-                          )
+                          ),
+
+                          SizedBox(
+                            width: double.infinity,
+                          child:ElevatedButton(onPressed:() { },
+                            
+
+                            
+                            child: Text('Force plugin')) 
+                          ),
+                          
                         
                       ]
                       
