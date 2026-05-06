@@ -1,9 +1,13 @@
 package pl.pjatk.alertwip.config;
 
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import pl.pjatk.alertwip.model.Role;
 import pl.pjatk.alertwip.model.SystemSetting;
+import pl.pjatk.alertwip.model.User;
 import pl.pjatk.alertwip.repository.SystemSettingRepository;
+import pl.pjatk.alertwip.repository.UserRepository;
 
 import java.util.Map;
 
@@ -11,9 +15,13 @@ import java.util.Map;
 public class SettingsSeeder implements CommandLineRunner {
 
     private final SystemSettingRepository repository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public SettingsSeeder(SystemSettingRepository repository) {
+    public SettingsSeeder(SystemSettingRepository repository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.repository = repository;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -47,5 +55,18 @@ public class SettingsSeeder implements CommandLineRunner {
                 System.out.println("[SYSTEM] Dodano domyślne ustawienie do bazy: " + key);
             }
         });
+
+        // Testowy uzytkownik
+        if (userRepository.findByEmail("admin@pjatk.pl").isEmpty()) {
+            User admin = new User();
+            admin.setEmail("admin@pjatk.pl");
+            admin.setPassword(passwordEncoder.encode("admin123"));
+            admin.setFirstname("Admin");
+            admin.setSurname("Systemu");
+            admin.setRole(Role.ADMINISTRATOR);
+            admin.setActive(true);
+            userRepository.save(admin);
+            System.out.println("[SECURITY] Utworzono testowego użytkownika: admin@pjatk.pl");
+        }
     }
 }
