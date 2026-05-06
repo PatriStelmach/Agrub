@@ -1,4 +1,4 @@
-<script setup lang="ts">
+ <script setup lang="ts">
 import DateCell from "@/helpers/DateCell.vue";
 import {
   Table,
@@ -61,26 +61,26 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<LibraryPlugin>(()
               :key="index">{{tag}}</Badge>
           </TableCell>
           <TableCell>
-            <component class="text-badge size-7 lg:size-8 xl:size-10 2xl:size-16" :class="{'text-yellow-500' : !plugin.log }" :is="plugin.log ? IconLogs : IconAlertTriangleFilled "/>
+            <component class="text-badge size-7 " :class="{'text-yellow-500' : !plugin.log }" :is="plugin.log ? IconLogs : IconAlertTriangleFilled "/>
           </TableCell>
           <TableCell >
             <img
               v-if="plugin.language === Language.PYTHON"
               alt="python_icon"
               src="@/components/icons/python_icon.png"
-              class="size-7 lg:size-8 xl:size-10 2xl:size-16"
+              class="size-7 "
             />
             <img
               v-if="[Language.BASH, Language.SH].includes(plugin.language)"
               alt="bash_icon"
               src="@/components/icons/bash_icon.png"
-              class="size-7 lg:size-8 xl:size-10 2xl:size-16"
+              class="size-7 "
             />
             <img
               v-if="[Language.POWERSHELL, Language.POWERSHELL_MODULE].includes(plugin.language)"
               alt="powershell_icon"
               src="@/components/icons/powershell_icon.png"
-              class="size-7 lg:size-8 xl:size-10 2xl:size-16"
+              class="size-7 "
             />
           </TableCell>
           <DateCell  :date="plugin.createdAt as Date"></DateCell>

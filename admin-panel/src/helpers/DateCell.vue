@@ -14,9 +14,14 @@ const parsed = computed(() => dateParser(props.date))
 
 <template>
   <TableCell class="px-2 relative">
-    {{ parsed.day }}/{{ parsed.month }}/{{ parsed.year }} -
+    <span v-if="props.date">
+          {{ parsed.day }}/{{ parsed.month }}/{{ parsed.year }} -
     {{ parsed.hours + ":" + parsed.minutes   }}
-    <slot/>
+    </span>
+    <span v-else>
+      ----------
+    </span>
+
   </TableCell>
 </template>
 
