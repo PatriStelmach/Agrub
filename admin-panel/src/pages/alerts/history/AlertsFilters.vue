@@ -41,6 +41,7 @@ import { alertSources } from "@/data/alertSources.ts";
 import { now, getLocalTimeZone, CalendarDateTime } from '@internationalized/date'
 import MyDateRangePicker from "@/helpers/MyDateRangePicker.vue";
 import type {AlertHistoryFilters} from "@/types/types.ts";
+import {dateParser} from "@/composables/dateParser.ts";
 
 const emit = defineEmits<{
   'update:filters': [AlertHistoryFilters]
@@ -142,6 +143,7 @@ const onCancel = () => {
 }
 
 const onSubmit = () => {
+  const toApiDate = (date: any) => date?.toDate(tz) ? dateParser(date.toDate(tz)).apiDate : undefined;
   emit("update:filters", {
     severity: filters.severity,
     message: filters.message,
@@ -150,10 +152,10 @@ const onSubmit = () => {
     source: filters.source,
     ack: filters.ack,
     unack: filters.unack,
-    createdDateFrom: filters.createdDateRange.start?.toDate(tz).toISOString(),
-    createdDateTo: filters.createdDateRange.end?.toDate(tz).toISOString(),
-    closedDateFrom: filters.closedDateRange.start?.toDate(tz).toISOString(),
-    closedDateTo: filters.closedDateRange.end?.toDate(tz).toISOString(),
+    createdDateFrom: toApiDate(filters.createdDateRange.start),
+    createdDateTo: toApiDate(filters.createdDateRange.end),
+    closedDateFrom: toApiDate(filters.closedDateRange.start),
+    closedDateTo: toApiDate(filters.closedDateRange.end),
   })
 }
 </script>
@@ -263,9 +265,9 @@ const onSubmit = () => {
             <div class="flex **:cursor-pointer *:flex *:items-center *:space-x-2">
               <div>
                 <input v-model="filters.ack" type="checkbox" id="acknowledged" />
-                <DialogLabel class="pb-0 mb-0 text-comment text-sm" text="Unacknowledged" for="acknowledged" />
+                <DialogLabel class="pb-0 mb-0 text-comment text-sm" text="Acknowledged" for="acknowledged" />
                 <input v-model="filters.unack" type="checkbox" id="unacknowledged" />
-                <DialogLabel class="pb-0 mb-0 text-comment text-sm" text="Acknowledged" for="unacknowledged" />
+                <DialogLabel class="pb-0 mb-0 text-comment text-sm" text="Unacknowledged" for="unacknowledged" />
               </div>
             </div>
           </div>
