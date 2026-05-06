@@ -42,9 +42,9 @@ public class GlobalProblemSpecifications {
 
                 // 5. Potwierdzenie (ACK / UNACK)
                 if (Boolean.TRUE.equals(f.ack()) && !Boolean.TRUE.equals(f.unack())) {
-                    predicates.add(cb.isTrue(root.get("acknowledged")));
+                    predicates.add(cb.isTrue(root.get("isAcknowledged")));
                 } else if (Boolean.TRUE.equals(f.unack()) && !Boolean.TRUE.equals(f.ack())) {
-                    predicates.add(cb.isFalse(root.get("acknowledged")));
+                    predicates.add(cb.isFalse(root.get("isAcknowledged")));
                 }
 
                 // 6. Daty Utworzenia
