@@ -26,18 +26,23 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .cors(Customizer.withDefaults())
-
                 .csrf(AbstractHttpConfigurer::disable)
-
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll() // Publiczne
-                        .anyRequest().authenticated() // Reszta wymaga logowania
-                )
+                        // whitelist
+                        .requestMatchers(
+                                "/api/auth/**",            // Logowanie i rejestracja
+                                "/v3/api-docs/**",         // Dokumentacja JSON/YAML
+                                "/swagger-ui/**",          // Interfejs Swaggera
+                                "/swagger-ui.html",        // Główny punkt wejścia Swaggera
+                                "/swagger-resources/**",   // Zasoby pomocnicze
+                                "/webjars/**"              // Pliki statyczne (JS/CSS) dla UI
+                        ).permitAll()
 
+                        .anyRequest().authenticated()
+                )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
