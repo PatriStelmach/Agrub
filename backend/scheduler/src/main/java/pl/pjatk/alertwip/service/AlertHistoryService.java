@@ -6,12 +6,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import pl.pjatk.alertwip.dto.AlertHistoryFiltersDTO;
 import pl.pjatk.alertwip.model.GlobalProblem;
 import pl.pjatk.alertwip.repository.GlobalProblemRepository;
 import pl.pjatk.alertwip.repository.GlobalProblemSpecifications;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 public class AlertHistoryService {
@@ -23,25 +21,20 @@ public class AlertHistoryService {
     }
 
     public Page<GlobalProblem> getAlertHistory(
-            int page, int pageSize, String sortBy, boolean descending,
-            String searchQueryMessage, String searchQuerySubject,
-            List<String> systems, String origin,
-            LocalDateTime dateFrom, LocalDateTime dateTo) {
+            int page, int pageSize, String sortKey, String sortOrder, AlertHistoryFiltersDTO filters) {
 
-        // Budujemy specyfikację (warunki)
-        Specification<GlobalProblem> spec = GlobalProblemSpecifications.buildHistoryFilter(
-                searchQueryMessage, searchQuerySubject, systems, origin, dateFrom, dateTo
-        );
+        // Budowa filtrów z DTO (z uwzględnieniem nałożonego z góry statusu "Done")
+        Specification<GlobalProblem> spec = GlobalProblemSpecifications.buildHistoryFilter(filters);
 
-        // Sortowanie wybrane przez użytkownika (np. po createdAt lub severity)
-        Sort primarySort = Sort.by(descending ? Sort.Direction.DESC : Sort.Direction.ASC, sortBy);
-        // Zapasowe sortowanie po ID dla stabilności bazy danych
+        // Mapowanie sortowania (asc / desc z frontu)
+        Sort.Direction direction = sortOrder.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort primarySort = Sort.by(direction, sortKey);
+
+        // Zabezpieczenie przed dublowaniem rekordów, jeśli daty są takie same
         Sort finalSort = primarySort.and(Sort.by(Sort.Direction.DESC, "id"));
 
-        // Tworzymy obiekt Pageable (UWAGA: Spring indeksuje strony od zera!)
         Pageable pageable = PageRequest.of(page, pageSize, finalSort);
 
-        // Magia Springa: wygeneruje sam 2 zapytania (SELECT dane LIMIT... oraz SELECT COUNT)
         return repository.findAll(spec, pageable);
     }
 }

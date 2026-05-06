@@ -1,5 +1,7 @@
 package pl.pjatk.alertwip.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -18,6 +20,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/alerts")
 public class AlertController {
+
+    private static final Logger log = LoggerFactory.getLogger(AlertController.class);
 
     private final GlobalProblemRepository problemRepository;
     private final SseNotifService sseService;
@@ -55,22 +59,18 @@ public class AlertController {
 
     @GetMapping("/history")
     public ResponseEntity<org.springframework.data.domain.Page<GlobalProblem>> getHistory(
-            @RequestParam(defaultValue = "0") int page, // Numer strony (0 to pierwsza strona)
+            @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int pageSize,
-            @RequestParam(defaultValue = "createdAt") String sortBy,
-            @RequestParam(defaultValue = "true") boolean descending,
-            @RequestParam(required = false) String searchQueryMessage,
-            @RequestParam(required = false) String searchQuerySubject,
-            @RequestParam(required = false) List<String> systems,
-            @RequestParam(required = false) String origin,
-            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime dateFrom,
-            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime dateTo
+            @RequestParam(defaultValue = "createdAt") String sortKey,
+            @RequestParam(defaultValue = "desc") String sortOrder,
+            @ModelAttribute pl.pjatk.alertwip.dto.AlertHistoryFiltersDTO filters
     ) {
 
-        org.springframework.data.domain.Page<GlobalProblem> historyPage = alertHistoryService.getAlertHistory(
-                page, pageSize, sortBy, descending,
-                searchQueryMessage, searchQuerySubject, systems, origin, dateFrom, dateTo
-        );
+        log.info("Otrzymano zapytanie do historii z filtrami: {}", filters);
+        log.info("Paginacja i sortowanie -> strona: {}, rozmiar: {}, sortKey: {}, sortOrder: {}", page, pageSize, sortKey, sortOrder);
+
+        org.springframework.data.domain.Page<GlobalProblem> historyPage =
+                alertHistoryService.getAlertHistory(page, pageSize, sortKey, sortOrder, filters);
 
         return ResponseEntity.ok(historyPage);
     }
