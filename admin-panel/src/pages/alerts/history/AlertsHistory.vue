@@ -39,9 +39,6 @@ const sortedHead = ref<{ sortKey: string; sortOrder: string }>({
   sortOrder: 'desc'
 })
 
-onMounted(async () => {
-  await getCurrentStateRequest()
-})
 
 const getCurrentStateRequest = async () => {
   const response = await alertStore.getAlertsHistory(
