@@ -38,6 +38,23 @@ public class PluginManagerService {
         this.dynamicSchedulerConfig = dynamicSchedulerConfig;
     }
 
+    // ==========================================
+    // BEZPIECZEŃSTWO: Ochrona przed Path Traversal
+    // ==========================================
+    private Path resolveSecurePath(String fileName) {
+        // Pobieramy absolutną i znormalizowaną ścieżkę bazową
+        Path basePath = Paths.get(scriptsPath).toAbsolutePath().normalize();
+        // Rozwiązujemy nazwę pliku względem ścieżki bazowej i normalizujemy (usuwamy np. /../)
+        Path resolvedPath = basePath.resolve(fileName).normalize();
+
+        // Jeśli po rozwiązaniu ścieżka nie zaczyna się od ścieżki bazowej, mamy próbę ataku
+        if (!resolvedPath.startsWith(basePath)) {
+            throw new SecurityException("Niedozwolona ścieżka pliku (próba Path Traversal): " + fileName);
+        }
+        return resolvedPath;
+    }
+
+
     // --- KLASY I METODY POMOCNICZE DO PLIKÓW ---
     private static class ParsedHeaders {
         String description = "Brak opisu w pliku";
@@ -110,7 +127,7 @@ public class PluginManagerService {
     }
 
     public PluginDetailsDTO getPluginDetailsByFileName(String fileName) {
-        Path path = Paths.get(scriptsPath).resolve(fileName).toAbsolutePath();
+        Path path = resolveSecurePath(fileName); // ZABEZPIECZONO
         if (!Files.exists(path)) throw new RuntimeException("Plik nie istnieje: " + fileName);
 
         try {
@@ -133,7 +150,6 @@ public class PluginManagerService {
                     if (isSystemHeader) {
                         continue;
                     } else if (trimmed.isEmpty() && cleanCodeLines.isEmpty()) {
-                        // Ignorujemy puste linie zaraz po nagłówkach
                         continue;
                     } else {
                         passedSystemHeaders = true;
@@ -154,8 +170,9 @@ public class PluginManagerService {
     public void saveFullConfig(PluginSaveDTO dto) throws Exception {
         String oldFileName = dto.oldName() + dto.extension();
         String newFileName = dto.name() + dto.extension();
-        Path oldPath = Paths.get(scriptsPath).resolve(oldFileName);
-        Path newPath = Paths.get(scriptsPath).resolve(newFileName);
+
+        Path oldPath = resolveSecurePath(oldFileName); // ZABEZPIECZONO
+        Path newPath = resolveSecurePath(newFileName); // ZABEZPIECZONO
 
         // 1. Obsługa zmiany nazwy pliku (Rename)
         if (!oldFileName.equals(newFileName) && Files.exists(oldPath)) {
@@ -194,7 +211,7 @@ public class PluginManagerService {
     }
 
     public int getScriptSeverity(String fileName) {
-        Path path = Paths.get(scriptsPath).resolve(fileName);
+        Path path = resolveSecurePath(fileName); // ZABEZPIECZONO
         if (!Files.exists(path)) {
             throw new RuntimeException("Nie można odczytać zadania. Plik nie istnieje: " + fileName);
         }
@@ -205,10 +222,11 @@ public class PluginManagerService {
         String ext = (plugin.getLanguage() != null && plugin.getLanguage().startsWith("."))
                 ? plugin.getLanguage() : "." + plugin.getLanguage();
         String fileName = plugin.getName() + ext;
-        Path directory = Paths.get(scriptsPath);
-        Path filePath = directory.resolve(fileName);
 
+        Path directory = Paths.get(scriptsPath).toAbsolutePath().normalize();
         if (!Files.exists(directory)) Files.createDirectories(directory);
+
+        Path filePath = resolveSecurePath(fileName); // ZABEZPIECZONO
 
         StringBuilder fileContent = new StringBuilder();
         fileContent.append("# Creator: ").append(plugin.getCreator() != null ? plugin.getCreator() : "Unknown").append("\n");
@@ -239,7 +257,7 @@ public class PluginManagerService {
 
     @Transactional
     public void deletePluginByFileName(String fileName) {
-        Path path = Paths.get(scriptsPath).resolve(fileName).toAbsolutePath();
+        Path path = resolveSecurePath(fileName); // ZABEZPIECZONO
         Optional<ScheduledTask> taskOpt = taskRepository.findByScriptName(fileName);
         if (taskOpt.isPresent()) {
             ScheduledTask task = taskOpt.get();
