@@ -1,5 +1,4 @@
 <script setup lang="ts" generic="T">
-
 import {
   Pagination,
   PaginationContent,

@@ -5,7 +5,6 @@ export function useBadgeFilter<T>(
   badges: string[],
   filter: (i: T) => string[]
 ){
-  const unwrappedItem = computed(() => item);
   const badgeSearch = ref("")
   const badgeListOpen = ref(false)
   const existingBadge = computed(() => {
@@ -17,13 +16,21 @@ export function useBadgeFilter<T>(
 
   const matchedBadges = computed(() => {
     if(item.value)
-      return availableBadges.value.filter(t => t.includes(badgeSearch.value.toLowerCase()))
+      return availableBadges.value.filter(t => t.toLowerCase().includes(badgeSearch.value.toLowerCase()))
       .filter(t => !filter(item.value!).includes(t))
     else return []
   })
-  const addBadge = () => {
-    if(unwrappedItem.value && !existingBadge.value && badgeSearch.value && item.value) {
+  const addNonExistingBadge = () => {
+    if(!existingBadge.value && badgeSearch.value && item.value) {
       filter(item.value).push(badgeSearch.value)
+      badgeSearch.value = ''
+    }
+  }
+
+  const addExistingBadge = () => {
+    if(badgeSearch.value && item.value) {
+      const matchedBadge = matchedBadges.value.find(b => b.toLowerCase() === badgeSearch.value.toLowerCase())
+      if(matchedBadge) filter(item.value).push(matchedBadge)
       badgeSearch.value = ''
     }
   }
@@ -34,7 +41,8 @@ export function useBadgeFilter<T>(
     badgeListOpen,
     matchedBadges,
     existingBadge,
-    addBadge,
+    addNonExistingBadge,
+    addExistingBadge
   }
 
 }

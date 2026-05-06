@@ -1,4 +1,5 @@
-import type {LibraryPlugin} from "@/types/types"
+import {Language, type LibraryPlugin} from "@/types/types"
+
 export const pluginLibraryData: LibraryPlugin[] = [
   {
     id: 1,
@@ -14,7 +15,7 @@ export const pluginLibraryData: LibraryPlugin[] = [
     id: 2,
     name: "Log Analyzer",
     creator: "Sarah Johnson",
-    language: ".ps1",
+    language: Language.PYTHON,
     description: "Analyzes application logs for error patterns and anomalies",
     weight: 8,
     createdAt: new Date("2024-02-20T14:15:00"),

@@ -1,7 +1,6 @@
 <script setup lang="ts" >
 import MyPluginsTable from "@/pages/plugins/MyPluginsTable.vue";
-import {myPluginsData} from "@/data/myPlugins.ts";
-import MyPagination from "@/helpers/MyPagination.vue";
+import MyClientPagination from "@/helpers/MyClientPagination.vue";
 import type { MyPlugin } from "@/types/types.ts";
 import {useSearchFilter} from "@/composables/useSearchFilter.ts";
 import {useMyPluginStore} from "@/stores/myPluginStore.ts";
@@ -22,7 +21,7 @@ const { updatePage, filteredData, tableData, updateData, updateSearchData, curre
       @update:searchData="updateSearchData"
     />
 
-    <MyPagination
+    <MyClientPagination
       :data="filteredData"
       :page="currentPage"
       @update:paginated-data="updateData"

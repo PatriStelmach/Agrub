@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import {Textarea} from "@/components/ui/textarea";
 
 const props = withDefaults(
   defineProps<{
     modelValue: string
-    /** Ile spacji ma robić jeden Tab. Ustaw 0, żeby wstawiać prawdziwy znak \t */
+    /** Ile spacji ma robić jeden Tab. 0, żeby wstawiać prawdziwy znak \t */
     tabSize?: number
   }>(),
   { tabSize: 2 },
@@ -133,7 +134,7 @@ function onInput(e: Event) {
 <template>
   <textarea
     ref="textareaRef"
-    class="code-area min-h-96 h-full m-2 w-95/100 badge-focus"
+    class="code-area min-h-96 h-full m-2 w-95/100 blue-badge-focus border-input"
     spellcheck="false"
     autocomplete="off"
     autocapitalize="off"
