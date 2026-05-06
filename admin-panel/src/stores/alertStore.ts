@@ -108,7 +108,17 @@ export const useAlertStore = defineStore('useAlertStore', () => {
             pageSize: pageSize,
             sortKey: sortKey,
             sortOrder: sortOrder,
-            filters: filters,
+            severity: filters.severity,
+            message: filters.message,
+            subject: filters.subject,
+            source: filters.source,
+            origin: filters.origin,
+            ack: filters.ack,
+            unack: filters.unack,
+            createdDateFrom: filters.createdDateFrom,
+            createdDateTo: filters.createdDateTo,
+            closedDateFrom: filters.closedDateFrom,
+            closedDateTo: filters.closedDateTo,
           }
         })
       if (response.status === 200) {
