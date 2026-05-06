@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {pluginLibraryData} from "@/data/pluginLibrary.ts";
-import MyClientPagination from "@/helpers/MyClientPagination.vue";
+import MyPagination from "@/helpers/MyPagination.vue";
 import PluginsLibraryTable from "@/pages/plugins/PluginsLibraryTable.vue";
 import {
   IconMessageCode,
@@ -14,7 +14,7 @@ import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/inpu
 import {useSearchFilter} from "@/composables/useSearchFilter.ts";
 import {topButtonGroup, topDiv, topH1} from "@/assets/cssFunctions.ts";
 import GoBackButton from "@/helpers/GoBackButton.vue";
-import MyServerPagination from "@/helpers/MyServerPagination.vue";
+import MyPagination from "@/helpers/MyPagination.vue";
 import axios from "axios";
 
 const getPluginLibraryData = async (page: number, pageSize: number, name: string, creator: string, language: Language) => {
@@ -49,7 +49,7 @@ const getPluginLibraryData = async (page: number, pageSize: number, name: string
       <div>
     </div>
 <PluginsLibraryTable :data="tableData" />
-    <MyServerPagination :total
+    <MyPagination :total
       />
   </div>
 </div>

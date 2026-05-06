@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import {Badge} from "@/components/ui/badge";
-import type {ActionResponse} from "@/types/types.js";
-import {dateParser} from "@/composables/dateParser.js";
+import type {ActionResponse} from "@/types/types.ts";
+import {dateParser} from "@/composables/dateParser.ts";
 import {Skeleton} from "@/components/ui/skeleton";
 
 const props = defineProps<{
   actions: ActionResponse[] | undefined;
-  isLoading: boolean;
 }>()
 
 </script>
@@ -23,11 +22,8 @@ const props = defineProps<{
         <span class="w-15/100 text-right pr-2">Date</span>
       </div>
       <ul class="overflow-y-auto overflow-x-hidden max-h-[20vh] w-full divide-y text-sm">
-        <li v-if="isLoading"><Skeleton  class=" m-2 h-2 w-full"/></li>
-        <li v-if="isLoading"><Skeleton  class=" m-2 h-2 w-full"/></li>
-        <li v-if="isLoading"><Skeleton  class=" m-2 h-2 w-full"/></li>
 
-        <li v-else-if=" !isLoading && !actions?.length" class="px-4 py-8 text-center text-slate-400 italic">
+        <li v-if=" !actions?.length" class="px-4 py-8 text-center text-slate-400 italic">
           No actions recorded yet.
         </li>
 

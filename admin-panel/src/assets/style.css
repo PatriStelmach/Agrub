@@ -271,16 +271,16 @@ input[type="checkbox"]:focus-visible
 
 .slide-fade-enter-active,
 .slide-fade-leave-active {
-  transition: all 0.5s cubic-bezier(1, 0.5, 0.8, 1);
+  transition: all 0.1s cubic-bezier(1, 0.5, 0.8, 1);
 }
 
 .slide-fade-enter-from {
-  transform: translateX(-50rem);
+  transform: translateX(-100rem);
   opacity: 0;
 }
 
 .slide-fade-leave-to {
-  transform: translateX(50rem);
+  transform: translateX(100rem);
   opacity: 0;
 }
 

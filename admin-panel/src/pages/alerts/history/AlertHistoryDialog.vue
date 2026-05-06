@@ -17,7 +17,7 @@ import {
   SelectValue
 } from "@/components/ui/select";
 import {Textarea} from "@/components/ui/textarea";
-import ActionsTable from "@/pages/alerts/active/ActionsTable.vue";
+import ActionsTable from "@/pages/alerts/ActionsTable.vue";
 import {Button} from "@/components/ui/button";
 import {IconCheck, IconSend2, IconX} from "@tabler/icons-vue";
 import type {ActionResponse, ActiveAlert, HistoryAlert} from "@/types/types.ts";

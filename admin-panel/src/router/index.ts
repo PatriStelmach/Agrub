@@ -16,12 +16,12 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: () => import('../pages/alerts/active/AlertsPage.vue'),
+      component: () => import('../pages/alerts/active/ActiveAlertsPage.vue'),
     },
     {
       path: '/alerts',
       name: 'alerts',
-      component: () => import('../pages/alerts/active/AlertsPage.vue'),
+      component: () => import('../pages/alerts/active/ActiveAlertsPage.vue'),
     },
     {
       path: '/alerts_history',

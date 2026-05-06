@@ -17,23 +17,26 @@ import {Badge} from "@/components/ui/badge";
 import {dataTable, tableHeaders, tableCaption} from "@/assets/cssFunctions.js";
 import type {ActiveAlert, AlertDetails} from "@/types/types.js";
 import {useSort} from "@/composables/sorting.js";
-import {computed, ref, watch} from "vue";
+import {computed, ref, watch, watchEffect} from "vue";
 
 const props = defineProps<{
   tableData: ActiveAlert[];
 }>()
 
-const emit = defineEmits<{
-  'update:hovered-alert': [AlertDetails | null]
-}>()
+const hoveredAlert = defineModel<AlertDetails | null>('hoveredAlert')
 
 const hoveredId = ref<number | null>(null);
 
-watch(hoveredId, (newId) => {
-  const alert = props.tableData.find(a => a.id === newId);
-  emit('update:hovered-alert',
-    newId ? {message: alert?.message, subject: alert?.subject, severity: alert?.severity} : null)
-})
+const computedHoveredAlert = computed(() => {
+  const alert = props.tableData.find(a => a.id === hoveredId.value);
+  return hoveredId.value
+    ? { message: alert?.message, subject: alert?.subject, severity: alert?.severity }
+    : null;
+});
+
+watchEffect(() => {
+  hoveredAlert.value = computedHoveredAlert.value;
+});
 
 const { sortedData, sortKey, sortOrder, toggleSort } = useSort<ActiveAlert>(() => props.tableData as ActiveAlert[], 'createdAt')
 
@@ -41,8 +44,9 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<ActiveAlert>(() =
 
 <template>
   <Table id="alert-table" :class="dataTable">
-    <TableCaption :class="tableCaption">Active Alerts:
-      <span class="font-extrabold">{{ sortedData.length}}</span>
+    <TableCaption :class="tableCaption">
+      <slot/>
+      <span>Active Alerts: <span class="font-extrabold">{{ sortedData.length}}</span></span>
     </TableCaption>
     <TableHeader class="h-10">
       <TableRow :class="tableHeaders">
@@ -56,7 +60,7 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<ActiveAlert>(() =
         <TableHead class="max-md:w-9/100 w-6/100 lg:w-4/100 font-bold text-sm lg:text-md xl:text-lg 2xl:text:xl">Actions</TableHead>
       </TableRow>
     </TableHeader>
-    <TransitionGroup tag="tbody" name="fade">
+    <TransitionGroup tag="tbody" name="slide-fade">
       <TableRow
         :id="`${alert.id}_row`"
         class="relative cursor-pointer duration-0  hover:bg-accent/50"

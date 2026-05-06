@@ -20,9 +20,9 @@ import { IconFilterCog} from "@tabler/icons-vue";
 import GoBackButton from "@/helpers/GoBackButton.vue";
 import {useAlertStore} from "@/stores/alertStore.ts";
 import AlertsHistoryTable from "@/pages/alerts/history/AlertsHistoryTable.vue";
-import MyServerPagination from "@/helpers/MyServerPagination.vue";
+import MyPagination from "@/helpers/MyPagination.vue";
 import AlertsFilters from "@/pages/alerts/history/AlertsFilters.vue";
-const DetailsCard = defineAsyncComponent(() => import('@/pages/alerts/active/DetailsCard.vue'))
+const DetailsCard = defineAsyncComponent(() => import('@/pages/alerts/DetailsCard.vue'))
 
 const alertStore = useAlertStore()
 
@@ -110,7 +110,7 @@ watch(sortedHead, async () => {
         :alerts="alerts"
         :totalElements="totalElements"
       >
-        <MyServerPagination
+        <MyPagination
           :total="totalElements"
           v-model:page-index="currentPage"
           v-model:page-size="pageSize"

@@ -1,6 +1,6 @@
 export const inputText = 'text-sm!  xl:text-xl! 2xl:text-2xl!';
 export const nameLabel = 'text-sm lg:text-md xl:text-xl 2xl:text-2xl'
-export const dataTable = "w-99/100 text-xs md:text-sm lg:text-md xl:text-lg 2xl:text:xl  mx-auto  table-fixed"
+export const dataTable = "w-99/100 text-xs md:text-sm lg:text-md xl:text-lg 2xl:text:xl h-full mx-auto  table-fixed"
 export const tableCaption = "bg-secondary border-b border-t text-foreground sticky z-9 bottom-0 py-2 text-md lg:text-lg xl:text-xl 2xl:text:3xl"
 export const tableHeaders = "bg-secondary hover:bg-secondary gap-0 space-0 "
 export const tableDiv = " mt-[2vh] mx-[1%] w-98/100 relative overflow-auto max-h-[77vh]   "
