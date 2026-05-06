@@ -131,6 +131,8 @@ class AckDialog extends StatefulWidget {
 class _AckDialogState extends State<AckDialog> {
   late TextEditingController _controller;
 
+  bool isAck = true;
+
   @override
   void initState() {
     super.initState();
@@ -146,15 +148,36 @@ class _AckDialogState extends State<AckDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(' Actions for Alert ${widget.alertId}'),
-      content: TextField(controller: _controller),
+title: Text('Actions for Alert ${widget.alertId}'),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _controller,
+              decoration: const InputDecoration(labelText: 'Your comment'),
+            ),
+            const SizedBox(height: 15),
+            CheckboxListTile(
+              title: const Text("Acknowledge alert"),
+              value: isAck,
+              contentPadding: EdgeInsets.zero,
+              onChanged: (bool? value) {
+                setState(() {
+                  isAck = value ?? false;
+                });
+              },
+            ),
+          ],
+        ),
+      ),
       actions: [
         TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
 
         ElevatedButton(
           onPressed: () {
             final String commentValue = _controller.text;
-            context.read<AlertsViewModel>().acknowledgeAlert(widget.alertId, comment: commentValue );
+            context.read<AlertsViewModel>().acknowledgeAlert(widget.alertId, comment: commentValue, isAck: this.isAck );
             Navigator.pop(context);
           },
           child: const Text('ACK'),

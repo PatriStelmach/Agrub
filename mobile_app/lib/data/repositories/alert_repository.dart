@@ -175,10 +175,19 @@ void _processAlerts(List<Alert> incomingAlerts) {
 
 }
 
-Future<void> sendAcknowledge(int alertId, {String? comment}) async {
+Future<void> sendAcknowledge(int alertId, {String? comment, bool isAck = true}) async {
   
 final String baseUrl = 'http://10.0.2.2:10000';
   final url = Uri.parse('$baseUrl/api/alerts/$alertId/ack');
+
+
+final String actionType = isAck ? "ACK" : "COMMENT";
+
+final Map<String, dynamic> requestBody = {
+    "message": comment ?? "",
+    "actionType": actionType,
+    "author": "Mobile User", // Możesz tu przekazać zmienną z loginem
+  };
 
 
   try {
@@ -189,9 +198,7 @@ headers: {
         'Accept': 'application/json',
       },
 
-      body: (comment == null || comment.isEmpty) 
-          ? jsonEncode({}) 
-          : jsonEncode(comment),
+      body: jsonEncode(requestBody),
     );
     
     if (response.statusCode == 200) {
