@@ -41,7 +41,6 @@ export const useAlertStore = defineStore('useAlertStore', () => {
     const alert = findAlert(action.alertId)
     console.log(alert)
     if (alert) {
-      //alert.actions.push(action)
       alert.acknowledged = action.ack ??  alert.acknowledged
       alert.severity = action.newSeverity ?? alert.severity
     }
@@ -80,7 +79,6 @@ export const useAlertStore = defineStore('useAlertStore', () => {
 
       })
       if(response.status === 200) {
-        //await getCurrentAlertsRequest()
         toast.success(response.data.message)
       }
       else {
@@ -119,6 +117,9 @@ export const useAlertStore = defineStore('useAlertStore', () => {
             createdDateTo: filters.createdDateTo,
             closedDateFrom: filters.closedDateFrom,
             closedDateTo: filters.closedDateTo,
+          },
+          paramsSerializer: {
+            indexes: null
           }
         })
       if (response.status === 200) {

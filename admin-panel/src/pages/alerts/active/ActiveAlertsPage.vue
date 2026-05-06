@@ -1,6 +1,5 @@
 <script setup lang="ts" >
 import {type ActiveAlert, type AlertDetails} from "@/types/types.js";
-import MyClientPagination from "@/helpers/MyClientPagination.vue";
 import {Search} from "lucide-vue-next";
 import {ButtonGroup} from "@/components/ui/button-group";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
@@ -14,23 +13,17 @@ import {
   topDiv, topButtonGroup
 } from "@/assets/cssFunctions.js";
 import GoBackButton from "@/helpers/GoBackButton.vue";
-import AlertsTable from "@/pages/alerts/active/AlertsTable.vue";
+import ActiveAlertsTable from "@/pages/alerts/active/ActiveAlertsTable.vue";
+import MyClientPagination from "@/helpers/MyClientPagination.vue";
+const DetailsCard = defineAsyncComponent(() => import('@/pages/alerts/DetailsCard.vue'))
 
 const alertStore = useAlertStore();
 onMounted(() => {
   alertStore.getCurrentAlertsRequest()
 })
-
-const DetailsCard = defineAsyncComponent(() => import('@/pages/alerts/active/DetailsCard.vue'))
 const hoveredAlert = ref<AlertDetails | null>(null)
-
-const { updatePage, filteredData, updateData, currentPage, searchFilter, tableData } =
+const {pageSize, filteredData, updateData, currentPage, searchFilter, tableData } =
   useSearchFilter<ActiveAlert>(() => alertStore.getAllCurrentAlerts,(item) => item.subject)
-
-const updateHovered = (data: AlertDetails | null) => {
-  hoveredAlert.value = data
-}
-
 
 </script>
 
@@ -38,7 +31,6 @@ const updateHovered = (data: AlertDetails | null) => {
   <div>
     <div :class="topDiv">
       <h1 :class="topH1">Alerts dashboard</h1>
-
         <ButtonGroup :class="topButtonGroup">
           <GoBackButton/>
             <InputGroup >
@@ -57,19 +49,18 @@ const updateHovered = (data: AlertDetails | null) => {
         v-if="hoveredAlert"
         :data=hoveredAlert
       />
-    <AlertsTable
+    <ActiveAlertsTable
       :tableData="tableData"
-      @update:hovered-alert="updateHovered"
-    />
-
+      v-model:activeAlerts="alertStore.getAllCurrentAlerts"
+      v-model:hoveredAlert="hoveredAlert"
+    >
+      <MyClientPagination
+        :data="filteredData"
+        v-model:page-index="currentPage"
+        v-model:page-size="pageSize"
+        @update:paginatedData="updateData"
+      />
+    </ActiveAlertsTable>
     </div>
-    <MyClientPagination
-      class="max-h-[5vh] z-99"
-      :data="filteredData"
-      :page="currentPage"
-      @update:paginated-data="updateData"
-      @update:pages="updatePage"
-    />
   </div>
-
 </template>

@@ -6,6 +6,7 @@ export function useSearchFilter<T>(data: () => T[], filter: (item: T) => string)
   const debounceFilter = ref<string>('')
   const currentPage = ref(1)
   const tableData = ref<T[]>(data())
+  const pageSize = ref<number>(20)
 
   const filteredData = computed(() => {
     if(!debounceFilter.value) {
@@ -16,13 +17,7 @@ export function useSearchFilter<T>(data: () => T[], filter: (item: T) => string)
 
   const updateFilter = useDebounceFn((filter: string)=> {
     debounceFilter.value = filter
-  }, 300)
-
-  watch(searchFilter, (val) => {
-    currentPage.value = 1
-    updateFilter(val)
-  })
-
+  }, 100)
   const updateData = (data:T[]) => {
     tableData.value = data as T[]
   }
@@ -30,9 +25,13 @@ export function useSearchFilter<T>(data: () => T[], filter: (item: T) => string)
     searchFilter.value = data.trim()
   }
 
-  const updatePage = (page: number) => {
-    currentPage.value = page
-  }
+  watch(searchFilter, (val) => {
+    currentPage.value = 1
+    updateFilter(val)
+  })
+  watch(pageSize, () => {
+    currentPage.value = 1
+  })
 
   return {
     searchFilter,
@@ -41,6 +40,6 @@ export function useSearchFilter<T>(data: () => T[], filter: (item: T) => string)
     filteredData,
     updateData,
     updateSearchData,
-    updatePage,
+    pageSize
   }
 }

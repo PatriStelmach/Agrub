@@ -23,19 +23,13 @@ import {useAlertStore} from "@/stores/alertStore.js";
 import DialogLabel from "@/helpers/DialogLabel.vue";
 import type {ActionResponse, ActiveAlert} from "@/types/types.js";
 import {Badge} from "@/components/ui/badge";
-import ActionsTable from "@/pages/alerts/active/ActionsTable.vue";
+import ActionsTable from "@/pages/alerts/ActionsTable.vue";
 
 const props = defineProps<{
   alert: ActiveAlert
 }>()
 
 const isLoading = ref(true);
-
-const actions = ref<ActionResponse[]>([])
-const getActions = async () => {
-  actions.value = await alertStore.getAlertActions(props.alert.id)
-  isLoading.value = false
-}
 const alertStore = useAlertStore()
 
 const newAck = ref(props.alert.acknowledged)
@@ -66,7 +60,7 @@ const onClose = () => {
 
 <template>
   <Dialog >
-      <DialogTrigger as-child @click="getActions">
+      <DialogTrigger as-child>
         <slot />
       </DialogTrigger>
       <DialogContent :class="` h-fit border-2 shadow-[0_0_1rem_2px] max-md:max-w-4/5! md:max-w-2/5! shadow-severity-${newSeverity}/70 border-severity-${newSeverity}/70 duration-500`" >
@@ -131,8 +125,7 @@ const onClose = () => {
         </div>
         <!-- zmienić na tabs z shadcn dla actions -->
         <ActionsTable
-          :actions="actions"
-          :isLoading="isLoading"
+          :actions="alert.actions"
           >
           <DialogLabel text="Actions" for="actions-history" />
         </ActionsTable>

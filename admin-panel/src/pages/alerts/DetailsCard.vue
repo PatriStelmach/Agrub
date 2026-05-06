@@ -4,7 +4,7 @@ import {computed} from "vue";
 import {useMouse} from "@vueuse/core";
 import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import {Label} from "@/components/ui/label";
-import type {AlertDetails} from "@/types/types.js";
+import type {AlertDetails} from "@/types/types.ts";
 
 const props = defineProps<{
   data: AlertDetails | null
