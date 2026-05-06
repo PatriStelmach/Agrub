@@ -85,7 +85,7 @@ public class AlertController {
         System.out.println("========================================");
 
         try {
-            // Ręcznie parsujemy JSONa na Twoje DTO, żeby sprawdzić co się przypisze
+            // Ręcznie parsujemy JSONa na DTO
             com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
             // Konfiguracja, żeby nie wywalało błędu przy nieznanych polach
             mapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
