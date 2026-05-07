@@ -50,7 +50,7 @@ const emits = defineEmits<{
         <div class="grid gap-4">
           <div class="grid gap-3">
             <Label for="my-plugin-description">Description</Label>
-            <Input class="m-2 badge-focus max-w-95/100" id="my-plugin-description" name="description" v-model="newDescription" :default-value="description" />
+            <Input class="m-2 badge-focus max-w-95/100 blue-badge-focus" id="my-plugin-description" name="description" v-model="newDescription" :default-value="description" />
           </div>
           <div class="grid gap-3  h-full">
             <Label for="my-plugin-code">Code</Label>

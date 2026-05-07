@@ -17,19 +17,18 @@ export const badgeVariants = cva(
         outline:
           "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
         groups:
-          "border-transparent text-primary bg-badge/80 hover:bg-badge/50 cursor-pointer  transition-all duration-50" +
+          "border-transparent text-primary bg-blue-badge/80 hover:bg-blue-badge/50 cursor-pointer  transition-all duration-50" +
           " hover:shadow-badge hover:shadow-md mr-1 my-1 text-xs md:text-sm lg:text-md 2xl:text-lg ",
         tags:
-          "border-transparent text-primary bg-accent hover:bg-badge2 cursor-pointer  transition-all duration-50" +
-          " hover:shadow-badge2 hover:shadow-md mr-1 my-1 text-xs md:text-sm lg:text-md 2xl:text-lg",
+          "border-transparent text-primary bg-accent hover:bg-red-badge cursor-pointer  transition-all duration-50" +
+          " hover:shadow-red-badge hover:shadow-md mr-1 my-1 text-xs md:text-sm lg:text-md 2xl:text-lg",
         source:
-          "border-transparent text-primary bg-badge1/70 hover:bg-badge1/50 cursor-pointer  transition-all duration-50" +
-          " hover:shadow-badge1 hover:shadow-md text-xs md:text-sm lg:text-md 2xl:text-lg ",
+          "border-transparent text-primary bg-green-badge/70 hover:bg-green-badge/50 cursor-pointer  transition-all duration-50" +
+          " hover:shadow-green-badge hover:shadow-md text-xs md:text-sm lg:text-md 2xl:text-lg ",
         origin:
-          "border-transparent text-primary bg-badge/70 hover:bg-badge/50 cursor-pointer  transition-all duration-50" +
-          " hover:shadow-badge hover:shadow-md text-xs md:text-sm lg:text-md 2xl:text-lg ",
-        ack_type:"border-transparent text-blue-400  bg-blue-400/20 hover:bg-vlue/50 cursor-pointer  transition-all duration-50" +
-        " hover:shadow-badge  text-xs  ",
+          "border-transparent text-primary bg-blue-badge/70 hover:bg-blue-badge/50 cursor-pointer  transition-all duration-50" +
+          " hover:shadow-blue-badge hover:shadow-md text-xs md:text-sm lg:text-md 2xl:text-lg ",
+        ack_type:"border-transparent text-blue-400  bg-blue-400/20  transition-all duration-50 text-xs",
       },
     },
     defaultVariants: {

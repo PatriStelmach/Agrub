@@ -47,7 +47,7 @@ const { wrap, unwrap, unwrappedItem, isUnwrapped, originalItem } = useWrapping(u
 const { updatePage, filteredData, tableData, updateData, updateSearchData, currentPage, searchFilter } =
   useSearchFilter<User>(() => users.value,(user) => `${user.firstname} ${user.surname}` )
 
-const { badgeSearch, availableBadges, addBadge, badgeListOpen, matchedBadges, existingBadge } = useBadgeFilter<User>(
+const { badgeSearch, availableBadges, addNonExistingBadge, badgeListOpen, matchedBadges, existingBadge } = useBadgeFilter<User>(
   unwrappedItem,
   groups,
   () => unwrappedItem.value?.groups ?? []
@@ -105,8 +105,8 @@ const { badgeSearch, availableBadges, addBadge, badgeListOpen, matchedBadges, ex
               </AvatarFallback>
             </Avatar>
             <span
-              class="absolute bottom-0 right-0 size-2.5 rounded-full  bg-badge1"
-              :class="{'bg-badge2' : !user.active}"
+              class="absolute bottom-0 right-0 size-2.5 rounded-full  bg-green-badge"
+              :class="{'bg-red-badge' : !user.active}"
             />
           </div>
 
@@ -149,7 +149,7 @@ const { badgeSearch, availableBadges, addBadge, badgeListOpen, matchedBadges, ex
           </div>
           <component :is="isUnwrapped(user.id) ? IconEditOff : IconEdit"
                      @click="isUnwrapped(user.id) ? wrap(false) : unwrap(user.id)"
-                     class="text-badge1 cursor-pointer hover:scale-115 " :class="{'text-badge2' : isUnwrapped(user.id)}" />
+                     class="text-green-badge cursor-pointer hover:scale-115 " :class="{'text-red-badge' : isUnwrapped(user.id)}" />
         </CardHeader>
         <CardDescription class="px-3 ">
             <RadioGroup v-if="isUnwrapped(user.id)"
@@ -184,10 +184,10 @@ const { badgeSearch, availableBadges, addBadge, badgeListOpen, matchedBadges, ex
                       :class="inputText"
                       v-model="badgeSearch"
                       type="search"
-                      @keyup.enter="addBadge"
+                      @keyup.enter="addNonExistingBadge"
                       @keyup.esc="badgeListOpen=!badgeListOpen"
                       placeholder="Add new group"/>
-                    <InputGroupAddon><IconPlus class="size-4 lg:size-5 xl:size-6 2xl:size-8 cursor-pointer" @click="addBadge"/></InputGroupAddon>
+                    <InputGroupAddon><IconPlus class="size-4 lg:size-5 xl:size-6 2xl:size-8 cursor-pointer" @click="addNonExistingBadge"/></InputGroupAddon>
                   </InputGroup>
                   <div class="max-h-20 w-4/5 mb-2  overflow-y-auto border-2 border-t-0! border-input p-2 rounded-b-md" v-if="matchedBadges.length ">
                     <Badge

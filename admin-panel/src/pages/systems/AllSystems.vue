@@ -16,14 +16,11 @@ import
 } from "@tabler/icons-vue";
 import {Button} from "@/components/ui/button";
 import {Item, ItemContent} from "@/components/ui/item";
-import AddNew from "@/pages/systems/AddNew.vue";
 import {ref} from "vue";
 import type {System} from "@/types/types.ts";
 import {Field, FieldGroup, FieldLabel} from "@/components/ui/field";
 import {Input} from "@/components/ui/input";
 import {ButtonGroup} from "@/components/ui/button-group";
-import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
-import {ArrowLeftIcon, Search} from "lucide-vue-next";
 import {topButtonGroup, topDiv, topH1} from "@/assets/cssFunctions.ts";
 import GoBackButton from "@/helpers/GoBackButton.vue";
 
@@ -59,9 +56,9 @@ const closeDialog = () => {
         class=" transition-all duration-300 mx-6 center"
         :class="{'blur-3xl' : isOpen}">
         <Card
-          class=" m-4 gap-2 h-[40vh] xl:h-[35vh] hover:shadow-[0_0_20px_1px] border-2 transition-all transition-duration-50 hover:transition-duration-50"
-          :class="{' hover:shadow-blue-900 hover:border-blue-900': !system.openSource,
-           ' hover:shadow-green-900 hover:border-green-900': system.openSource}">
+          class=" m-4 gap-2 h-[40vh] xl:h-[35vh] hover:shadow-[0_0_20px_1px] border-2  duration-200"
+          :class="{' hover:shadow-blue-badge hover:border-blue-badge': !system.openSource,
+           ' hover:shadow-green-badge hover:border-green-badge': system.openSource}">
           <div class=" flex justify-between items-center">
             <CardHeader class=" text-3xl xl:text-4xl 2xl:text-6xl text-shadow-sky-800 text-shadow-sm font-bold ">
               {{system.name}}</CardHeader>
@@ -69,11 +66,11 @@ const closeDialog = () => {
           </div>
           <CardAction class="mx-4 text-md lg:text-lg xl:text-xl 2xl:text:3xl flex items-center gap-2"
                       v-if="system.openSource">
-            <IconBrandOpenSource class="text-green-500  size-8 xl:size-12 2xl:size-16"/>
+            <IconBrandOpenSource class="text-green-badge  size-8 xl:size-12 2xl:size-16"/>
             Open Source
           </CardAction>
           <CardAction v-else class="mx-4 text-md lg:text-lg xl:text-xl 2xl:text:3xl flex items-center gap-1">
-            <IconCurrencyDollar class="text-blue-500 size-8 xl:size-12 2xl:size-16"/>
+            <IconCurrencyDollar class="text-blue-badge size-8 xl:size-12 2xl:size-16"/>
             Commercial
           </CardAction>
           <CardDescription class="h-1/3">
@@ -97,8 +94,8 @@ const closeDialog = () => {
       </div>
       <div v-if="openSystem && isOpen" class="left-0 top-[20vh] absolute w-full z-100 flex mx-auto items-center ">
           <form class="bg-background flex mx-auto p-[2vw] items-center justify-center shadow-[0px_0px_150px_1px] rounded-xl w-1/3 border "
-                :class="{' shadow-blue-900 border-blue-900': openSystem.openSource,
-           ' shadow-green-900 border-green-900': openSystem.openSource}">
+                :class="{' shadow-blue-badge border-blue-badge': !openSystem.openSource,
+           ' shadow-green-badge border-green-badge': openSystem.openSource}">
             <FieldGroup>
               <FieldLabel class="flex w-full text-4xl justify-between">{{openSystem.name}}
                 <img :alt="openSystem.name+'_image'" :src="openSystem.img" class=" rounded-full size-[6vh]"/>

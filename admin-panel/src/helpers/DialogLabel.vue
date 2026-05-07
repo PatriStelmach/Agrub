@@ -5,11 +5,11 @@ import type {HTMLAttributes} from "vue";
 
 const props = defineProps<{
   text: string
-  for: string
+  for?: string
   class?: HTMLAttributes["class"]
 }>()
 </script>
 
 <template>
-  <Label :class="`text-md mr-3 pb-2 font-bold text-label ${props.class}`" :for="props.for">{{ text }}</Label>
+  <Label :class="`text-md mr-3 pb-1 font-bold text-label ${props.class}`" :for="props.for">{{ text }}</Label>
 </template>

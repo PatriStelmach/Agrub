@@ -21,7 +21,7 @@ const props = defineProps<{
       <span
 
         class="font-bold text-sm lg:text-md xl:text-lg 2xl:text:xl">{{props.label}}</span>
-      <i class="pi pi-sort-amount-up" v-if="sortKey === props.keyName && sortOrder === 'asc'" />
-      <i class="pi pi-sort-amount-down-alt" v-if="sortKey === props.keyName && sortOrder === 'desc'" /></div>
+      <i class="pi pi-sort-amount-down-alt" v-if="sortKey === props.keyName && sortOrder === 'asc'" />
+      <i class="pi pi-sort-amount-up" v-if="sortKey === props.keyName && sortOrder === 'desc'" /></div>
   </TableHead>
 </template>

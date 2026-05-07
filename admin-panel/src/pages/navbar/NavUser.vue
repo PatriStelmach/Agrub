@@ -47,7 +47,7 @@ defineProps<{
                 {{user.firstname.slice(0,1) + user.surname.slice(0,1)}}
               </AvatarFallback>
               <span
-                class="absolute bottom-1 right-1 size-1.5 rounded-full  bg-badge1"
+                class="absolute bottom-1 right-1 size-1.5 rounded-full  bg-green-badge"
               ></span>
             </Avatar>
             <div class="grid flex-1 text-left text-sm leading-tight">

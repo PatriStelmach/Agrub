@@ -13,6 +13,11 @@ export interface ActiveAlert {
   severity: 0 | 1 | 2 | 3 | 4 | 5,
 }
 
+
+export interface HistoryAlert extends ActiveAlert {
+  closedAt: Date
+}
+
 export interface Actions {
   id: number
   alertId?: number
@@ -23,14 +28,43 @@ export interface Actions {
 }
 
 export interface ActionResponse extends Actions {
-  actionType: 'ACK' | 'UNACK' | 'MESSAGE',
+  actionType: string
   problemId: number,
   createdAt: Date,
 }
 
+export interface AlertDetails {
+  message?: string,
+  subject?: string,
+  severity?: 0 | 1 | 2 | 3 | 4 | 5
+}
 
-export interface ClosedAlert extends ActiveAlert {
-  closedAt: Date
+export const undefinedFilters = {
+  severity: undefined,
+  message: undefined,
+  subject: undefined,
+  source: undefined,
+  origin: undefined,
+  ack: undefined,
+  unack: undefined,
+  createdDateFrom: undefined,
+  createdDateTo: undefined,
+  closedDateFrom: undefined,
+  closedDateTo: undefined
+}
+
+export interface AlertHistoryFilters {
+  severity?: number[]
+  message?: string
+  subject?: string
+  source?: string
+  origin?: string[]
+  ack? : boolean
+  unack? : boolean
+  createdDateFrom?: string
+  createdDateTo?: string
+  closedDateFrom?: string
+  closedDateTo?: string
 }
 
 
