@@ -7,6 +7,7 @@ import pl.pjatk.alertwip.model.Role;
 import pl.pjatk.alertwip.model.SystemSetting;
 import pl.pjatk.alertwip.model.User;
 import pl.pjatk.alertwip.repository.SystemSettingRepository;
+import pl.pjatk.alertwip.repository.UserGroupRepository;
 import pl.pjatk.alertwip.repository.UserRepository;
 
 import java.util.Map;
@@ -17,11 +18,13 @@ public class SettingsSeeder implements CommandLineRunner {
     private final SystemSettingRepository repository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserGroupRepository userGroupRepository;
 
-    public SettingsSeeder(SystemSettingRepository repository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public SettingsSeeder(SystemSettingRepository repository, UserRepository userRepository, PasswordEncoder passwordEncoder, UserGroupRepository userGroupRepository) {
         this.repository = repository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.userGroupRepository = userGroupRepository;
     }
 
     @Override
@@ -56,8 +59,15 @@ public class SettingsSeeder implements CommandLineRunner {
             }
         });
 
-        // Testowy uzytkownik
+        // Testowy uzytkownik admin
         if (userRepository.findByEmail("admin@pjatk.pl").isEmpty()) {
+            pl.pjatk.alertwip.model.UserGroup adminGroup = userGroupRepository.findByName("ADMIN")
+                    .orElseGet(() -> {
+                        pl.pjatk.alertwip.model.UserGroup newGroup = new pl.pjatk.alertwip.model.UserGroup();
+                        newGroup.setName("ADMIN");
+                        return userGroupRepository.save(newGroup);
+                    });
+
             User admin = new User();
             admin.setEmail("admin@pjatk.pl");
             admin.setPassword(passwordEncoder.encode("admin123"));
@@ -65,8 +75,34 @@ public class SettingsSeeder implements CommandLineRunner {
             admin.setSurname("Systemu");
             admin.setRole(Role.ADMINISTRATOR);
             admin.setActive(true);
+
+            admin.getGroups().add(adminGroup);
+
             userRepository.save(admin);
-            System.out.println("[SECURITY] Utworzono testowego użytkownika: admin@pjatk.pl");
+            System.out.println("[SECURITY] Utworzono testowego użytkownika: admin@pjatk.pl w grupie ADMIN");
+        }
+
+        // Testowy uzytkownik tech
+        if (userRepository.findByEmail("tech@pjatk.pl").isEmpty()) {
+            pl.pjatk.alertwip.model.UserGroup techGroup = userGroupRepository.findByName("TECH")
+                    .orElseGet(() -> {
+                        pl.pjatk.alertwip.model.UserGroup newGroup = new pl.pjatk.alertwip.model.UserGroup();
+                        newGroup.setName("TECH");
+                        return userGroupRepository.save(newGroup);
+                    });
+
+            User tech = new User();
+            tech.setEmail("tech@pjatk.pl");
+            tech.setPassword(passwordEncoder.encode("tech"));
+            tech.setFirstname("Tech");
+            tech.setSurname("Systemu");
+            tech.setRole(Role.ADMINISTRATOR);
+            tech.setActive(true);
+
+            tech.getGroups().add(techGroup);
+
+            userRepository.save(tech);
+            System.out.println("[SECURITY] Utworzono testowego użytkownika: tech@pjatk.pl w grupie TECH");
         }
     }
 }

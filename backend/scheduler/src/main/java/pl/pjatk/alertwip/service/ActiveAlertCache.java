@@ -46,10 +46,15 @@ public class ActiveAlertCache {
         activeAlerts.remove(id);
     }
 
-    // Pobranie z pamięci
-    public List<GlobalProblem> getActiveAlertsForGroups(List<String> groups) {
+    // Pobranie z pamięciNA
+    public List<GlobalProblem> getActiveAlertsForGroups(List<String> userGroups) {
+        // Admin widzi wszystko
+        if (userGroups.contains("ADMIN")) {
+            return activeAlerts.values().stream().toList();
+        }
+
         return activeAlerts.values().stream()
-                .filter(p -> p.getTechnicianGroups().stream().anyMatch(groups::contains))
+                .filter(p -> p.getTechnicianGroups().stream().anyMatch(userGroups::contains))
                 .toList();
     }
 }

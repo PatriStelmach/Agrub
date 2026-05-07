@@ -36,7 +36,6 @@ public class PluginController {
     }
 
     // --- ZAKTUALIZOWANA BIBLIOTEKA ---
-    // Zmieniamy sygnaturę z List<PluginDTO> na ResponseEntity<Page<PluginDTO>>
     @GetMapping("/library")
     public ResponseEntity<Page<PluginDTO>> getPluginsFromLibrary(
             @RequestParam(required = false) String name,
@@ -48,12 +47,8 @@ public class PluginController {
         // Domyślnie sortujemy od najnowszych wtyczek
         Pageable pageable = PageRequest.of(page, pageSize, Sort.by(Sort.Direction.DESC, "id"));
 
-        // Pobieramy "stronę" encji z repozytorium
         Page<Plugin> libraryPage = pluginRepository.findLibrary(name, creator, language, pageable);
-
-        // Mapujemy całą stronę encji na stronę obiektów DTO za pomocą metody z Twojego serwisu
         Page<PluginDTO> dtoPage = libraryPage.map(pluginManagerService::mapStorePluginToDTO);
-
         return ResponseEntity.ok(dtoPage);
     }
 
