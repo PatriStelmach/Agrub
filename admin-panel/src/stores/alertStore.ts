@@ -4,10 +4,9 @@ import {
   type ActionResponse,
   type Actions,
   type ActiveAlert, type AlertHistoryFilters,
-  api_url,
   type HistoryAlert
 } from "@/types/types.ts";
-import axios from "axios";
+import api from "@/lib/axios";
 import {toast} from "vue-sonner";
 import {dashboardData} from "@/data/dashboardData.ts";
 
@@ -28,7 +27,7 @@ export const useAlertStore = defineStore('useAlertStore', () => {
   }
 
   const getAlertActions = async (id: number) => {
-    const response = await axios.get<ActionResponse[]>(`${api_url}/alerts/${id}/actions`)
+    const response = await api.get<ActionResponse[]>(`/alerts/${id}/actions`)
     console.log(id)
     console.log(response.data)
     if (response.status === 200 && response.data) {
@@ -47,7 +46,7 @@ export const useAlertStore = defineStore('useAlertStore', () => {
   }
   const getCurrentAlertsRequest = async (interval?: number) => {
     try {
-      const response = await axios.get<ActiveAlert[]>(`${api_url}/alerts/active`)
+      const response = await api.get<ActiveAlert[]>('/alerts/active')
       if(response.status === 200) {
         currentAlerts.value = response.data
         console.log(response.data)
@@ -71,7 +70,7 @@ export const useAlertStore = defineStore('useAlertStore', () => {
   const updateAlertRequest = async (action: Actions) => {
     console.log(action)
     try {
-      const response = await axios.post(`${api_url}/alerts/${action.id}/ack`, {
+      const response = await api.post(`/alerts/${action.id}/ack`, {
           ack: action.ack,
           newSeverity: action.newSeverity,
           message: action.message,
@@ -79,7 +78,7 @@ export const useAlertStore = defineStore('useAlertStore', () => {
 
       })
       if(response.status === 200) {
-        toast.success(response.data.message)
+        toast.success(`Alert updated \n ${response.data.message}`)
       }
       else {
         toast.error(response.data.message)
@@ -100,7 +99,7 @@ export const useAlertStore = defineStore('useAlertStore', () => {
       filters: filters,
     })
       try {
-        const response = await axios.get(`${api_url}/alerts/history`, {
+        const response = await api.get('/alerts/history', {
           params: {
             page: page - 1,
             pageSize: pageSize,
