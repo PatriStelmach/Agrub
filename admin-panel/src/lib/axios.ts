@@ -36,7 +36,7 @@ api.interceptors.response.use(
       originalRequest._retry = true
 
       try {
-        await authStore.refreshToken()
+        //await authStore.refreshToken()
         const newToken = authStore.getAccessToken;
         if (newToken) {
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
@@ -44,8 +44,8 @@ api.interceptors.response.use(
         return api(originalRequest);
       }
       catch (refreshError) {
-        if(authStore.getIsAuthenticated)
-          await authStore.logout()
+        // if(authStore.getIsAuthenticated)
+        //   await authStore.logout()
         return Promise.reject(refreshError)
       }
     }

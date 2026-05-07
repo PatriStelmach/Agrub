@@ -57,6 +57,7 @@ import {useMyPluginStore} from "@/stores/myPluginStore.ts";
 import {useBadgeFilter} from "@/composables/useBadgeFilter.ts";
 import {inputText} from "@/assets/cssFunctions.ts";
 import GoBackButton from "@/helpers/GoBackButton.vue";
+import MyClientPagination from "@/helpers/MyClientPagination.vue";
 
 const props = defineProps<{
   data: MyPlugin[];
@@ -217,8 +218,9 @@ const savePlugin = async () => {
 
   <div class="  mt-[2vh] mx-[1%] w-98/100 relative overflow-auto max-h-[77vh]   ">
     <Table id="my-plugin-table" :class="dataTable">
-      <TableCaption :class="tableCaption">My Plugins:
-        <span class="font-extrabold">{{ sortedData.length}}</span>
+      <TableCaption :class="tableCaption">
+        <slot/>
+        <span>My Plugins:<span class="font-extrabold">{{ sortedData.length}}</span></span>
       </TableCaption>
       <TableHeader class="h-10">
         <TableRow :class="tableHeaders">
