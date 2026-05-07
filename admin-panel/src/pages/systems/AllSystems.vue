@@ -49,14 +49,14 @@ const closeDialog = () => {
       </ButtonGroup>
     </div>
 
-    <div class="pt-4 grid grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 overflow-auto max-h-[85vh]">
+    <div class="pt-4 grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 overflow-auto max-h-[85vh]">
       <div
         v-for="system in systemsLibraryData"
         :key="system.id"
         class=" transition-all duration-300 mx-6 center"
         :class="{'blur-3xl' : isOpen}">
         <Card
-          class=" m-4 gap-2 h-[40vh] xl:h-[35vh] hover:shadow-[0_0_20px_1px] border-2  duration-200"
+          class=" m-4 gap-2 h-[40vh] xl:h-[35vh] hover:shadow-[0_0_20px_1px] border-2 w-full duration-200"
           :class="{' hover:shadow-blue-badge hover:border-blue-badge': !system.openSource,
            ' hover:shadow-green-badge hover:border-green-badge': system.openSource}">
           <div class=" flex justify-between items-center">

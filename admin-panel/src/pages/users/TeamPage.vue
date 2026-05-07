@@ -24,7 +24,7 @@ import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {Badge} from "@/components/ui/badge";
 import {useWrapping} from "@/composables/unwrapping.ts";
 import {computed, onMounted, ref, watch} from "vue";
-import {useSearchFilter} from "@/composables/useSearchFilter.ts";
+import {useClientSearchFilter} from "@/composables/useClientSearchFilter.js";
 import type {ActiveAlert, User} from "@/types/types.ts";
 import {dashboardData} from "@/data/dashboardData.ts";
 import {Input} from "@/components/ui/input";
@@ -45,7 +45,7 @@ const groups = ["Technicial", "Database",  "System Admins", "Administration", "S
 
 const { wrap, unwrap, unwrappedItem, isUnwrapped, originalItem } = useWrapping(users)
 const { updatePage, filteredData, tableData, updateData, updateSearchData, currentPage, searchFilter } =
-  useSearchFilter<User>(() => users.value,(user) => `${user.firstname} ${user.surname}` )
+  useClientSearchFilter<User>(() => users.value,(user) => `${user.firstname} ${user.surname}` )
 
 const { badgeSearch, availableBadges, addNonExistingBadge, badgeListOpen, matchedBadges, existingBadge } = useBadgeFilter<User>(
   unwrappedItem,

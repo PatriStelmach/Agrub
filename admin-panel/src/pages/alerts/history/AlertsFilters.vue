@@ -42,6 +42,7 @@ import { now, getLocalTimeZone, CalendarDateTime } from '@internationalized/date
 import MyDateRangePicker from "@/helpers/MyDateRangePicker.vue";
 import type {AlertHistoryFilters} from "@/types/types.ts";
 import {dateParser} from "@/composables/dateParser.ts";
+import {DateValue} from "reka-ui/date";
 
 const emit = defineEmits<{
   'update:filters': [AlertHistoryFilters]
@@ -259,7 +260,7 @@ const onSubmit = () => {
             </Transition>
           </div>
 
-          <!-- Status / Checkboxes -->
+          <!-- Status  -->
           <div>
             <DialogLabel text="Status" />
             <div class="flex **:cursor-pointer *:flex *:items-center *:space-x-2">
