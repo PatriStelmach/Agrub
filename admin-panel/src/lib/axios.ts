@@ -10,7 +10,7 @@ const api = axios.create({
 
 api.interceptors.request.use((config) => {
   const authStore = useAuthStore();
-  const token = authStore.getAccessToken
+  const token = authStore.accessToken
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -27,8 +27,8 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     if (originalRequest.url?.includes(['refresh', 'login', 'logout']) ) {
-      authStore.setAccessToken(null)
-      authStore.setIsAuthenticated(false)
+      authStore.accessToken = null
+      authStore.isAuthenticated = false
       return Promise.reject(error);
     }
 
@@ -36,16 +36,16 @@ api.interceptors.response.use(
       originalRequest._retry = true
 
       try {
-        await authStore.refreshToken()
-        const newToken = authStore.getAccessToken;
+        //await authStore.refreshToken()
+        const newToken = authStore.accessToken;
         if (newToken) {
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
         }
         return api(originalRequest);
       }
       catch (refreshError) {
-        if(authStore.getIsAuthenticated)
-          await authStore.logout()
+        // if(authStore.isAuthenticated)
+        //   await authStore.logout()
         return Promise.reject(refreshError)
       }
     }

@@ -1,23 +1,17 @@
 import {defineStore} from "pinia";
-import {computed, h, ref, watch} from "vue";
+import { ref} from "vue";
 import {
   type ActionResponse,
   type Actions,
-  type ActiveAlert, type AlertHistoryFilters,
-  type HistoryAlert
+  type ActiveAlert
 } from "@/types/types.ts";
 import api from "@/lib/axios";
 import {toast} from "vue-sonner";
-import {dashboardData} from "@/data/dashboardData.ts";
 
 export const useAlertStore = defineStore('useAlertStore', () => {
   const currentAlerts = ref<ActiveAlert[]>([])
 
-  const getAllCurrentAlerts = computed(() => currentAlerts.value)
-
-  const setCurrentAlerts = (newAlerts: ActiveAlert[]) => { currentAlerts.value = newAlerts }
   const addCurrentAlert  = (newAlert: ActiveAlert) => { currentAlerts.value.push(newAlert) }
-  // zmienic na splice, bo wolne
   const deleteCurrentAlert  = (index: number) => {
     currentAlerts.value = currentAlerts.value.filter(a => a.id !== index)
   }
@@ -89,56 +83,10 @@ export const useAlertStore = defineStore('useAlertStore', () => {
     }
   }
 
-  const getAlertsHistory =
-    async (page: number, pageSize: number, filters: AlertHistoryFilters, sortKey: string = 'createdAt', sortOrder: string = 'desc') => {
-    console.log({
-      page: page - 1,
-      pageSize: pageSize,
-      sortKey: sortKey,
-      sortOrder: sortOrder,
-      filters: filters,
-    })
-      try {
-        const response = await api.get('/alerts/history', {
-          params: {
-            page: page - 1,
-            pageSize: pageSize,
-            sortKey: sortKey,
-            sortOrder: sortOrder,
-            severity: filters.severity,
-            message: filters.message,
-            subject: filters.subject,
-            source: filters.source,
-            origin: filters.origin,
-            ack: filters.ack,
-            unack: filters.unack,
-            createdDateFrom: filters.createdDateFrom,
-            createdDateTo: filters.createdDateTo,
-            closedDateFrom: filters.closedDateFrom,
-            closedDateTo: filters.closedDateTo,
-          },
-          paramsSerializer: {
-            indexes: null
-          }
-        })
-      if (response.status === 200) {
-        toast.info('Alerts history fetched')
-        response.data.content.forEach((a:HistoryAlert) => {
-          a.createdAt = new Date (a.createdAt)
-          a.closedAt = new Date (a.closedAt)
-        })
-        return {alerts: response.data.content, totalElements: response.data.totalElements}
-      }
-    }
-    catch {
-      toast.error('Error getting alerts history');
-    }
-  }
+
 
   return {
     currentAlerts,
-    getAllCurrentAlerts,
-    setCurrentAlerts,
     addCurrentAlert,
     deleteCurrentAlert,
     getCurrentAlertsRequest,
@@ -146,7 +94,6 @@ export const useAlertStore = defineStore('useAlertStore', () => {
     updateAlert,
     findAlert,
     getAlertActions,
-    getAlertsHistory
   }
 })
 

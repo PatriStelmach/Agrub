@@ -13,7 +13,7 @@ const router = useRouter();
 
 
 const authStore = useAuthStore()
-const loggedIn = computed(() => authStore.getIsAuthenticated)
+const loggedIn = computed(() => authStore.isAuthenticated)
 watchEffect(async () => {
   if(loggedIn.value){
     useSSEstore()

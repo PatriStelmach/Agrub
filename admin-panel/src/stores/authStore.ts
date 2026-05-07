@@ -11,22 +11,13 @@ export const useAuthStore = defineStore('auth', () => {
   const user = computed(() => userPayload.value?.sub || null)
   const userRoles = computed(() => userPayload.value?.authorities || [])
   const userPayload = computed(() => {
-    if (!accessToken.value || !getAccessToken.value) return null
+    if (!accessToken.value) return null
     try {
-      return jwtDecode<MyJWTPayload>(getAccessToken.value)
+      return jwtDecode<MyJWTPayload>(accessToken.value)
     } catch {
       return null
     }
   })
-  const getAccessToken =  computed(() => accessToken.value)
-  const getIsAuthenticated = computed(() => isAuthenticated.value)
-
-  const setAccessToken = (token: string | null) => {
-    accessToken.value = token
-  }
-  const setIsAuthenticated = (val: boolean) => {
-    isAuthenticated.value = val
-  }
 
 
   async function login(credentials: { email: string; password: string }) {
@@ -70,10 +61,8 @@ export const useAuthStore = defineStore('auth', () => {
     userPayload,
     userRoles,
     user,
-    getAccessToken,
-    getIsAuthenticated,
-    setAccessToken,
-    setIsAuthenticated,
+    accessToken,
+    isAuthenticated,
     login,
     logout,
     refreshToken
