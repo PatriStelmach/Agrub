@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import {watch} from "vue";
 
 const props = defineProps<{
   total: number
@@ -20,6 +21,10 @@ const props = defineProps<{
 
 const currentPage = defineModel<number>('pageIndex', { default: 1 })
 const pageSize = defineModel<number>('pageSize', { default: 20 })
+
+watch(pageSize, () => {
+  currentPage.value = 1
+})
 
 </script>
 

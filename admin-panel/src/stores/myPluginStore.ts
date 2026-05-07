@@ -1,20 +1,19 @@
 import {defineStore} from "pinia";
 import {
-  api_url,
   type ApiResponse,
   type MyPlugin,
   type MyPluginsFromApi,
   type PluginDetails
 } from "@/types/types.ts";
 import {computed, ref} from "vue";
-import axios from "axios";
+import api from "@/lib/axios";
 
 export const useMyPluginStore = defineStore('my-plugins', () => {
   const allMyPlugins = ref<MyPlugin[]>([]);
 
   const editMyPlugin = async (plugin: MyPlugin) => {
     console.log(plugin)
-    const response = await axios.put(`${api_url}/local-scripts/${plugin.fileName}/edit`, {
+    const response = await api.put(`/local-scripts/${plugin.fileName}/edit`, {
       fileName: plugin.fileName,
       code: plugin.code,
       description: plugin.description,
@@ -26,12 +25,12 @@ export const useMyPluginStore = defineStore('my-plugins', () => {
     return response.data as ApiResponse
   }
   const getMyPluginDetails = async (fileName: string) => {
-    const response = await axios.get(`${api_url}/local-scripts/${fileName}/details`)
+    const response = await api.get(`/local-scripts/${fileName}/details`)
     return response.data as PluginDetails
   }
 
   const getAllMyPlugins = async () => {
-    const response= await axios.get(`${api_url}/local-scripts/list`)
+    const response= await api.get('/local-scripts/list')
     allMyPlugins.value = response.data.map((item: MyPluginsFromApi) => ({
         active: item.active,
         creator: item.creator,
@@ -48,12 +47,12 @@ export const useMyPluginStore = defineStore('my-plugins', () => {
 
   const changeStatus = async (fileNames: string[]) => {
     console.log(fileNames)
-    const response = await axios.post(`${api_url}/local-scripts/change-status`, fileNames)
+    const response = await api.post('/local-scripts/change-status', fileNames)
     return response.data as ApiResponse
   }
 
   const deleteMyPlugins = async (fileNames: string[]) => {
-    const response = await axios.delete(`${api_url}/local-scripts/delete`, {params: {fileNames: fileNames}})
+    const response = await api.delete('/local-scripts/delete', {params: {fileNames: fileNames}})
     return response.data as ApiResponse
   }
 

@@ -39,6 +39,13 @@ export interface AlertDetails {
   severity?: 0 | 1 | 2 | 3 | 4 | 5
 }
 
+export interface MyJWTPayload {
+  authorities: string[];
+  sub: string;
+  iat: number;
+  exp: number;
+}
+
 export const undefinedFilters = {
   severity: undefined,
   message: undefined,
