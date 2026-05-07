@@ -35,7 +35,7 @@ import {
   dataTable,
   tableHeaders,
   topH1,
-  topButtonGroup
+  topButtonGroup, tableDiv
 } from "@/assets/cssFunctions.ts";
 import {useWrapping} from "@/composables/unwrapping.ts";
 import {Button} from "@/components/ui/button";
@@ -216,7 +216,7 @@ const savePlugin = async () => {
     </ButtonGroup>
 </div>
 
-  <div class="  mt-[2vh] mx-[1%] w-98/100 relative overflow-auto max-h-[77vh]   ">
+  <div :class="tableDiv ">
     <Table id="my-plugin-table" :class="dataTable">
       <TableCaption :class="tableCaption">
         <slot/>
@@ -224,7 +224,7 @@ const savePlugin = async () => {
       </TableCaption>
       <TableHeader class="h-10">
         <TableRow :class="tableHeaders">
-        <TableHead class="w-3/100 px-4 ">
+        <TableHead class="w-14 px-4 ">
           <input
             :disabled="blockedCheckbox"
             type="checkbox"
@@ -233,14 +233,14 @@ const savePlugin = async () => {
           />
             </TableHead>
 
-        <SortableHead keyName="name" label="Name" :sort-key="sortKey" class=" w-13/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-        <SortableHead keyName="tags" label="Tags" :sort-key="sortKey" class=" w-17/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-        <SortableHead keyName="cronExpression" label="Cron" :sort-key="sortKey" class=" w-23/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-        <SortableHead keyName="severity" label="Severity" :sort-key="sortKey" class=" w-8/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-        <SortableHead keyName="language" label="Language" :sort-key="sortKey" class=" w-8/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-        <SortableHead keyName="updatedAt" label="Last modified" :sort-key="sortKey" class=" w-14/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-        <SortableHead keyName="active" label="Status" :sort-key="sortKey" class=" w-7/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-        <SortableHead keyName="weight" label="Weight" :sort-key="sortKey" class="  w-7/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="name" label="Name" :sort-key="sortKey" class=" w-fit" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="tags" label="Tags" :sort-key="sortKey" class=" w-1/6" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="cronExpression" label="Cron" :sort-key="sortKey" class=" w-1/5" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="severity" label="Severity" :sort-key="sortKey" class=" w-fit" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="language" label="Language" :sort-key="sortKey" class=" w-fit" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="updatedAt" label="Last modified" :sort-key="sortKey" class=" w-14/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="active" label="Status" :sort-key="sortKey" class=" w-7/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="weight" label="Weight" :sort-key="sortKey" class="  w-7/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
           </TableRow>
         </TableHeader>
           <TransitionGroup tag="tbody" name="slide-fade">
@@ -281,7 +281,7 @@ const savePlugin = async () => {
                 >{{tag}}</Badge>
               </TableCell>
               <TableCell v-else class=" whitespace-break-spaces" >
-                <Transition name="slide-fade">
+                <Transition name="fade">
                   <div v-if="badgeListOpen" class="mb-4">
                     <InputGroup
                       class="w-full xl:h-10 2xl:h-12  "
@@ -369,8 +369,10 @@ const savePlugin = async () => {
               </TableCell>
               <TableCell v-else  >
                 <div
-                  :class="`bg-linear-to-l w-2/3 text-center font-bold text-xl
-                   from-severity-${plugin.severity}/50 via-severity-${plugin.severity} to-severity-${plugin.severity}/50`">{{plugin.severity}}</div>
+                  :class="` text-center font-extrabold text-lg border-2 shadow-[0px_0px_10px_2px]
+                 shadow-severity-${plugin.severity}/70 border-severity-${plugin.severity} bg-severity-${plugin.severity}/80 rounded-sm `">
+                  <span >{{plugin.severity}}</span>
+                </div>
               </TableCell>
               <TableCell >
                 <img
@@ -410,33 +412,34 @@ const savePlugin = async () => {
                 </RadioGroup>
               </TableCell>
               <TableCell v-else class=" text-green-badge" :class="{'text-destructive' : !plugin.active}">{{ plugin.active ? 'On' : 'Off'}}</TableCell>
-              <TableCell class="">{{plugin.weight}} KB</TableCell>
-              <ButtonGroup v-if="isUnwrapped(plugin.fileName) && unwrappedItem" class="flex  absolute bottom-4 right-3 *:items-center *:align-middle *:flex">
-                <Button
-                  @click="closePlugin"
-                  variant="red_outline">
-                  Cancel<IconCancel class="size-4 xl:size-5"/>
-                </Button>
-                <Button variant="orange_outline" class="p-0">
-                  <PluginDetailsDialog
-                    :code="unwrappedItem.code ?? ''"
-                    :description="unwrappedItem.description ?? ''"
-                    @update:save-changes="updateDetails"
-                  >
-                    <Button
-                      class="border-0! m-0 rounded-none bg-transparent! text-severity-3 hover:text-primary"
+              <TableCell class="">{{plugin.weight}} KB
+                <ButtonGroup v-if="isUnwrapped(plugin.fileName) && unwrappedItem" class="flex  absolute bottom-4 right-3 *:items-center *:align-middle *:flex">
+                  <Button
+                    @click="closePlugin"
+                    variant="red_outline">
+                    Cancel<IconCancel class="size-4 xl:size-5"/>
+                  </Button>
+                  <Button variant="orange_outline" class="p-0">
+                    <PluginDetailsDialog
+                      :code="unwrappedItem.code ?? ''"
+                      :description="unwrappedItem.description ?? ''"
+                      @update:save-changes="updateDetails"
                     >
-                      Details<IconMessageCode class="size-4 xl:size-5"/>
-                    </Button>
-                  </PluginDetailsDialog>
-                </Button>
+                      <Button
+                        class="border-0! m-0 rounded-none bg-transparent! text-severity-3 hover:text-primary"
+                      >
+                        Details<IconMessageCode class="size-4 xl:size-5"/>
+                      </Button>
+                    </PluginDetailsDialog>
+                  </Button>
 
-                <Button
-                  @click="savePlugin"
-                  variant="green_outline">
-                  Save<IconDeviceFloppy class="size-4 xl:size-5"/>
-                </Button>
-              </ButtonGroup>
+                  <Button
+                    @click="savePlugin"
+                    variant="green_outline">
+                    Save<IconDeviceFloppy class="size-4 xl:size-5"/>
+                  </Button>
+                </ButtonGroup></TableCell>
+
             </TableRow>
           </TransitionGroup>
 

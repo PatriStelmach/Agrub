@@ -49,7 +49,7 @@ export const useSSEstore = defineStore('SSE', () => {
   };
 
   const connectToSSE = async () => {
-    const token = authStore.getAccessToken
+    const token = authStore.accessToken
 
     await fetchEventSource(`${api_url}/alerts/stream`, {
       method: 'GET',

@@ -46,7 +46,7 @@ export interface MyJWTPayload {
   exp: number;
 }
 
-export const undefinedFilters = {
+export const undefinedAlertsFilters = {
   severity: undefined,
   message: undefined,
   subject: undefined,
@@ -74,6 +74,17 @@ export interface AlertHistoryFilters {
   closedDateTo?: string
 }
 
+export interface LibraryPluginFilters {
+  name?: string,
+  language?: Language,
+  creator?: string,
+}
+
+export const undefinedLibraryFilters = {
+  name: undefined,
+  language: undefined,
+  creator: undefined,
+}
 
 export interface User {
   id: number,
@@ -135,7 +146,7 @@ export interface ImportPlugin {
 export interface LibraryPlugin
 {
   id: number,
-  name: string,
+  fileName: string,
   creator: string,
   language: Language,
   description?: string,
@@ -143,7 +154,6 @@ export interface LibraryPlugin
   weight: number,
   createdAt: Date,
   tags: string[],
-  log?: boolean
 }
 
 

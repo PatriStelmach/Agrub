@@ -2,7 +2,7 @@
 import MyPluginsTable from "@/pages/plugins/MyPluginsTable.vue";
 import MyServerPagination from "@/helpers/MyServerPagination.vue";
 import type { MyPlugin } from "@/types/types.ts";
-import {useSearchFilter} from "@/composables/useSearchFilter.ts";
+import {useClientSearchFilter} from "@/composables/useClientSearchFilter.js";
 import {useMyPluginStore} from "@/stores/myPluginStore.ts";
 import MyClientPagination from "@/helpers/MyClientPagination.vue";
 
@@ -10,7 +10,7 @@ const myPluginStore = useMyPluginStore()
 myPluginStore.getAllMyPlugins()
 
 const {filteredData, tableData, updateData, updateSearchData, currentPage, pageSize } =
-  useSearchFilter<MyPlugin>(() => myPluginStore.allMyPlugins,(plugin) => plugin.name)
+  useClientSearchFilter<MyPlugin>(() => myPluginStore.allMyPlugins,(plugin) => plugin.name)
 
 
 </script>

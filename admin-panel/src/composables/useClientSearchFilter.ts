@@ -1,7 +1,7 @@
 import { ref, computed, watch } from "vue"
 import {useDebounceFn} from "@vueuse/core";
 
-export function useSearchFilter<T>(data: () => T[], filter: (item: T) => string) {
+export function useClientSearchFilter<T>(data: () => T[], filter: (item: T) => string) {
   const searchFilter = ref<string>('')
   const debounceFilter = ref<string>('')
   const currentPage = ref(1)
