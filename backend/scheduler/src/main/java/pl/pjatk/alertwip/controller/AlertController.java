@@ -1,5 +1,7 @@
 package pl.pjatk.alertwip.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -10,6 +12,7 @@ import pl.pjatk.alertwip.repository.GlobalProblemRepository;
 import pl.pjatk.alertwip.repository.ProblemActionRepository;
 import pl.pjatk.alertwip.service.ActiveAlertCache;
 import pl.pjatk.alertwip.service.AlertActionService;
+import pl.pjatk.alertwip.service.AlertHistoryService;
 import pl.pjatk.alertwip.service.SseNotifService;
 
 import java.util.List;
@@ -18,28 +21,33 @@ import java.util.List;
 @RequestMapping("/api/alerts")
 public class AlertController {
 
+    private static final Logger log = LoggerFactory.getLogger(AlertController.class);
+
     private final GlobalProblemRepository problemRepository;
     private final SseNotifService sseService;
     private final AlertActionService alertActionService;
     private final ActiveAlertCache alertCache;
     private final ProblemActionRepository actionRepository;
+    private final AlertHistoryService alertHistoryService;
 
     public AlertController(GlobalProblemRepository problemRepository,
                            SseNotifService sseService,
                            AlertActionService alertActionService,
                            ActiveAlertCache alertCache,
-                           ProblemActionRepository actionRepository) {
+                           ProblemActionRepository actionRepository,
+                           AlertHistoryService alertHistoryService) {
         this.problemRepository = problemRepository;
         this.sseService = sseService;
         this.alertActionService = alertActionService;
         this.alertCache = alertCache;
         this.actionRepository = actionRepository;
+        this.alertHistoryService = alertHistoryService;
     }
 
     // Pobieranie otwartych alertów (Filtrowane po uprawnieniach usera z URL)
     @GetMapping("/active")
     public List<GlobalProblem> getActiveAlerts(@RequestParam(defaultValue = "ADMIN") List<String> groups) {
-        // Odpytujemy naszą strukturę w pamięci!
+        // Odpytujemy naszą strukturę w pamięci
         return alertCache.getActiveAlertsForGroups(groups);
     }
 
@@ -47,6 +55,24 @@ public class AlertController {
     @GetMapping("/stream")
     public SseEmitter streamAlerts(@RequestParam(defaultValue = "ADMIN") List<String> groups) {
         return sseService.subscribe(groups);
+    }
+
+    @GetMapping("/history")
+    public ResponseEntity<org.springframework.data.domain.Page<GlobalProblem>> getHistory(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int pageSize,
+            @RequestParam(defaultValue = "createdAt") String sortKey,
+            @RequestParam(defaultValue = "desc") String sortOrder,
+            @ModelAttribute pl.pjatk.alertwip.dto.AlertHistoryFiltersDTO filters
+    ) {
+
+        log.info("Otrzymano zapytanie do historii z filtrami: {}", filters);
+        log.info("Paginacja i sortowanie -> strona: {}, rozmiar: {}, sortKey: {}, sortOrder: {}", page, pageSize, sortKey, sortOrder);
+
+        org.springframework.data.domain.Page<GlobalProblem> historyPage =
+                alertHistoryService.getAlertHistory(page, pageSize, sortKey, sortOrder, filters);
+
+        return ResponseEntity.ok(historyPage);
     }
 
     @PostMapping("/{id}/ack")
@@ -59,7 +85,7 @@ public class AlertController {
         System.out.println("========================================");
 
         try {
-            // Ręcznie parsujemy JSONa na Twoje DTO, żeby sprawdzić co się przypisze
+            // Ręcznie parsujemy JSONa na DTO
             com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
             // Konfiguracja, żeby nie wywalało błędu przy nieznanych polach
             mapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -85,7 +111,8 @@ public class AlertController {
     @GetMapping("/{id}/actions")
     public ResponseEntity<List<ProblemAction>> getAlertActions(@PathVariable Long id) {
         // Zwracamy całą historię od najstarszego do najnowszego
-        List<ProblemAction> history = actionRepository.findAllByProblemIdOrderByCreatedAtAsc(id);
+        List<ProblemAction> history = actionRepository.findAllByProblemIdOrderByCreatedAtDesc(id);
+        System.out.println(history.toString());
         return ResponseEntity.ok(history);
     }
 }
