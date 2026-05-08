@@ -1,56 +1,78 @@
 <script setup lang="ts">
-import {pluginLibraryData} from "@/data/pluginLibrary.ts";
-import MyPagination from "@/helpers/MyPagination.vue";
 import PluginsLibraryTable from "@/pages/plugins/PluginsLibraryTable.vue";
 import {
-  IconMessageCode,
+  IconFilterCog,
 } from "@tabler/icons-vue";
 
-import {ArrowLeftIcon, Search} from "lucide-vue-next";
 import {ButtonGroup} from "@/components/ui/button-group";
 import {Button} from "@/components/ui/button";
-import {api_url, Language, type LibraryPlugin} from "@/types/types.ts"
-import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
-import {useSearchFilter} from "@/composables/useSearchFilter.ts";
-import {topButtonGroup, topDiv, topH1} from "@/assets/cssFunctions.ts";
+import {
+  type LibraryPlugin,
+  type LibraryPluginFilters, undefinedLibraryFilters
+} from "@/types/types.ts"
+import {tableDiv, topButtonGroup, topDiv, topH1} from "@/assets/cssFunctions.ts";
 import GoBackButton from "@/helpers/GoBackButton.vue";
-import MyPagination from "@/helpers/MyPagination.vue";
-import axios from "axios";
+import MyServerPagination from "@/helpers/MyServerPagination.vue";
+import {useServerSearchFilter} from "@/composables/useServerSearchFilter.ts";
+import api from "@/lib/axios.ts";
+import PluginFilters from "@/pages/plugins/PluginFilters.vue";
 
-const getPluginLibraryData = async (page: number, pageSize: number, name: string, creator: string, language: Language) => {
-  const response = await axios.get(`${api_url}/plugins/library`, {
-    name: name,
-    creator: creator,
-    page_size: pageSize,
-
+const getLibraryPluginsRequest = async () => {
+  const response = await api.get('/plugins/library', {
+    params: {
+      name: filters.value.name,
+      page: currentPage.value -1,
+      language: filters.value.language,
+      creator: filters.value.creator,
+      pageSize: pageSize.value,
+    }
   })
+  console.log(`params: {
+    name: ${filters.value.name},
+      page: ${currentPage.value},
+      language: ${filters.value.language},
+      creator: ${filters.value.creator},
+      pageSize: ${pageSize.value},
+  }`);
+  if (response.status === 200) {
+    items.value = response.data.content
+    totalElements.value = response.data.totalElements
+  }
 }
-
+const {filters, items, pageSize, currentPage, totalElements, sortedHead, updateFilters  } =
+  useServerSearchFilter<LibraryPlugin, LibraryPluginFilters>
+  (getLibraryPluginsRequest, undefinedLibraryFilters,'createdAt', 'desc')
 </script>
 
 <template>
   <div>
     <div :class="topDiv">
-      <h1 :class="topH1">Plugins library</h1>
-        <ButtonGroup :class="topButtonGroup">
-          <ButtonGroup>
-            <GoBackButton/>
-            <InputGroup  >
-              <InputGroupInput
-                v-model="searchFilter"
-                type="search"
-                placeholder="Search for plugin"/>
-              <InputGroupAddon>
-                <Search/>
-              </InputGroupAddon>
-            </InputGroup>
-          </ButtonGroup>
+      <h1 :class="topH1">Alerts history</h1>
+      <ButtonGroup :class="topButtonGroup">
+        <ButtonGroup>
+          <GoBackButton />
         </ButtonGroup>
-      <div>
+        <ButtonGroup>
+
+          <PluginFilters @update:filters="updateFilters">
+            <Button variant="outline">
+              Filters <IconFilterCog />
+            </Button>
+          </PluginFilters>
+        </ButtonGroup>
+      </ButtonGroup>
     </div>
-<PluginsLibraryTable :data="tableData" />
-    <MyPagination :total
+    <div :class="tableDiv">
+    <PluginsLibraryTable
+      v-model:sorted-head="sortedHead"
+      :plugins="items"
+      :totalElements="totalElements">
+      <MyServerPagination
+        :total="totalElements"
+        v-model:page-index="currentPage"
+        v-model:page-size="pageSize"
       />
+    </PluginsLibraryTable>
   </div>
 </div>
 </template>

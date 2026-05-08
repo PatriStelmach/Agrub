@@ -20,8 +20,8 @@ export const badgeVariants = cva(
           "border-transparent text-primary bg-blue-badge/80 hover:bg-blue-badge/50 cursor-pointer  transition-all duration-50" +
           " hover:shadow-badge hover:shadow-md mr-1 my-1 text-xs md:text-sm lg:text-md 2xl:text-lg ",
         tags:
-          "border-transparent text-primary bg-accent hover:bg-red-badge cursor-pointer  transition-all duration-50" +
-          " hover:shadow-red-badge hover:shadow-md mr-1 my-1 text-xs md:text-sm lg:text-md 2xl:text-lg",
+          "border-transparent text-primary bg-accent hover:bg-orange-badge/80 cursor-pointer  transition-all duration-50" +
+          " hover:shadow-orange-badge hover:shadow-md mr-1 my-1 text-xs md:text-sm lg:text-md 2xl:text-lg",
         source:
           "border-transparent text-primary bg-green-badge/70 hover:bg-green-badge/50 cursor-pointer  transition-all duration-50" +
           " hover:shadow-green-badge hover:shadow-md text-xs md:text-sm lg:text-md 2xl:text-lg ",

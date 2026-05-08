@@ -4,7 +4,7 @@ import {Search} from "lucide-vue-next";
 import {ButtonGroup} from "@/components/ui/button-group";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
 
-import {useSearchFilter} from "@/composables/useSearchFilter.js";
+import {useClientSearchFilter} from "@/composables/useClientSearchFilter";
 import { useAlertStore } from "@/stores/alertStore";
 import {computed, defineAsyncComponent, onMounted, ref} from "vue";
 import {
@@ -23,7 +23,7 @@ onMounted(() => {
 })
 const hoveredAlert = ref<AlertDetails | null>(null)
 const {pageSize, filteredData, updateData, currentPage, searchFilter, tableData } =
-  useSearchFilter<ActiveAlert>(() => alertStore.getAllCurrentAlerts,(item) => item.subject)
+  useClientSearchFilter<ActiveAlert>(() => alertStore.currentAlerts,(item) => item.subject)
 
 </script>
 
@@ -51,7 +51,7 @@ const {pageSize, filteredData, updateData, currentPage, searchFilter, tableData 
       />
     <ActiveAlertsTable
       :tableData="tableData"
-      v-model:activeAlerts="alertStore.getAllCurrentAlerts"
+      v-model:activeAlerts="alertStore.currentAlerts"
       v-model:hoveredAlert="hoveredAlert"
     >
       <MyClientPagination

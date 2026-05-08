@@ -1,5 +1,5 @@
 package pl.pjatk.alertwip.dto;
 
-public record AuthenticationResponse(
+public record AuthenticationResponseDTO(
         String token
 ) {}
