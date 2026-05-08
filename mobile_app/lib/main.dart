@@ -2,6 +2,8 @@ import 'package:alert_app/data/repositories/alert_repository.dart';
 import 'package:alert_app/data/repositories/plugin_repository.dart';
 import 'package:alert_app/data/repositories/user_repository.dart';
 import 'package:alert_app/firebase_options.dart';
+import 'package:alert_app/screens/login_screen.dart';
+import 'package:alert_app/services/auth_service.dart';
 import 'package:alert_app/services/navigation_service.dart';
 import 'package:alert_app/logic/plugins_view_model.dart';
 import 'package:alert_app/logic/alerts_view_model.dart';
@@ -36,16 +38,21 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  final alertRepository = AlertRepository();
+
+  final authService = AuthService();
+  final dioInstance = authService.dio;
+  //Creation of repositories instances
+  final alertRepository = AlertRepository(dio: dioInstance);
   final pluginRepository = PluginsRepository();
+  final userRepository = UserRepository();
+
+  
+
   final notificationService = PushNotificationService(alertRepository);
 
-
-//TO DO - małpowane rozwiązanie alerts dla plugins, sprawdzić czy dobre podejście
-  await alertRepository.updateAllAlerts();
-  await pluginRepository.updateAllPlugins();
-  alertRepository.initSseConnection();
   await notificationService.initNotificationHandling();
+
+
   runApp(
     MultiProvider(
       providers: [
@@ -53,10 +60,27 @@ Future<void> main() async {
         ChangeNotifierProvider.value(value: alertRepository),
         ChangeNotifierProvider.value(value: pluginRepository),
         ChangeNotifierProvider.value(value: notificationService),
+        ChangeNotifierProvider.value(value: userRepository),
 
-        //Single source of truth
-        //ChangeNotifierProvider(create: (_) => PluginsRepository()),
-        ChangeNotifierProvider(create: (_) => UserRepository()),
+
+
+        ChangeNotifierProvider<UserViewModel>(
+          create: (context) => UserViewModel(
+            repository: context.read<UserRepository>(),
+          ),
+        ),
+
+        ChangeNotifierProxyProvider<UserViewModel, AlertRepository>(
+          create: (context) => alertRepository,
+          update: (context, userVM, alertRepo) {
+            if (userVM.isLoggedIn && alertRepo!.alertsCache.isEmpty) {
+              
+              alertRepo.updateAllAlerts();
+              alertRepo.initSseConnection();
+            }
+            return alertRepo!;
+          },
+        ),
         
         //Creation of view models
         ChangeNotifierProvider<PluginsViewModel>(
@@ -88,7 +112,7 @@ Future<void> main() async {
 }
 
 class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+const MainApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -98,9 +122,29 @@ class MainApp extends StatelessWidget {
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.light,
       navigatorKey: navigationService.navigatorKey,
-      home: GeneralLayout());
-    
-    }
+      
+      // Home staje się dynamiczny
+      home: Consumer<UserViewModel>(
+        builder: (context, userVM, child) {
+          
+          // 1. Ekran ładowania (podczas sprawdzania SecureStorage przy starcie)
+          if (userVM.isLoading) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
+
+          // 2. Jeśli zalogowany - pokazujemy główny layout
+          if (userVM.isLoggedIn) {
+            return const GeneralLayout();
+          }
+
+          // 3. Jeśli niezalogowany - pokazujemy ekran logowania
+          return const LoginScreen();
+        },
+      ),
+    );
+  }
     
   }
 
