@@ -49,10 +49,11 @@ List<Alert> get sortedAlerts {
     return list;
   }
 
+
+
 void sortAlertsBy(String property, {bool? ascending}) {
     _currentSortProperty = property;
     
-    // Jeśli podano nowy kierunek, ustaw go. Jeśli nie, zostaw poprzedni.
     if (ascending != null) {
       _isAscending = ascending;
     }
