@@ -7,9 +7,6 @@ class DebugViewModel extends ChangeNotifier {
 
 
 
-void mockPush() {
-  
-}
 
 void alarmPressed() {
  
