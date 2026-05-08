@@ -19,6 +19,9 @@ class _AlertsScreenState extends State<AlertsScreen> {
 
     debugPrint("--- REBUILD ---");
     final alertsViewModel = context.watch<AlertsViewModel>();
+
+    final currentSort = alertsViewModel.currentSortProperty;
+    final isAsc = alertsViewModel.isAscending;
     
     if (alertsViewModel.alertsList.isEmpty) {
     return const Scaffold( 
@@ -40,25 +43,29 @@ final sortedList = alertsViewModel.sortedAlerts;
                 DropdownButton<String>(
                             padding: EdgeInsets.all(6),
                             borderRadius: BorderRadius.all(Radius.circular(16)),
-                            value: dropDownValue, 
+                            value: currentSort, 
                             icon: const Icon(Icons.menu),
                             style: const TextStyle(color: Colors.black), 
                             onChanged: (String? newValue) {
-                              setState(() {
-                dropDownValue = newValue!;
-                              });
+                              if (newValue != null) {
+                alertsViewModel.sortAlertsBy(newValue);
+              }
                             },
                             items:const[
                             DropdownMenuItem<String>(value: 'id', child: Text('ID',style:TextStyle(fontSize: 30))),
                             DropdownMenuItem<String>(value: 'title', child: Text('Title',style:TextStyle(fontSize: 30))),
                             DropdownMenuItem<String>(value: 'createdAt', child: Text('CreatedAt',style:TextStyle(fontSize: 30))),
+                            DropdownMenuItem<String>(value: 'acknowledged', child: Text('Acknowledged',style:TextStyle(fontSize: 30))),
+                            DropdownMenuItem<String>(value: 'severity', child: Text('Severity',style:TextStyle(fontSize: 30))),
                             ]
                             ),
+                              IconButton(icon: Icon(isAsc ? Icons.arrow_upward : Icons.arrow_downward),
+            onPressed: () {
+              alertsViewModel.sortAlertsBy(currentSort, ascending: !isAsc);
+            },
+            ),
               ]
             ),
-                
-
-          
 
 
             Expanded(
@@ -91,7 +98,7 @@ final sortedList = alertsViewModel.sortedAlerts;
                      
                         SizedBox(
                           width: double.infinity,
-                          child:ElevatedButton(onPressed:() { _openAckDialog(context, alert.id);}, child: Text('Acknowledge')) 
+                          child:ElevatedButton(onPressed:() { _openAckDialog(context, alert.id);}, child: Text('Actions')) 
                           )
                         
                       ]
@@ -180,7 +187,7 @@ title: Text('Actions for Alert ${widget.alertId}'),
             context.read<AlertsViewModel>().acknowledgeAlert(widget.alertId, comment: commentValue, isAck: this.isAck );
             Navigator.pop(context);
           },
-          child: const Text('ACK'),
+          child: const Text('Update'),
         ),
       ],
     );

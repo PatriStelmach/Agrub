@@ -7,10 +7,16 @@ class AlertsViewModel extends ChangeNotifier {
 
 final AlertRepository alertsRepository;
 String _currentSortProperty = 'id';
+  bool _isAscending = true;
+
+
 AlertsViewModel({required this.alertsRepository}) {
   alertsRepository.addListener(handleRepoChange);
 
 }
+
+String get currentSortProperty => _currentSortProperty;
+  bool get isAscending => _isAscending;
 
 List<Alert> get alertsList => alertsRepository.alertsCache.values.toList();
 
@@ -30,18 +36,37 @@ List<Alert> get sortedAlerts {
     };
 
     final getter = getters[_currentSortProperty] ?? (alert) => alert.id;
-    list.sort((a, b) => getter(a).compareTo(getter(b)));
+      
+      list.sort((a, b) {
+      final aValue = getter(a);
+      final bValue = getter(b);
+      
+      return _isAscending 
+          ? aValue.compareTo(bValue) 
+          : bValue.compareTo(aValue); 
+    });
+
     return list;
   }
 
-void sortAlertsBy(String property) {
+void sortAlertsBy(String property, {bool? ascending}) {
+    _currentSortProperty = property;
+    
+    // Jeśli podano nowy kierunek, ustaw go. Jeśli nie, zostaw poprzedni.
+    if (ascending != null) {
+      _isAscending = ascending;
+    }
+    
+    debugPrint("Sorting by $property, Ascending: $_isAscending");
     notifyListeners(); 
   }
 
-void handleRepoChange() {
+  void handleRepoChange() {
     debugPrint("ViewModel: Repo wysłało sygnał, odświeżam widok.");
     notifyListeners(); 
   }
+
+
 
 
 
@@ -52,7 +77,6 @@ Future<void> acknowledgeAlert(int alertId, {String? comment, bool isAck = true})
   try {
     await alertsRepository.sendAcknowledge(alertId, comment: comment, isAck: isAck);
     
-    notifyListeners();
   } catch (e) {
       debugPrint('Placeholder error: $e');
 
