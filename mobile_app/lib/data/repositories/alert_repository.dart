@@ -1,14 +1,18 @@
 import 'dart:convert';
 
 import 'package:alert_app/data/models/alert_model.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:alert_app/services/navigation_service.dart';
 import 'package:flutter_client_sse/constants/sse_request_type_enum.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_client_sse/flutter_client_sse.dart';
+import 'package:dio/dio.dart';
 
 class AlertRepository extends ChangeNotifier {
 
+final Dio dio;
+AlertRepository({required this.dio});
 final Map<int, Alert> alertsCache = {};
 //remembering extreme alerts that triggered alert screen
 final Set<int> notifiedAlertIds = {};
@@ -73,16 +77,14 @@ SSEClient.subscribeToSSE(
 //FINAL: updating full list via REST when opening the app
 Future<void> updateAllAlerts() async {
 
-  final url = Uri.parse('http://10.0.2.2:10000/api/alerts/active');
+final url = Uri.parse('http://10.0.2.2:10000/api/alerts');
+  final response = await dio.get('http://10.0.2.2:10000/api/alerts/active');
 
-  final response = await http.get(url);
 
-
-  //Used for mock:
-  //final String response = await rootBundle.loadString('assets/mocks/alerts.json');
-    final List<dynamic> decodedData = jsonDecode(response.body);
-    final List<Alert> parsedAlerts = decodedData.map((item) {
-      return Alert.fromJson(item as Map<String, dynamic>);
+      final List<dynamic> data = response.data;
+      
+      final List<Alert> parsedAlerts = data.map((item) {
+        return Alert.fromJson(item as Map<String, dynamic>);
       }).toList();
 
     _processAlerts(parsedAlerts);
@@ -177,8 +179,6 @@ void _processAlerts(List<Alert> incomingAlerts) {
 
 Future<void> sendAcknowledge(int alertId, {String? comment, bool isAck = true}) async {
   
-final String baseUrl = 'http://10.0.2.2:10000';
-  final url = Uri.parse('$baseUrl/api/alerts/$alertId/ack');
 
 
 final String actionType = isAck ? "ACK" : "COMMENT";
@@ -191,24 +191,18 @@ final Map<String, dynamic> requestBody = {
 
 
   try {
-    final response = await http.post(
-      url,
-headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
+      final response = await dio.post(
+        'http://10.0.2.2:10000/api/alerts/$alertId/ack',
+        data: requestBody,
+      );
 
-      body: jsonEncode(requestBody),
-    );
-    
-    if (response.statusCode == 200) {
-      debugPrint('ACK DEBUG: Alert $alertId acknowledged.');
-    } else {
-      debugPrint('ACK DEBUG: Server error ${response.statusCode}');
-      debugPrint('ACK DEBUG: ${response.body}');
+      if (response.statusCode == 200) {
+        debugPrint('ACK SUCCESS: Alert $alertId acknowledged.');
+      }
+    } on DioException catch (e) {
+      debugPrint('ACK DIO ERROR: ${e.response?.statusCode} - ${e.message}');
+    } catch (e) {
+      debugPrint('ACK UNKNOWN ERROR: $e');
     }
-  } catch (e) {
-    debugPrint('ACK DEBUG: $e');
   }
-}
 }
