@@ -13,6 +13,7 @@ final int id;
   final String message; 
   final String? author;
   final bool acknowledged;
+  
 
   Alert({
     required this.id,

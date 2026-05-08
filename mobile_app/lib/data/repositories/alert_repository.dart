@@ -1,13 +1,11 @@
+import 'dart:async';
 import 'dart:convert';
-
 import 'package:alert_app/data/models/alert_model.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:alert_app/services/navigation_service.dart';
 import 'package:flutter_client_sse/constants/sse_request_type_enum.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter_client_sse/flutter_client_sse.dart';
-import 'package:dio/dio.dart';
 
 class AlertRepository extends ChangeNotifier {
 
@@ -16,6 +14,8 @@ AlertRepository({required this.dio});
 final Map<int, Alert> alertsCache = {};
 //remembering extreme alerts that triggered alert screen
 final Set<int> notifiedAlertIds = {};
+
+StreamSubscription? _sseSubscription;
 
 DateTime lastPing = DateTime.now();
 
@@ -39,6 +39,8 @@ AlertSeverity _mapIntToSeverity(int value) {
 
 void initSseConnection() {
   const String sseUrl = 'http://10.0.2.2:10000/api/alerts/stream?groups=ADMIN';
+
+  _sseSubscription?.cancel();
 
 SSEClient.subscribeToSSE(
       method: SSERequestType.GET,
@@ -92,50 +94,47 @@ final url = Uri.parse('http://10.0.2.2:10000/api/alerts');
 
 
 void handleSingleAlertUpdate(dynamic message) {
-  debugPrint("SSE Message content: $message");
+    debugPrint("SSE Message: $message");
+    if (message is! Map<String, dynamic>) return;
 
-    // Severity update
-    if (message.containsKey('alertId') && message.containsKey('newSeverity')) {
-      int id = message['alertId'];
-      int newSeverityValue = message['newSeverity'];
-
-      if (alertsCache.containsKey(id)) {
-        debugPrint("SSE: Aktualizuję tylko severity dla alertu $id");
-        
-        // Update of the object in cache
-        final existingAlert = alertsCache[id]!;
-        alertsCache[id] = existingAlert.copyWith(
-          severity: _mapIntToSeverity(newSeverityValue), 
-        );
-        notifyListeners();
-      } else {
-        // Jeśli nie mamy go w cache, pobierzmy wszystko od nowa
-        updateAllAlerts();
-      }
-    }
-
-    // ACK update
-    if (message.containsKey('alertId') && message.containsKey('ack')) {
-      final int id = message['alertId'];
-      final bool isAck = message['ack'];
-
-      if (alertsCache.containsKey(id)) {
-        debugPrint("SSE: ACK status change for $id to $isAck");
-        
-        alertsCache[id] = alertsCache[id]!.copyWith(
-          acknowledged: isAck,
-        );
-        notifyListeners();
-      }
-    } 
-
-
-    // Full alert update
-    else if (message.containsKey('subject')) { 
+    final int? id = message['alertId'];
+    
+    // Jeśli to pełny obiekt Alert (ma pole subject)
+    if (message.containsKey('subject')) {
       final alert = Alert.fromJson(message);
       _processAlerts([alert]);
+      return;
     }
-}
+
+    // Jeśli to częściowy update i mamy go w cache
+    if (id != null && alertsCache.containsKey(id)) {
+      final existing = alertsCache[id]!;
+      Alert updated = existing;
+
+      // Update Severity
+      if (message.containsKey('newSeverity')) {
+        updated = updated.copyWith(severity: _mapIntToSeverity(message['newSeverity']));
+      }
+
+      // Update ACK status
+      if (message.containsKey('ack')) {
+        updated = updated.copyWith(acknowledged: message['ack']);
+      }
+
+      // Update Komentarza (obsługa comment z endpointu ack)
+      if (message.containsKey('comment') || message.containsKey('message')) {
+        updated = updated.copyWith(
+          message: message['comment'] ?? message['message'], 
+        );
+      }
+
+      alertsCache[id] = updated;
+      notifyListeners();
+    } else if (id != null) {
+      // Nie mamy w cache? Pobieramy listę, by być up-to-date
+      updateAllAlerts();
+    }
+  }
 
 
 void _processAlerts(List<Alert> incomingAlerts) {
@@ -148,9 +147,9 @@ void _processAlerts(List<Alert> incomingAlerts) {
 
       alertsCache[alert.id] = alert;
 
-    debugPrint("DEBUG: Analysis of Alert ID: ${alert.id}");
-    debugPrint(" DEBUG: Show severity: ${alert.severity}");
-    debugPrint(" DEBUG: Is ID already in notifedAlertIds list>? ${notifiedAlertIds.contains(alert.id)}");
+      debugPrint("DEBUG: Analysis of Alert ID: ${alert.id}");
+      debugPrint(" DEBUG: Show severity: ${alert.severity}");
+      debugPrint(" DEBUG: Is ID already in notifedAlertIds list>? ${notifiedAlertIds.contains(alert.id)}");
 
       if (alert.severity == AlertSeverity.extreme && !notifiedAlertIds.contains(alert.id)) {
         debugPrint("DEBUG: Alert is new");
@@ -182,6 +181,16 @@ Future<void> sendAcknowledge(int alertId, {String? comment, bool isAck = true}) 
 
 
 final String actionType = isAck ? "ACK" : "COMMENT";
+final String commentText = comment ?? "";
+
+final originalAlert = alertsCache[alertId];
+    if (originalAlert != null) {
+      alertsCache[alertId] = originalAlert.copyWith(
+        acknowledged: isAck,
+        message: commentText.isNotEmpty ? commentText : originalAlert.message,
+      );
+      notifyListeners();
+    }
 
 final Map<String, dynamic> requestBody = {
     "message": comment ?? "",
@@ -200,7 +209,11 @@ final Map<String, dynamic> requestBody = {
         debugPrint('ACK SUCCESS: Alert $alertId acknowledged.');
       }
     } on DioException catch (e) {
-      debugPrint('ACK DIO ERROR: ${e.response?.statusCode} - ${e.message}');
+      // To wypisze dokładnie co serwer ma do powiedzenia o błędzie 403
+  debugPrint('--- [Detailed Error Log] ---');
+  debugPrint('Status Code: ${e.response?.statusCode}');
+  debugPrint('Response Data: ${e.response?.data}'); // Tu może być powód, np. "Missing roles"
+  debugPrint('Headers: ${e.response?.headers}');
     } catch (e) {
       debugPrint('ACK UNKNOWN ERROR: $e');
     }

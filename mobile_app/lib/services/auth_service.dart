@@ -41,7 +41,10 @@ late final Dio _dio;
       });
 
       if (response.statusCode == 200) {
-        return response.data['token'];
+        final token = response.data['token'];
+        await _storage.write(key: 'jwt_token', value: token);
+        return token;
+        
       }
       return null;
     } catch (e) {

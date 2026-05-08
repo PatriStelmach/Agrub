@@ -100,10 +100,6 @@ Future<void> main() async {
             alertsRepository: context.read<AlertRepository>(),
           )),
           
-        ChangeNotifierProvider<UserViewModel>(
-          create: (context) => UserViewModel(
-            repository: context.read<UserRepository>(),
-          )),
         
       ],
       child: MainApp(),
