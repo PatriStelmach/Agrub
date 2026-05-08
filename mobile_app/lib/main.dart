@@ -2,6 +2,7 @@ import 'package:alert_app/data/repositories/alert_repository.dart';
 import 'package:alert_app/data/repositories/plugin_repository.dart';
 import 'package:alert_app/data/repositories/user_repository.dart';
 import 'package:alert_app/firebase_options.dart';
+import 'package:alert_app/logic/general_layout_view_model.dart';
 import 'package:alert_app/screens/login_screen.dart';
 import 'package:alert_app/services/auth_service.dart';
 import 'package:alert_app/services/navigation_service.dart';
@@ -57,6 +58,8 @@ Future<void> main() async {
     MultiProvider(
       providers: [
 
+
+        ChangeNotifierProvider(create: (_) => GeneralLayoutViewModel()),
         ChangeNotifierProvider.value(value: alertRepository),
         ChangeNotifierProvider.value(value: pluginRepository),
         ChangeNotifierProvider.value(value: notificationService),
