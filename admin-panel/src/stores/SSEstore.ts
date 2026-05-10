@@ -10,7 +10,6 @@ import {useAuthStore} from "@/stores/authStore.ts";
 
 export const useSSEstore = defineStore('SSE', () => {
   const alertStore = useAlertStore()
-  const notificationStore = useNotificationStore()
   const authStore = useAuthStore()
   const isConnected = ref(false)
 
@@ -29,19 +28,23 @@ export const useSSEstore = defineStore('SSE', () => {
     if (event.status === 'success') {
       switch (event.eventType) {
         case 'NEW_ALERT': {
-          toast.error(event.message.subject, { icon: h(IconAlertTriangle, { class: 'animate-pulse duration-100' }) });
+          toast.error(`New alert: ${event.message.subject}`, { icon: h(IconAlertTriangle, { class: 'animate-pulse duration-100' }) });
           alertStore.addCurrentAlert(event.message);
-          notificationStore.addNotification();
           break;
         }
         case 'ALERT_RESOLVED': {
-          toast.success(`Resolved: ${event.message.subject}`, { icon: IconCircleDashedCheck });
+          toast.success(`Alert resolved: ${event.message.subject}`, { icon: IconCircleDashedCheck });
           alertStore.deleteCurrentAlert(event.message.id);
-          notificationStore.removeNotification();
           break;
         }
-        case 'ALERT_UPDATE': {
-          toast.success(`Updated: ${event.message.alertId}`);
+        case 'ALERT_UPDATE_ONLY': {
+          toast.success(`Alert updated: ${event.message.subject}`);
+          alertStore.updateAlertActions(event.message);
+          break;
+        }
+        case 'ALERT_UPDATE' : {
+          if(event.message)
+          toast.success(`Alert updated: ${event.message.subject}`);
           alertStore.updateAlert(event.message);
           break;
         }
@@ -71,7 +74,6 @@ export const useSSEstore = defineStore('SSE', () => {
         if(event.event !== 'INIT') {
           handleSSEMessage(JSON.parse(event.data));
         }
-
       },
 
       onclose() {

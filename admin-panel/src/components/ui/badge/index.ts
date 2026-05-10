@@ -23,11 +23,11 @@ export const badgeVariants = cva(
           "border-blue-badge border-2 text-blue-badge bg-blue-badge/20 hover:bg-blue-badge/10 cursor-pointer  " +
           " hover:scale-102 hover:shadow-blue-badge  mr-1 my-1 ",
         source:
-          "border-green-badge border-2 text-green-badge bg-green-badge/10  " +
+          "border-transparent border text-primary bg-input  " +
           " ",
         origin:
-          "border-orange-badge border-2  bg-orange-badge/10 hover:bg-transparent cursor-pointer " +
-          " hover:shadow-orange-badge  text-orange-badge hover:scale-102",
+          "border-blue-badge border-2  bg-blue-badge/10 hover:bg-transparent cursor-pointer " +
+          " hover:shadow-blue-badge  text-blue-badge hover:scale-102",
         ack_type:"border-blue-400/50 border-2 text-blue-400  bg-blue-400/20  text-xs",
       },
     },

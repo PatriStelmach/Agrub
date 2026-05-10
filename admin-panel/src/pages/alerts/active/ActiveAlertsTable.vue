@@ -19,6 +19,7 @@ import type {ActiveAlert, AlertDetails} from "@/types/types.js";
 import {useSort} from "@/composables/sorting.js";
 import {computed, ref, watch, watchEffect} from "vue";
 import SeverityDiv from "@/helpers/SeverityDiv.vue";
+import {dateParser} from "@/composables/dateParser.ts";
 
 const props = defineProps<{
   tableData: ActiveAlert[];
@@ -92,7 +93,7 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<ActiveAlert>(() =
           <IconCircleDashedCheck v-if="alert.acknowledged" class="text-green-badge"/>
           <IconCircleDashedX v-else class="text-red-badge"/>
         </TableCell>
-        <DateCell v-if="alert.createdAt"  :date="alert.createdAt "></DateCell>
+        <DateCell v-if="alert.createdAt"  :date="dateParser(alert.createdAt).toDate "></DateCell>
         <TableCell>
           <EditAlertDialog
             :alert="alert"

@@ -55,7 +55,7 @@ const router = createRouter({
     }
   ],
 })
-router.beforeEach((to) => {
+router.beforeEach((to, from) => {
   if (!to.name) return { path: '/'}
 })
 

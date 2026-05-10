@@ -15,14 +15,11 @@ import {Skeleton} from "@/components/ui/skeleton";
 const authStore = useAuthStore()
 const isLoading = ref(true);
 authStore.refreshToken().finally(() => {
-  setTimeout(() => {
     isLoading.value = false
     if (authStore.isAuthenticated) {
       useSSEstore()
       console.log(authStore.accessToken)
     }
-  }, 500)
-
 });
 
 </script>
@@ -42,7 +39,7 @@ authStore.refreshToken().finally(() => {
     <Toaster
       theme="system"
       richColors
-      position="top-right"
+      position="top-center"
       :expand="true"
     />
     <header class="relative w-full">

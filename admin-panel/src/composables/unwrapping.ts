@@ -16,7 +16,7 @@ export function useWrapping<T extends object>(
 
   const wrap = () => {
     if(originalItem.value !== unwrappedItem.value) {
-      Object.assign(originalItem.value, unwrappedItem.value)
+      Object.assign(unwrappedItem.value, originalItem.value)
     }
     originalItem.value = null
     unwrappedItem.value = null

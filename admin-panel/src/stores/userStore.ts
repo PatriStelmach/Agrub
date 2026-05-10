@@ -3,10 +3,11 @@ import type {User, UserGroup} from "@/types/types.ts";
 import {ref} from "vue";
 import api from "@/lib/axios.ts";
 import {toast} from "vue-sonner";
+import {sidebarData} from "@/data/sidebarData.ts";
 
 export const useUserStore = defineStore('user-store',() => {
   const allUsers = ref<User[]>([])
-  const allGroups = ref<string[]>([])
+  const allGroups = ref<UserGroup[]>([])
 
   const getAllUsersRequest = async () => {
     try {
@@ -35,14 +36,16 @@ export const useUserStore = defineStore('user-store',() => {
   }
 
   const getUserByIdRequest = async (id: number) => {
-    try {
-      const res = await api.get(`/users/${id}`)
-      if (res.status === 200) return res.data
-      else toast.error(`Error retrieving user: ${id}`)
-    }
-    catch (error) {
-      toast.error(`Error retrieving user: ${error}`)
-    }
+    // try {
+    //   const res = await api.get(`/users/${id}`)
+    //   if (res.status === 200) return res.data
+    //   else toast.error(`Error retrieving user: ${id}`)
+    // }
+    // catch (error) {
+    //   toast.error(`Error retrieving user: ${error}`)
+    // }
+
+    return sidebarData.loggedUser
   }
 
   const editUserRequest = async (user: User) => {

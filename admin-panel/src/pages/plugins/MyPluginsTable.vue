@@ -3,7 +3,6 @@ import cronParser from 'cron-parser';
 import cronstrue from 'cronstrue'
 import {
   Table,
-  TableBody,
   TableCaption,
   TableCell,
   TableFooter,
@@ -22,10 +21,8 @@ import {
   IconLabel,
   IconMessageCode,
   IconPencilCode,
-  IconPlus,
   IconStatusChange,
   IconTrash,
-  IconX
 } from "@tabler/icons-vue"
 import {computed, defineAsyncComponent, ref, useTemplateRef, watch} from "vue";
 import {useSort} from "@/composables/sorting.ts";
@@ -56,24 +53,21 @@ const MyTagInput = defineAsyncComponent(() => import('@/helpers/MyTagInput.vue')
 const props = defineProps<{
   data: MyPlugin[];
 }>()
-
 const emit = defineEmits<{
   'update:search-data': [data:string]
 }>()
 
 const PluginDetailsDialog = defineAsyncComponent( () => import ("@/pages/plugins/PluginDetailsDialog.vue"))
 
-const store = useMyPluginStore()
+const myPluginStore = useMyPluginStore()
 const { sortedData, sortKey, sortOrder, toggleSort } = useSort<MyPlugin>(() => props.data, 'updatedAt')
-const { wrap, isUnwrapped, unwrap, unwrappedItem, save } = useWrapping(sortedData, 'fileName')
+const { wrap, isUnwrapped, unwrap, unwrappedItem, save } = useWrapping(sortedData, 'fullName')
 
 const tagsRef = useTemplateRef<InstanceType<typeof MyTagInput>>('tagsRef')
-const showInfoDialog = ref<boolean>(false)
 const searchFilter = ref<string>("")
 const checkedPlugins = ref<string[]>([])
 
 const blockedCheckbox = computed(() => !!unwrappedItem.value)
-const blockedEdit = computed(() => checkedPlugins.value.length !== 1 || unwrappedItem.value)
 
 const blockedRemoveAndChange = computed(() =>
   !checkedPlugins.value.length || (checkedPlugins.value.length && unwrappedItem.value))
@@ -103,26 +97,26 @@ watch(searchFilter, () => {
 
 const checkAll = () => {
   return !allChecked.value ?
-    checkedPlugins.value = props.data.map(plugin => plugin.fileName) : checkedPlugins.value = []
+    checkedPlugins.value = props.data.map(plugin => plugin.fullName) : checkedPlugins.value = []
 }
 
 const changeStatus = () => {
   if(!unwrappedItem.value) {
-     console.log(store.changeStatus(checkedPlugins.value))
+     console.log(myPluginStore.changeStatus(checkedPlugins.value))
   }
 }
 
 const deletePlugins = () => {
   if(!unwrappedItem.value) {
-    console.log(store.deleteMyPlugins(checkedPlugins.value))
+    console.log(myPluginStore.deleteMyPlugins(checkedPlugins.value))
   }
 }
 
 const getDetails = async (fileName: string) => {
   if(unwrappedItem.value) {
-    const details = await store.getMyPluginDetails(fileName)
-    unwrappedItem.value.code = details.code
-    unwrappedItem.value.description = details.description
+    const details = await myPluginStore.getMyPluginDetails(fileName)
+    unwrappedItem.value.code = details?.code
+    unwrappedItem.value.description = details?.description
   }
 }
 
@@ -130,32 +124,11 @@ const nextRun = (plugin: MyPlugin) => {
   return plugin.cronExpression ?  dateParser(cronParser.parse(plugin.cronExpression).next().toDate()).fullDate : ''
 }
 
-const check = (fileName: string) => {
-  return checkedPlugins.value.some(p => p === fileName) ?
-    checkedPlugins.value = checkedPlugins.value.filter(p => p !== fileName) : checkedPlugins.value.push(fileName)
-}
 
 const updateDetails = (code: string, description: string) => {
   if(unwrappedItem.value) {
     unwrappedItem.value.code = code
     unwrappedItem.value.description = description
-    console.log(unwrappedItem.value)
-  }
-}
-
-const closePlugin = () => {
-  if(unwrappedItem.value) {
-    wrap();
-  }
-}
-
-const savePlugin = async () => {
-  if(unwrappedItem.value) {
-    const response = await store.editMyPlugin(unwrappedItem.value)
-    if(response.success) {
-      save()
-    }
-    showInfoDialog.value = true
   }
 }
 
@@ -170,13 +143,6 @@ const savePlugin = async () => {
       </ButtonGroup>
       <ButtonGroup >
         <Button
-          :disabled="blockedEdit"
-          @click="unwrap(checkedPlugins[0]!); getDetails(checkedPlugins[0]!)"
-          variant="green_outline">
-          Edit
-          <IconPencilCode/>
-        </Button>
-        <Button
           @click="changeStatus"
           :disabled="blockedRemoveAndChange"
           variant="orange_outline">
@@ -184,6 +150,7 @@ const savePlugin = async () => {
           <IconStatusChange/>
         </Button>
         <Button
+          class="border-l!"
           @click="deletePlugins"
           :disabled="blockedRemoveAndChange"
           variant="red_outline">
@@ -221,11 +188,11 @@ const savePlugin = async () => {
             </TableHead>
 
             <SortableHead keyName="name" label="Name" :sort-key="sortKey" class=" w-fit" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-            <SortableHead keyName="tags" label="Tags" :sort-key="sortKey" class=" w-1/6" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-            <SortableHead keyName="cronExpression" label="Cron" :sort-key="sortKey" class=" w-1/5" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="tags" label="Tags" :sort-key="sortKey" class=" w-fit" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="cronExpression" label="Cron" :sort-key="sortKey" class=" w-fit" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
             <SortableHead keyName="severity" label="Severity" :sort-key="sortKey" class=" w-1/15" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
             <SortableHead keyName="language" label="Language" :sort-key="sortKey" class=" w-8/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-            <SortableHead keyName="updatedAt" label="Last modified" :sort-key="sortKey" class=" w-14/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="updatedAt" label="Last modified" :sort-key="sortKey" class=" w-13/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
             <SortableHead keyName="active" label="Status" :sort-key="sortKey" class=" w-7/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
             <SortableHead keyName="weight" label="Weight" :sort-key="sortKey" class="  w-7/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
           </TableRow>
@@ -234,38 +201,39 @@ const savePlugin = async () => {
             <TableRow
               class="cursor-pointer duration-0 border-radius-0  [&_td]:py-2 [&_td]:pr-4 hover:bg-green-badge/20 "
               v-for="plugin in sortedData"
-              :key="plugin.fileName"
-              @click="blockedCheckbox ? true: check(plugin.fileName)"
+              :key="plugin.fullName" @click="unwrap(plugin.fullName); getDetails(plugin.fullName)"
               :class="{'hover:bg-destructive/20': !plugin.active,
-             'bg-selected [&_td]:align-top  sticky h-40! [&_td]:pt-4! top-11 bottom-11 hover:bg-card z-9 cursor-auto'
-                    : isUnwrapped(plugin.fileName) }">
+             'bg-selected [&_td]:align-top cursor-auto sticky h-40! [&_td]:pt-4! top-11 bottom-11 hover:bg-card z-9 '
+                    : isUnwrapped(plugin.fullName) }">
               <TableCell class="px-4">
                 <input
+                  @click.stop
                   :disabled="blockedCheckbox"
                   type="checkbox"
-                  :id="cn('my-plugin-no-'+plugin.fileName)" class="size-[1vw] cursor-pointer align-middle"
-                  :value="plugin.fileName"
+                  :id="cn('my-plugin-no-'+plugin.fullName)" class="size-[1vw] cursor-pointer align-middle"
+                  :value="plugin.fullName"
                   v-model="checkedPlugins"
                 />
               </TableCell>
-              <TableCell v-if="isUnwrapped(plugin.fileName)">
+              <TableCell v-if="isUnwrapped(plugin.fullName) && unwrappedItem">
                 <InputGroup
                   class="w-full xl:h-10 2xl:h-12 ">
                   <InputGroupInput
                     :class="inputText"
-                    v-model="plugin.name"
+                    v-model="unwrappedItem.name"
                     type="text"
                     placeholder="plugin name"/>
                   <InputGroupAddon><IconLabel class="size-4 lg:size-5 xl:size-6 2xl:size-7 cursor-pointer"/></InputGroupAddon>
                 </InputGroup>
               </TableCell>
-              <TableCell v-else class=" whitespace-break-spaces">{{plugin.name}}</TableCell>
+              <TableCell v-else class=" whitespace-break-spaces">{{plugin.name}}
+              </TableCell>
 
 
               <!-- Tags -->
               <TableCell class="whitespace-break-spaces" >
                 <MyTagInput
-                  v-if="unwrappedItem && isUnwrapped(plugin.fileName)"
+                  v-if="unwrappedItem && isUnwrapped(plugin.fullName)"
                   v-model:tags="unwrappedItem.tags"
                   ref="tagsRef"
                   :all-tags="availableTags"
@@ -282,7 +250,7 @@ const savePlugin = async () => {
 
               </TableCell>
 
-              <TableCell v-if="!isUnwrapped(plugin.fileName)" class="whitespace-break-spaces">
+              <TableCell v-if="!isUnwrapped(plugin.fullName)" class="whitespace-break-spaces">
                 {{ plugin.cronExpression ? cronstrue.toString(plugin.cronExpression) : ''}}
                 <br>
                 <span>Next run: {{ nextRun(plugin) }}
@@ -307,9 +275,9 @@ const savePlugin = async () => {
                     Next run: {{ cronDescription[1]}}</span>
                 </span>
               </TableCell>
-              <TableCell v-if="isUnwrapped(plugin.fileName) && unwrappedItem" >
+              <TableCell v-if="isUnwrapped(plugin.fullName) && unwrappedItem" >
                 <SeveritySelect
-                  v-model:severity="plugin.severity"
+                  v-model:severity="unwrappedItem.severity"
                 />
               </TableCell>
               <TableCell v-else  >
@@ -338,7 +306,7 @@ const savePlugin = async () => {
                 />
               </TableCell>
               <DateCell class="" v-if="plugin.updatedAt" :date="plugin.updatedAt"></DateCell>
-              <TableCell v-if="isUnwrapped(plugin.fileName) && unwrappedItem" >
+              <TableCell v-if="isUnwrapped(plugin.fullName) && unwrappedItem" >
                 <RadioGroup
                   @update:model-value="unwrappedItem.active = $event === 'on'"
                   :model-value="unwrappedItem.active ? 'on' : 'off'"
@@ -356,9 +324,9 @@ const savePlugin = async () => {
               </TableCell>
               <TableCell v-else class=" text-green-badge" :class="{'text-destructive' : !plugin.active}">{{ plugin.active ? 'On' : 'Off'}}</TableCell>
               <TableCell class="">{{plugin.weight}} KB
-                <ButtonGroup v-if="isUnwrapped(plugin.fileName) && unwrappedItem" class="flex  absolute bottom-4 right-3 *:items-center *:align-middle *:flex">
+                <ButtonGroup v-if="isUnwrapped(plugin.fullName) && unwrappedItem" class="flex  absolute bottom-4 right-3 *:items-center *:align-middle *:flex">
                   <Button
-                    @click="closePlugin"
+                    @click.stop="wrap"
                     variant="red_outline">
                     Cancel<IconCancel class="size-4 xl:size-5"/>
                   </Button>
@@ -369,6 +337,7 @@ const savePlugin = async () => {
                       @update:save-changes="updateDetails"
                     >
                       <Button
+                        @click.stop
                         class="border-0! m-0 rounded-none bg-transparent! text-severity-3 hover:text-primary"
                       >
                         Details<IconMessageCode class="size-4 xl:size-5"/>
@@ -377,7 +346,7 @@ const savePlugin = async () => {
                   </Button>
 
                   <Button
-                    @click="savePlugin"
+                    @click.stop="save(async ()=> await myPluginStore.editMyPlugin(unwrappedItem!))"
                     variant="green_outline">
                     Save<IconDeviceFloppy class="size-4 xl:size-5"/>
                   </Button>

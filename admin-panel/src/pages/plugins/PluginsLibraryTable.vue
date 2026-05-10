@@ -16,6 +16,7 @@ import {ButtonGroup} from "@/components/ui/button-group";
 import {Button} from "@/components/ui/button";
 import { IconDownload, IconSourceCode} from "@tabler/icons-vue";
 import {watchEffect} from "vue";
+import {dateParser} from "@/composables/dateParser.ts";
 
 const props = defineProps<{
   plugins: LibraryPlugin[]
@@ -86,7 +87,7 @@ watchEffect(() => {
               class="size-7 "
             />
           </TableCell>
-          <DateCell  :date="plugin.createdAt as Date"></DateCell>
+          <DateCell  :date="dateParser(plugin.createdAt).toDate"></DateCell>
           <TableCell >{{plugin.weight}} Kb</TableCell>
           <TableCell>
             <ButtonGroup>
