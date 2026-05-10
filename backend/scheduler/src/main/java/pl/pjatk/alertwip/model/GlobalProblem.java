@@ -82,8 +82,8 @@ public class GlobalProblem {
     public void setStatus(String status) { this.status = status; }
     public int getSeverity() { return severity; }
     public void setSeverity(int severity) { this.severity = severity; }
-    public List<String> getTECHNICIANGroups() { return technicianGroups; }
-    public void setTECHNICIANGroups(List<String> technicianGroups) { this.technicianGroups = technicianGroups; }
+    public List<String> getTechnicianGroups() { return technicianGroups; }
+    public void setTechnicianGroups(List<String> technicianGroups) { this.technicianGroups = technicianGroups; }
     public boolean isRequiresNotification() { return requiresNotification; }
     public void setRequiresNotification(boolean requiresNotification) { this.requiresNotification = requiresNotification; }
     public LocalDateTime getCreatedAt() { return createdAt; }

@@ -43,7 +43,7 @@ public class AlertRoutingService {
             }
         }
 
-        alert.setTECHNICIANGroups(new ArrayList<>(targetGroups));
+        alert.setTechnicianGroups(new ArrayList<>(targetGroups));
         alert.setRequiresNotification(shouldPlaySound);
     }
 
