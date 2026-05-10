@@ -97,7 +97,7 @@ public class Plugin {
         this.tags = tags;
     }
 
-    public void setCreator(String creator) {
-        this.creator = creator;
-    }
+    public void setCreator(String creator) { this.creator = creator; }
+
+    public void setLanguage(String language) { this.language = language; }
 }
