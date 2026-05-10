@@ -14,14 +14,17 @@ export function useWrapping<T extends object>(
     return unwrappedItem.value?.[key] === keyValue
   }
 
-  const wrap = (save: boolean , message?: string) => {
-    if (save && unwrappedItem.value && originalItem.value) {
-      // tu request zamiast assign
+  const wrap = () => {
+    if(originalItem.value !== unwrappedItem.value) {
       Object.assign(originalItem.value, unwrappedItem.value)
-      return message
     }
     originalItem.value = null
     unwrappedItem.value = null
+  }
+
+  const save = (request: () => void) => {
+    request()
+    wrap()
   }
 
   const unwrap = (keyValue: string | number) => {
@@ -29,5 +32,5 @@ export function useWrapping<T extends object>(
     unwrappedItem.value = structuredClone(toRaw(originalItem.value))
   }
 
-  return { unwrap, unwrappedItem, originalItem, wrap, isUnwrapped }
+  return { unwrap, unwrappedItem, originalItem, wrap, isUnwrapped, save }
 }

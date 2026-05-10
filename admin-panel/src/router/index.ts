@@ -50,5 +50,9 @@ const router = createRouter({
     },
   ],
 })
+router.beforeEach((to) => {
+  if (!router.getRoutes().some(r => r.path === to.path)) return { path: '/'}
+})
+
 
 export default router

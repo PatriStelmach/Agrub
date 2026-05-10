@@ -11,10 +11,8 @@ import {
 } from '@/components/ui/sheet'
 import { Button } from "@/components/ui/button";
 import {
-  IconEye, IconEyeOff,
   IconFilterOff,
   IconFilterShare,
-  IconTrash,
   IconFilterX
 } from "@tabler/icons-vue";
 import DialogLabel from "@/helpers/DialogLabel.vue";
@@ -26,22 +24,14 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
-import { computed, onMounted, reactive } from "vue";
-import {
-  TagsInput,
-  TagsInputInput,
-  TagsInputItem, TagsInputItemDelete,
-  TagsInputItemText
-} from "@/components/ui/tags-input";
-import { Badge } from "@/components/ui/badge";
-import { useBadgeFilter } from "@/composables/useBadgeFilter.ts";
-import { badgesContainer, inputText } from "@/assets/cssFunctions.ts";
+import {computed, reactive, useTemplateRef} from "vue";
 import type { DateRange } from "reka-ui";
 import { alertSources } from "@/data/alertSources.ts";
 import { now, getLocalTimeZone, CalendarDateTime } from '@internationalized/date'
 import MyDateRangePicker from "@/helpers/MyDateRangePicker.vue";
 import type {AlertHistoryFilters} from "@/types/types.ts";
 import {dateParser} from "@/composables/dateParser.ts";
+import MyTagInput from "@/helpers/MyTagInput.vue";
 
 const emit = defineEmits<{
   'update:filters': [AlertHistoryFilters]
@@ -50,6 +40,7 @@ const emit = defineEmits<{
 const tz = getLocalTimeZone()
 const currentTime = now(tz)
 
+const tagsRef = useTemplateRef<InstanceType<typeof MyTagInput>>('tagsRef')
 const filters = reactive({
   severity: [] as number[],
   message: undefined as string | undefined,
@@ -89,38 +80,7 @@ const areRangesInterValid = computed(() => {
   return true;
 });
 
-const {badgeListOpen, addExistingBadge, matchedBadges, badgeSearch } = useBadgeFilter<string[] | null>(
-  computed({
-    get: () => filters.origins,
-    set: (val) => filters.origins = val || []
-  }),
-  alertSources,
-  () => filters.origins
-)
 
-onMounted(() => {
-  badgeListOpen.value = false
-})
-
-const handleInputChange = (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  badgeSearch.value = target.value;
-};
-
-const clearOrigins = () => {
-  filters.origins = [];
-}
-
-const clearOriginInput = () => {
-  const input = document.getElementById('origin-input') as HTMLInputElement
-  if (input) input.value = '';
-  addExistingBadge()
-}
-
-const originToggle = () => {
-  badgeListOpen.value = !badgeListOpen.value
-  clearOriginInput()
-}
 
 const clearFilters = () => {
   filters.severity = []
@@ -132,8 +92,7 @@ const clearFilters = () => {
   filters.origins = []
   filters.createdDateRange = { start: undefined, end: undefined }
   filters.closedDateRange = { start: undefined, end: undefined }
-  badgeListOpen.value = false
-  clearOriginInput()
+  tagsRef.value?.clearTagsInput()
 }
 
 const onCancel = () => {
@@ -175,7 +134,7 @@ const onSubmit = () => {
           </Button>
         </SheetHeader>
 
-        <div class="grid space-y-3 pl-4">
+        <div class="grid space-y-3 pl-4 overflow-y-scroll max-h-[75vh]">
           <!-- Alert Subject -->
           <div>
             <DialogLabel text="Alert" for="subject-input" />
@@ -212,54 +171,18 @@ const onSubmit = () => {
           </div>
 
           <!-- Origin -->
-          <div>
-            <div class="flex mb-2 space-x-2">
-              <DialogLabel text="Origin" for="origin-input" />
-              <Button @click="originToggle" :variant="badgeListOpen ? 'red_outline' : 'green_outline'" size="icon-sm">
-                <component :is="badgeListOpen ? IconEyeOff : IconEye" />
-              </Button>
-              <Button v-if="badgeListOpen" @click="clearOrigins" size="icon-sm" variant="red_outline">
-                <IconTrash />
-              </Button>
-            </div>
-            <div class="flex space-x-2">
-              <Transition name="fade">
-                <TagsInput
-                  v-show="badgeListOpen"
-                  v-model="filters.origins"
-                  :class="badgeListOpen ? `${inputText} rounded-[0.5rem_0.5rem_0_0]` : `${inputText}`"
-                  class="w-3/4">
-                  <TagsInputItem v-for="(origin, index) in filters.origins" :key="index" :value="origin">
-                    <TagsInputItemText />
-                    <TagsInputItemDelete />
-                  </TagsInputItem>
-                  <TagsInputInput id="origin-input" @input="handleInputChange" @keydown.enter="clearOriginInput" placeholder="Origins..." />
-                </TagsInput>
-              </Transition>
-            </div>
-            <Transition name="fade">
-              <div v-if="badgeListOpen && matchedBadges.length > 0" :class="badgesContainer">
-                <Badge
-                  variant="origin" class="mr-1 my-1"
-                  @click="filters.origins.push(tag)"
-                  v-for="(tag, index) in matchedBadges" :key="index">
-                  {{ tag }}
-                </Badge>
-              </div>
-              <div v-else-if="badgeListOpen" :class="badgesContainer" class="h-10 text-center text-sm! text-comment">
-                No matched origins
-              </div>
-            </Transition>
-            <Transition name="fade">
-              <div v-if="!badgeListOpen">
-                <Badge variant="origin" class="mr-1 my-1" v-for="(origin, index) in filters.origins" :key="index">
-                  {{ origin }}
-                </Badge>
-              </div>
-            </Transition>
+          <div class="w-3/4">
+            <MyTagInput
+              ref="tagsRef"
+              :all-tags="alertSources"
+              input-id="origin-input"
+              :can-add-new="false"
+              v-model:tags="filters.origins"
+              tagsLabel="Origin"
+              />
           </div>
 
-          <!-- Status / Checkboxes -->
+          <!-- Status  -->
           <div>
             <DialogLabel text="Status" />
             <div class="flex **:cursor-pointer *:flex *:items-center *:space-x-2">

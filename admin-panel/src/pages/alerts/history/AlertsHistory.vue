@@ -1,10 +1,5 @@
 <script setup lang="ts">
-import {
-  tableDiv,
-  topButtonGroup,
-  topDiv,
-  topH1
-} from "@/assets/cssFunctions.js";
+import {tableDiv, topButtonGroup, topDiv, topH1} from "@/assets/cssFunctions.js";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
 import {Button} from "@/components/ui/button";
 import {Search} from "lucide-vue-next";
@@ -12,105 +7,111 @@ import {ButtonGroup} from "@/components/ui/button-group";
 import {
   type AlertDetails,
   type AlertHistoryFilters,
-  undefinedFilters,
-  type HistoryAlert
+  type HistoryAlert,
+  undefinedAlertsFilters
 } from "@/types/types.js";
-import {defineAsyncComponent, onMounted, ref, watch} from "vue";
-import { IconFilterCog} from "@tabler/icons-vue";
+import {defineAsyncComponent, ref} from "vue";
+import {IconFilterCog} from "@tabler/icons-vue";
 import GoBackButton from "@/helpers/GoBackButton.vue";
-import {useAlertStore} from "@/stores/alertStore.ts";
 import AlertsHistoryTable from "@/pages/alerts/history/AlertsHistoryTable.vue";
-import MyPagination from "@/helpers/MyPagination.vue";
+import MyServerPagination from "@/helpers/MyServerPagination.vue";
 import AlertsFilters from "@/pages/alerts/history/AlertsFilters.vue";
+import {useServerSearchFilter} from "@/composables/useServerSearchFilter.ts";
+import api from "@/lib/axios.ts";
+import {toast} from "vue-sonner";
+
 const DetailsCard = defineAsyncComponent(() => import('@/pages/alerts/DetailsCard.vue'))
 
-const alertStore = useAlertStore()
-
-
-const alerts = ref<HistoryAlert[]>([])
-const searchFilter = ref<string | null>(null);
-const pageSize = ref<number>(20);
-const currentPage = ref<number>(1);
-const filters = ref<AlertHistoryFilters>(undefinedFilters);
-const totalElements = ref<number>(0);
-const hoveredAlert = ref<AlertDetails | null>(null)
-const sortedHead = ref<{ sortKey: string; sortOrder: string }>({
-  sortKey: 'createdAt',
-  sortOrder: 'desc'
-})
-
-
 const getCurrentStateRequest = async () => {
-  const response = await alertStore.getAlertsHistory(
-    currentPage.value,
-    pageSize.value,
-    filters.value,
-    sortedHead.value.sortKey,
-    sortedHead.value.sortOrder
-  )
-  alerts.value = response?.alerts
-  totalElements.value = response?.totalElements
+  try {
+    const response = await api.get('/alerts/history', {
+      params: {
+        page: currentPage.value - 1,
+        pageSize: pageSize.value,
+        sortKey: sortedHead.value.sortKey,
+        sortOrder: sortedHead.value.sortOrder,
+        severity: filters.value.severity,
+        message: filters.value.message,
+        subject: filters.value.subject,
+        source: filters.value.source,
+        origin: filters.value.origin,
+        ack: filters.value.ack,
+        unack: filters.value.unack,
+        createdDateFrom: filters.value.createdDateFrom,
+        createdDateTo: filters.value.createdDateTo,
+        closedDateFrom: filters.value.closedDateFrom,
+        closedDateTo: filters.value.closedDateTo,
+      },
+      paramsSerializer: {
+        indexes: null
+      }
+    })
+
+    if (response.status === 200) {
+      items.value = response.data.content.map((a: HistoryAlert) => ({
+        ...a,
+        createdAt: new Date(a.createdAt),
+        closedAt: new Date(a.closedAt)
+      }))
+      totalElements.value = response.data.totalElements
+
+      toast.info('Alerts history fetched')
+    }
+  } catch {
+    toast.error('Error getting alerts history')
+  }
 }
 
-const updateFilters = async (data: AlertHistoryFilters) => {
-  filters.value = data
-  currentPage.value = 1
-  await getCurrentStateRequest()
-}
+const {
+  filters,
+  items,
+  pageSize,
+  currentPage,
+  totalElements,
+  sortedHead,
+  updateFilters
+} = useServerSearchFilter<HistoryAlert, AlertHistoryFilters>(
+  getCurrentStateRequest,
+  undefinedAlertsFilters,
+  'createdAt',
+  'desc'
+)
 
-watch([currentPage, pageSize], async () => {
-  await getCurrentStateRequest()
-})
+const hoveredAlert = ref<AlertDetails | null>(null)
 
-watch(sortedHead, async () => {
-  await getCurrentStateRequest()
-}, { deep: true })
 
 </script>
 
 <template>
-
   <div>
     <div :class="topDiv">
       <h1 :class="topH1">Alerts history</h1>
       <ButtonGroup :class="topButtonGroup">
         <ButtonGroup>
-          <GoBackButton/>
+          <GoBackButton />
         </ButtonGroup>
-
         <ButtonGroup>
-          <InputGroup >
-            <InputGroupInput
-              v-model="searchFilter"
-              type="search"
-              placeholder="Search for alert"/>
-            <InputGroupAddon>
-              <Search/>
-            </InputGroupAddon>
-          </InputGroup>
-          <AlertsFilters
-            @update:filters="updateFilters"
-          >
-            <Button  variant="outline">
-              Filters <IconFilterCog/>
+
+          <AlertsFilters @update:filters="updateFilters">
+            <Button variant="outline">
+              Filters <IconFilterCog />
             </Button>
           </AlertsFilters>
         </ButtonGroup>
-
       </ButtonGroup>
     </div>
     <div :class="tableDiv">
       <DetailsCard
         v-if="hoveredAlert"
-        :data=hoveredAlert
+        :data="hoveredAlert"
       />
       <AlertsHistoryTable
         v-model:hovered-alert="hoveredAlert"
         v-model:sorted-head="sortedHead"
-        :alerts="alerts"
+        :alerts="items"
         :totalElements="totalElements"
       >
-        <MyPagination
+        <MyServerPagination
           :total="totalElements"
           v-model:page-index="currentPage"
           v-model:page-size="pageSize"

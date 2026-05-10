@@ -2,7 +2,7 @@
 @import "tw-animate-css";
 
 
-@variant light ([data-theme="light"] &);
+@variant light (.light &);
 
 
 @theme inline {
@@ -49,8 +49,8 @@
   --color-orange-badge: var(--orange-badge);
   --color-severity-0: var(--blue-badge);
   --color-severity-1: var(--green-badge);
-  --color-severity-2: var(--color-yellow-300);
-  --color-severity-3: var(--color-amber-500);
+  --color-severity-2: var(--yellow-badge);
+  --color-severity-3: var(--orange-badge);
   --color-severity-4: var(--color-orange-500);
   --color-severity-5: var(--red-badge);
   --color-list-hover: var(--list-hover);
@@ -60,6 +60,7 @@
 }
 @source inline("hover:bg-severity-{0,1,2,3,4,5}{/90,/80,/70,/60,/50,/40,/30,/20,/10,}{!,}");
 @source inline("bg-severity-{0,1,2,3,4,5}{/90,/80,/70,/60,/50,/40,/30,/20,/10,}{!,}");
+@source inline("text-severity-{0,1,2,3,4,5}{/90,/80,/70,/60,/50,/40,/30,/20,/10,}{!,}");
 @source inline("shadow-severity-{0,1,2,3,4,5}{/90,/80,/70,/60,/50,/40,/30,/20,/10,}{!,}");
 @source inline("border-severity-{0,1,2,3,4,5}{/90,/80,/70,/60,/50,/40,/30,/20,/10,}{!,}");
 @source inline("{from,via,to}-severity-{0,1,2,3,4,5}{/90,/80,/70,/60,/50,/40,/30,/20,/10,}{!,}");
@@ -84,7 +85,7 @@
   --muted-foreground: oklch(0.707 0.022 261.325);
   --accent: oklch(0.278 0.033 256.848);
   --accent-foreground: oklch(0.985 0.002 247.839);
-  --destructive: oklch(0.704 0.191 22.216);
+  --destructive: var(--red-badge);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.551 0.027 264.364);
@@ -101,11 +102,11 @@
   --sidebar-accent-foreground: oklch(0.985 0.002 247.839);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.707 0.022 261.325);
-  --blue-badge: oklch(0.70 0.14 242);
-  --green-badge: oklch(0.731 0.255 137.694);
-  --red-badge: oklch(54.5% 0.246 16.439);
-  --yellow-badge: var(--color-yellow-300);
-  --orange-badge: var(--color-amber-500);
+  --blue-badge: oklch(0.80 0.14 242);
+  --green-badge: oklch(0.75 0.255 137.694);
+  --red-badge: oklch(0.602 0.255 21.972);
+  --yellow-badge: oklch(90.5% 0.182 98.111);
+  --orange-badge: oklch(76.9% 0.188 70.08);
   --list-hover: var(--color-slate-900);
   --date: var(--color-slate-500);
   --comment: var(--color-slate-400);
@@ -128,7 +129,7 @@
   --muted-foreground: oklch(0.551 0.027 264.364);
   --accent: oklch(0.967 0.003 264.542);
   --accent-foreground: oklch(0.21 0.034 264.665);
-  --destructive: oklch(0.577 0.245 27.325);
+  --destructive: var(--red-badge);
   --border: oklch(0.928 0.006 264.531);
   --input: oklch(0.928 0.006 264.531);
   --ring: oklch(0.707 0.022 261.325);
@@ -145,7 +146,10 @@
   --sidebar-accent-foreground: oklch(0.21 0.034 264.665);
   --sidebar-border: oklch(0.928 0.006 264.531);
   --sidebar-ring: oklch(0.707 0.022 261.325);
-  --blue-badge: oklch(0.79 0.14 242);
+  --blue-badge: oklch(0.69 0.24 242);
+  --green-badge: oklch(0.631 0.255 137.694);
+  --yellow-badge: oklch(84.5% 0.182 98.111);
+  --orange-badge: oklch(70.9% 0.188 70.08);
   --list-hover: var(--color-slate-100);
   --date: var(--color-slate-400);
   --comment: var(--color-slate-600);
@@ -158,8 +162,8 @@
 @theme
 {
   --breakpoint-sm: 720px;
-  --breakpoint-md: 1400px;
-  --breakpoint-lg: 1920px;
+  --breakpoint-md: 1200px;
+  --breakpoint-lg: 1900px;
   --breakpoint-xl: 2400px;
   --breakpoint-2xl: 3600px;
 }
@@ -259,9 +263,8 @@ input[type="checkbox"]:focus-visible
 }
 
 .fade-enter-active,
-.fade-leave-active {
-  transition: all 0.4s ease-in-out;
-  opacity: 1;
+.fade-leave-active{
+  transition: all 0.3s ease-in-out;
 }
 
 .fade-enter-from,
@@ -269,18 +272,29 @@ input[type="checkbox"]:focus-visible
   opacity: 0;
 }
 
-.slide-fade-enter-active,
-.slide-fade-leave-active {
-  transition: all 0.1s cubic-bezier(1, 0.5, 0.8, 1);
+.fade-absolute-enter-active,
+.fade-absolute-leave-active{
+  max-width: 15rem;
+  position: absolute;
+  transition: all 0.3s ease-in-out;
+}
+
+.fade-absolute-enter-from,
+.fade-absolute-leave-to {
+  opacity: 0;
+}
+
+.slide-fade-enter-active{
+  transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
 }
 
 .slide-fade-enter-from {
-  transform: translateX(-100rem);
+  transform: translateY(50rem);
   opacity: 0;
 }
 
 .slide-fade-leave-to {
-  transform: translateX(100rem);
+  transform: translateY(-50rem);
   opacity: 0;
 }
 

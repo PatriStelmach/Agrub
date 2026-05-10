@@ -2,66 +2,69 @@
 import DateCell from "@/helpers/DateCell.vue";
 import {
   Table,
-  TableBody,
   TableCaption, TableCell,
   TableFooter,
   TableHead,
   TableHeader, TableRow
 } from "@/components/ui/table";
 import {Badge} from "@/components/ui/badge";
-import {Language, type LibraryPlugin, type MyPlugin} from "@/types/types.ts"
+import {Language, type LibraryPlugin} from "@/types/types.ts"
 import SortableHead from "@/helpers/SortableHead.vue";
 import {tableCaption, dataTable, tableHeaders} from "@/assets/cssFunctions.ts";
 import {useSort} from "@/composables/sorting.ts";
-import {IconAlertTriangleFilled, IconLogs} from "@tabler/icons-vue";
-import {ButtonGroup, ButtonGroupSeparator} from "@/components/ui/button-group";
+import {ButtonGroup} from "@/components/ui/button-group";
 import {Button} from "@/components/ui/button";
 import { IconDownload, IconSourceCode} from "@tabler/icons-vue";
+import {watchEffect} from "vue";
 
 const props = defineProps<{
-  data: LibraryPlugin[]
+  plugins: LibraryPlugin[]
+  totalElements: number
 }>()
 
-const { sortedData, sortKey, sortOrder, toggleSort } = useSort<LibraryPlugin>(() => props.data, 'createdAt')
+const sortedHead =  defineModel<{ sortKey: string; sortOrder: string }>('sortedHead')
 
+
+const { sortKey, sortOrder, toggleSort } =
+  useSort<LibraryPlugin>(() => props.plugins, 'createdAt')
+
+watchEffect(() => {
+  sortedHead.value = { sortKey: sortKey.value, sortOrder: sortOrder.value };
+});
 
 </script>
 
 <template>
 
-  <div class=" mt-[2vh] mx-[1%] w-98/100 relative overflow-auto max-h-[77vh]   ">
     <Table id="plugins-library-table" :class="dataTable">
-      <TableCaption :class="tableCaption">Plugins Library:
-        <span class="font-extrabold">{{ props.data.length}}</span>
+      <TableCaption :class="tableCaption">
+        <slot/>
+        <span >Plugins Library: <span class="font-extrabold">{{ totalElements}}</span></span>
       </TableCaption>
       <TableHeader class="h-10">
         <TableRow :class="tableHeaders">
-          <SortableHead keyName="name" label="Name" :sort-key="sortKey" class="pl-4 w-21/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-          <SortableHead keyName="creator" label="Creator" :sort-key="sortKey" class=" w-15/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-          <SortableHead keyName="tags" label="Tags" :sort-key="sortKey" class=" w-20/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-          <SortableHead keyName="log" label="Type" :sort-key="sortKey" class=" w-7/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+          <SortableHead keyName="name" label="Name" :sort-key="sortKey" class=" *:pl-2 w-1/6" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+          <SortableHead keyName="creator" label="Creator" :sort-key="sortKey" class="w-1/8 lg:w-1/6" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+          <SortableHead keyName="tags" label="Tags" :sort-key="sortKey" class="w-15/100 lg:w-20/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
           <SortableHead keyName="language" label="Language" :sort-key="sortKey" class=" w-8/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-          <SortableHead keyName="createdAt" label="Date" :sort-key="sortKey" class=" w-15/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+          <SortableHead keyName="createdAt" label="Date" :sort-key="sortKey" class=" w-11/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
           <SortableHead keyName="weight" label="Weight" :sort-key="sortKey" class="  w-7/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-          <TableHead class="w-7/100"></TableHead>
+          <TableHead class="w-7/100 pr-4!"></TableHead>
 
         </TableRow>
     </TableHeader>
-      <TransitionGroup tag="tbody" name="slide-fade">
+      <TransitionGroup name="slide-fade">
         <TableRow
-          class=" cursor-pointer duration-0 hover:bg-blue-700/30"
-          v-for="plugin in sortedData"
+          class=" cursor-pointer duration-0 hover:bg-accent"
+          v-for="plugin in plugins"
           :key="plugin.id">
-          <TableCell class="pl-4 ">{{plugin.name}}</TableCell>
-          <TableCell >{{plugin.creator}}</TableCell>
+          <TableCell class="pl-4 whitespace-break-spaces ">{{plugin.fileName}}</TableCell>
+          <TableCell class="whitespace-break-spaces" >{{plugin.creator}}</TableCell>
           <TableCell class="whitespace-break-spaces">
             <Badge
               v-for="(tag, index) in plugin.tags"
               variant="tags"
               :key="index">{{tag}}</Badge>
-          </TableCell>
-          <TableCell>
-            <component class="text-badge size-7 " :class="{'text-yellow-500' : !plugin.log }" :is="plugin.log ? IconLogs : IconAlertTriangleFilled "/>
           </TableCell>
           <TableCell >
             <img
@@ -102,8 +105,8 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<LibraryPlugin>(()
           </TableCell>
         </TableRow>
       </TransitionGroup>
+
     <TableFooter>
     </TableFooter>
   </Table>
-  </div>
 </template>
