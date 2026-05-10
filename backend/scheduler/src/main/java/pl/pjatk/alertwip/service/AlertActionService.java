@@ -83,7 +83,7 @@ public class AlertActionService {
         );
 
         // Wysyłamy wyłącznie zmiany (eventPayload).
-        sseService.sendAlertUpdate("ALERT_UPDATE", eventPayload, problem);
+        sseService.sendAlertUpdate("ALERT_UPDATE_ONLY", eventPayload, problem);
 
         // 5. Delegacja do odpowiedniego adaptera (Zabbix, Wazuh)
         String originType = problem.getOriginType();
@@ -94,7 +94,7 @@ public class AlertActionService {
                 .orElse(null);
 
         if (matchedAdapter != null) {
-            // Przekazujemy oryginalne DTO (request) oraz stan alertu, dokładnie tak jak wymaga zaktualizowany interfejs
+            // Przekazujemy oryginalne DTO (request) oraz stan alertu
             boolean success = matchedAdapter.sendAction(request, problem);
             savedAction.setSyncStatus(success ? SyncStatus.SYNCED : SyncStatus.FAILED);
             actionRepository.save(savedAction);
