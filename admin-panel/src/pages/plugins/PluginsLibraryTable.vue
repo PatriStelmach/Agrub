@@ -43,23 +43,23 @@ watchEffect(() => {
       </TableCaption>
       <TableHeader class="h-10">
         <TableRow :class="tableHeaders">
-          <SortableHead keyName="name" label="Name" :sort-key="sortKey" class="pl-4! w-fit" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-          <SortableHead keyName="creator" label="Creator" :sort-key="sortKey" class=" w-fit" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-          <SortableHead keyName="tags" label="Tags" :sort-key="sortKey" class=" w-20/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+          <SortableHead keyName="name" label="Name" :sort-key="sortKey" class=" *:pl-2 w-1/6" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+          <SortableHead keyName="creator" label="Creator" :sort-key="sortKey" class="w-1/8 lg:w-1/6" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+          <SortableHead keyName="tags" label="Tags" :sort-key="sortKey" class="w-15/100 lg:w-20/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
           <SortableHead keyName="language" label="Language" :sort-key="sortKey" class=" w-8/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-          <SortableHead keyName="createdAt" label="Date" :sort-key="sortKey" class=" w-14/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+          <SortableHead keyName="createdAt" label="Date" :sort-key="sortKey" class=" w-11/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
           <SortableHead keyName="weight" label="Weight" :sort-key="sortKey" class="  w-7/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-          <TableHead class="w-7/100"></TableHead>
+          <TableHead class="w-7/100 pr-4!"></TableHead>
 
         </TableRow>
     </TableHeader>
       <TransitionGroup name="slide-fade">
         <TableRow
-          class=" cursor-pointer duration-0 hover:bg-blue-700/30"
+          class=" cursor-pointer duration-0 hover:bg-accent"
           v-for="plugin in plugins"
           :key="plugin.id">
-          <TableCell class="pl-4 ">{{plugin.fileName}}</TableCell>
-          <TableCell >{{plugin.creator}}</TableCell>
+          <TableCell class="pl-4 whitespace-break-spaces ">{{plugin.fileName}}</TableCell>
+          <TableCell class="whitespace-break-spaces" >{{plugin.creator}}</TableCell>
           <TableCell class="whitespace-break-spaces">
             <Badge
               v-for="(tag, index) in plugin.tags"

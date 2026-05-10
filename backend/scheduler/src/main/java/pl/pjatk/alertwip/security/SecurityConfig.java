@@ -43,7 +43,8 @@ public class SecurityConfig {
                                 "/swagger-resources/**",
                                 "/webjars/**",
                                 "/favicon.ico",
-                                "/api/mock/zabbix"
+                                "/api/mock/zabbix",
+                                "/test-sse"
                         ).permitAll()
 
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()

@@ -38,7 +38,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function logout() {
     try {
-      await axios.post(`${api_url}/auth/logout`, {}, { withCredentials: true });
+      // await axios.post(`${api_url}/auth/logout`, {}, { withCredentials: true });
     } catch (error) {
       console.error('Logout error context:', error)
     } finally {
@@ -50,7 +50,9 @@ export const useAuthStore = defineStore('auth', () => {
   async function refreshToken() {
     try {
       const response = await axios.post(`${api_url}/auth/refresh`, {}, { withCredentials: true });
-      accessToken.value = response.data.token;
+      accessToken.value = response.data.token
+      isAuthenticated.value = true
+
       return true;
     } catch (err) {
       throw err;

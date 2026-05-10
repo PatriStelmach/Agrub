@@ -5,7 +5,6 @@ import { useAuthStore } from "../stores/authStore.ts";
 const api = axios.create({
   baseURL: api_url,
   withCredentials: true,
-
 });
 
 api.interceptors.request.use((config) => {
@@ -36,7 +35,7 @@ api.interceptors.response.use(
       originalRequest._retry = true
 
       try {
-        //await authStore.refreshToken()
+        await authStore.refreshToken()
         const newToken = authStore.accessToken;
         if (newToken) {
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
@@ -44,8 +43,8 @@ api.interceptors.response.use(
         return api(originalRequest);
       }
       catch (refreshError) {
-        // if(authStore.isAuthenticated)
-        //   await authStore.logout()
+        if(authStore.isAuthenticated)
+          await authStore.logout()
         return Promise.reject(refreshError)
       }
     }

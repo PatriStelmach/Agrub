@@ -23,6 +23,7 @@ import {IconCheck, IconSend2, IconX} from "@tabler/icons-vue";
 import type {ActionResponse, ActiveAlert, HistoryAlert} from "@/types/types.ts";
 import {ref} from "vue";
 import {useAlertStore} from "@/stores/alertStore.ts";
+import SeverityDiv from "@/helpers/SeverityDiv.vue";
 
 const props = defineProps<{
   alert: HistoryAlert
@@ -84,11 +85,9 @@ const getActions = async () => {
           </div>
           <div class="flex items-end">
             <DialogLabel for="severity" class="w-36 pb-0 " text="Severity level"/>
-            <div
-              :class="` text-center w-1/5 font-extrabold text-lg border-2 shadow-[0px_0px_10px_2px]
-                 shadow-severity-${alert.severity}/70 border-severity-${alert.severity} bg-severity-${alert.severity}/80 rounded-sm `">
-              <span >{{alert.severity}}</span>
-            </div>
+            <SeverityDiv
+              :severity="alert.severity"
+            />
           </div>
         </div>
       </div>
@@ -101,7 +100,7 @@ const getActions = async () => {
       </ActionsTable>
       <DialogFooter class=" items-center">
         <DialogClose as-child>
-          <Button variant="destructive">
+          <Button variant="red_outline">
             Exit
           </Button>
         </DialogClose>

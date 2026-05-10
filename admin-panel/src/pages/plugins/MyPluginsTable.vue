@@ -27,7 +27,7 @@ import {
   IconTrash,
   IconX
 } from "@tabler/icons-vue"
-import {computed, defineAsyncComponent, ref, watch} from "vue";
+import {computed, defineAsyncComponent, ref, useTemplateRef, watch} from "vue";
 import {useSort} from "@/composables/sorting.ts";
 import SortableHead from "@/helpers/SortableHead.vue";
 import {
@@ -40,24 +40,18 @@ import {
 import {useWrapping} from "@/composables/unwrapping.ts";
 import {Button} from "@/components/ui/button";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
-import {ArrowLeftIcon, Search} from "lucide-vue-next";
+import {Search} from "lucide-vue-next";
 import {availableTags} from "@/data/tags.ts";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import {Label} from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {ButtonGroup} from "@/components/ui/button-group";
 import {dateParser} from "@/composables/dateParser.ts";
 import {useMyPluginStore} from "@/stores/myPluginStore.ts";
-import {useBadgeFilter} from "@/composables/useBadgeFilter.ts";
 import {inputText} from "@/assets/cssFunctions.ts";
 import GoBackButton from "@/helpers/GoBackButton.vue";
-import MyClientPagination from "@/helpers/MyClientPagination.vue";
+import SeveritySelect from "@/helpers/SeveritySelect.vue";
+import SeverityDiv from "@/helpers/SeverityDiv.vue";
+const MyTagInput = defineAsyncComponent(() => import('@/helpers/MyTagInput.vue'))
 
 const props = defineProps<{
   data: MyPlugin[];
@@ -71,12 +65,9 @@ const PluginDetailsDialog = defineAsyncComponent( () => import ("@/pages/plugins
 
 const store = useMyPluginStore()
 const { sortedData, sortKey, sortOrder, toggleSort } = useSort<MyPlugin>(() => props.data, 'updatedAt')
-const { wrap, isUnwrapped, unwrap, unwrappedItem } = useWrapping(sortedData, 'fileName')
-const { badgeListOpen, addNonExistingBadge, existingBadge, matchedBadges, badgeSearch } = useBadgeFilter<MyPlugin | null>(
-  unwrappedItem,
-  availableTags,
-  () => unwrappedItem.value?.tags ?? []
-)
+const { wrap, isUnwrapped, unwrap, unwrappedItem, save } = useWrapping(sortedData, 'fileName')
+
+const tagsRef = useTemplateRef<InstanceType<typeof MyTagInput>>('tagsRef')
 const showInfoDialog = ref<boolean>(false)
 const searchFilter = ref<string>("")
 const checkedPlugins = ref<string[]>([])
@@ -154,9 +145,7 @@ const updateDetails = (code: string, description: string) => {
 
 const closePlugin = () => {
   if(unwrappedItem.value) {
-    wrap(false);
-    badgeListOpen.value = false;
-    badgeSearch.value = '';
+    wrap();
   }
 }
 
@@ -164,9 +153,7 @@ const savePlugin = async () => {
   if(unwrappedItem.value) {
     const response = await store.editMyPlugin(unwrappedItem.value)
     if(response.success) {
-      wrap(true, response.message )
-      badgeListOpen.value = false
-      badgeSearch.value = ''
+      save()
     }
     showInfoDialog.value = true
   }
@@ -236,8 +223,8 @@ const savePlugin = async () => {
             <SortableHead keyName="name" label="Name" :sort-key="sortKey" class=" w-fit" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
             <SortableHead keyName="tags" label="Tags" :sort-key="sortKey" class=" w-1/6" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
             <SortableHead keyName="cronExpression" label="Cron" :sort-key="sortKey" class=" w-1/5" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-            <SortableHead keyName="severity" label="Severity" :sort-key="sortKey" class=" w-fit" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-            <SortableHead keyName="language" label="Language" :sort-key="sortKey" class=" w-fit" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="severity" label="Severity" :sort-key="sortKey" class=" w-1/15" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="language" label="Language" :sort-key="sortKey" class=" w-8/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
             <SortableHead keyName="updatedAt" label="Last modified" :sort-key="sortKey" class=" w-14/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
             <SortableHead keyName="active" label="Status" :sort-key="sortKey" class=" w-7/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
             <SortableHead keyName="weight" label="Weight" :sort-key="sortKey" class="  w-7/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
@@ -250,7 +237,7 @@ const savePlugin = async () => {
               :key="plugin.fileName"
               @click="blockedCheckbox ? true: check(plugin.fileName)"
               :class="{'hover:bg-destructive/20': !plugin.active,
-             'bg-selected [&_td]:align-top  sticky h-40! lg:h-70! xl:h-80! 2xl:h-90! [&_td]:pt-4! top-11 bottom-11 hover:bg-card z-9 cursor-auto'
+             'bg-selected [&_td]:align-top  sticky h-40! [&_td]:pt-4! top-11 bottom-11 hover:bg-card z-9 cursor-auto'
                     : isUnwrapped(plugin.fileName) }">
               <TableCell class="px-4">
                 <input
@@ -269,65 +256,32 @@ const savePlugin = async () => {
                     v-model="plugin.name"
                     type="text"
                     placeholder="plugin name"/>
-                  <InputGroupAddon><IconLabel class="size-4 lg:size-5 xl:size-6 2xl:size-8 cursor-pointer"/></InputGroupAddon>
+                  <InputGroupAddon><IconLabel class="size-4 lg:size-5 xl:size-6 2xl:size-7 cursor-pointer"/></InputGroupAddon>
                 </InputGroup>
               </TableCell>
               <TableCell v-else class=" whitespace-break-spaces">{{plugin.name}}</TableCell>
-              <TableCell v-if="!isUnwrapped(plugin.fileName)"  class=" whitespace-break-spaces">
-                <Badge
-                  v-for="(tag, index) in plugin.tags"
-                  variant="tags"
-                  :key="index"
-                >{{tag}}</Badge>
-              </TableCell>
-              <TableCell v-else class=" whitespace-break-spaces" >
-                <Transition name="fade">
-                  <div v-if="badgeListOpen" class="mb-4">
-                    <InputGroup
-                      class="w-full xl:h-10 2xl:h-12  "
-                      :class="{'rounded-br-none rounded-bl-none' : matchedBadges.length || badgeSearch === ''}">
-                      <InputGroupInput
-                        :class="inputText"
-                        v-model="badgeSearch"
-                        type="search"
-                        @keyup.enter="addNonExistingBadge"
-                        @keyup.esc="badgeListOpen=!badgeListOpen"
-                        placeholder="Add new tags"/>
-                      <InputGroupAddon><IconPlus class="size-4 lg:size-5 xl:size-6 2xl:size-8 cursor-pointer" @click="addNonExistingBadge"/></InputGroupAddon>
-                    </InputGroup>
-                    <div class="max-h-30 w-full mb-2  overflow-y-auto border-2 border-t-0! border-input p-2 rounded-b-md" v-if="matchedBadges.length ">
-                      <Badge
-                        variant="tags"
-                        @click="unwrappedItem?.tags.push(tag); badgeSearch = ''"
-                        v-for="(tag, index) in matchedBadges" :key="index">{{tag}}</Badge>
-                    </div>
-                    <Transition name="fade" class="w-full">
-                  <span
-                    v-if="existingBadge"
-                    class="text-destructive cursor-text w-full">
-                  Tag already exists</span>
-                    </Transition>
-                  </div>
-                </Transition>
-                <div class="w-full justify-between">
+
+
+              <!-- Tags -->
+              <TableCell class="whitespace-break-spaces" >
+                <MyTagInput
+                  v-if="unwrappedItem && isUnwrapped(plugin.fileName)"
+                  v-model:tags="unwrappedItem.tags"
+                  ref="tagsRef"
+                  :all-tags="availableTags"
+                  input-id="tags-input"
+                  :can-add-new="true"
+                  tags-label="Tags"/>
+                <TransitionGroup v-else name="fade" mode="out-in">
                   <Badge
-                    v-for="(tag, index) in unwrappedItem?.tags"
+                    v-for="(tag, index) in plugin.tags"
                     variant="tags"
                     :key="index"
-                  >{{tag}}
-                    <div>
-                      <IconX
-                        @click="unwrappedItem!.tags.splice(index, 1)"
-                        class="size-4 lg:size-5 xl:size-6 2xl:size-10 hover:text-destructive">
-                      </IconX>
-                    </div>
-                  </Badge>
-                  <Button class="align-middle size-6 lg:size-7 xl:size-8 2xl:size-12 "
-                          :variant="badgeListOpen ? 'red_inside': 'green_inside'" @click="badgeListOpen=!badgeListOpen; badgeSearch=''">
-                    <component stroke="2" class=" size-4 lg:size-5 xl:size-6 2xl:size-10" :is=" badgeListOpen ? IconX: IconPlus" />
-                  </Button>
-                </div>
+                  >{{tag}}</Badge>
+                </TransitionGroup>
+
               </TableCell>
+
               <TableCell v-if="!isUnwrapped(plugin.fileName)" class="whitespace-break-spaces">
                 {{ plugin.cronExpression ? cronstrue.toString(plugin.cronExpression) : ''}}
                 <br>
@@ -354,25 +308,14 @@ const savePlugin = async () => {
                 </span>
               </TableCell>
               <TableCell v-if="isUnwrapped(plugin.fileName) && unwrappedItem" >
-                <Select
-                  v-model="unwrappedItem.severity"
-                >
-                  <SelectTrigger class="cursor-pointer w-full ">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem
-                      :class='`cursor-pointer hover:bg-severity-${value}/50! `'
-                      v-for="value in [0,1,2,3,4,5]" :key="value" :value="value">{{value}}</SelectItem>
-                  </SelectContent>
-                </Select>
+                <SeveritySelect
+                  v-model:severity="plugin.severity"
+                />
               </TableCell>
               <TableCell v-else  >
-                <div
-                  :class="` text-center font-extrabold text-lg border-2 shadow-[0px_0px_10px_2px]
-                 shadow-severity-${plugin.severity}/70 border-severity-${plugin.severity} bg-severity-${plugin.severity}/80 rounded-sm `">
-                  <span >{{plugin.severity}}</span>
-                </div>
+                <SeverityDiv
+                  :severity="plugin.severity"
+                />
               </TableCell>
               <TableCell >
                 <img

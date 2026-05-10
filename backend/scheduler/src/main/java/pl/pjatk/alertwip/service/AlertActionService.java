@@ -57,7 +57,7 @@ public class AlertActionService {
         if (stateChanged) {
             problem = problemRepository.save(problem);
             alertCache.updateAlert(problem);
-            // Uwaga: Nie wysyłamy tu całego obiektu przez SSE. Zrobimy to niżej przez lekki DTO.
+            // tu NIE ma być sse
         }
 
         // 3. Utworzenie wpisu w historii operacji (Audyt)
@@ -82,8 +82,7 @@ public class AlertActionService {
                 request.newSeverity()  // null jeśli nie zmieniono w żądaniu
         );
 
-        // Wysyłamy wyłącznie naszą paczkę ze zmianami (eventPayload).
-        // Obiekt 'problem' przekazujemy tylko jako kontekst do sprawdzenia uprawnień wewnątrz SseNotifService.
+        // Wysyłamy wyłącznie zmiany (eventPayload).
         sseService.sendAlertUpdate("ALERT_UPDATE", eventPayload, problem);
 
         // 5. Delegacja do odpowiedniego adaptera (Zabbix, Wazuh)
