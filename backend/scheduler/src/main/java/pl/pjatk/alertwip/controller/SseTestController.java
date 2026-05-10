@@ -67,6 +67,7 @@ public class SseTestController {
                                 headers: {
                                     'Authorization': `Bearer ${token}`
                                 },
+                                openWhenHidden: true,
                                 onopen(response) {
                                     if (response.ok) {
                                         status.innerText = "3. POŁĄCZONO (Oczekiwanie na alerty...)";

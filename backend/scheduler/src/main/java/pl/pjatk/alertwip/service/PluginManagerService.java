@@ -38,9 +38,7 @@ public class PluginManagerService {
         this.dynamicSchedulerConfig = dynamicSchedulerConfig;
     }
 
-    // ==========================================
-    // BEZPIECZEŃSTWO: Ochrona przed Path Traversal
-    // ==========================================
+
     private Path resolveSecurePath(String fileName) {
         // Pobieramy absolutną i znormalizowaną ścieżkę bazową
         Path basePath = Paths.get(scriptsPath).toAbsolutePath().normalize();
@@ -168,11 +166,11 @@ public class PluginManagerService {
 
     @Transactional
     public void saveFullConfig(PluginSaveDTO dto) throws Exception {
-        String oldFileName = dto.oldName() + dto.extension();
-        String newFileName = dto.name() + dto.extension();
+        String oldFileName = dto.fileName();
+        String newFileName = dto.name() + dto.language();
 
-        Path oldPath = resolveSecurePath(oldFileName); // ZABEZPIECZONO
-        Path newPath = resolveSecurePath(newFileName); // ZABEZPIECZONO
+        Path oldPath = resolveSecurePath(oldFileName);
+        Path newPath = resolveSecurePath(newFileName);
 
         // 1. Obsługa zmiany nazwy pliku (Rename)
         if (!oldFileName.equals(newFileName) && Files.exists(oldPath)) {
@@ -208,6 +206,56 @@ public class PluginManagerService {
         if (!oldFileName.equals(newFileName)) {
             dynamicSchedulerConfig.stopTask(task.getId());
         }
+    }
+
+    @Transactional
+    public void updatePluginPartial(String fileName, PluginSaveDTO partialDto) throws Exception {
+        // 1. Pobieramy stary kod i opis
+        PluginDetailsDTO currentDetails = getPluginDetailsByFileName(fileName);
+
+        // 2. Pobieramy stare metadane bezpośrednio
+        Path path = resolveSecurePath(fileName);
+        ParsedHeaders currentHeaders = parseFileHeaders(path);
+        Optional<ScheduledTask> taskOpt = taskRepository.findByScriptName(fileName);
+
+        // 3. Obliczamy bezpiecznie obecną nazwę i rozszerzenie
+        int dotIdx = fileName.lastIndexOf('.');
+        String currentName = (dotIdx == -1) ? fileName : fileName.substring(0, dotIdx);
+        String currentExt = (dotIdx == -1) ? "" : fileName.substring(dotIdx);
+
+        // 4. Mergujemy dane (jeśli pole z frontu to null, bierzemy stare wartości)
+        String finalName = partialDto.name() != null ? partialDto.name() : currentName;
+        String finalCode = partialDto.code() != null ? partialDto.code() : currentDetails.code();
+        String finalDescription = partialDto.description() != null ? partialDto.description() : currentDetails.description();
+        List<String> finalTags = partialDto.tags() != null ? partialDto.tags() : currentHeaders.tags;
+
+        String finalCron = partialDto.cronExpression() != null
+                ? partialDto.cronExpression()
+                : taskOpt.map(ScheduledTask::getCronExpression).orElse(null);
+
+        int finalSeverity = partialDto.severity() != null
+                ? partialDto.severity()
+                : taskOpt.map(ScheduledTask::getSeverity).orElse(currentHeaders.severity);
+
+        boolean finalActive = partialDto.active() != null
+                ? partialDto.active()
+                : taskOpt.map(ScheduledTask::isActive).orElse(false);
+
+        // 5. Budujemy kompletny obiekt gotowy do zapisu w systemie
+        PluginSaveDTO fullDtoToSave = new PluginSaveDTO(
+                fileName,         // Stara nazwa jako punkt odniesienia
+                finalName,        // Nowa nazwa lub stara
+                currentExt,
+                finalCode,
+                finalDescription,
+                finalTags,
+                finalCron,
+                finalSeverity,
+                finalActive
+        );
+
+        // 6. Przekazujemy pełen pakiet do głównej metody zapisującej
+        saveFullConfig(fullDtoToSave);
     }
 
     public int getScriptSeverity(String fileName) {

@@ -15,6 +15,10 @@ public class Plugin {
 
     private String description;
 
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
     public String getDescription() {
         return description;
     }
@@ -91,5 +95,9 @@ public class Plugin {
 
     public void setTags(List<String> tags) {
         this.tags = tags;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
     }
 }
