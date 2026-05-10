@@ -15,6 +15,7 @@ export const useSSEstore = defineStore('SSE', () => {
   const isConnected = ref(false)
 
   const handleSSEMessage = (event: any) => {
+    console.log("handleSSEMessage", event)
     if (!event) return;
 
     if (event.status === 'loading') {
@@ -49,14 +50,15 @@ export const useSSEstore = defineStore('SSE', () => {
   };
 
   const connectToSSE = async () => {
-    const token = authStore.accessToken
+
 
     await fetchEventSource(`${api_url}/alerts/stream`, {
-      method: 'GET',
       headers: {
-        'Authorization': `Bearer ${token}`,
+        'Authorization': `Bearer ${authStore.accessToken}`,
         'Accept': 'text/event-stream',
       },
+      credentials: 'include',
+      openWhenHidden: true,
       async onopen(response) {
         if (response.ok && response.headers.get('content-type')?.includes('text/event-stream')) {
           isConnected.value = true;
@@ -65,12 +67,13 @@ export const useSSEstore = defineStore('SSE', () => {
           throw new Error(`Fatal connection error: ${response.status}`);
         }
       },
-      onmessage(msg) {
-        console.log(`data: ${msg.data}`);
-          const parsedData = JSON.parse(msg.data);
-          handleSSEMessage(parsedData);
-          console.log(parsedData);
+      onmessage(event) {
+        if(event.event !== 'INIT') {
+          handleSSEMessage(JSON.parse(event.data));
+        }
+
       },
+
       onclose() {
         isConnected.value = false;
         console.log("SSE connection closed by server");

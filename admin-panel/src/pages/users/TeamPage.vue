@@ -16,23 +16,19 @@ import {useTagsFilter} from "@/composables/useTagsFilter.ts";
 import {topButtonGroup, topH1} from "@/assets/cssFunctions.ts";
 import GoBackButton from "@/helpers/GoBackButton.vue";
 import UserCard from "@/pages/users/UserCard.vue";
-import EditUserCard from "@/pages/users/EditUserCard.vue";
+import EditUser from "@/pages/users/EditUser.vue";
 import {useUserStore} from "@/stores/userStore.ts";
+import {useRouter} from "vue-router";
 
-const userStore = useUserStore();
 const users = computed(() => {
   return usersData;
 })
 
 const groups = ["Technicial", "Database",  "System Admins", "Administration", "Servers", "Network"]
 
-const {save, wrap, unwrap, unwrappedItem} = useWrapping(users)
 const { filteredData,  searchFilter } =
   useClientSearchFilter<User>(() => users.value,(user) => `${user.firstname} ${user.surname}` )
 
-const editUser = async (user: User) => {
-  save( () => userStore.editUserRequest(user) )
-}
 
 </script>
 
@@ -76,21 +72,13 @@ const editUser = async (user: User) => {
     class=" px-6 py-2 pr-3 grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 max-h-[85vh] overflow-y-auto"
     tag="div"
     name="slide-fade-card"
-    v-if="!unwrappedItem"
   >
     <UserCard
-      @update:unwrap="unwrap"
       v-for="user in filteredData"
       :key="user.id"
       :user="user"/>
   </TransitionGroup>
-  <Transition name="slide-fade-card" tag="div" v-else>
-    <EditUserCard
-      :user="unwrappedItem"
-      :available-groups="groups"
-      @wrap="wrap"
-      @save="editUser"/>
-  </Transition>
+
 
 
   </div>

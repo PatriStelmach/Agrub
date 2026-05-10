@@ -48,10 +48,15 @@ const router = createRouter({
       name: 'team',
       component: () => import('../pages/users/TeamPage.vue')
     },
+    {
+      path: '/edit_user/:id',
+      name: 'edit_user',
+      component: () => import('../pages/users/EditUser.vue')
+    }
   ],
 })
 router.beforeEach((to) => {
-  if (!router.getRoutes().some(r => r.path === to.path)) return { path: '/'}
+  if (!to.name) return { path: '/'}
 })
 
 
