@@ -12,11 +12,11 @@ import type {User} from "@/types/types";
 export const sidebarData = {
   loggedUser: {
     id: 40,
-    firstname: "Administrator",
+    firstname: "ADMINISTRATOR",
     surname: "pjatk",
     email: "admin@pjatk",
-    role: "Administrator" as User["role"],
-    groups: ["Administration"],
+    role: "ADMINISTRATOR" as User["role"],
+    groups: ["ADMINISTRATOR"],
     avatar: "/avatars/shadcn.jpg",
     active: true
   },

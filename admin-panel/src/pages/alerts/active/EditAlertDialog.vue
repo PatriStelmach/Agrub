@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogClose,
-  DialogContent,
+  DialogContent, DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -66,10 +66,12 @@ const onClose = () => {
       <DialogTrigger as-child>
         <slot />
       </DialogTrigger>
-      <DialogContent :class="` h-fit border-2 shadow-[0_0_1rem_2px] max-md:max-w-4/5! md:max-w-2/5! shadow-severity-${newSeverity}/70 border-severity-${newSeverity}/70 duration-500`" >
-        <DialogHeader>
-          <DialogTitle :class="`border-b-2 pb-2 border-severity-${newSeverity}/70 duration-500`">Alert actions</DialogTitle>
-
+      <DialogContent
+        :show-close-button="false"
+        :class="` h-fit border-2 shadow-[0_0_1rem_2px] max-md:max-w-4/5! md:max-w-2/5! shadow-severity-${newSeverity}/70 border-severity-${newSeverity}/70 duration-500`" >
+        <DialogHeader :class="`border-b-2 pb-2 border-severity-${newSeverity}/70 duration-500`">
+          <DialogTitle >Alert details</DialogTitle>
+          <DialogDescription>Review and add new actions</DialogDescription>
         </DialogHeader>
         <div class="flex flex-col max-h-[35vh] md:max-h-[50vh]">
           <div class="grid gap-y-2 [&_p]:text-comment border-b-2 pb-2">

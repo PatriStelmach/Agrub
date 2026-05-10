@@ -92,7 +92,7 @@ export interface User {
   surname: string,
   active?: boolean,
   email: string,
-  role: "Administrator" | "Technician"
+  role: "ADMINISTRATOR" | "TECHNICIAN"
   groups: string[]
 }
 
@@ -104,7 +104,7 @@ export interface UserGroup {
 export interface MyPlugin
 {
   name: string,
-  fileName: string
+  fullName: string
   creator: string,
   language: Language
   description?: string,

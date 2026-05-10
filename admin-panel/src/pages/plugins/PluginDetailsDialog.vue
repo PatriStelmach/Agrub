@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button'
+import { IconDeviceFloppy} from "@tabler/icons-vue";
 import {
   Dialog,
   DialogClose,
@@ -13,7 +14,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {Textarea} from "@/components/ui/textarea";
-import {ref, watch} from "vue";
+import {ref, watch, watchEffect} from "vue";
 import CodeEditor from "@/helpers/CodeEditor.vue";
 
 const props = defineProps<{
@@ -24,10 +25,23 @@ const props = defineProps<{
 const newCode = ref<string>(props.code)
 const newDescription = ref<string>(props.description)
 
-watch(() => [props.code, props.description], ([nextCode, nextDesc]) => {
-  newCode.value = nextCode;
-  newDescription.value = nextDesc;
-});
+watchEffect(() => {
+  newCode.value = props.code;
+  newDescription.value = props.description;
+})
+
+// watch(() => [props.code, props.description], ([nextCode, nextDesc]) => {
+//   newCode.value = nextCode;
+//   newDescription.value = nextDesc;
+// });
+
+const cancel = () => {
+  setTimeout(() => {
+    newCode.value = props.code;
+    newDescription.value = props.description;
+  }, 200)
+
+}
 
 
 const emits = defineEmits<{
@@ -42,7 +56,7 @@ const emits = defineEmits<{
       <DialogTrigger as-child>
         <slot/>
       </DialogTrigger>
-      <DialogContent class="max-w-[60vw]! min-h-1/4 max-h-4/5">
+      <DialogContent :show-close-button="false" class="max-w-[60vw]! min-h-1/4 max-h-4/5">
         <DialogHeader>
           <DialogTitle>Plugin details</DialogTitle>
 
@@ -59,16 +73,20 @@ const emits = defineEmits<{
         </div>
         <DialogFooter>
           <DialogClose as-child>
-            <Button variant="outline">
+            <Button
+              @click="cancel"
+              variant="red_outline">
               Cancel
             </Button>
           </DialogClose>
           <DialogClose>
             <Button
+              variant="green_outline"
               type="submit"
-              @click="$emit('update:save-changes', newCode, newDescription)"
+              @click="emits('update:save-changes', newCode, newDescription)"
             >
               Save changes
+              <IconDeviceFloppy />
             </Button>
           </DialogClose>
 

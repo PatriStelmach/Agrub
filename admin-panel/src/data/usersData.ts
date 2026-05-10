@@ -7,9 +7,8 @@ export const usersData: User[] = [
     surname: "Kowalska",
     active: true,
     email: "anna.kowalska@alert.pl",
-    role: "Administrator",
-    groups: ["Administration"],
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=anna"
+    role: "ADMINISTRATOR",
+    groups: ["ADMINISTRATOR"],
   },
   {
     id: 2,
@@ -17,9 +16,8 @@ export const usersData: User[] = [
     surname: "Nowak",
     active: false,
     email: "piotr.nowak@alert.pl",
-    role: "Technician",
-    groups: ["Technical", "Service", "System Administration"],
-    avatar: ""
+    role: "TECHNICIAN",
+    groups: ["Technical", "Service", "System ADMINISTRATOR"],
   },
   {
     id: 3,
@@ -27,9 +25,8 @@ export const usersData: User[] = [
     surname: "Wiśniewska",
     active: true,
     email: "ewa.wisniewska@alert.pl",
-    role: "Administrator",
-    groups: ["Administration"],
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=ewa"
+    role: "ADMINISTRATOR",
+    groups: ["ADMINISTRATOR"],
   },
   {
     id: 4,
@@ -37,9 +34,8 @@ export const usersData: User[] = [
     surname: "Dąbrowski",
     active: true,
     email: "jan.dabrowski@alert.pl",
-    role: "Technician",
+    role: "TECHNICIAN",
     groups: ["Technical", "Network"],
-    avatar: ""
   },
   {
     id: 5,
@@ -47,9 +43,8 @@ export const usersData: User[] = [
     surname: "Lewandowska",
     active: false,
     email: "katarzyna.lewandowska@alert.pl",
-    role: "Administrator",
-    groups: ["Administration"],
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=katarzyna"
+    role: "ADMINISTRATOR",
+    groups: ["ADMINISTRATOR"],
   },
   {
     id: 6,
@@ -57,9 +52,8 @@ export const usersData: User[] = [
     surname: "Wójcik",
     active: true,
     email: "tomasz.wojcik@alert.pl",
-    role: "Technician",
+    role: "TECHNICIAN",
     groups: ["Technical", "Service"],
-    avatar: ""
   },
   {
     id: 7,
@@ -67,8 +61,8 @@ export const usersData: User[] = [
     surname: "Kamińska",
     active: true,
     email: "magdalena.kaminska@alert.pl",
-    role: "Administrator",
-    groups: ["Administration"],
+    role: "ADMINISTRATOR",
+    groups: ["ADMINISTRATOR"],
   },
   {
     id: 8,
@@ -76,7 +70,7 @@ export const usersData: User[] = [
     surname: "Kowalczyk",
     active: false,
     email: "robert.kowalczyk@alert.pl",
-    role: "Technician",
+    role: "TECHNICIAN",
     groups: ["Technical", "Database"],
   },
   {
@@ -85,9 +79,8 @@ export const usersData: User[] = [
     surname: "Zielińska",
     active: true,
     email: "joanna.zielinska@alert.pl",
-    role: "Administrator",
-    groups: ["Administration"],
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=joanna"
+    role: "ADMINISTRATOR",
+    groups: ["ADMINISTRATOR"],
   },
   {
     id: 10,
@@ -95,9 +88,8 @@ export const usersData: User[] = [
     surname: "Szymczak",
     active: true,
     email: "marek.szymczak@alert.pl",
-    role: "Technician",
+    role: "TECHNICIAN",
     groups: ["Technical", "Service"],
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=marek"
   },
   {
     id: 11,
@@ -105,9 +97,8 @@ export const usersData: User[] = [
     surname: "Woźniak",
     active: false,
     email: "agnieszka.wozniak@alert.pl",
-    role: "Administrator",
-    groups: ["Administration"],
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=agnieszka"
+    role: "ADMINISTRATOR",
+    groups: ["ADMINISTRATOR"],
   },
   {
     id: 12,
@@ -115,7 +106,7 @@ export const usersData: User[] = [
     surname: "Kozłowski",
     active: true,
     email: "jakub.kozlowski@alert.pl",
-    role: "Technician",
+    role: "TECHNICIAN",
     groups: ["Technical", "Network"],
   },
   {
@@ -124,9 +115,8 @@ export const usersData: User[] = [
     surname: "Jankowska",
     active: true,
     email: "karolina.jankowska@alert.pl",
-    role: "Administrator",
-    groups: ["Administration"],
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=karolina"
+    role: "ADMINISTRATOR",
+    groups: ["ADMINISTRATOR"],
   },
   {
     id: 14,
@@ -134,7 +124,7 @@ export const usersData: User[] = [
     surname: "Mazur",
     active: false,
     email: "michal.mazur@alert.pl",
-    role: "Technician",
+    role: "TECHNICIAN",
     groups: ["Technical", "Database"],
   },
   {
@@ -143,9 +133,8 @@ export const usersData: User[] = [
     surname: "Krawczyk",
     active: true,
     email: "aleksandra.krawczyk@alert.pl",
-    role: "Administrator",
-    groups: ["Administration"],
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=aleksandra"
+    role: "ADMINISTRATOR",
+    groups: ["ADMINISTRATOR"],
   },
   {
     id: 16,
@@ -153,7 +142,7 @@ export const usersData: User[] = [
     surname: "Piotrowski",
     active: true,
     email: "pawel.piotrowski@alert.pl",
-    role: "Technician",
+    role: "TECHNICIAN",
     groups: ["Technical", "Service"],
   },
   {
@@ -162,9 +151,8 @@ export const usersData: User[] = [
     surname: "Grabowska",
     active: false,
     email: "monika.grabowska@alert.pl",
-    role: "Administrator",
-    groups: ["Administration"],
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=monika"
+    role: "ADMINISTRATOR",
+    groups: ["ADMINISTRATOR"],
   },
   {
     id: 18,
@@ -172,7 +160,7 @@ export const usersData: User[] = [
     surname: "Jabłoński",
     active: true,
     email: "lukasz.jablonski@alert.pl",
-    role: "Technician",
+    role: "TECHNICIAN",
     groups: ["Technical", "Network"],
   },
   {
@@ -181,9 +169,8 @@ export const usersData: User[] = [
     surname: "Nowicka",
     active: true,
     email: "dorota.nowicka@alert.pl",
-    role: "Administrator",
-    groups: ["Administration"],
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=dorota"
+    role: "ADMINISTRATOR",
+    groups: ["ADMINISTRATOR"],
   },
   {
     id: 20,
@@ -191,7 +178,7 @@ export const usersData: User[] = [
     surname: "Adamski",
     active: false,
     email: "sebastian.adamski@alert.pl",
-    role: "Technician",
+    role: "TECHNICIAN",
     groups: ["Technical", "Database"],
   }
 ]

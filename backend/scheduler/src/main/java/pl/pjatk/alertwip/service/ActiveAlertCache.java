@@ -49,7 +49,7 @@ public class ActiveAlertCache {
     // Pobranie z pamięci
     public List<GlobalProblem> getActiveAlertsForGroups(List<String> groups) {
         return activeAlerts.values().stream()
-                .filter(p -> p.getTechnicianGroups().stream().anyMatch(groups::contains))
+                .filter(p -> p.getTECHNICIANGroups().stream().anyMatch(groups::contains))
                 .toList();
     }
 }

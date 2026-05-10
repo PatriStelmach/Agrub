@@ -42,7 +42,7 @@ public class SseNotifService {
         List<SseEmitter> deadEmitters = new ArrayList<>();
 
         userSubscriptions.forEach((emitter, userGroups) -> {
-            boolean hasAccess = alert.getTechnicianGroups().stream()
+            boolean hasAccess = alert.getTECHNICIANGroups().stream()
                     .anyMatch(userGroups::contains);
 
             if (hasAccess) {
@@ -75,7 +75,7 @@ public class SseNotifService {
 
         userSubscriptions.forEach((emitter, userGroups) -> {
             // Używamy "alertContext", żeby sprawdzić, czy użytkownik ma uprawnienia do tego konkretnego alertu
-            boolean hasAccess = alertContext.getTechnicianGroups().stream()
+            boolean hasAccess = alertContext.getTECHNICIANGroups().stream()
                     .anyMatch(userGroups::contains);
 
             if (hasAccess) {

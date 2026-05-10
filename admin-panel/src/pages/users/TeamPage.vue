@@ -24,8 +24,6 @@ const users = computed(() => {
   return usersData;
 })
 
-const groups = ["Technicial", "Database",  "System Admins", "Administration", "Servers", "Network"]
-
 const { filteredData,  searchFilter } =
   useClientSearchFilter<User>(() => users.value,(user) => `${user.firstname} ${user.surname}` )
 

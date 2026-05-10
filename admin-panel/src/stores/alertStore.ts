@@ -20,30 +20,31 @@ export const useAlertStore = defineStore('useAlertStore', () => {
     return currentAlerts.value.find(a => a.id === id)
   }
 
-  const getAlertActions = async (id: number) => {
-    const response = await api.get<ActionResponse[]>(`/alerts/${id}/actions`)
-    console.log(id)
-    console.log(response.data)
-    if (response.status === 200 && response.data) {
-      return response.data
-    }
-    return []
+  const findAlertIndex = (id: number | undefined) => {
+    return currentAlerts.value.findIndex(a => a.id === id)
   }
 
-  const updateAlert = (action: ActionResponse)=> {
+  const updateAlertActions = (action : ActionResponse)=> {
     const alert = findAlert(action.alertId)
-    console.log(alert)
-    if (alert) {
-      alert.acknowledged = action.ack ??  alert.acknowledged
-      alert.severity = action.newSeverity ?? alert.severity
+    if (alert){
+      alert.severity = action.newSeverity ?? alert.severity;
+      alert.acknowledged = action.ack ?? alert.acknowledged
+      alert.actions.push(action)
     }
   }
-  const getCurrentAlertsRequest = async (interval?: number) => {
+
+  const updateAlert = (updatedAlert : ActiveAlert) => {
+    const index = findAlertIndex(updatedAlert.id)
+    if (index !== -1) {
+      currentAlerts.value[index] = updatedAlert;
+    }
+  }
+
+  const getCurrentAlertsRequest = async () => {
     try {
       const response = await api.get<ActiveAlert[]>('/alerts/active')
       if(response.status === 200) {
         currentAlerts.value = response.data
-        console.log(response.data)
       }
       else {
         toast.error('Error while fetching current alerts')
@@ -52,13 +53,7 @@ export const useAlertStore = defineStore('useAlertStore', () => {
     catch {
       toast.error('Error getting current alerts')
     }
-    if(interval) {
-      setTimeout(() => {
-        getCurrentAlertsRequest(interval)
-      }, interval)
-    }
   }
-
 
 
   const updateAlertRequest = async (action: Actions) => {
@@ -92,8 +87,8 @@ export const useAlertStore = defineStore('useAlertStore', () => {
     getCurrentAlertsRequest,
     updateAlertRequest,
     updateAlert,
+    updateAlertActions,
     findAlert,
-    getAlertActions,
   }
 })
 

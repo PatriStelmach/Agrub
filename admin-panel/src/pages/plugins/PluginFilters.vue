@@ -74,7 +74,8 @@ const getLangStyles = (lang: string) => {
     <SheetTrigger as-child>
       <slot />
     </SheetTrigger>
-    <SheetContent side="left">
+    <SheetContent
+      side="left">
       <div class="w-full">
         <SheetHeader>
           <SheetTitle>Filters</SheetTitle>

@@ -82,7 +82,7 @@ const navItems = [
                   <RouterLink
                     :class="{'bg-blue-badge/50' : route.name === link.to}"
                     class="flex xl:text-lg ml-3 border-l-3 w-full hover:bg-input rounded-[0_0.5rem_0.5rem_0]"
-                    v-for="link in item.links" :key="link.to" :to="link.to">
+                    v-for="link in item.links" :key="link.to" :to="{ name: link.to}">
                     <div class="flex items-center gap-x-2 p-2 ml-1 ">
                       <component class="size-4  xl:size-6" :is="link.icon"/> {{link.label}}
                     </div>
