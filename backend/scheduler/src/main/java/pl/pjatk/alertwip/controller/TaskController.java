@@ -8,6 +8,8 @@ import pl.pjatk.alertwip.model.ScheduledTask;
 import pl.pjatk.alertwip.repository.ScheduledTaskRepository;
 import pl.pjatk.alertwip.service.PluginManagerService;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/tasks")
 public class TaskController {
@@ -76,5 +78,12 @@ public class TaskController {
         repository.save(task);
 
         schedulerConfig.updateSchedule(task);
+    }
+
+    @GetMapping("/list")
+    public ResponseEntity<List<ScheduledTask>> getAllTasks() {
+        // Pobiera wszystkie zaplanowane zadania (aktywne i nieaktywne) prosto z bazy danych
+        List<ScheduledTask> tasks = repository.findAll();
+        return ResponseEntity.ok(tasks);
     }
 }

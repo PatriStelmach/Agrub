@@ -15,10 +15,6 @@ public class Plugin {
 
     private String description;
 
-    public void setLanguage(String language) {
-        this.language = language;
-    }
-
     public String getDescription() {
         return description;
     }

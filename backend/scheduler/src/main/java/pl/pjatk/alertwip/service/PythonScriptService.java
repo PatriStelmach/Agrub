@@ -23,7 +23,9 @@ public class PythonScriptService {
     private final GlobalProblemRepository problemRepository;
     private final TaskExecutionLogRepository logRepository;
     private final SseNotifService sseService;
-    private final AlertRoutingService routingService; // Nasz nowy router widoczności
+    private final AlertRoutingService routingService;
+
+    private final ActiveAlertCache activeAlertCache;
 
     @Value("${app.scripts.path}")
     private String scriptsPath;
@@ -31,17 +33,19 @@ public class PythonScriptService {
     public PythonScriptService(TaskExecutionLogRepository logRepository,
                                GlobalProblemRepository problemRepository,
                                SseNotifService sseService,
-                               AlertRoutingService routingService) {
+                               AlertRoutingService routingService,
+                               ActiveAlertCache activeAlertCache) {
         this.problemRepository = problemRepository;
         this.logRepository = logRepository;
         this.sseService = sseService;
         this.routingService = routingService;
+        this.activeAlertCache = activeAlertCache;
     }
 
     /**
      * Uruchamia fizyczny plik skryptu.
      */
-    public void runScript(ScheduledTask task) {
+    public int runScript(ScheduledTask task) {
         String scriptName = task.getScriptName();
         String[] args = (task.getArguments() != null && !task.getArguments().isEmpty())
                 ? task.getArguments().split(" ") : new String[0];
@@ -99,6 +103,7 @@ public class PythonScriptService {
             // Wywołujemy mechanizm alertowania
             handleAlerting(task, exitCode, outputCollector.toString());
         }
+        return exitCode;
     }
 
     private void handleAlerting(ScheduledTask task, int exitCode, String output) {
@@ -128,15 +133,19 @@ public class PythonScriptService {
                 problem.setMessage(output.length() > 255 ? output.substring(0, 252) + "..." : output);
                 problem.setSeverity(task.getSeverity());
 
-                // --- MAGIA SILNIKA REGUŁ ---
                 // Oceniamy, które grupy techników powinny zobaczyć ten alert (oraz czy ma grać dźwięk)
                 routingService.processVisibility(problem);
 
                 GlobalProblem saved = problemRepository.save(problem);
 
+                activeAlertCache.updateAlert(saved);
+
                 // Wysyłamy do frontendu tylko jeśli to nowe zdarzenie
                 if (existingProblem.isEmpty()) {
                     sseService.sendAlert("NEW_ALERT", saved);
+                }
+                else {
+                    sseService.sendAlert("ALERT_UPDATE", saved);
                 }
             } else {
                 // Severity 1 traktujemy tylko jako informację w logach serwera
@@ -149,6 +158,7 @@ public class PythonScriptService {
                 problemToResolve.setClosedAt(LocalDateTime.now());
 
                 problemRepository.save(problemToResolve);
+                activeAlertCache.updateAlert(problemToResolve);
                 sseService.sendAlert("ALERT_RESOLVED", problemToResolve);
 
                 System.out.println("[PYTHON] Skrypt naprawiony. Alert zamknięty: " + task.getTaskName());
