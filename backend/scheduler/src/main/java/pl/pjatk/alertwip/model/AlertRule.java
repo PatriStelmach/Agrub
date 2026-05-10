@@ -11,6 +11,7 @@ public class AlertRule {
     @ManyToOne(optional = false)
     private UserGroup userGroup;
 
+    // Widocznosc
     private String sourcePattern;
     @Enumerated(EnumType.STRING)
     private MatchType sourceType = MatchType.CONTAINS;
@@ -19,10 +20,53 @@ public class AlertRule {
     @Enumerated(EnumType.STRING)
     private MatchType contentType = MatchType.CONTAINS;
 
+    private String subjectPattern;
+    @Enumerated(EnumType.STRING)
+    private MatchType subjectMatchType = MatchType.CONTAINS;
+
+    private String originPattern;
+    @Enumerated(EnumType.STRING)
+    private MatchType originMatchType = MatchType.CONTAINS;
+
+
+    //notyfikacje
     private int minSeverity = 1;
     private boolean playSound = false;
 
     // --- GETTERY I SETTERY ---
+
+    public String getSubjectPattern() {
+        return subjectPattern;
+    }
+
+    public void setSubjectPattern(String subjectPattern) {
+        this.subjectPattern = subjectPattern;
+    }
+
+    public MatchType getSubjectMatchType() {
+        return subjectMatchType;
+    }
+
+    public void setSubjectMatchType(MatchType subjectMatchType) {
+        this.subjectMatchType = subjectMatchType;
+    }
+
+    public String getOriginPattern() {
+        return originPattern;
+    }
+
+    public void setOriginPattern(String originPattern) {
+        this.originPattern = originPattern;
+    }
+
+    public MatchType getOriginMatchType() {
+        return originMatchType;
+    }
+
+    public void setOriginMatchType(MatchType originMatchType) {
+        this.originMatchType = originMatchType;
+    }
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public UserGroup getUserGroup() { return userGroup; }

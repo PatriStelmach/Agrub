@@ -22,11 +22,11 @@ services:
       - INDEXER_URL=https://wazuh-indexer:9200
       - INDEXER_USERNAME=admin
       - INDEXER_PASSWORD=admin
-      - FILEBEAT_SSL_VERIFICATION_MODE=none    # <-- TA LINIJKA TO KLUCZ DO SUKCESU
+      - FILEBEAT_SSL_VERIFICATION_MODE=none
       - WAZUH_API_USER=wazuh
       - WAZUH_API_PASSWORD=wazuh
   wazuh-agent:
-    build: .                 # To mówi: "Zbuduj obraz używając pliku Dockerfile w tym folderze"
+    build: .
     container_name: wazuh-agent
     hostname: prod-agent-01
     depends_on:

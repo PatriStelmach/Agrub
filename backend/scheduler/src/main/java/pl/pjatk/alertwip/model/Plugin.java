@@ -92,4 +92,8 @@ public class Plugin {
     public void setTags(List<String> tags) {
         this.tags = tags;
     }
+
+    public void setCreator(String creator) { this.creator = creator; }
+
+    public void setLanguage(String language) { this.language = language; }
 }
