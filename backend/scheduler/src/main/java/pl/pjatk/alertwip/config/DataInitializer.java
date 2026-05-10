@@ -24,6 +24,7 @@ public class DataInitializer implements CommandLineRunner {
             return;
         }
 
+
         List<String> creators = Arrays.asList("Alice", "Bob", "Charlie", "Diana", "Eve", "Frank", "Grace", "Henry");
         List<String> languages = Arrays.asList(".py", ".sh", ".bash", ".ps1", ".psm1");
         List<String> tagPool = Arrays.asList("monitoring", "backup", "security", "network", "database", "web", "automation", "reporting", "alert", "sync");
@@ -61,4 +62,5 @@ public class DataInitializer implements CommandLineRunner {
         pluginRepository.saveAll(plugins);
         System.out.println("Dodano 300 rekordów do tabeli plugin.");
     }
+
 }
