@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { useColorMode } from '@vueuse/core'
 import { Button } from '@/components/ui/button'
-import {IconSunFilled, IconMoonFilled, IconHelpCircleFilled, IconSettingsFilled, IconBellFilled} from "@tabler/icons-vue";
+import {
+  IconSunFilled, IconMoonFilled, IconHelpCircleFilled, IconSettingsFilled, IconBellFilled,
+  IconLogout, IconLogin
+} from "@tabler/icons-vue";
 import {useNotificationStore} from "@/stores/notificationStore.ts";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
-
+import {useAuthStore} from "@/stores/authStore.ts";
+const authStore = useAuthStore();
 const mode = useColorMode()
 </script>
 
@@ -17,6 +21,10 @@ const mode = useColorMode()
 
           <component :is="mode === 'light' ? IconSunFilled :IconMoonFilled" @click="mode == 'light' ? mode = 'dark' : mode = 'light' "
                      class="cursor-pointer relative size-6 p-0! rounded-full  hover:scale-115 duration-100"/>
-
+    <component
+      class="cursor-pointer relative size-6 p-0! rounded-full  hover:scale-115 duration-100"
+      :is="IconLogout"
+      @click="authStore.logout()"
+    />
   </div>
 </template>

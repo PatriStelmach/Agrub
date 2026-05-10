@@ -17,7 +17,6 @@ const {filteredData, tableData, updateData, updateSearchData, currentPage, pageS
 
 <template>
   <div>
-
   <div>
     <MyPluginsTable
       :data="tableData"
@@ -30,8 +29,6 @@ const {filteredData, tableData, updateData, updateSearchData, currentPage, pageS
         @update:paginatedData="updateData"
       />
     </MyPluginsTable>
-
-
   </div>
 </div>
 </template>

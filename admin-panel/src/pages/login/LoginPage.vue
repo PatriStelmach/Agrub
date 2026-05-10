@@ -22,13 +22,20 @@ import {
 import { Input } from '@/components/ui/input'
 import {useAuthStore} from "@/stores/authStore.ts";
 import router from "@/router";
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
 import { IconAlertCircle, IconX, IconLoader} from "@tabler/icons-vue";
 
 const authStore = useAuthStore()
 const showAlert = ref(false)
 const isLoading = ref(false)
+const mounting = ref(true)
+
+onMounted(() => {
+  setTimeout(() => {
+    mounting.value = false
+  }, 300)
+})
 
 const formSchema = toTypedSchema(
   z.object({
@@ -66,10 +73,10 @@ const onSubmit = handleSubmit(async (data) => {
 </script>
 
 <template>
-  <Transition name="fade">
+  <Transition v-if="!mounting" name="fade">
     <Alert
       class="z-999 absolute w-1/3 left-1/2 -translate-x-1/2 top-1/2 translate-y-1/2 border-red-badge/50 border-2 "
-      v-if="showAlert" variant="destructive">
+      v-if="showAlert" variant="red_outline">
       <IconX @click="showAlert = false" class="size-5! absolute top-2 right-2 hover:border cursor-pointer"></IconX>
       <IconAlertCircle />
       <AlertTitle>Unable to log in</AlertTitle>

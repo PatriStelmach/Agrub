@@ -4,7 +4,7 @@ import { cva } from "class-variance-authority"
 export { default as Badge } from "./Badge.vue"
 
 export const badgeVariants = cva(
-  "inline-flex items-center justify-center rounded-full border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden",
+  "hover:shadow-md text-xs transition-all duration-50!  lg:text-sm 2xl:text-lg  inline-flex items-center justify-center rounded-full border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden",
   {
     variants: {
       variant: {
@@ -17,18 +17,18 @@ export const badgeVariants = cva(
         outline:
           "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
         groups:
-          "border-transparent text-primary bg-blue-badge/80 hover:bg-blue-badge/50 cursor-pointer  transition-all duration-50" +
-          " hover:shadow-badge hover:shadow-md mr-1 my-1 text-xs md:text-sm lg:text-md 2xl:text-lg ",
+          "border-yellow-badge border-2 text-yellow-badge bg-yellow-badge/20 hover:bg-blue-badge/50 cursor-pointer  " +
+          " hover:shadow-badge hover:scale-102  mr-1 my-1  ",
         tags:
-          "border-transparent text-primary bg-accent hover:bg-orange-badge/80 cursor-pointer  transition-all duration-50" +
-          " hover:shadow-orange-badge hover:shadow-md mr-1 my-1 text-xs md:text-sm lg:text-md 2xl:text-lg",
+          "border-blue-badge border-2 text-blue-badge bg-blue-badge/20 hover:bg-blue-badge/10 cursor-pointer  " +
+          " hover:scale-102 hover:shadow-blue-badge  mr-1 my-1 ",
         source:
-          "border-transparent text-primary bg-green-badge/70 hover:bg-green-badge/50 cursor-pointer  transition-all duration-50" +
-          " hover:shadow-green-badge hover:shadow-md text-xs md:text-sm lg:text-md 2xl:text-lg ",
+          "border-green-badge border-2 text-green-badge bg-green-badge/10  " +
+          " ",
         origin:
-          "border-transparent text-primary bg-blue-badge/70 hover:bg-blue-badge/50 cursor-pointer  transition-all duration-50" +
-          " hover:shadow-blue-badge hover:shadow-md text-xs md:text-sm lg:text-md 2xl:text-lg ",
-        ack_type:"border-transparent text-blue-400  bg-blue-400/20  transition-all duration-50 text-xs",
+          "border-orange-badge border-2  bg-orange-badge/10 hover:bg-transparent cursor-pointer " +
+          " hover:shadow-orange-badge  text-orange-badge hover:scale-102",
+        ack_type:"border-blue-400/50 border-2 text-blue-400  bg-blue-400/20  text-xs",
       },
     },
     defaultVariants: {
