@@ -12,7 +12,7 @@ import {
   IconScript, IconSitemap, IconSitemapOff,
   IconUpload, IconUserCircle, IconUsers
 } from "@tabler/icons-vue";
-import TeamBar from "@/pages/navbar/TeamBar.vue";
+import TeamBar from "@/pages/globals/navbar/TeamBar.vue";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader,
   SidebarInput,
@@ -27,9 +27,9 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar";
-import {usersData} from "@/data/usersData.ts";
-import {sidebarData} from "@/data/sidebarData.ts";
-import NavUser from "@/pages/navbar/NavUser.vue";
+import {usersData} from "@/data/usersData.js";
+import {sidebarData} from "@/data/sidebarData.js";
+import NavUser from "@/pages/globals/navbar/NavUser.vue";
 import {useRoute} from "vue-router";
 
 const route = useRoute()
