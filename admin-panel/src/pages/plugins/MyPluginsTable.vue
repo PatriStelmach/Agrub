@@ -272,7 +272,7 @@ const savePlugin = async () => {
                   input-id="tags-input"
                   :can-add-new="true"
                   tags-label="Tags"/>
-                <TransitionGroup v-else name="fade" mode="out-in">
+                <TransitionGroup v-else name="fade">
                   <Badge
                     v-for="(tag, index) in plugin.tags"
                     variant="tags"

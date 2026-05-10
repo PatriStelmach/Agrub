@@ -90,11 +90,15 @@ export interface User {
   id: number,
   firstname: string,
   surname: string,
-  active: boolean,
-  email?: string,
+  active?: boolean,
+  email: string,
   role: "Administrator" | "Technician"
   groups: string[]
-  avatar?: string
+}
+
+export interface UserGroup {
+  id: number,
+  name: string,
 }
 
 export interface MyPlugin
