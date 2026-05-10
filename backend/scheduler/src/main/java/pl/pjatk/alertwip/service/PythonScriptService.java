@@ -115,44 +115,49 @@ public class PythonScriptService {
                 .filter(p -> !"Done".equals(p.getStatus()));
 
         if (exitCode != 0) {
-            // SCENARIUSZ: BŁĄD SKRYPTU
             if (task.getSeverity() >= 2) {
-                GlobalProblem problem = existingProblem.orElse(new GlobalProblem());
+                String newMessage = output.length() > 255 ? output.substring(0, 252) + "..." : output;
 
-                // Jeśli to nowy problem, ustawiamy podstawowe dane
-                if (problem.getId() == null) {
+                if (existingProblem.isEmpty()) {
+                    GlobalProblem problem = new GlobalProblem();
                     problem.setUniqueKey(uniqueKey);
                     problem.setSubject(task.getTaskName());
                     problem.setSource("Local Script");
                     problem.setOriginType("PYTHON");
                     problem.setStatus("Sent");
                     problem.setCreatedAt(LocalDateTime.now());
-                }
+                    problem.setMessage(newMessage);
+                    problem.setSeverity(task.getSeverity());
 
-                // Aktualizujemy błąd (przycinamy do 255 znaków, żeby baza MySQL nie rzuciła błędem)
-                problem.setMessage(output.length() > 255 ? output.substring(0, 252) + "..." : output);
-                problem.setSeverity(task.getSeverity());
+                    routingService.processVisibility(problem);
+                    GlobalProblem saved = problemRepository.save(problem);
+                    activeAlertCache.updateAlert(saved);
 
-                // Oceniamy, które grupy techników powinny zobaczyć ten alert (oraz czy ma grać dźwięk)
-                routingService.processVisibility(problem);
-
-                GlobalProblem saved = problemRepository.save(problem);
-
-                activeAlertCache.updateAlert(saved);
-
-                // Wysyłamy do frontendu tylko jeśli to nowe zdarzenie
-                if (existingProblem.isEmpty()) {
                     sseService.sendAlert("NEW_ALERT", saved);
-                }
-                else {
-                    sseService.sendAlert("ALERT_UPDATE", saved);
+                } else {
+                    GlobalProblem problem = existingProblem.get();
+
+                    // coś się zmieniło?
+                    boolean isMessageDifferent = !newMessage.equals(problem.getMessage());
+                    boolean isSeverityDifferent = problem.getSeverity() != task.getSeverity();
+
+                    if (isMessageDifferent || isSeverityDifferent) {
+                        problem.setMessage(newMessage);
+                        problem.setSeverity(task.getSeverity());
+
+                        routingService.processVisibility(problem);
+                        GlobalProblem saved = problemRepository.save(problem);
+                        activeAlertCache.updateAlert(saved);
+
+                        sseService.sendAlert("ALERT_UPDATE", saved);
+                        System.out.println("[LOG] Zaktualizowano alert dla skryptu: " + task.getTaskName());
+                    }
                 }
             } else {
                 // Severity 1 traktujemy tylko jako informację w logach serwera
                 System.out.println("[LOG] Skrypt " + task.getTaskName() + " zakończył się błędem, ale ma severity 1.");
             }
         } else {
-            // SCENARIUSZ: SKRYPT OK (Miękkie usuwanie / Recovery)
             existingProblem.ifPresent(problemToResolve -> {
                 problemToResolve.setStatus("Done");
                 problemToResolve.setClosedAt(LocalDateTime.now());
