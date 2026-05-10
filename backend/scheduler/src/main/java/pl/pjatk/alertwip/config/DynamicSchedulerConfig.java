@@ -50,11 +50,29 @@ public class DynamicSchedulerConfig implements SchedulingConfigurer {
         if (task.isActive() && task.getCronExpression() != null) {
             try {
                 ScheduledFuture<?> future = taskScheduler.schedule(
-                        () -> pythonService.runScript(task),
+                        () -> {
+                            // Rozbudowany log startu
+                            System.out.println("\n==================================================");
+                            System.out.println("[CRON TRIGGER] Odpalam zadanie: " + task.getTaskName());
+                            System.out.println("[CRON TRIGGER] Plik docelowy: " + task.getScriptName());
+                            System.out.println("[CRON TRIGGER] Czas: " + java.time.LocalDateTime.now());
+
+                            try {
+                                // Właściwe wykonanie skryptu
+                               int exitCode = pythonService.runScript(task);
+                               System.out.println("[CRON FINISHED] Zakończono zadanie: " + task.getTaskName() + " | Exit code: " + exitCode);
+                            } catch (Exception e) {
+                                System.err.println("[CRON ERROR] Błąd w trakcie wykonywania " + task.getScriptName() + ": " + e.getMessage());
+                            }
+
+                            // Log zakończenia
+
+                            System.out.println("==================================================\n");
+                        },
                         new CronTrigger(task.getCronExpression())
                 );
                 scheduledTasks.put(task.getId(), future);
-                System.out.println("[SCHEDULER] Zaplanowano/Zaktualizowano: " + task.getTaskName());
+                System.out.println("[SCHEDULER] Zaplanowano/Zaktualizowano: " + task.getTaskName() + " z Cronem: " + task.getCronExpression());
             } catch (Exception e) {
                 System.err.println("[SCHEDULER] Błąd CRON w zadaniu " + task.getId() + ": " + e.getMessage());
             }

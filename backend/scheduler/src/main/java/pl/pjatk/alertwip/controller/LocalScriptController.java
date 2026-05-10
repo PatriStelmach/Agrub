@@ -1,5 +1,6 @@
 package pl.pjatk.alertwip.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +34,20 @@ public class LocalScriptController {
     @GetMapping("/{fileName:.+}/details")
     public PluginDetailsDTO getDetails(@PathVariable String fileName) {
         return pluginManagerService.getPluginDetailsByFileName(fileName);
+    }
+
+    @PutMapping("/{fileName:.+}/edit")
+    public ResponseEntity<String> editScript(
+            @PathVariable String fileName,
+            @RequestBody PluginSaveDTO partialDto) {
+        try {
+            // Przekazujemy wszystko do serwisu
+            pluginManagerService.updatePluginPartial(fileName, partialDto);
+            return ResponseEntity.ok("Skrypt " + fileName + " został zaktualizowany pomyślnie.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Błąd podczas aktualizacji: " + e.getMessage());
+        }
     }
 
     @PostMapping("/save-all")
