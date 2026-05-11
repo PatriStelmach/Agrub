@@ -68,6 +68,22 @@ public class PluginController {
         Specification<Plugin> spec = PluginSpecification.filterLibrary(name, creator, language, tags, maxWeight);
         Page<Plugin> libraryPage = pluginRepository.findAll(spec, pageable);
         Page<PluginDTO> dtoPage = libraryPage.map(pluginManagerService::mapStorePluginToDTO);
+
+        //test logging
+        System.out.println("\n=== [API /library] WYSYŁKA DO FRONTENDU ===");
+        System.out.println("Filtry -> tags: " + tags + ", maxWeight: " + maxWeight + "KB, sort: " + sortKey + " " + sortOrder.toUpperCase());
+        System.out.println("Wyników na tej stronie: " + dtoPage.getNumberOfElements() + " / Razem: " + dtoPage.getTotalElements());
+
+        for (PluginDTO dto : dtoPage.getContent()) {
+            System.out.println(String.format(" -> ID: %-4d | %-12s | Waga: %-2d KB | Data: %-19s | Tagi: %s",
+                    dto.id(),
+                    dto.fileName(),
+                    dto.weight(),
+                    dto.updatedAt() != null ? dto.updatedAt() : "BRAK DATY",
+                    dto.tags()));
+        }
+        System.out.println("===========================================\n");
+
         return ResponseEntity.ok(dtoPage);
     }
 
