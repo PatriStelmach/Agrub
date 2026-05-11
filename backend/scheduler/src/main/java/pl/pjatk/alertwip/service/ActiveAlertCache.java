@@ -52,4 +52,15 @@ public class ActiveAlertCache {
                 .filter(p -> p.getTechnicianGroups().stream().anyMatch(groups::contains))
                 .toList();
     }
+
+    public GlobalProblem getByUniqueKey(String uniqueKey) {
+        return activeAlerts.values().stream()
+                .filter(p -> uniqueKey.equals(p.getUniqueKey()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public GlobalProblem getAlertById(Long id) {
+        return activeAlerts.get(id);
+    }
 }

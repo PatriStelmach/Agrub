@@ -37,6 +37,10 @@ public class AlertActionService {
         GlobalProblem problem = problemRepository.findById(problemId)
                 .orElseThrow(() -> new RuntimeException("Nie znaleziono problemu o ID: " + problemId));
 
+        GlobalProblem cachedAlert = alertCache.getAlertById(problemId);
+        boolean wasLocked = cachedAlert != null && cachedAlert.isSeverityLocked();
+        problem.setSeverityLocked(wasLocked);
+
         boolean stateChanged = false;
         ActionType inferredActionType = ActionType.COMMENT; // Domyślny typ akcji dla historii
 
@@ -51,11 +55,18 @@ public class AlertActionService {
             problem.setSeverity(request.newSeverity());
             stateChanged = true;
             inferredActionType = ActionType.SEVERITY_CHANGE;
+
+            problem.setSeverityLocked(true);
         }
 
         // Jeśli zmienił się stan głównego alertu, nadpisujemy go w bazie i aktualizujemy Cache
         if (stateChanged) {
             problem = problemRepository.save(problem);
+
+            if (wasLocked || inferredActionType == ActionType.SEVERITY_CHANGE) {
+                problem.setSeverityLocked(true);
+            }
+
             alertCache.updateAlert(problem);
             // tu NIE ma być sse
         }

@@ -109,16 +109,15 @@ public class PythonScriptService {
     private void handleAlerting(ScheduledTask task, int exitCode, String output) {
         // Unikalny klucz dla skryptu to np. "[SCRIPT] 12"
         String uniqueKey = "[SCRIPT] " + task.getId();
-
-        // Szukamy otwartego problemu po kluczu
-        Optional<GlobalProblem> existingProblem = problemRepository.findFirstByUniqueKeyOrderByIdDesc(uniqueKey)
-                .filter(p -> !"Done".equals(p.getStatus()));
+        
+        GlobalProblem cachedProblem = activeAlertCache.getByUniqueKey(uniqueKey);
 
         if (exitCode != 0) {
             if (task.getSeverity() >= 2) {
                 String newMessage = output.length() > 255 ? output.substring(0, 252) + "..." : output;
 
-                if (existingProblem.isEmpty()) {
+                if (cachedProblem == null) {
+                    // nowy błąd
                     GlobalProblem problem = new GlobalProblem();
                     problem.setUniqueKey(uniqueKey);
                     problem.setSubject(task.getTaskName());
@@ -135,18 +134,26 @@ public class PythonScriptService {
 
                     sseService.sendAlert("NEW_ALERT", saved);
                 } else {
-                    GlobalProblem problem = existingProblem.get();
+                    // Błąd już jest, sprawdzamy czy coś się zmeiniło
 
-                    // coś się zmieniło?
-                    boolean isMessageDifferent = !newMessage.equals(problem.getMessage());
-                    boolean isSeverityDifferent = problem.getSeverity() != task.getSeverity();
+                    boolean isMessageDifferent = !newMessage.equals(cachedProblem.getMessage());
+                    boolean isSeverityDifferent = (cachedProblem.getSeverity() != task.getSeverity()) && !cachedProblem.isSeverityLocked();
 
+                    // Aktualizujemy tylko jak coś się zmieni
                     if (isMessageDifferent || isSeverityDifferent) {
-                        problem.setMessage(newMessage);
-                        problem.setSeverity(task.getSeverity());
 
-                        routingService.processVisibility(problem);
-                        GlobalProblem saved = problemRepository.save(problem);
+                        if (isMessageDifferent) {
+                            cachedProblem.setMessage(newMessage);
+                        }
+
+                        if (isSeverityDifferent) {
+                            cachedProblem.setSeverity(task.getSeverity());
+                        }
+
+                        routingService.processVisibility(cachedProblem);
+
+                        // Zapisujemy zmiany do bazy i odświeżamy Cache
+                        GlobalProblem saved = problemRepository.save(cachedProblem);
                         activeAlertCache.updateAlert(saved);
 
                         sseService.sendAlert("ALERT_UPDATE", saved);
@@ -154,20 +161,21 @@ public class PythonScriptService {
                     }
                 }
             } else {
-                // Severity 1 traktujemy tylko jako informację w logach serwera
                 System.out.println("[LOG] Skrypt " + task.getTaskName() + " zakończył się błędem, ale ma severity 1.");
             }
         } else {
-            existingProblem.ifPresent(problemToResolve -> {
-                problemToResolve.setStatus("Done");
-                problemToResolve.setClosedAt(LocalDateTime.now());
+            // Jest ok zamykamy problem
+            if (cachedProblem != null) {
+                cachedProblem.setStatus("Done");
+                cachedProblem.setClosedAt(LocalDateTime.now());
 
-                problemRepository.save(problemToResolve);
-                activeAlertCache.updateAlert(problemToResolve);
-                sseService.sendAlert("ALERT_RESOLVED", problemToResolve);
+                // Zapisujemy zamknięcie w bazie i automatycznie wyrzucamy z Cache
+                problemRepository.save(cachedProblem);
+                activeAlertCache.updateAlert(cachedProblem);
+                sseService.sendAlert("ALERT_RESOLVED", cachedProblem);
 
                 System.out.println("[PYTHON] Skrypt naprawiony. Alert zamknięty: " + task.getTaskName());
-            });
+            }
         }
     }
 
