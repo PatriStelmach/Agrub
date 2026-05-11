@@ -12,5 +12,14 @@ services:
     volumes:
       - mysql_main_data:/var/lib/mysql
 
+  redis-server:
+    image: redis:alpine
+    container_name: alertwip-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_main_data:/data
+
 volumes:
   mysql_main_data:
+  redis_main_data:
