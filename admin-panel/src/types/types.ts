@@ -90,17 +90,21 @@ export interface User {
   id: number,
   firstname: string,
   surname: string,
-  active: boolean,
-  email?: string,
-  role: "Administrator" | "Technician"
+  active?: boolean,
+  email: string,
+  role: "ADMINISTRATOR" | "TECHNICIAN"
   groups: string[]
-  avatar?: string
+}
+
+export interface UserGroup {
+  id: number,
+  name: string,
 }
 
 export interface MyPlugin
 {
   name: string,
-  fileName: string
+  fullName: string
   creator: string,
   language: Language
   description?: string,

@@ -10,9 +10,9 @@ public record ActionRequestDTO (
         @JsonProperty("message")
         String message,
 
-        @JsonProperty("ack") // To zmapuje Twoje 'ack: boolean' z frontu
+        @JsonProperty("ack")
         Boolean acknowledge,
 
-        @JsonProperty("newSeverity") // To zmapuje 'newSeverity: number'
+        @JsonProperty("newSeverity")
         Integer newSeverity
 ) {}

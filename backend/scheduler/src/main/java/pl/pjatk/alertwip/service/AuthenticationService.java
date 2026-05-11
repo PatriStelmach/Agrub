@@ -2,6 +2,7 @@ package pl.pjatk.alertwip.service;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -34,12 +35,31 @@ public class AuthenticationService {
     }
 
     public Map<String, String> authenticate(AuthenticationRequestDTO request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.email(), request.password())
-        );
+        try {
+            // uderza równolegle do bazy danych i do Active Directory
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.email(), request.password())
+            );
+        } catch (AuthenticationException e) {
+            throw new RuntimeException("Nieprawidłowy login, hasło lub błąd połączenia z serwerem: " + e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException("Wystąpił nieoczekiwany błąd podczas logowania.");
+        }
 
+        // Jeśli logowanie się powiodło, szukamy usera u nas w bazie.
+        // Jeśli go nie ma (bo loguje się pierwszy raz przez AD), to automatycznie tworzymy mu lokalny profil.
         User user = repository.findByEmail(request.email())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseGet(() -> {
+                    User newUser = new User();
+                    newUser.setEmail(request.email());
+                    newUser.setPassword(""); // Hasło puste, bo jest zarządzane przez AD
+                    newUser.setFirstname(request.email().split("@")[0]);
+                    newUser.setSurname("AD User");
+                    // Ustaw domyślną rolę dla nowych osób z AD
+                    newUser.setRole(pl.pjatk.alertwip.model.Role.TECHNICIAN);
+                    newUser.setActive(true);
+                    return repository.save(newUser);
+                });
 
         return Map.of(
                 "access_token", jwtService.generateAccessToken(user),

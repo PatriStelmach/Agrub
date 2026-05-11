@@ -18,6 +18,8 @@ import {dataTable, tableHeaders, tableCaption} from "@/assets/cssFunctions.js";
 import type {ActiveAlert, AlertDetails} from "@/types/types.js";
 import {useSort} from "@/composables/sorting.js";
 import {computed, ref, watch, watchEffect} from "vue";
+import SeverityDiv from "@/helpers/SeverityDiv.vue";
+import {dateParser} from "@/composables/dateParser.ts";
 
 const props = defineProps<{
   tableData: ActiveAlert[];
@@ -56,24 +58,20 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<ActiveAlert>(() =
         <SortableHead keyName="source" label="Source" :sort-key="sortKey" class="w-fit " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
         <SortableHead keyName="originType" label="Origin" :sort-key="sortKey" class="w-1/10 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
         <SortableHead keyName="acknowledge" label="ACK" :sort-key="sortKey" class="w-6/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-        <SortableHead keyName="createdAt" label="Timestamp" :sort-key="sortKey" class="w-fit md:w-14/100 lg:w-1/10" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-        <TableHead class="max-md:w-9/100 w-6/100 lg:w-4/100 font-bold text-sm lg:text-md xl:text-lg 2xl:text:xl">Actions</TableHead>
+        <SortableHead keyName="createdAt" label="Created at" :sort-key="sortKey" class="w-fit md:w-14/100 lg:w-1/10" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+        <TableHead class="max-md:w-9/100 w-6/100 lg:w-5/100 font-bold text-sm lg:text-md xl:text-lg 2xl:text:xl">Actions</TableHead>
       </TableRow>
     </TableHeader>
     <TransitionGroup tag="tbody" name="slide-fade">
       <TableRow
         :id="`${alert.id}_row`"
-        class="relative cursor-pointer duration-0  hover:bg-accent/50"
+        class="relative duration-0  hover:bg-accent/50"
         v-for="alert in sortedData"
         :key="alert.id">
 
         <TableCell class="pl-4  whitespace-break-spaces">{{alert.subject}}</TableCell>
         <TableCell>
-          <div
-            :class="` text-center font-extrabold text-lg border-2 shadow-[0px_0px_10px_2px]
-                 shadow-severity-${alert.severity}/70 border-severity-${alert.severity} bg-severity-${alert.severity}/80 rounded-sm `">
-            <span >{{alert.severity}}</span>
-          </div>
+          <SeverityDiv :severity="alert.severity"/>
         </TableCell>
         <TableCell
           @mouseenter="hoveredId = alert.id"
@@ -95,7 +93,7 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<ActiveAlert>(() =
           <IconCircleDashedCheck v-if="alert.acknowledged" class="text-green-badge"/>
           <IconCircleDashedX v-else class="text-red-badge"/>
         </TableCell>
-        <DateCell v-if="alert.createdAt"  :date="alert.createdAt "></DateCell>
+        <DateCell v-if="alert.createdAt"  :date="dateParser(alert.createdAt).toDate "></DateCell>
         <TableCell>
           <EditAlertDialog
             :alert="alert"

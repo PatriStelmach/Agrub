@@ -10,11 +10,11 @@ import {useAuthStore} from "@/stores/authStore.ts";
 
 export const useSSEstore = defineStore('SSE', () => {
   const alertStore = useAlertStore()
-  const notificationStore = useNotificationStore()
   const authStore = useAuthStore()
   const isConnected = ref(false)
 
   const handleSSEMessage = (event: any) => {
+    console.log("handleSSEMessage", event)
     if (!event) return;
 
     if (event.status === 'loading') {
@@ -28,19 +28,23 @@ export const useSSEstore = defineStore('SSE', () => {
     if (event.status === 'success') {
       switch (event.eventType) {
         case 'NEW_ALERT': {
-          toast.error(event.message.subject, { icon: h(IconAlertTriangle, { class: 'animate-pulse duration-100' }) });
+          toast.error(`New alert: ${event.message.subject}`, { icon: h(IconAlertTriangle, { class: 'animate-pulse duration-100' }) });
           alertStore.addCurrentAlert(event.message);
-          notificationStore.addNotification();
           break;
         }
         case 'ALERT_RESOLVED': {
-          toast.success(`Resolved: ${event.message.subject}`, { icon: IconCircleDashedCheck });
+          toast.success(`Alert resolved: ${event.message.subject}`, { icon: IconCircleDashedCheck });
           alertStore.deleteCurrentAlert(event.message.id);
-          notificationStore.removeNotification();
           break;
         }
-        case 'ALERT_UPDATE': {
-          toast.success(`Updated: ${event.message.alertId}`);
+        case 'ALERT_UPDATE_ONLY': {
+          toast.success(`Alert updated: ${event.message.subject}`);
+          alertStore.updateAlertActions(event.message);
+          break;
+        }
+        case 'ALERT_UPDATE' : {
+          if(event.message)
+          toast.success(`Alert updated: ${event.message.subject}`);
           alertStore.updateAlert(event.message);
           break;
         }
@@ -49,14 +53,15 @@ export const useSSEstore = defineStore('SSE', () => {
   };
 
   const connectToSSE = async () => {
-    const token = authStore.accessToken
+
 
     await fetchEventSource(`${api_url}/alerts/stream`, {
-      method: 'GET',
       headers: {
-        'Authorization': `Bearer ${token}`,
+        'Authorization': `Bearer ${authStore.accessToken}`,
         'Accept': 'text/event-stream',
       },
+      credentials: 'include',
+      openWhenHidden: true,
       async onopen(response) {
         if (response.ok && response.headers.get('content-type')?.includes('text/event-stream')) {
           isConnected.value = true;
@@ -65,12 +70,12 @@ export const useSSEstore = defineStore('SSE', () => {
           throw new Error(`Fatal connection error: ${response.status}`);
         }
       },
-      onmessage(msg) {
-        console.log(`data: ${msg.data}`);
-          const parsedData = JSON.parse(msg.data);
-          handleSSEMessage(parsedData);
-          console.log(parsedData);
+      onmessage(event) {
+        if(event.event !== 'INIT') {
+          handleSSEMessage(JSON.parse(event.data));
+        }
       },
+
       onclose() {
         isConnected.value = false;
         console.log("SSE connection closed by server");

@@ -4,7 +4,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import pl.pjatk.alertwip.model.GlobalProblem;
-import pl.pjatk.alertwip.dto.AlertUpdateEventDTO;
+import pl.pjatk.alertwip.dto.AlertUpdateEventDTO; // <--- Nowy import!
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,13 +37,13 @@ public class SseNotifService {
         return emitter;
     }
 
-    // 1. Wysyłanie nowego alertu
+    // 1. Zostawiamy tę metodę bez zmian - Zabbix i Wazuh z niej korzystają (NEW_ALERT, ALERT_RESOLVED)
     public void sendAlert(String status, GlobalProblem alert) {
         List<SseEmitter> deadEmitters = new ArrayList<>();
 
         userSubscriptions.forEach((emitter, userGroups) -> {
-            boolean hasAccess = userGroups.contains("ADMIN") ||
-                    alert.getTechnicianGroups().stream().anyMatch(userGroups::contains);
+            boolean hasAccess = alert.getTechnicianGroups().stream()
+                    .anyMatch(userGroups::contains);
 
             if (hasAccess) {
                 try {
@@ -69,24 +69,25 @@ public class SseNotifService {
         deadEmitters.forEach(userSubscriptions::remove);
     }
 
-    // 2. Wysyłanie aktualizacji
+    // 2. NOWA METODA - Wysyłanie tylko "Diffa" (zmian) dla istniejących alertów
     public void sendAlertUpdate(String status, AlertUpdateEventDTO payload, GlobalProblem alertContext) {
         List<SseEmitter> deadEmitters = new ArrayList<>();
 
         userSubscriptions.forEach((emitter, userGroups) -> {
-            boolean hasAccess = userGroups.contains("ADMIN") ||
-                    alertContext.getTechnicianGroups().stream().anyMatch(userGroups::contains);
+            // Używamy "alertContext", żeby sprawdzić, czy użytkownik ma uprawnienia do tego konkretnego alertu
+            boolean hasAccess = alertContext.getTechnicianGroups().stream()
+                    .anyMatch(userGroups::contains);
 
             if (hasAccess) {
                 try {
                     SseEmitter.SseEventBuilder event = SseEmitter.event()
-                            .id(String.valueOf(payload.alertId()))
+                            .id(String.valueOf(payload.alertId())) // ID głównego alertu
                             .name("message")
                             .data(Map.of(
                                     "status", "success",
-                                    "eventType", status,
-                                    "notification", false,
-                                    "message", payload
+                                    "eventType", status,       // "ALERT_UPDATE"
+                                    "notification", false,     // Aktualizacje nie robią hałasu w przeglądarce
+                                    "message", payload         // <--- Wysyłamy nasz lekki DTO ze zmianami
                             ), MediaType.APPLICATION_JSON);
 
                     emitter.send(event);

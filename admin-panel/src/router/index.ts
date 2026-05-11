@@ -4,11 +4,6 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/login',
-      name: 'login_page',
-      component: () => import('../pages/login/LoginPage.vue')
-    },
-    {
       path: '/my_systems',
       name: 'my_systems',
       component: () => import('../pages/systems/MySystems.vue'),
@@ -53,7 +48,16 @@ const router = createRouter({
       name: 'team',
       component: () => import('../pages/users/TeamPage.vue')
     },
+    {
+      path: '/edit_user/:id',
+      name: 'edit_user',
+      component: () => import('../pages/users/EditUser.vue')
+    }
   ],
 })
+router.beforeEach((to, from) => {
+  if (!to.name) return { path: '/'}
+})
+
 
 export default router

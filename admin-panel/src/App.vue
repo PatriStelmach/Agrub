@@ -1,35 +1,45 @@
 <script setup lang="ts">
-import {RouterView, useRouter} from 'vue-router'
+import {RouterView} from 'vue-router'
 import TopRightButtons from "@/pages/globals/TopRightButtons.vue";
-import NavBar from "@/pages/navbar/NavBar.vue";
+import NavBar from "@/pages/globals/navbar/NavBar.vue";
 import {Toaster} from "vue-sonner";
 import {useSSEstore} from "@/stores/SSEstore.ts";
 import {SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
 import {useAuthStore} from "@/stores/authStore.ts";
 import LoginPage from "@/pages/login/LoginPage.vue";
-import {computed, watchEffect} from "vue";
+import {ref} from "vue";
+import {Skeleton} from "@/components/ui/skeleton";
 
-const router = useRouter();
 
 
 const authStore = useAuthStore()
-const loggedIn = computed(() => authStore.isAuthenticated)
-watchEffect(async () => {
-  if(loggedIn.value){
-    useSSEstore()
-  }
-})
-
-
+const isLoading = ref(true);
+authStore.refreshToken().finally(() => {
+    isLoading.value = false
+    if (authStore.isAuthenticated) {
+      useSSEstore()
+      console.log(authStore.accessToken)
+    }
+});
 
 </script>
 
 <template>
-  <div v-if="loggedIn">
+  <div
+    v-if="isLoading">
+    <Skeleton
+      class="w-screen h-screen text-blue-badge"
+    />
+
+  </div>
+  <div v-else-if="!isLoading && !authStore.isAuthenticated ">
+    <LoginPage/>
+  </div>
+  <div v-else-if="!isLoading && authStore.isAuthenticated" >
     <Toaster
       theme="system"
       richColors
-      position="top-right"
+      position="top-center"
       :expand="true"
     />
     <header class="relative w-full">
@@ -48,9 +58,7 @@ watchEffect(async () => {
       </div>
     </SidebarProvider>
   </div>
-  <div v-else>
-    <LoginPage/>
-  </div>
+
 
 </template>
 

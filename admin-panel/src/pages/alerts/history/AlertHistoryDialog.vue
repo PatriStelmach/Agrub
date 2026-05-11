@@ -2,7 +2,7 @@
 
 import {
   Dialog, DialogClose,
-  DialogContent,
+  DialogContent, DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle, DialogTrigger
@@ -23,16 +23,16 @@ import {IconCheck, IconSend2, IconX} from "@tabler/icons-vue";
 import type {ActionResponse, ActiveAlert, HistoryAlert} from "@/types/types.ts";
 import {ref} from "vue";
 import {useAlertStore} from "@/stores/alertStore.ts";
+import SeverityDiv from "@/helpers/SeverityDiv.vue";
 
 const props = defineProps<{
   alert: HistoryAlert
 }>()
-const alertStore = useAlertStore()
 const isLoading = ref(true);
 
 const actions = ref<ActionResponse[]>([])
 const getActions = async () => {
-  actions.value = await alertStore.getAlertActions(props.alert.id)
+  actions.value = props.alert.actions
   isLoading.value = false
 }
 
@@ -47,6 +47,7 @@ const getActions = async () => {
     <DialogContent :class="` h-fit border-2 shadow-[0_0_1rem_2px] max-md:max-w-4/5! md:max-w-2/5! shadow-severity-${alert.severity}/70 border-severity-${alert.severity}/70 duration-500`" >
       <DialogHeader>
         <DialogTitle :class="`border-b-2 pb-2 border-severity-${alert.severity}/70 duration-500`">Alert actions</DialogTitle>
+        <DialogDescription></DialogDescription>
 
       </DialogHeader>
       <div class="flex flex-col max-h-[35vh] md:max-h-[60vh]  border-b-2 pb-2 ">
@@ -84,11 +85,9 @@ const getActions = async () => {
           </div>
           <div class="flex items-end">
             <DialogLabel for="severity" class="w-36 pb-0 " text="Severity level"/>
-            <div
-              :class="` text-center w-1/5 font-extrabold text-lg border-2 shadow-[0px_0px_10px_2px]
-                 shadow-severity-${alert.severity}/70 border-severity-${alert.severity} bg-severity-${alert.severity}/80 rounded-sm `">
-              <span >{{alert.severity}}</span>
-            </div>
+            <SeverityDiv
+              :severity="alert.severity"
+            />
           </div>
         </div>
       </div>
@@ -101,7 +100,7 @@ const getActions = async () => {
       </ActionsTable>
       <DialogFooter class=" items-center">
         <DialogClose as-child>
-          <Button variant="destructive">
+          <Button variant="red_outline">
             Exit
           </Button>
         </DialogClose>
