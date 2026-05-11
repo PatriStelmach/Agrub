@@ -7,11 +7,16 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.pjatk.alertwip.dto.AuthenticationRequestDTO;
+import pl.pjatk.alertwip.model.BlacklistedToken;
 import pl.pjatk.alertwip.model.User;
+import pl.pjatk.alertwip.repository.BlacklistedTokenRepository;
 import pl.pjatk.alertwip.repository.UserRepository;
 import pl.pjatk.alertwip.repository.UserGroupRepository;
 import pl.pjatk.alertwip.security.JwtService;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.Map;
 
 @Service
@@ -22,16 +27,19 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final UserGroupRepository groupRepository;
+    private final BlacklistedTokenRepository tokenRepository;
 
     public AuthenticationService(UserRepository repository, JwtService jwtService,
                                  AuthenticationManager authenticationManager,
                                  PasswordEncoder passwordEncoder,
-                                 UserGroupRepository groupRepository) {
+                                 UserGroupRepository groupRepository,
+                                 BlacklistedTokenRepository tokenRepository) {
         this.repository = repository;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
         this.groupRepository = groupRepository;
+        this.tokenRepository = tokenRepository;
     }
 
     public Map<String, String> authenticate(AuthenticationRequestDTO request) {
@@ -65,6 +73,14 @@ public class AuthenticationService {
                 "access_token", jwtService.generateAccessToken(user),
                 "refresh_token", jwtService.generateRefreshToken(user)
         );
+    }
+
+    public void logout(String token) {
+        Date expiryDate = jwtService.extractClaim(token, io.jsonwebtoken.Claims::getExpiration);
+        LocalDateTime expiry = expiryDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+        BlacklistedToken blacklistedToken = new BlacklistedToken(token, expiry);
+        tokenRepository.save(blacklistedToken);
     }
 
     public String refreshAccessToken(String refreshToken) {
