@@ -65,8 +65,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
         } catch (Exception e) {
-            // Ignorujemy błędy (np. ExpiredJwtException, MalformedJwtException).
-            // Request przejdzie dalej jako nieautoryzowany, co jest pożądanym zachowaniem.
         }
 
         filterChain.doFilter(request, response);
