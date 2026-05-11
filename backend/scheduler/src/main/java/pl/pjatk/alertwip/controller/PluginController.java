@@ -40,6 +40,19 @@ public class PluginController {
     }
 
     // ==========================================
+    // SZCZEGÓŁY PLUGINU (OPIS I KOD)
+    // ==========================================
+    @GetMapping("/{id}/details")
+    public ResponseEntity<Map<String, String>> getPluginDetails(@PathVariable Long id) {
+        return pluginRepository.findById(id)
+                .map(plugin -> ResponseEntity.ok(Map.of(
+                        "description", plugin.getDescription() != null ? plugin.getDescription() : "",
+                        "code", plugin.getCode() != null ? plugin.getCode() : ""
+                )))
+                .orElse(ResponseEntity.notFound().build());
+    }
+    
+    // ==========================================
     // POBIERANIE UNIKALNYCH TAGÓW
     // ==========================================
     @GetMapping("/tags")
