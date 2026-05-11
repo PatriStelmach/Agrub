@@ -109,7 +109,7 @@ public class PythonScriptService {
     private void handleAlerting(ScheduledTask task, int exitCode, String output) {
         // Unikalny klucz dla skryptu to np. "[SCRIPT] 12"
         String uniqueKey = "[SCRIPT] " + task.getId();
-        
+
         GlobalProblem cachedProblem = activeAlertCache.getByUniqueKey(uniqueKey);
 
         if (exitCode != 0) {
