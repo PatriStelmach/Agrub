@@ -45,6 +45,7 @@ export const useAlertStore = defineStore('useAlertStore', () => {
       const response = await api.get<ActiveAlert[]>('/alerts/active')
       if(response.status === 200) {
         currentAlerts.value = response.data
+        console.log(currentAlerts.value)
       }
       else {
         toast.error('Error while fetching current alerts')
