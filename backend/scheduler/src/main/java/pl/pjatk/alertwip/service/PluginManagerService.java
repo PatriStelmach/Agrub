@@ -348,8 +348,18 @@ public class PluginManagerService {
         boolean installed = Files.exists(Paths.get(scriptsPath).resolve(p.getName() + ext));
 
         return new PluginDTO(
-                p.getId(), p.getName(), p.getCreator(), p.getDescription(),
-                ext, 0, p.getTags(), null, null, false, p.getSeverity(), installed
+                p.getId(),
+                p.getName(),
+                p.getCreator(),
+                p.getDescription(),
+                ext,
+                0, // store plugins nie mają tu fizycznej wagi
+                p.getTags(),
+                null, // cron (nie dotyczy sklepu)
+                p.getCreatedAt(),
+                false,
+                p.getSeverity(),
+                installed
         );
     }
 

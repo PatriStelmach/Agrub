@@ -54,7 +54,9 @@ public class DataInitializer implements CommandLineRunner {
             }
             plugin.setTags(tags);
 
-            plugin.setCode("# Sample code for Plugin_" + i + "\nprint('Hello from plugin " + i + "')");
+            String testCode =
+
+            plugin.setCode("# Sample code for Plugin_" + i + "\nprint('Hello from plugin " + i + "') ");
 
             plugins.add(plugin);
         }
