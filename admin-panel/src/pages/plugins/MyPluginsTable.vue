@@ -57,13 +57,13 @@ const emit = defineEmits<{
   'update:search-data': [data:string]
 }>()
 
+
 const PluginDetailsDialog = defineAsyncComponent( () => import ("@/pages/plugins/PluginDetailsDialog.vue"))
 
 const myPluginStore = useMyPluginStore()
 const { sortedData, sortKey, sortOrder, toggleSort } = useSort<MyPlugin>(() => props.data, 'updatedAt')
 const { wrap, isUnwrapped, unwrap, unwrappedItem, save } = useWrapping(sortedData, 'fullName')
 
-const tagsRef = useTemplateRef<InstanceType<typeof MyTagInput>>('tagsRef')
 const searchFilter = ref<string>("")
 const checkedPlugins = ref<string[]>([])
 
@@ -201,7 +201,8 @@ const updateDetails = (code: string, description: string) => {
             <TableRow
               class="cursor-pointer duration-0 border-radius-0  [&_td]:py-2 [&_td]:pr-4 hover:bg-green-badge/20 "
               v-for="plugin in sortedData"
-              :key="plugin.fullName" @click="unwrap(plugin.fullName); getDetails(plugin.fullName)"
+              :key="plugin.fullName"
+              @click="isUnwrapped(plugin.fullName) ? null : unwrap(plugin.fullName); "
               :class="{'hover:bg-destructive/20': !plugin.active,
              'bg-selected [&_td]:align-top cursor-auto sticky h-40! [&_td]:pt-4! top-11 bottom-11 hover:bg-card z-9 '
                     : isUnwrapped(plugin.fullName) }">
@@ -235,7 +236,6 @@ const updateDetails = (code: string, description: string) => {
                 <MyTagInput
                   v-if="unwrappedItem && isUnwrapped(plugin.fullName)"
                   v-model:tags="unwrappedItem.tags"
-                  ref="tagsRef"
                   :all-tags="availableTags"
                   input-id="tags-input"
                   :can-add-new="true"
@@ -337,7 +337,7 @@ const updateDetails = (code: string, description: string) => {
                       @update:save-changes="updateDetails"
                     >
                       <Button
-                        @click.stop
+                        @click.stop="getDetails(plugin.fullName)"
                         class="border-0! m-0 rounded-none bg-transparent! text-severity-3 hover:text-primary"
                       >
                         Details<IconMessageCode class="size-4 xl:size-5"/>

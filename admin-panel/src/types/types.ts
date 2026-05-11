@@ -78,6 +78,8 @@ export interface LibraryPluginFilters {
   name?: string,
   language?: Language,
   creator?: string,
+  tags?: string[],
+  maxWeight?: number,
 }
 
 export const undefinedLibraryFilters = {
@@ -87,13 +89,21 @@ export const undefinedLibraryFilters = {
 }
 
 export interface User {
-  id: number,
+  id?: number,
   firstname: string,
   surname: string,
   active?: boolean,
   email: string,
   role: "ADMINISTRATOR" | "TECHNICIAN"
   groups: string[]
+}
+
+export const blankUser = {
+  firstname: '',
+  surname: '',
+  email: '',
+  role: "TECHNICIAN",
+  groups: []
 }
 
 export interface UserGroup {

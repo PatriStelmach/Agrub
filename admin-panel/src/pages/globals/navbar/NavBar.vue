@@ -105,7 +105,7 @@ const navItems = [
               </SidebarMenuButton>
             </SidebarMenuItem >
             <TeamBar  />
-            <NavUser class="border-t-4 pt-2" :user="sidebarData.loggedUser"/>
+            <NavUser class="border-t-4 pt-2"/>
 
 
         </SidebarMenu>

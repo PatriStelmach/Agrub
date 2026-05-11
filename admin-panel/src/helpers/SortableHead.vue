@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {TableHead} from "@/components/ui/table";
 import type {HTMLAttributes} from "vue";
-
+import {IconSortAscending, IconSortDescending} from "@tabler/icons-vue";
 
 const props = defineProps<{
   keyName: string,
@@ -21,7 +21,7 @@ const props = defineProps<{
       <span
 
         class="font-bold text-sm lg:text-md xl:text-lg 2xl:text:xl">{{props.label}}</span>
-      <i class="pi pi-sort-amount-down-alt" v-if="sortKey === props.keyName && sortOrder === 'asc'" />
-      <i class="pi pi-sort-amount-up" v-if="sortKey === props.keyName && sortOrder === 'desc'" /></div>
+      <IconSortAscending v-if="sortKey === props.keyName && sortOrder === 'asc'" />
+      <IconSortDescending v-if="sortKey === props.keyName && sortOrder === 'desc'" /></div>
   </TableHead>
 </template>

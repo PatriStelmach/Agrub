@@ -171,16 +171,15 @@ const onSubmit = () => {
           </div>
 
           <!-- Origin -->
-          <div class="w-3/4">
-            <MyTagInput
-              ref="tagsRef"
-              :all-tags="alertSources"
-              input-id="origin-input"
-              :can-add-new="false"
-              v-model:tags="filters.origins"
-              tagsLabel="Origin"
-              />
-          </div>
+          <MyTagInput
+            class="w-3/4"
+            ref="tagsRef"
+            :all-tags="alertSources"
+            input-id="origin-input"
+            :can-add-new="false"
+            v-model:tags="filters.origins"
+            tagsLabel="Origin"
+          />
 
           <!-- Status  -->
           <div>

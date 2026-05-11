@@ -24,9 +24,10 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const response = await api.post('/auth/login', credentials)
 
-      if (response.status === 200 && response.data.token) {
-        accessToken.value = response.data.token as string
+      if (response.status === 200 && response.data.access_token) {
+        accessToken.value = response.data.access_token as string
         isAuthenticated.value = true
+        console.log(response.data.access_token)
         return true
       }
 
@@ -38,7 +39,9 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function logout() {
     try {
-      // await axios.post(`${api_url}/auth/logout`, {}, { withCredentials: true });
+       await api.post(`${api_url}/auth/logout`, {
+         Authorization: accessToken.value,
+       }, { withCredentials: true });
     } catch (error) {
       console.error('Logout error context:', error)
     } finally {
