@@ -75,11 +75,11 @@ public class PluginController {
         System.out.println("Wyników na tej stronie: " + dtoPage.getNumberOfElements() + " / Razem: " + dtoPage.getTotalElements());
 
         for (PluginDTO dto : dtoPage.getContent()) {
-            System.out.println(String.format(" -> ID: %-4d | %-12s | Waga: %-2d KB | Data: %-19s | Tagi: %s",
+            System.out.println(String.format(" -> id: %-4d | fileName: %-12s | weight: %-2d KB | updatedAt: %-19s | tags: %s",
                     dto.id(),
                     dto.fileName(),
                     dto.weight(),
-                    dto.updatedAt() != null ? dto.updatedAt() : "BRAK DATY",
+                    dto.updatedAt() != null ? dto.updatedAt() : "null",
                     dto.tags()));
         }
         System.out.println("===========================================\n");
