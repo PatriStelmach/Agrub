@@ -25,7 +25,7 @@ api.interceptors.response.use(
     const authStore = useAuthStore();
     const originalRequest = error.config;
 
-    if (originalRequest.url?.includes(['refresh', 'login', 'logout']) ) {
+    if (originalRequest.url?.includes(['refresh', 'logout']) ) {
       authStore.accessToken = null
       authStore.isAuthenticated = false
       return Promise.reject(error);
