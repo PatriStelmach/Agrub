@@ -58,17 +58,12 @@ const { handleSubmit } = useForm({
 
 const onSubmit = handleSubmit(async (data) => {
   isLoading.value = true
-  try{
+  try {
     if(!await authStore.login(data))
       showAlert.value = true
   }
-  catch {
-    showAlert.value = true
-  }
-  finally {
-    isLoading.value = false
-  }
-
+  catch { showAlert.value = true }
+  finally { isLoading.value = false }
 })
 </script>
 
@@ -76,7 +71,7 @@ const onSubmit = handleSubmit(async (data) => {
   <Transition v-if="!mounting" name="fade">
     <Alert
       class="z-999 absolute w-1/3 left-1/2 -translate-x-1/2 top-1/2 translate-y-1/2 border-red-badge/50 border-2 "
-      v-if="showAlert" variant="red_outline">
+      v-if="showAlert" variant="destructive">
       <IconX @click="showAlert = false" class="size-5! absolute top-2 right-2 hover:border cursor-pointer"></IconX>
       <IconAlertCircle />
       <AlertTitle>Unable to log in</AlertTitle>

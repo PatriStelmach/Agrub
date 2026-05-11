@@ -11,8 +11,16 @@ export function useSort<T>(data: () => T[], defaultSort: keyof T) {
     return [...data()].sort((a , b) => {
       const aVal = a[key]
       const bVal = b[key]
+      console.log(aVal, bVal)
+      console.log(key)
       if (aVal == null) return sortOrder.value === 'asc' ? 1 : -1
       if (bVal == null) return sortOrder.value === 'asc' ? -1 : 1
+      if (typeof bVal === 'boolean' && typeof aVal === 'boolean') {
+        console.log(a[key])
+        return sortOrder.value === 'asc' ?
+          Number(aVal) - Number(bVal) :
+          Number(bVal) - Number(aVal)
+      }
       if (aVal < bVal) return sortOrder.value === 'asc' ? -1 : 1
       if (aVal > bVal) return sortOrder.value === 'asc' ? 1 : -1
 

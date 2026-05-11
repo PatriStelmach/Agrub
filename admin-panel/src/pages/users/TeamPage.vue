@@ -9,23 +9,31 @@ import {ButtonGroup, ButtonGroupSeparator} from "@/components/ui/button-group";
 import {Search} from "lucide-vue-next";
 import {Button} from "@/components/ui/button";
 import {useWrapping} from "@/composables/unwrapping.ts";
-import {computed} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {useClientSearchFilter} from "@/composables/useClientSearchFilter.js";
-import type { User} from "@/types/types.ts";
+import {blankUser, type User} from "@/types/types.ts";
 import {useTagsFilter} from "@/composables/useTagsFilter.ts";
 import {topButtonGroup, topH1} from "@/assets/cssFunctions.ts";
 import GoBackButton from "@/helpers/GoBackButton.vue";
 import UserCard from "@/pages/users/UserCard.vue";
-import EditUser from "@/pages/users/EditUser.vue";
 import {useUserStore} from "@/stores/userStore.ts";
-import {useRouter} from "vue-router";
+import EditUser from "@/pages/users/EditUser.vue";
 
 const users = computed(() => {
   return usersData;
 })
 
+const userStore = useUserStore();
+const isLoading = ref<boolean>(false);
+
 const { filteredData,  searchFilter } =
   useClientSearchFilter<User>(() => users.value,(user) => `${user.firstname} ${user.surname}` )
+
+onMounted(async () => {
+   await userStore.getAllGroupsRequest().finally(() => isLoading.value = false)
+})
+
+
 
 
 </script>
@@ -40,12 +48,16 @@ const { filteredData,  searchFilter } =
           <GoBackButton/>
         </ButtonGroup>
         <ButtonGroup>
-          <Button
-            @click=""
-            variant="green_outline">
-            Add new user
-            <IconUserPlus/>
-          </Button>
+          <EditUser
+            :user="blankUser as User"
+          >
+            <Button
+              variant="green_outline">
+              Add new user
+              <IconUserPlus/>
+            </Button>
+          </EditUser>
+
           <Button
             class="border-l!"
             @click=""

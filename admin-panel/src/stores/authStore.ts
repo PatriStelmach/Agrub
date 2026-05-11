@@ -24,8 +24,8 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const response = await api.post('/auth/login', credentials)
 
-      if (response.status === 200 && response.data.token) {
-        accessToken.value = response.data.token as string
+      if (response.status === 200 && response.data.access_token) {
+        accessToken.value = response.data.access_token as string
         isAuthenticated.value = true
         return true
       }

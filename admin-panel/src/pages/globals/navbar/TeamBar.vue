@@ -31,7 +31,6 @@ import NavUser from "@/pages/globals/navbar/NavUser.vue";
           >
             <div class="relative">
               <Avatar class="size-8 rounded-lg ">
-                <AvatarImage class="size-8" :src="user.avatar ? user.avatar : ''" :alt="`${user.surname}_${user.surname}`"/>
                 <AvatarFallback class="rounded-full grayscale">
                   {{user.firstname.slice(0,1) + user.surname.slice(0,1)}}
                 </AvatarFallback>

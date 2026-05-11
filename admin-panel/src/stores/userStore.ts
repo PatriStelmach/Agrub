@@ -65,6 +65,7 @@ export const useUserStore = defineStore('user-store',() => {
 
   return {
     allUsers,
+    allGroups,
     getAllUsersRequest,
     editUserRequest,
     getUserByIdRequest,
