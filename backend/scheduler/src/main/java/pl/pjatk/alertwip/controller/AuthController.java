@@ -30,12 +30,15 @@ public class AuthController {
         }
         String refreshToken = authHeader.substring(7);
         String newAccessToken = authenticationService.refreshAccessToken(refreshToken);
-
         return ResponseEntity.ok(Map.of("access_token", newAccessToken));
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Map<String, String>> logout() {
+    public ResponseEntity<Map<String, String>> logout(@RequestHeader("Authorization") String authHeader) {
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            authenticationService.logout(token);
+        }
         return ResponseEntity.ok(Map.of("message", "Wylogowano pomyślnie"));
     }
 }
