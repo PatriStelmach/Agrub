@@ -2,6 +2,8 @@ package pl.pjatk.alertwip.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -15,17 +17,29 @@ public class Plugin {
 
     private String description;
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String decription) {
-        this.description = decription;
-    }
-
     private String name;
     @Column(updatable = false)
     private String creator;
+
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    private Integer weight;
+
+    @PrePersist
+    protected void onCreate(){
+        //data
+        if (this.createdAt == null) {
+            this.createdAt = LocalDateTime.now();
+        }
+        //rozmiar
+        if (this.code != null){
+            this.weight = this.code.length();
+        } else {
+            this.weight = 0;
+        }
+    }
+
     @Column(updatable = false)
     private String language; // "py", "ps", "sh"
 
@@ -37,6 +51,14 @@ public class Plugin {
     @ElementCollection
     private List<String> tags;
 
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String decription) {
+        this.description = decription;
+    }
 
     public int getSeverity() {
         return severity;
@@ -93,7 +115,27 @@ public class Plugin {
         this.tags = tags;
     }
 
-    public void setCreator(String creator) { this.creator = creator; }
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
 
-    public void setLanguage(String language) { this.language = language; }
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Integer getWeight() {
+        return weight;
+    }
+
+    public void setWeight(Integer weight) {
+        this.weight = weight;
+    }
 }
