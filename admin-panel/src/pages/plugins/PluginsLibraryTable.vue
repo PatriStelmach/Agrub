@@ -17,6 +17,8 @@ import {Button} from "@/components/ui/button";
 import { IconDownload, IconSourceCode} from "@tabler/icons-vue";
 import {watchEffect} from "vue";
 import {dateParser} from "@/composables/dateParser.ts";
+import api from "@/lib/axios.ts";
+import {toast} from "vue-sonner";
 
 const props = defineProps<{
   plugins: LibraryPlugin[]
@@ -24,14 +26,28 @@ const props = defineProps<{
 }>()
 
 const sortedHead =  defineModel<{ sortKey: string; sortOrder: string }>('sortedHead')
-
-
 const { sortKey, sortOrder, toggleSort } =
   useSort<LibraryPlugin>(() => props.plugins, 'createdAt')
 
 watchEffect(() => {
   sortedHead.value = { sortKey: sortKey.value, sortOrder: sortOrder.value };
 });
+
+const downloadPlugin = async (id: number) => {
+  try {
+    const res = await api.post(`/plugins/download/${id}`)
+    if (res.status === 200) {
+      toast.success(res.data);
+    }
+    else {
+      toast.error(`Error downloading plugin: ${res.data}`)
+    }
+  }
+  catch (error) {
+    toast.error(`Error downloading plugin: ${error}`);
+  }
+}
+
 
 </script>
 
@@ -97,6 +113,7 @@ watchEffect(() => {
                 <IconSourceCode/>
               </Button>
               <Button
+                @click="downloadPlugin(plugin.id)"
                 variant="green_outline"
                 class="border-l!"
               >

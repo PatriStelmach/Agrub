@@ -40,7 +40,9 @@ export interface AlertDetails {
 }
 
 export interface MyJWTPayload {
-  authorities: string[];
+  role: "ADMINISTRATOR" | "TECHNICIAN";
+  firstname: string,
+  surname: string,
   sub: string;
   iat: number;
   exp: number;
