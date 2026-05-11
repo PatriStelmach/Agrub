@@ -8,12 +8,17 @@ import axios from "axios";
 export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = ref<boolean>(false)
   const accessToken = ref<string | null>(null)
-  const user = computed(() => userPayload.value?.sub || null)
-  const userRoles = computed(() => userPayload.value?.authorities || [])
+  const fullName = computed(() => `${userFirstname.value} ${userSurname.value}`)
+  const avFallback = computed(() =>  `${userFirstname.value?.slice(0,1)}${userSurname.value?.slice(0,1)}`)
+  const userEmail = computed(() => userPayload.value?.sub)
+  const userFirstname = computed(() => userPayload.value?.firstname)
+  const userSurname = computed(() => userPayload.value?.surname)
+  const userRole = computed(() => userPayload.value?.role)
   const userPayload = computed(() => {
     if (!accessToken.value) return null
     try {
       return jwtDecode<MyJWTPayload>(accessToken.value)
+
     } catch {
       return null
     }
@@ -62,10 +67,14 @@ export const useAuthStore = defineStore('auth', () => {
 
   return {
     userPayload,
-    userRoles,
-    user,
+    userRole,
+    fullName,
+    userEmail,
+    userFirstname,
+    userSurname,
     accessToken,
     isAuthenticated,
+    avFallback,
     login,
     logout,
     refreshToken

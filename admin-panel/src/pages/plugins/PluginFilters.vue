@@ -24,29 +24,45 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
-import {reactive, useTemplateRef} from "vue";
+import {onMounted, reactive, ref, useTemplateRef} from "vue";
 import {Language, type LibraryPluginFilters} from "@/types/types.ts";
 import MyTagInput from "@/helpers/MyTagInput.vue";
-import {availableTags} from "@/data/tags.ts";
 import {
   NumberField,
   NumberFieldContent,
   NumberFieldDecrement, NumberFieldIncrement,
   NumberFieldInput
 } from "@/components/ui/number-field";
+import api from "@/lib/axios.ts";
+import { toast } from "vue-sonner";
 
 const emit = defineEmits<{
   'update:filters': [LibraryPluginFilters]
 }>()
 
 const tagsRef = useTemplateRef<InstanceType<typeof MyTagInput>>('tagsRef')
-
+const availableTags = ref<string[]>([])
 const filters = reactive({
   name: undefined as string | undefined,
   language: undefined as Language | undefined,
   creator: undefined as string | undefined,
   tags: [] as string[],
   maxWeight: undefined as number | undefined,
+})
+
+onMounted(async () => {
+  try {
+    const res = await api.get('/plugins/tags')
+    if (res.status === 200) {
+      availableTags.value = res.data
+    }
+    else {
+      toast.error(res.data)
+    }
+  }
+  catch (err) {
+    toast.error(`Error getting tags:${err}`)
+  }
 })
 
 const clearFilters = () => {
@@ -62,6 +78,7 @@ const clearFilters = () => {
 const onCancel = () => {
   setTimeout(() => {
     clearFilters()
+    onSubmit()
   }, 200)
 }
 

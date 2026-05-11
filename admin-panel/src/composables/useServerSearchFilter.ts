@@ -23,6 +23,7 @@ export function useServerSearchFilter<T, F>
   })
 
   watch(sortedHead, async () => {
+    currentPage.value = 1
     getItemsRequest()
   }, { deep: true })
 

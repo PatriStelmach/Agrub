@@ -63,13 +63,22 @@ export const useUserStore = defineStore('user-store',() => {
     }
   }
 
+  const avFallback = (user: User) =>  {
+    return `${user.firstname.slice(0, 1).toUpperCase()} ${user.surname.slice(0,1).toUpperCase()}`
+  }
+  const fullName = (user: User) =>  {
+   return `${user.firstname} ${user.surname}`
+  }
+
   return {
     allUsers,
     allGroups,
     getAllUsersRequest,
     editUserRequest,
     getUserByIdRequest,
-    getAllGroupsRequest
+    getAllGroupsRequest,
+    fullName,
+    avFallback
 
   }
 })

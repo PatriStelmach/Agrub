@@ -23,13 +23,11 @@ import {
   SidebarMenu,
   SidebarMenuButton,
 } from '@/components/ui/sidebar'
-import type {User} from "@/types/types.js";
 import {useAuthStore} from "@/stores/authStore.ts";
+import {useUserStore} from "@/stores/userStore.ts";
 
 const authStore = useAuthStore()
-const user = authStore.user
-//const avFallback = `${user.firstname.slice(0, 1).toUpperCase()} ${user.surname.slice(0,1).toUpperCase()}`
-//const fullName = `${user.firstname} ${user.surname}`
+const userStore = useUserStore()
 </script>
 
 <template>
@@ -42,17 +40,15 @@ const user = authStore.user
           >
             <Avatar class="size-9 rounded-lg relative ">
               <AvatarFallback class="rounded-full grayscale">
-<!--                {{user.firstname.slice(0,1) + user.surname.slice(0,1)}}-->
-                AP
+                {{ authStore.avFallback}}
               </AvatarFallback>
             </Avatar>
             <div class="grid flex-1 text-left text-sm leading-tight">
               <span class="truncate font-medium">
-<!--                {{ user.firstname + ' ' + user.surname }}-->
-                Administrator Pjatk
+                {{ authStore.fullName }}
               </span>
               <span class="text-muted-foreground truncate text-xs">
-                {{ user }}
+                {{ authStore.userEmail }}
               </span>
             </div>
             <IconDotsVertical class="ml-auto size-4" />
@@ -72,9 +68,11 @@ const user = authStore.user
                 </AvatarFallback>
               </Avatar>
               <div class="grid flex-1 text-left text-sm leading-tight">
-                <span class="truncate font-medium">Administrator Pjatk</span>
+                <span class="truncate font-medium">
+                  {{ authStore.fullName }}
+                </span>
                 <span class="text-muted-foreground truncate text-xs">
-                  {{ user }}
+                  {{ authStore.userEmail }}
                 </span>
               </div>
             </div>

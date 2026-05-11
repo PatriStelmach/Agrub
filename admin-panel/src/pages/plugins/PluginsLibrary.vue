@@ -46,15 +46,8 @@ const getLibraryPluginsRequest = async () => {
       maxWeight: ${filters.value.maxWeight}
   }`);
 
-  /*    if (response.status === 200) {
-      items.value = response.data.content.map((a: HistoryAlert) => ({
-        ...a,
-        createdAt: new Date(a.createdAt),
-        closedAt: new Date(a.closedAt)
-      }))
-  * */
   if (response.status === 200) {
-    items.value = response.data.content.map((p) => ({
+    items.value = response.data.content.map((p: any) => ({
       ...p,
       createdAt: new Date(p.updatedAt),
     }))
@@ -69,7 +62,7 @@ const {filters, items, pageSize, currentPage, totalElements, sortedHead, updateF
 <template>
   <div>
     <div :class="topDiv">
-      <h1 :class="topH1">Alerts history</h1>
+      <h1 :class="topH1">Plugins library</h1>
       <ButtonGroup :class="topButtonGroup">
         <ButtonGroup>
           <GoBackButton />
