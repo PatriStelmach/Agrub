@@ -25,7 +25,8 @@ public class GlobalProblem {
     private String originType;
     private String status = "Sent"; // "Sent" | "In Process" | "Done"
     private int severity = 1;
-
+    @Transient
+    private boolean isSeverityLocked = false;
     private String externalEventId;
     private boolean requiresNotification = false; // Flaga dla dźwięku/popupu
     private LocalDateTime createdAt;
@@ -90,4 +91,12 @@ public class GlobalProblem {
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public LocalDateTime getClosedAt() { return closedAt; }
     public void setClosedAt(LocalDateTime closedAt) { this.closedAt = closedAt; }
+
+    public boolean isSeverityLocked() {
+        return isSeverityLocked;
+    }
+
+    public void setSeverityLocked(boolean severityLocked) {
+        isSeverityLocked = severityLocked;
+    }
 }
