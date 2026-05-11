@@ -8,6 +8,7 @@ import pl.pjatk.alertwip.repository.PluginRepository;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
@@ -24,7 +25,6 @@ public class DataInitializer implements CommandLineRunner {
             return;
         }
 
-
         List<String> creators = Arrays.asList("Alice", "Bob", "Charlie", "Diana", "Eve", "Frank", "Grace", "Henry");
         List<String> languages = Arrays.asList(".py", ".sh", ".bash", ".ps1", ".psm1");
         List<String> tagPool = Arrays.asList("monitoring", "backup", "security", "network", "database", "web", "automation", "reporting", "alert", "sync");
@@ -37,6 +37,11 @@ public class DataInitializer implements CommandLineRunner {
         );
 
         List<Plugin> plugins = new ArrayList<>();
+        Random random = new Random();
+
+        // Zbiór znaków do generowania losowego wypełnienia (śmieciowego kodu)
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 =+*()[]{};:";
+
         for (int i = 1; i <= 300; i++) {
             Plugin plugin = new Plugin();
             plugin.setName("Plugin_" + i);
@@ -54,15 +59,36 @@ public class DataInitializer implements CommandLineRunner {
             }
             plugin.setTags(tags);
 
-            String testCode =
+            // 1. Ustalenie losowego rozmiaru w bajtach (od 1 KB do 5 KB)
+            // 1 KB = 1024 znaki. Szukamy wartości w przedziale 1024 - 5120
+            int targetWeight = 1024 + random.nextInt(4097);
 
-            plugin.setCode("# Sample code for Plugin_" + i + "\nprint('Hello from plugin " + i + "') ");
+            // 2. Budowanie właściwego kodu
+            StringBuilder codeBuilder = new StringBuilder(targetWeight);
+            codeBuilder.append("# Sample code for Plugin_").append(i).append("\n");
+            codeBuilder.append("print('Hello from plugin ").append(i).append("')\n");
+            codeBuilder.append("\n# --- START OF RANDOM PAYLOAD (Target: ").append(targetWeight).append(" bytes) ---\n# ");
+
+            // 3. Wypełnianie reszty stringa losowymi znakami aż osiągniemy targetWeight
+            while (codeBuilder.length() < targetWeight) {
+                codeBuilder.append(chars.charAt(random.nextInt(chars.length())));
+
+                // Łamanie wierszy co około 80 znaków, żeby kod wyglądał w miarę naturalnie w bazie/edytorze
+                if (codeBuilder.length() % 80 == 0) {
+                    codeBuilder.append("\n# ");
+                }
+            }
+
+            // Ucinamy dokładnie do wyliczonego rozmiaru, jeśli pętla lekko przestrzeliła przez dodawanie nowej linii
+            String finalCode = codeBuilder.substring(0, targetWeight);
+
+            plugin.setCode(finalCode);
+            plugin.setWeight(finalCode.length()); // Ręczne przypisanie wagi dla pewności
 
             plugins.add(plugin);
         }
 
         pluginRepository.saveAll(plugins);
-        System.out.println("Dodano 300 rekordów do tabeli plugin.");
+        System.out.println("Dodano 300 rekordów do tabeli plugin (wagi z przedziału 1-5 KB).");
     }
-
 }
