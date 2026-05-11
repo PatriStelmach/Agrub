@@ -19,18 +19,17 @@ import UserCard from "@/pages/users/UserCard.vue";
 import {useUserStore} from "@/stores/userStore.ts";
 import EditUser from "@/pages/users/EditUser.vue";
 
-const users = computed(() => {
-  return usersData;
-})
-
 const userStore = useUserStore();
 const isLoading = ref<boolean>(false);
 
 const { filteredData,  searchFilter } =
-  useClientSearchFilter<User>(() => users.value,(user) => `${user.firstname} ${user.surname}` )
+  useClientSearchFilter<User>(() => userStore.allUsers,(user) => `${user.firstname} ${user.surname}` )
 
 onMounted(async () => {
-   await userStore.getAllGroupsRequest().finally(() => isLoading.value = false)
+  await userStore.getAllUsersRequest().finally(() => {
+    userStore.getAllGroupsRequest().finally(() => isLoading.value = false)
+  })
+
 })
 
 

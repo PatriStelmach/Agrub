@@ -22,7 +22,7 @@ import MyTagInput from "@/helpers/MyTagInput.vue"
 import {Field, FieldError, FieldGroup} from "@/components/ui/field";
 import {toTypedSchema} from "@vee-validate/zod";
 import z from "zod"
-import { useForm, Field as VeeField } from 'vee-validate'
+import {useForm, Field as VeeField, useField} from 'vee-validate'
 import MyFieldLabel from "@/helpers/MyFieldLabel.vue";
 import DialogLabel from "@/helpers/DialogLabel.vue";
 
@@ -49,21 +49,26 @@ const formSchema = toTypedSchema(
 
 const { handleSubmit } = useForm({
   validationSchema: formSchema,
-  initialValues: {
-    email: '',
-    firstname: '',
-    surname: '',
-  },
 })
-// const onSubmit = handleSubmit(async (data) => {
-//   isLoading.value = true
-//   try {
-//     if(!await userStore.
-//       showAlert.value = true
-//   }
-//   catch { showAlert.value = true }
-//   finally { isLoading.value = false }
-// })
+
+const { value: firstname, errors: firstnameErrors } = useField<string>('firstname', undefined, {
+  initialValue: updatedUser.value.firstname
+})
+const { value: surname, errors: surnameErrors } = useField<string>('surname', undefined, {
+  initialValue: updatedUser.value.surname
+})
+const { value: email, errors: emailErrors } = useField<string>('email', undefined, {
+  initialValue: updatedUser.value.email
+})
+
+const onSubmit = handleSubmit(async () => {
+  isLoading.value = true
+  updatedUser.value.firstname = firstname.value
+  updatedUser.value.surname = surname.value
+  updatedUser.value.email = email.value
+  console.log(updatedUser.value)
+  await userStore.editUserRequest(updatedUser.value).finally(() => isLoading.value = false)
+})
 
 
 </script>
@@ -79,7 +84,7 @@ const { handleSubmit } = useForm({
           <SheetDescription>Change privileges and user data</SheetDescription>
         </SheetHeader>
         <form
-          id="create-user-form" @submit="onSubmit"
+          id="edit-user-form" @submit="onSubmit"
           class="px-4 space-y-4">
           <div class="grid space-y-2 w-3/4">
             <Avatar class="size-12 rounded-lg">
@@ -89,58 +94,43 @@ const { handleSubmit } = useForm({
                 }}
               </AvatarFallback>
             </Avatar>
-            <FieldGroup class=" space-x-2">
+            <FieldGroup class="space-x-2">
+              <Field :data-invalid="!!firstnameErrors.length" class="w-fit">
+                <MyFieldLabel text="Firstname" :class="nameLabel" for="firstname"/>
+                <Input
+                  v-model="firstname"
+                  placeholder="Firstname..."
+                  autocomplete="firstname"
+                  :class="inputText"
+                  id="firstname"
+                />
+                <FieldError v-if="firstnameErrors.length" :errors="firstnameErrors" />
+              </Field>
 
-              <VeeField v-slot="{ field, errors }" name="firstname">
-                <Field
-                  :data-invalid="!!errors.length"
-                  class="w-fit">
-                  <MyFieldLabel text="Firstname" :class="nameLabel" for="firstname"/>
-                  <Input
-                    v-bind="field"
-                    placeholder="Firstname..."
-                    autocomplete="firstname"
-                    :class="inputText"
-                    id="firstname"
-                    v-model="updatedUser.firstname"
-                  />
-                  <FieldError v-if="errors.length" :errors="errors" />
-                </Field>
-              </VeeField>
-              <VeeField v-slot="{ field, errors }" name="surname">
-                <Field
-                  :data-invalid="!!errors.length"
-                  class="w-fit ">
-                  <MyFieldLabel text="Surname" :class="nameLabel" for="surname">Surname</MyFieldLabel>
-                  <Input
-                    v-bind="field"
-                    placeholder="Surname..."
-                    autocomplete="surname"
-                    :class="inputText"
-                    id="surname"
-                    v-model="updatedUser.surname"
-                  />
-                  <FieldError v-if="errors.length" :errors="errors" />
-                </Field>
-              </VeeField>
+              <Field :data-invalid="!!surnameErrors.length" class="w-fit">
+                <MyFieldLabel text="Surname" :class="nameLabel" for="surname"/>
+                <Input
+                  v-model="surname"
+                  placeholder="Surname..."
+                  autocomplete="surname"
+                  :class="inputText"
+                  id="surname"
+                />
+                <FieldError v-if="surnameErrors.length" :errors="surnameErrors" />
+              </Field>
 
-              <VeeField v-slot="{ field, errors }" name="email">
-                <Field
-                  class="w-fit "
-                  :data-invalid="!!errors.length">
-                  <MyFieldLabel text="e-mail" :class="nameLabel" for="email">e-mail</MyFieldLabel>
-                  <Input
-                    v-bind="field"
-                    placeholder="user@domain.com"
-                    :aria-invalid="!!errors.length"
-                    autocomplete="email"
-                    :class="inputText"
-                    id="email"
-                    v-model="updatedUser.email"
-                  />
-                  <FieldError v-if="errors.length" :errors="errors" />
-                </Field>
-              </VeeField>
+              <Field :data-invalid="!!emailErrors.length" class="w-fit">
+                <MyFieldLabel text="e-mail" :class="nameLabel" for="email"/>
+                <Input
+                  v-model="email"
+                  placeholder="user@domain.com"
+                  :aria-invalid="!!emailErrors.length"
+                  autocomplete="email"
+                  :class="inputText"
+                  id="email"
+                />
+                <FieldError v-if="emailErrors.length" :errors="emailErrors" />
+              </Field>
             </FieldGroup>
             <div class="grid mt-4 space-y-6">
               <div>

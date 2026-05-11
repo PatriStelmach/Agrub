@@ -93,7 +93,7 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<ActiveAlert>(() =
           <IconCircleDashedCheck v-if="alert.acknowledged" class="text-green-badge"/>
           <IconCircleDashedX v-else class="text-red-badge"/>
         </TableCell>
-        <DateCell v-if="alert.createdAt"  :date="dateParser(alert.createdAt).toDate "></DateCell>
+        <DateCell   :date="dateParser(alert.createdAt).toDate "></DateCell>
         <TableCell>
           <EditAlertDialog
             :alert="alert"

@@ -36,21 +36,21 @@ export const useUserStore = defineStore('user-store',() => {
   }
 
   const getUserByIdRequest = async (id: number) => {
-    // try {
-    //   const res = await api.get(`/users/${id}`)
-    //   if (res.status === 200) return res.data
-    //   else toast.error(`Error retrieving user: ${id}`)
-    // }
-    // catch (error) {
-    //   toast.error(`Error retrieving user: ${error}`)
-    // }
+    try {
+      const res = await api.get(`/users/${id}`)
+      if (res.status === 200) return res.data
+      else toast.error(`Error retrieving user: ${id}`)
+    }
+    catch (error) {
+      toast.error(`Error retrieving user: ${error}`)
+    }
 
     return sidebarData.loggedUser
   }
 
   const editUserRequest = async (user: User) => {
     try {
-      const res = await api.put(`/users/${user.id}`, user)
+      const res = await api.put(`/users/${user.id}`, user, )
       if (res.status === 200){
         toast.success(`User ${user.email} updated successfully.`)
         await getAllUsersRequest()

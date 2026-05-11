@@ -45,8 +45,19 @@ const getLibraryPluginsRequest = async () => {
       tags: ${filters.value.tags},
       maxWeight: ${filters.value.maxWeight}
   }`);
+
+  /*    if (response.status === 200) {
+      items.value = response.data.content.map((a: HistoryAlert) => ({
+        ...a,
+        createdAt: new Date(a.createdAt),
+        closedAt: new Date(a.closedAt)
+      }))
+  * */
   if (response.status === 200) {
-    items.value = response.data.content
+    items.value = response.data.content.map((p) => ({
+      ...p,
+      createdAt: new Date(p.updatedAt),
+    }))
     totalElements.value = response.data.totalElements
   }
 }
