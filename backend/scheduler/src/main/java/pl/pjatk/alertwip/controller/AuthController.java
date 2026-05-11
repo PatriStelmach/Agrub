@@ -1,5 +1,6 @@
 package pl.pjatk.alertwip.controller;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -15,18 +16,27 @@ public class AuthController {
 
     private final AuthenticationService authenticationService;
 
+    @Value("${app.cookie.secure:false}")
+    private boolean cookieSecure;
+
+    @Value("${app.cookie.same-site:Lax}")
+    private String cookieSameSite;
+
     public AuthController(AuthenticationService authenticationService) {
         this.authenticationService = authenticationService;
     }
 
+
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestBody AuthenticationRequestDTO request) {
         Map<String, String> tokens = authenticationService.authenticate(request);
+
         ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", tokens.get("refresh_token"))
                 .httpOnly(true)
-                .secure(false)
-                .path("/api/auth")
+                .secure(cookieSecure)
+                .path("/")
                 .maxAge(7 * 24 * 60 * 60)
+                .sameSite(cookieSameSite)
                 .build();
 
         return ResponseEntity.ok()
@@ -47,15 +57,18 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<Map<String, String>> logout(@RequestHeader(value = "Authorization", required = false) String authHeader) {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
-            authenticationService.logout(token);
+            String jwt = authHeader.substring(7).trim();
+            if (!jwt.isEmpty() && !jwt.equals("undefined") && !jwt.equals("null")) {
+                 authenticationService.logout(jwt);
+            }
         }
 
         ResponseCookie deleteCookie = ResponseCookie.from("refresh_token", "")
                 .httpOnly(true)
-                .secure(false)
-                .path("/api/auth")
+                .secure(cookieSecure)
+                .path("/")
                 .maxAge(0)
+                .sameSite(cookieSameSite)
                 .build();
 
         return ResponseEntity.ok()
