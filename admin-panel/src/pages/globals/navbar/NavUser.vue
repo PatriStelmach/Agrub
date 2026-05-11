@@ -2,14 +2,13 @@
 import {
   IconDotsVertical,
   IconLogout,
-  IconNotification, IconUsers,
+  IconNotification,
   IconUserCircle,
 } from "@tabler/icons-vue"
 
 import {
   Avatar,
   AvatarFallback,
-  AvatarImage,
 } from '@/components/ui/avatar'
 import {
   DropdownMenu,
@@ -23,15 +22,14 @@ import {
 import {
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem,
 } from '@/components/ui/sidebar'
 import type {User} from "@/types/types.js";
+import {useAuthStore} from "@/stores/authStore.ts";
 
-
-defineProps<{
-  user: User
-}>()
-
+const authStore = useAuthStore()
+const user = authStore.user
+//const avFallback = `${user.firstname.slice(0, 1).toUpperCase()} ${user.surname.slice(0,1).toUpperCase()}`
+//const fullName = `${user.firstname} ${user.surname}`
 </script>
 
 <template>
@@ -44,16 +42,17 @@ defineProps<{
           >
             <Avatar class="size-9 rounded-lg relative ">
               <AvatarFallback class="rounded-full grayscale">
-                {{user.firstname.slice(0,1) + user.surname.slice(0,1)}}
+<!--                {{user.firstname.slice(0,1) + user.surname.slice(0,1)}}-->
+                AP
               </AvatarFallback>
-              <span
-                class="absolute bottom-1 right-1 size-1.5 rounded-full  bg-green-badge"
-              ></span>
             </Avatar>
             <div class="grid flex-1 text-left text-sm leading-tight">
-              <span class="truncate font-medium">{{ user.firstname + ' ' + user.surname }}</span>
+              <span class="truncate font-medium">
+<!--                {{ user.firstname + ' ' + user.surname }}-->
+                Administrator Pjatk
+              </span>
               <span class="text-muted-foreground truncate text-xs">
-                {{ user.email }}
+                {{ user }}
               </span>
             </div>
             <IconDotsVertical class="ml-auto size-4" />
@@ -68,15 +67,14 @@ defineProps<{
           <DropdownMenuLabel class="p-0 font-normal">
             <div class="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
               <Avatar class="h-8 w-8 rounded-lg">
-                <AvatarImage :src="user.avatar as string" :alt="user.firstname + '_' + user.surname + '_avatar'"  />
                 <AvatarFallback class="rounded-lg">
-                  CN
+                  AP
                 </AvatarFallback>
               </Avatar>
               <div class="grid flex-1 text-left text-sm leading-tight">
-                <span class="truncate font-medium">{{ user.firstname + ' ' + user.surname }}</span>
+                <span class="truncate font-medium">Administrator Pjatk</span>
                 <span class="text-muted-foreground truncate text-xs">
-                  {{ user.email }}
+                  {{ user }}
                 </span>
               </div>
             </div>
@@ -93,8 +91,9 @@ defineProps<{
             </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
-            <IconLogout />
+          <DropdownMenuItem
+            @click="authStore.logout">
+            <IconLogout/>
             Log out
           </DropdownMenuItem>
         </DropdownMenuContent>

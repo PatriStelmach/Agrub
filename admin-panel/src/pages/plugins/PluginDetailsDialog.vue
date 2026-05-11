@@ -13,8 +13,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {Textarea} from "@/components/ui/textarea";
-import {ref, watch, watchEffect} from "vue";
+import {ref, watchEffect} from "vue";
 import CodeEditor from "@/helpers/CodeEditor.vue";
 
 const props = defineProps<{
@@ -30,19 +29,12 @@ watchEffect(() => {
   newDescription.value = props.description;
 })
 
-// watch(() => [props.code, props.description], ([nextCode, nextDesc]) => {
-//   newCode.value = nextCode;
-//   newDescription.value = nextDesc;
-// });
-
 const cancel = () => {
   setTimeout(() => {
     newCode.value = props.code;
     newDescription.value = props.description;
   }, 200)
-
 }
-
 
 const emits = defineEmits<{
   'update:save-changes': [code: string, description: string]

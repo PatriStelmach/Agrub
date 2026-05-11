@@ -24,23 +24,39 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
-import { reactive } from "vue";
+import {reactive, useTemplateRef} from "vue";
 import {Language, type LibraryPluginFilters} from "@/types/types.ts";
+import MyTagInput from "@/helpers/MyTagInput.vue";
+import {availableTags} from "@/data/tags.ts";
+import {
+  NumberField,
+  NumberFieldContent,
+  NumberFieldDecrement, NumberFieldIncrement,
+  NumberFieldInput
+} from "@/components/ui/number-field";
 
 const emit = defineEmits<{
   'update:filters': [LibraryPluginFilters]
 }>()
 
+const tagsRef = useTemplateRef<InstanceType<typeof MyTagInput>>('tagsRef')
+
 const filters = reactive({
   name: undefined as string | undefined,
   language: undefined as Language | undefined,
   creator: undefined as string | undefined,
+  tags: [] as string[],
+  maxWeight: undefined as number | undefined,
 })
 
 const clearFilters = () => {
   filters.name = undefined
   filters.language = undefined
   filters.creator = undefined
+  filters.maxWeight = undefined
+  filters.tags = []
+  tagsRef.value?.clearTagsInput()
+
 }
 
 const onCancel = () => {
@@ -54,6 +70,8 @@ const onSubmit = () => {
     name: filters.name,
     language: filters.language,
     creator: filters.creator,
+    tags: filters.tags,
+    maxWeight: filters.maxWeight
   })
 }
 
@@ -65,7 +83,7 @@ const getLangStyles = (lang: string) => {
     bash: 'from-[#222B32]/60 to-[#4CA825]/50 focus:from-[#222B32]/60 focus:to-[#4CA825]/80',
     sh: 'from-[#222B32]/60 to-[#4CA825]/50 focus:from-[#222B32]/60 focus:to-[#4CA825]/80',
   };
-  return styles[lang.toLowerCase()] || 'from-gray-500 to-gray-700';
+  return styles[lang.toLowerCase()]
 };
 </script>
 
@@ -107,13 +125,38 @@ const getLangStyles = (lang: string) => {
                   v-for="lang in Object.keys(Language)"
                   :key="lang"
                   :value="Language[lang as keyof typeof Language]"
-                  class="bg-linear-to-bl rounded-none cursor-pointer  py-3 my-1"
+                  class="bg-linear-to-bl rounded-none cursor-pointer  py-2 my-1"
                   :class="getLangStyles(lang)"
                 >
                   {{ lang }}
                 </SelectItem>
               </SelectContent>
             </Select>
+          </div>
+          <MyTagInput
+            ref="tagsRef"
+            v-model:tags="filters.tags"
+            class="w-3/4"
+            :all-tags="availableTags"
+            input-id="tags-input"
+            :can-add-new="false"
+            tags-label="Tags"
+          />
+          <div class="w-3/4 flex space-x-2">
+            <NumberField
+              id="max-weight"
+              :default-value="0"
+              :min="0"
+              v-model="filters.maxWeight"
+            >
+              <DialogLabel text="Maximum Weight" for="max-weight" />
+              <NumberFieldContent>
+                <NumberFieldDecrement/>
+                <NumberFieldInput/>
+                <NumberFieldIncrement/>
+              </NumberFieldContent>
+            </NumberField>
+            <span class="text-comment text-sm mb-2 mt-auto">KB</span>
           </div>
         </div>
       </div>
