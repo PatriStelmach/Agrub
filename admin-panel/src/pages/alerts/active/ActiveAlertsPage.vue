@@ -12,14 +12,15 @@ import {
   topH1,
   topDiv, topButtonGroup
 } from "@/assets/cssFunctions.js";
-import GoBackButton from "@/helpers/GoBackButton.vue";
+import GoBackButton from "@/helpers_components/GoBackButton.vue";
 import ActiveAlertsTable from "@/pages/alerts/active/ActiveAlertsTable.vue";
-import MyClientPagination from "@/helpers/MyClientPagination.vue";
+import MyClientPagination from "@/helpers_components/MyClientPagination.vue";
 const DetailsCard = defineAsyncComponent(() => import('@/pages/alerts/DetailsCard.vue'))
 
+const isLoading = ref(true)
 const alertStore = useAlertStore();
-onMounted(() => {
-  alertStore.getCurrentAlertsRequest()
+onMounted(async () => {
+  await alertStore.getCurrentAlertsRequest().finally(() => isLoading.value = false);
 })
 const hoveredAlert = ref<AlertDetails | null>(null)
 const {pageSize, filteredData, updateData, currentPage, searchFilter, tableData } =
@@ -50,6 +51,7 @@ const {pageSize, filteredData, updateData, currentPage, searchFilter, tableData 
         :data=hoveredAlert
       />
     <ActiveAlertsTable
+      :isLoading="isLoading"
       :tableData="tableData"
       v-model:activeAlerts="alertStore.currentAlerts"
       v-model:hoveredAlert="hoveredAlert"

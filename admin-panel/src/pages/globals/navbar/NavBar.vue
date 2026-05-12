@@ -40,7 +40,7 @@ const navItems = [
     label: 'Alerts',
     links: [
       { label: 'Active', to: 'alerts', icon: IconAlertTriangle },
-      { label: 'Hstory', to: 'alerts_history', icon: IconHistory },
+      { label: 'History', to: 'alerts_history', icon: IconHistory },
     ]
   },
   {

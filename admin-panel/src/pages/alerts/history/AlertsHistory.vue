@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import {tableDiv, topButtonGroup, topDiv, topH1} from "@/assets/cssFunctions.js";
-import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
 import {Button} from "@/components/ui/button";
-import {Search} from "lucide-vue-next";
 import {ButtonGroup} from "@/components/ui/button-group";
 import {
   type AlertDetails,
@@ -10,19 +8,20 @@ import {
   type HistoryAlert,
   undefinedAlertsFilters
 } from "@/types/types.js";
-import {defineAsyncComponent, ref} from "vue";
+import {defineAsyncComponent, onMounted, ref} from "vue";
 import {IconFilterCog} from "@tabler/icons-vue";
-import GoBackButton from "@/helpers/GoBackButton.vue";
+import GoBackButton from "@/helpers_components/GoBackButton.vue";
 import AlertsHistoryTable from "@/pages/alerts/history/AlertsHistoryTable.vue";
-import MyServerPagination from "@/helpers/MyServerPagination.vue";
+import MyServerPagination from "@/helpers_components/MyServerPagination.vue";
 import AlertsFilters from "@/pages/alerts/history/AlertsFilters.vue";
 import {useServerSearchFilter} from "@/composables/useServerSearchFilter.ts";
 import api from "@/lib/axios.ts";
 import {toast} from "vue-sonner";
-
 const DetailsCard = defineAsyncComponent(() => import('@/pages/alerts/DetailsCard.vue'))
 
-const getCurrentStateRequest = async () => {
+const isLoading = ref(true);
+
+const getAlertsHistory = async () => {
   try {
     const response = await api.get('/alerts/history', {
       params: {
@@ -54,6 +53,7 @@ const getCurrentStateRequest = async () => {
         closedAt: new Date(a.closedAt)
       }))
       totalElements.value = response.data.totalElements
+      console.log(response.data.totalElements)
 
       toast.info('Alerts history fetched')
     }
@@ -61,6 +61,10 @@ const getCurrentStateRequest = async () => {
     toast.error('Error getting alerts history')
   }
 }
+
+onMounted(async () => {
+  await getAlertsHistory().finally( () => isLoading.value = false)
+})
 
 const {
   filters,
@@ -71,7 +75,7 @@ const {
   sortedHead,
   updateFilters
 } = useServerSearchFilter<HistoryAlert, AlertHistoryFilters>(
-  getCurrentStateRequest,
+  getAlertsHistory,
   undefinedAlertsFilters,
   'createdAt',
   'desc'
@@ -106,6 +110,7 @@ const hoveredAlert = ref<AlertDetails | null>(null)
         :data="hoveredAlert"
       />
       <AlertsHistoryTable
+        :isLoading="isLoading"
         v-model:hovered-alert="hoveredAlert"
         v-model:sorted-head="sortedHead"
         :alerts="items"

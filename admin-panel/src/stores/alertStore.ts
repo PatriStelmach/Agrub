@@ -8,7 +8,7 @@ import {
 import api from "@/lib/axios";
 import {toast} from "vue-sonner";
 
-export const useAlertStore = defineStore('useAlertStore', () => {
+export const useAlertStore = defineStore('alert-store', () => {
   const currentAlerts = ref<ActiveAlert[]>([])
 
   const addCurrentAlert  = (newAlert: ActiveAlert) => { currentAlerts.value.push(newAlert) }

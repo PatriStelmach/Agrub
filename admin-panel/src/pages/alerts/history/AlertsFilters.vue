@@ -15,7 +15,7 @@ import {
   IconFilterShare,
   IconFilterX
 } from "@tabler/icons-vue";
-import DialogLabel from "@/helpers/DialogLabel.vue";
+import DialogLabel from "@/helpers_components/DialogLabel.vue";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -28,10 +28,10 @@ import {computed, reactive, useTemplateRef} from "vue";
 import type { DateRange } from "reka-ui";
 import { alertSources } from "@/data/alertSources.ts";
 import { now, getLocalTimeZone, CalendarDateTime } from '@internationalized/date'
-import MyDateRangePicker from "@/helpers/MyDateRangePicker.vue";
+import MyDateRangePicker from "@/helpers_components/MyDateRangePicker.vue";
 import type {AlertHistoryFilters} from "@/types/types.ts";
 import {dateParser} from "@/composables/dateParser.ts";
-import MyTagInput from "@/helpers/MyTagInput.vue";
+import MyTagInput from "@/helpers_components/MyTagInput.vue";
 
 const emit = defineEmits<{
   'update:filters': [AlertHistoryFilters]

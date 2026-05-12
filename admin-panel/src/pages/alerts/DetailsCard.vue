@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import {computed} from "vue";
+import {computed, watchEffect} from "vue";
 import {useMouse} from "@vueuse/core";
 import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import {Label} from "@/components/ui/label";

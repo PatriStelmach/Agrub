@@ -20,12 +20,12 @@ import {
   SelectValue
 } from "@/components/ui/select";
 import {useAlertStore} from "@/stores/alertStore.js";
-import DialogLabel from "@/helpers/DialogLabel.vue";
+import DialogLabel from "@/helpers_components/DialogLabel.vue";
 import type {ActionResponse, ActiveAlert} from "@/types/types.js";
 import {Badge} from "@/components/ui/badge";
 import ActionsTable from "@/pages/alerts/ActionsTable.vue";
 import {useAuthStore} from "@/stores/authStore.ts";
-import SeveritySelect from "@/helpers/SeveritySelect.vue";
+import SeveritySelect from "@/helpers_components/SeveritySelect.vue";
 
 const props = defineProps<{
   alert: ActiveAlert

@@ -9,20 +9,22 @@ import {
   TableRow
 } from "@/components/ui/table";
 import {IconCircleDashedCheck, IconCircleDashedX, IconEdit} from "@tabler/icons-vue";
-import SortableHead from "@/helpers/SortableHead.vue";
+import SortableHead from "@/helpers_components/SortableHead.vue";
 import EditAlertDialog from "@/pages/alerts/active/EditAlertDialog.vue";
 import {Button} from "@/components/ui/button";
-import DateCell from "@/helpers/DateCell.vue";
+import DateCell from "@/helpers_components/DateCell.vue";
 import {Badge} from "@/components/ui/badge";
 import {dataTable, tableHeaders, tableCaption} from "@/assets/cssFunctions.js";
 import type {ActiveAlert, AlertDetails} from "@/types/types.js";
 import {useSort} from "@/composables/sorting.js";
 import {computed, ref, watch, watchEffect} from "vue";
-import SeverityDiv from "@/helpers/SeverityDiv.vue";
+import SeverityDiv from "@/helpers_components/SeverityDiv.vue";
 import {dateParser} from "@/composables/dateParser.ts";
+import LoadingTable from "@/helpers_components/LoadingTable.vue";
 
 const props = defineProps<{
-  tableData: ActiveAlert[];
+  tableData: ActiveAlert[]
+  isLoading: boolean
 }>()
 
 const hoveredAlert = defineModel<AlertDetails | null>('hoveredAlert')
@@ -62,7 +64,8 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<ActiveAlert>(() =
         <TableHead class="max-md:w-9/100 w-6/100 lg:w-5/100 font-bold text-sm lg:text-md xl:text-lg 2xl:text:xl">Actions</TableHead>
       </TableRow>
     </TableHeader>
-    <TransitionGroup tag="tbody" name="slide-fade">
+    <LoadingTable :colspan="8" v-if="isLoading"/>
+    <TransitionGroup v-else tag="tbody" name="slide-fade">
       <TableRow
         :id="`${alert.id}_row`"
         class="relative duration-0  hover:bg-accent/50"
@@ -106,6 +109,5 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<ActiveAlert>(() =
         </TableCell>
       </TableRow>
     </TransitionGroup>
-
   </Table>
 </template>
