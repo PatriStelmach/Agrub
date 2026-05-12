@@ -6,9 +6,8 @@ import ActiveAlertsPage from '../pages/alerts/active/ActiveAlertsPage.vue'
 import AlertsHistory from '../pages/alerts/history/AlertsHistory.vue'
 import PluginsLibrary from '../pages/plugins/PluginsLibrary.vue'
 import MyPlugins from '../pages/plugins/MyPlugins.vue'
-import ImportPlugin from '../pages/plugins/ImportPlugin.vue'
 import TeamPage from '../pages/users/TeamPage.vue'
-import EditUser from '../pages/users/EditUser.vue'
+import Groups from '../pages/users/Groups.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -20,9 +19,9 @@ const router = createRouter({
     { path: '/alerts_history',  name: 'alerts_history',  component: AlertsHistory },
     { path: '/plugins_library', name: 'plugins_library', component: PluginsLibrary },
     { path: '/my_plugins',      name: 'my_plugins',      component: MyPlugins },
-    { path: '/import_plugins',  name: 'import_plugins',  component: ImportPlugin },
-    { path: '/team',            name: 'team',            component: TeamPage },
-    { path: '/edit_user/:id',   name: 'edit_user',       component: EditUser },
+    { path: '/import_plugins',  name: 'import_plugins',  component:() => import('../pages/plugins/ImportPlugin.vue') },
+    { path: '/team_members',    name: 'team_members',    component: TeamPage },
+    { path: '/groups',          name: 'groups',          component: Groups }
   ],
 })
 

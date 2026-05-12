@@ -19,7 +19,6 @@ import PluginFilters from "@/pages/plugins/PluginFilters.vue";
 import {onMounted, ref} from "vue";
 import {getPluginTagsResponse} from "@/helpers_functions/requests.ts";
 
-const isLoading = ref(true);
 const tags = ref<string[]>([])
 const getLibraryPluginsRequest = async () => {
   const response = await api.get('/plugins/library', {
@@ -66,7 +65,7 @@ onMounted(async () => {
   ]).finally(() => isLoading.value = false)
 })
 
-const {filters, items, pageSize, currentPage, totalElements, sortedHead, updateFilters  } =
+const {filters, items, pageSize, currentPage, totalElements, sortedHead, updateFilters, isLoading  } =
   useServerSearchFilter<LibraryPlugin, LibraryPluginFilters>
   (getLibraryPluginsRequest, undefinedLibraryFilters,'createdAt', 'desc')
 </script>

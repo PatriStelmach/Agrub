@@ -1,12 +1,12 @@
 <script setup lang="ts">
 
-import {computed, watchEffect} from "vue";
+import {computed} from "vue";
 import {useMouse} from "@vueuse/core";
 import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import {Label} from "@/components/ui/label";
 import type {AlertDetails} from "@/types/types.ts";
 
-const props = defineProps<{
+defineProps<{
   data: AlertDetails | null
 }>()
 
@@ -25,7 +25,7 @@ const descriptionBox = computed(() => {
 <template>
   <Card
     :style="descriptionBox"
-    class="z-9999 max-w-120 border-2 border-primary">
+    class="z-9999 max-w-120 border-2 border-secondary">
     <CardHeader><Label class=" font-extrabold ">Subject: </Label> {{ data?.subject }}</CardHeader>
     <CardContent class="max-w-full wrap-break-word"><Label class="pb-2 grid font-extrabold">Message:</Label> {{ data?.message}}</CardContent>
   </Card>

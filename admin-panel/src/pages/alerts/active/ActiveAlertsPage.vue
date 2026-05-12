@@ -6,7 +6,7 @@ import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/inpu
 
 import {useClientSearchFilter} from "@/composables/useClientSearchFilter";
 import { useAlertStore } from "@/stores/alertStore";
-import {computed, defineAsyncComponent, onMounted, ref} from "vue";
+import { defineAsyncComponent, onMounted, ref} from "vue";
 import {
   tableDiv,
   topH1,

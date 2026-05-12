@@ -7,19 +7,16 @@ import { nameLabel } from '@/assets/cssFunctions'
 import {
   IconUsersGroup, IconEdit, IconKey, IconTool,
 } from "@tabler/icons-vue";
-import {defineAsyncComponent} from "vue";
 import EditUser from "@/pages/users/EditUser.vue";
 
 defineProps<{
   user: User
 }>()
 
-
-
 </script>
 
 <template>
-  <Card class="border-2 user-box flex hover:shadow-lg hover:border-blue-badge/50 hover:shadow-blue-badge/50 duration-100">
+  <Card class="border-2 my-2 user-box flex hover:shadow-md hover:border-blue-badge/50 hover:shadow-blue-badge/50 transition-all duration-200 hover:translate-y-2">
     <CardHeader class="px-3 flex space-x-1 items-center relative">
       <div class="relative">
         <Avatar class="size-9 rounded-lg">
@@ -34,6 +31,7 @@ defineProps<{
         <span class="text-muted-foreground truncate text-xs">{{ user.email }}</span>
       </div>
       <EditUser
+        action-type="edit"
         :user="user"
       >
         <IconEdit

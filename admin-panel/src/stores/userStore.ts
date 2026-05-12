@@ -3,7 +3,6 @@ import type {User, UserGroup} from "@/types/types.ts";
 import {ref} from "vue";
 import api from "@/lib/axios.ts";
 import {toast} from "vue-sonner";
-import {sidebarData} from "@/data/sidebarData.ts";
 
 export const useUserStore = defineStore('user-store',() => {
   const allUsers = ref<User[]>([])
@@ -44,8 +43,6 @@ export const useUserStore = defineStore('user-store',() => {
     catch (error) {
       toast.error(`Error retrieving user: ${error}`)
     }
-
-    return sidebarData.loggedUser
   }
 
   const editUserRequest = async (user: User) => {

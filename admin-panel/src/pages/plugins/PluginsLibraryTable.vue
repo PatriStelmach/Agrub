@@ -1,9 +1,8 @@
  <script setup lang="ts">
 import DateCell from "@/helpers_components/DateCell.vue";
 import {
-  Table,
+  Table, TableBody,
   TableCaption, TableCell,
-  TableFooter,
   TableHead,
   TableHeader, TableRow
 } from "@/components/ui/table";
@@ -61,7 +60,7 @@ const downloadPlugin = async (id: number) => {
     <Table id="plugins-library-table" :class="dataTable">
       <TableCaption :class="tableCaption">
         <slot/>
-        <span >Plugins Library: <span class="font-extrabold">{{ totalElements}}</span></span>
+        <span >Matched plugins: <span class="font-extrabold">{{ totalElements}}</span></span>
       </TableCaption>
       <TableHeader class="h-10">
         <TableRow :class="tableHeaders">
@@ -74,59 +73,61 @@ const downloadPlugin = async (id: number) => {
           <TableHead class="w-7/100 pr-4!"></TableHead>
         </TableRow>
     </TableHeader>
-      <LoadingTable :colspan="7" v-if="isLoading"/>
-      <TransitionGroup v-else tag="tbody" name="slide-fade">
-        <TableRow
-          class=" cursor-pointer duration-0 hover:bg-accent"
-          v-for="plugin in plugins"
-          :key="plugin.id">
-          <TableCell class="pl-4 whitespace-break-spaces ">{{plugin.fileName}}</TableCell>
-          <TableCell class="whitespace-break-spaces" >{{plugin.creator}}</TableCell>
-          <TableCell class="whitespace-break-spaces">
-            <Badge
-              v-for="(tag, index) in plugin.tags"
-              variant="tags"
-              :key="index">{{tag}}</Badge>
-          </TableCell>
-          <TableCell >
-            <img
-              v-if="isPython(plugin.language)"
-              alt="python_icon"
-              src="@/components/icons/python_icon.png"
-              class="size-7 "
-            />
-            <img
-              v-if="isBash(plugin.language)"
-              alt="bash_icon"
-              src="@/components/icons/bash_icon.png"
-              class="size-7 "
-            />
-            <img
-              v-if="isPowerShell(plugin.language)"
-              alt="powershell_icon"
-              src="@/components/icons/powershell_icon.png"
-              class="size-7 "
-            />
-          </TableCell>
-          <DateCell  :date="dateParser(plugin.createdAt).toDate"></DateCell>
-          <TableCell >{{plugin.weight}} Kb</TableCell>
-          <TableCell>
-            <ButtonGroup>
-              <Button
-                variant="orange_outline"
-              >
-                <IconSourceCode/>
-              </Button>
-              <Button
-                @click="downloadPlugin(plugin.id)"
-                variant="green_outline"
-                class="border-l!"
-              >
-                <IconDownload/>
-              </Button>
-            </ButtonGroup>
-          </TableCell>
-        </TableRow>
-      </TransitionGroup>
+      <Transition name="fade" mode="out-in">
+        <LoadingTable :colspan="7" v-if="isLoading"/>
+        <TableBody v-else>
+          <TableRow
+            class=" cursor-pointer duration-0 hover:bg-accent"
+            v-for="plugin in plugins"
+            :key="plugin.id">
+            <TableCell class="pl-4 whitespace-break-spaces ">{{plugin.fileName}}</TableCell>
+            <TableCell class="whitespace-break-spaces" >{{plugin.creator}}</TableCell>
+            <TableCell class="whitespace-break-spaces">
+              <Badge
+                v-for="(tag, index) in plugin.tags"
+                variant="tags"
+                :key="index">{{tag}}</Badge>
+            </TableCell>
+            <TableCell >
+              <img
+                v-if="isPython(plugin.language)"
+                alt="python_icon"
+                src="@/components/icons/python_icon.png"
+                class="size-7 "
+              />
+              <img
+                v-if="isBash(plugin.language)"
+                alt="bash_icon"
+                src="@/components/icons/bash_icon.png"
+                class="size-7 "
+              />
+              <img
+                v-if="isPowerShell(plugin.language)"
+                alt="powershell_icon"
+                src="@/components/icons/powershell_icon.png"
+                class="size-7 "
+              />
+            </TableCell>
+            <DateCell  :date="dateParser(plugin.createdAt).toDate"></DateCell>
+            <TableCell >{{plugin.weight}} Kb</TableCell>
+            <TableCell>
+              <ButtonGroup>
+                <Button
+                  variant="orange_outline"
+                >
+                  <IconSourceCode/>
+                </Button>
+                <Button
+                  @click="downloadPlugin(plugin.id)"
+                  variant="green_outline"
+                  class="border-l-2!"
+                >
+                  <IconDownload/>
+                </Button>
+              </ButtonGroup>
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Transition>
   </Table>
 </template>

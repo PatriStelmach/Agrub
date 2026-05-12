@@ -1,9 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from "vue"
-import {api_url, type MyJWTPayload} from "@/types/types.ts"
+import { type MyJWTPayload} from "@/types/types.ts"
 import { jwtDecode } from "jwt-decode"
 import api from "@/lib/axios"
-import axios from "axios";
 
 export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = ref<boolean>(false)
@@ -18,7 +17,6 @@ export const useAuthStore = defineStore('auth', () => {
     if (!accessToken.value) return null
     try {
       return jwtDecode<MyJWTPayload>(accessToken.value)
-
     } catch {
       return null
     }
@@ -55,13 +53,14 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function refreshToken() {
     try {
-      const response = await api.post(`/auth/refresh`, {}, { withCredentials: true });
-      accessToken.value = response.data.access_token
-      isAuthenticated.value = true
-
-      return true;
-    } catch (err) {
-      throw err;
+      const response = await api.post(`/auth/refresh`, { withCredentials: true });
+      if (response.status === 200 && response.data.access_token) {
+        accessToken.value = response.data.access_token
+        isAuthenticated.value = true
+      }
+      else isAuthenticated.value = false
+    } catch  {
+      isAuthenticated.value = false
     }
   }
 

@@ -1,5 +1,4 @@
 import {type Ref, ref, toRaw} from "vue";
-import type {ApiResponse} from "@/types/types.ts";
 
 export function useWrapping<T extends object>(
   data: Ref<T[]>,

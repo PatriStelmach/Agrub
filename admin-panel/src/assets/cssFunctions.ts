@@ -9,3 +9,4 @@ export const topH1 = "text-center my-[2vh] text-xl xl:text-2xl 2xl:text-4xl bord
 export const topButtonGroup = "absolute left-4 top-0 flex max-w-2/5 "
 export const unwrappedItemClass = "bg-selected [&_td]:align-top  sticky h-26! [&_td]:pt-4! top-11 bottom-11 hover:bg-card z-9 cursor-auto"
 export const tagsContainer = "max-h-30 mb-2  overflow-y-auto border-2 border-t-0! border-input p-2 rounded-b-md"
+export const gridSkeletons = " px-6 py-2 pr-3 grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 max-h-[85vh] overflow-y-auto"

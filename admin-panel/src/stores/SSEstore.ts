@@ -3,7 +3,6 @@ import { h, ref } from "vue";
 import { toast } from "vue-sonner";
 import { IconAlertTriangle, IconCircleDashedCheck, IconRefresh } from "@tabler/icons-vue";
 import { useAlertStore } from "@/stores/alertStore.ts";
-import { useNotificationStore } from "@/stores/notificationStore.ts";
 import { defineStore } from "pinia";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
 import {useAuthStore} from "@/stores/authStore.ts";

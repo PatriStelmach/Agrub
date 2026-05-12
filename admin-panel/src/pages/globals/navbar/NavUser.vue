@@ -24,10 +24,8 @@ import {
   SidebarMenuButton,
 } from '@/components/ui/sidebar'
 import {useAuthStore} from "@/stores/authStore.ts";
-import {useUserStore} from "@/stores/userStore.ts";
 
 const authStore = useAuthStore()
-const userStore = useUserStore()
 </script>
 
 <template>

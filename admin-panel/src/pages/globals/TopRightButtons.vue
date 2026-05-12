@@ -1,12 +1,9 @@
 <script setup lang="ts">
 import { useColorMode } from '@vueuse/core'
-import { Button } from '@/components/ui/button'
 import {
-  IconSunFilled, IconMoonFilled, IconHelpCircleFilled, IconSettingsFilled, IconBellFilled,
-  IconLogout, IconLogin
+  IconSunFilled, IconMoonFilled, IconHelpCircleFilled, IconSettingsFilled,
+  IconLogout
 } from "@tabler/icons-vue";
-import {useNotificationStore} from "@/stores/notificationStore.ts";
-import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {useAuthStore} from "@/stores/authStore.ts";
 const authStore = useAuthStore();
 const mode = useColorMode()
