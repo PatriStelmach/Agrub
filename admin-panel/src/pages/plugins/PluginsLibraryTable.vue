@@ -8,7 +8,13 @@ import {
   TableHeader, TableRow
 } from "@/components/ui/table";
 import {Badge} from "@/components/ui/badge";
-import {Language, type LibraryPlugin} from "@/types/types.ts"
+import {
+  type Bash,
+  type Python,
+  type PowerShell,
+  type LibraryPlugin,
+  isPowerShell, isBash, isPython
+} from "@/types/types.ts"
 import SortableHead from "@/helpers/SortableHead.vue";
 import {tableCaption, dataTable, tableHeaders} from "@/assets/cssFunctions.ts";
 import {useSort} from "@/composables/sorting.ts";
@@ -85,19 +91,19 @@ const downloadPlugin = async (id: number) => {
           </TableCell>
           <TableCell >
             <img
-              v-if="plugin.language === Language.PYTHON"
+              v-if="isPython(plugin.language)"
               alt="python_icon"
               src="@/components/icons/python_icon.png"
               class="size-7 "
             />
             <img
-              v-if="[Language.BASH, Language.SH].includes(plugin.language)"
+              v-if="isBash(plugin.language)"
               alt="bash_icon"
               src="@/components/icons/bash_icon.png"
               class="size-7 "
             />
             <img
-              v-if="[Language.POWERSHELL, Language.POWERSHELL_MODULE].includes(plugin.language)"
+              v-if="isPowerShell(plugin.language)"
               alt="powershell_icon"
               src="@/components/icons/powershell_icon.png"
               class="size-7 "

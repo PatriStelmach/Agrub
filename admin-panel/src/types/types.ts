@@ -199,7 +199,16 @@ export interface ApiResponse {
 export enum Language {
   PYTHON = ".py",
   SH = ".sh",
-  BASH = ".bash",
+  BASH = ".bash" ,
   POWERSHELL = ".ps1",
   POWERSHELL_MODULE = ".psm1"
 }
+
+export const isBash = (lang: string)  =>
+  lang === Language.SH || lang === Language.BASH
+
+export const isPython = (lang: string)  =>
+  lang === Language.PYTHON
+
+export const isPowerShell = (lang: string)  =>
+  lang === Language.POWERSHELL_MODULE || lang === Language.POWERSHELL

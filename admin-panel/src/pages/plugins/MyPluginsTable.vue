@@ -24,7 +24,7 @@ import {
   IconStatusChange,
   IconTrash,
 } from "@tabler/icons-vue"
-import {computed, defineAsyncComponent, ref, useTemplateRef, watch} from "vue";
+import {computed, defineAsyncComponent, onMounted, ref, useTemplateRef, watch} from "vue";
 import {useSort} from "@/composables/sorting.ts";
 import SortableHead from "@/helpers/SortableHead.vue";
 import {
@@ -38,7 +38,6 @@ import {useWrapping} from "@/composables/unwrapping.ts";
 import {Button} from "@/components/ui/button";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
 import {Search} from "lucide-vue-next";
-import {availableTags} from "@/data/tags.ts";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import {Label} from "@/components/ui/label";
 import {ButtonGroup} from "@/components/ui/button-group";
@@ -48,6 +47,8 @@ import {inputText} from "@/assets/cssFunctions.ts";
 import GoBackButton from "@/helpers/GoBackButton.vue";
 import SeveritySelect from "@/helpers/SeveritySelect.vue";
 import SeverityDiv from "@/helpers/SeverityDiv.vue";
+import api from "@/lib/axios.ts";
+import {toast} from "vue-sonner";
 const MyTagInput = defineAsyncComponent(() => import('@/helpers/MyTagInput.vue'))
 
 const props = defineProps<{
@@ -57,9 +58,23 @@ const emit = defineEmits<{
   'update:search-data': [data:string]
 }>()
 
+onMounted(async () => {
+  try {
+    const res = await api.get('/plugins/tags')
+    if (res.status === 200) {
+      availableTags.value = res.data
+    }
+    else {
+      toast.error(res.data)
+    }
+  }
+  catch (err) {
+    toast.error(`Error getting tags:${err}`)
+  }
+})
 
 const PluginDetailsDialog = defineAsyncComponent( () => import ("@/pages/plugins/PluginDetailsDialog.vue"))
-
+const availableTags = ref<string[]>([])
 const myPluginStore = useMyPluginStore()
 const { sortedData, sortKey, sortOrder, toggleSort } = useSort<MyPlugin>(() => props.data, 'updatedAt')
 const { wrap, isUnwrapped, unwrap, unwrappedItem, save } = useWrapping(sortedData, 'fullName')
