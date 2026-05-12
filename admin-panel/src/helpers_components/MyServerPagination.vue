@@ -20,7 +20,7 @@ const props = defineProps<{
 }>()
 
 const currentPage = defineModel<number>('pageIndex', { default: 1 })
-const pageSize = defineModel<number>('pageSize', { default: 20 })
+const pageSize = defineModel<number>('pageSize', { default: 50 })
 
 watch(pageSize, () => {
   currentPage.value = 1

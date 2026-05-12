@@ -14,7 +14,7 @@ import {useClientSearchFilter} from "@/composables/useClientSearchFilter.js";
 import {blankUser, type User} from "@/types/types.ts";
 import {useTagsFilter} from "@/composables/useTagsFilter.ts";
 import {topButtonGroup, topH1} from "@/assets/cssFunctions.ts";
-import GoBackButton from "@/helpers/GoBackButton.vue";
+import GoBackButton from "@/helpers_components/GoBackButton.vue";
 import UserCard from "@/pages/users/UserCard.vue";
 import {useUserStore} from "@/stores/userStore.ts";
 import EditUser from "@/pages/users/EditUser.vue";

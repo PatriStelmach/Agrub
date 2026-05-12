@@ -11,12 +11,16 @@ import {
   type LibraryPluginFilters, undefinedLibraryFilters
 } from "@/types/types.ts"
 import {tableDiv, topButtonGroup, topDiv, topH1} from "@/assets/cssFunctions.ts";
-import GoBackButton from "@/helpers/GoBackButton.vue";
-import MyServerPagination from "@/helpers/MyServerPagination.vue";
+import GoBackButton from "@/helpers_components/GoBackButton.vue";
+import MyServerPagination from "@/helpers_components/MyServerPagination.vue";
 import {useServerSearchFilter} from "@/composables/useServerSearchFilter.ts";
 import api from "@/lib/axios.ts";
 import PluginFilters from "@/pages/plugins/PluginFilters.vue";
+import {onMounted, ref} from "vue";
+import {getPluginTagsResponse} from "@/helpers_functions/requests.ts";
 
+const isLoading = ref(true);
+const tags = ref<string[]>([])
 const getLibraryPluginsRequest = async () => {
   const response = await api.get('/plugins/library', {
     params: {
@@ -54,6 +58,14 @@ const getLibraryPluginsRequest = async () => {
     totalElements.value = response.data.totalElements
   }
 }
+
+onMounted(async () => {
+  await Promise.all([
+    getLibraryPluginsRequest(),
+    tags.value = await getPluginTagsResponse() || []
+  ]).finally(() => isLoading.value = false)
+})
+
 const {filters, items, pageSize, currentPage, totalElements, sortedHead, updateFilters  } =
   useServerSearchFilter<LibraryPlugin, LibraryPluginFilters>
   (getLibraryPluginsRequest, undefinedLibraryFilters,'createdAt', 'desc')
@@ -79,6 +91,7 @@ const {filters, items, pageSize, currentPage, totalElements, sortedHead, updateF
     </div>
     <div :class="tableDiv">
     <PluginsLibraryTable
+      :isLoading="isLoading"
       v-model:sorted-head="sortedHead"
       :plugins="items"
       :totalElements="totalElements">

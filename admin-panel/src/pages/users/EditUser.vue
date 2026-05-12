@@ -18,13 +18,13 @@ import { inputText, nameLabel } from '@/assets/cssFunctions'
 import { useUserStore } from "@/stores/userStore.ts"
 import { ref } from "vue"
 import type { User } from "@/types/types"
-import MyTagInput from "@/helpers/MyTagInput.vue"
+import MyTagInput from "@/helpers_components/MyTagInput.vue"
 import {Field, FieldError, FieldGroup} from "@/components/ui/field";
 import {toTypedSchema} from "@vee-validate/zod";
 import z from "zod"
 import {useForm, Field as VeeField, useField} from 'vee-validate'
-import MyFieldLabel from "@/helpers/MyFieldLabel.vue";
-import DialogLabel from "@/helpers/DialogLabel.vue";
+import MyFieldLabel from "@/helpers_components/MyFieldLabel.vue";
+import DialogLabel from "@/helpers_components/DialogLabel.vue";
 
 const userStore = useUserStore()
 const props = defineProps<{

@@ -14,22 +14,24 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table";
-import SortableHead from "@/helpers/SortableHead.vue";
+import SortableHead from "@/helpers_components/SortableHead.vue";
 import {computed, defineAsyncComponent, ref, watch, watchEffect} from "vue";
 import {type AlertDetails, type HistoryAlert} from "@/types/types.ts";
 import {Badge} from "@/components/ui/badge";
 import {IconCircleDashedCheck, IconCircleDashedX, IconHistory} from "@tabler/icons-vue";
 import {Button} from "@/components/ui/button";
-import DateCell from "@/helpers/DateCell.vue";
+import DateCell from "@/helpers_components/DateCell.vue";
 import {useSortRequests} from "@/composables/useSortRequests.ts";
-import SeverityDiv from "@/helpers/SeverityDiv.vue";
+import SeverityDiv from "@/helpers_components/SeverityDiv.vue";
+import LoadingTable from "@/helpers_components/LoadingTable.vue";
 const AlertHistoryDialog = defineAsyncComponent(
   () => import('@/pages/alerts/history/AlertHistoryDialog.vue')
 )
 
 const props = defineProps<{
-  alerts: HistoryAlert[];
+  alerts: HistoryAlert[]
   totalElements: number
+  isLoading: boolean
 }>()
 
 const hoveredAlert = defineModel<AlertDetails | null>('hoveredAlert')
@@ -76,6 +78,8 @@ watchEffect(() => {
             <TableHead class="max-md:w-9/100 w-6/100 lg:w-5/100 font-bold text-sm lg:text-md xl:text-lg 2xl:text:xl">Actions</TableHead>
           </TableRow>
         </TableHeader>
+        <LoadingTable :colspan="9" v-if="isLoading"/>
+        <TransitionGroup v-else tag="tbody" name="fade">
           <TableRow
             :id="`${alert.id}_row`"
             class="relative cursor-pointer duration-0  hover:bg-accent/50"
@@ -86,7 +90,7 @@ watchEffect(() => {
             <TableCell>
               <SeverityDiv
                 :severity="alert.severity"
-                />
+              />
             </TableCell>
             <TableCell
               @mouseenter="hoveredId = alert.id"
@@ -121,5 +125,6 @@ watchEffect(() => {
 
             </TableCell>
           </TableRow>
+        </TransitionGroup>
       </Table>
 </template>

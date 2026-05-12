@@ -8,7 +8,7 @@ import {
   DialogTitle, DialogTrigger
 } from "@/components/ui/dialog";
 import {Badge} from "@/components/ui/badge";
-import DialogLabel from "@/helpers/DialogLabel.vue";
+import DialogLabel from "@/helpers_components/DialogLabel.vue";
 import {
   Select,
   SelectContent,
@@ -23,7 +23,7 @@ import {IconCheck, IconSend2, IconX} from "@tabler/icons-vue";
 import type {ActionResponse, ActiveAlert, HistoryAlert} from "@/types/types.ts";
 import {ref} from "vue";
 import {useAlertStore} from "@/stores/alertStore.ts";
-import SeverityDiv from "@/helpers/SeverityDiv.vue";
+import SeverityDiv from "@/helpers_components/SeverityDiv.vue";
 
 const props = defineProps<{
   alert: HistoryAlert

@@ -1,17 +1,25 @@
 <script setup lang="ts" >
 import MyPluginsTable from "@/pages/plugins/MyPluginsTable.vue";
-import MyServerPagination from "@/helpers/MyServerPagination.vue";
+import MyServerPagination from "@/helpers_components/MyServerPagination.vue";
 import type { MyPlugin } from "@/types/types.ts";
 import {useClientSearchFilter} from "@/composables/useClientSearchFilter.js";
 import {useMyPluginStore} from "@/stores/myPluginStore.ts";
-import MyClientPagination from "@/helpers/MyClientPagination.vue";
-import {onMounted, useTemplateRef} from "vue";
+import MyClientPagination from "@/helpers_components/MyClientPagination.vue";
+import {onMounted, ref, useTemplateRef} from "vue";
+import {getPluginTagsResponse} from "@/helpers_functions/requests.ts";
+import { toast } from "vue-sonner";
 
 const myPluginStore = useMyPluginStore()
-onMounted(() => {
-  myPluginStore.getAllMyPlugins()
-})
+const isLoading = ref<boolean>(true)
+const tags = ref<string[]>([])
 
+onMounted(async () => {
+    await Promise.all([
+      myPluginStore.getAllMyPluginsRequest(),
+      tags.value = await getPluginTagsResponse() || []
+    ]).finally(() => isLoading.value = false)
+
+})
 
 const {filteredData, tableData, updateData, updateSearchData, currentPage, pageSize } =
   useClientSearchFilter<MyPlugin>(() => myPluginStore.allMyPlugins,(plugin) => plugin.name)
@@ -24,7 +32,9 @@ const {filteredData, tableData, updateData, updateSearchData, currentPage, pageS
   <div>
   <div>
     <MyPluginsTable
+      :isLoading="isLoading"
       :data="tableData"
+      :availableTags="tags"
       @update:searchData="updateSearchData"
     >
       <MyClientPagination

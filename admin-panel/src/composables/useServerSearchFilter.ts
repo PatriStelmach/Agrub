@@ -4,7 +4,7 @@ export function useServerSearchFilter<T, F>
 (getItemsRequest: () => void, emptyFilters: F, sortKey: string, sortOrder: string) {
   const items = ref<T[]>([])
   const searchFilter = ref<string | null>(null);
-  const pageSize = ref<number>(20);
+  const pageSize = ref<number>(50);
   const currentPage = ref<number>(1);
   const totalElements = ref<number>(0);
   const sortedHead = ref<{ sortKey: string; sortOrder: string }>({
@@ -22,10 +22,10 @@ export function useServerSearchFilter<T, F>
     getItemsRequest()
   })
 
-  watch(sortedHead, async () => {
+  watch([() => sortedHead.value.sortKey, () => sortedHead.value.sortOrder], async () => {
     currentPage.value = 1
     getItemsRequest()
-  }, { deep: true })
+  })
 
   return {
     items,

@@ -25,7 +25,7 @@ import type {fileType} from "@/types/types.ts";
 import { Label } from "@/components/ui/label"
 import {Progress} from "@/components/ui/progress";
 import {topButtonGroup, topH1} from "@/assets/cssFunctions.ts";
-import GoBackButton from "@/helpers/GoBackButton.vue";
+import GoBackButton from "@/helpers_components/GoBackButton.vue";
 
 const idCounter = ref(0)
 const files = ref<fileType[]>()

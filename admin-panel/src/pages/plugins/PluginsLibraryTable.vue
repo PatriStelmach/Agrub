@@ -1,5 +1,5 @@
  <script setup lang="ts">
-import DateCell from "@/helpers/DateCell.vue";
+import DateCell from "@/helpers_components/DateCell.vue";
 import {
   Table,
   TableCaption, TableCell,
@@ -8,8 +8,11 @@ import {
   TableHeader, TableRow
 } from "@/components/ui/table";
 import {Badge} from "@/components/ui/badge";
-import {Language, type LibraryPlugin} from "@/types/types.ts"
-import SortableHead from "@/helpers/SortableHead.vue";
+import {
+  type LibraryPlugin,
+  isPowerShell, isBash, isPython
+} from "@/types/types.ts"
+import SortableHead from "@/helpers_components/SortableHead.vue";
 import {tableCaption, dataTable, tableHeaders} from "@/assets/cssFunctions.ts";
 import {useSort} from "@/composables/sorting.ts";
 import {ButtonGroup} from "@/components/ui/button-group";
@@ -19,10 +22,12 @@ import {watchEffect} from "vue";
 import {dateParser} from "@/composables/dateParser.ts";
 import api from "@/lib/axios.ts";
 import {toast} from "vue-sonner";
+import LoadingTable from "@/helpers_components/LoadingTable.vue";
 
 const props = defineProps<{
   plugins: LibraryPlugin[]
   totalElements: number
+  isLoading: boolean;
 }>()
 
 const sortedHead =  defineModel<{ sortKey: string; sortOrder: string }>('sortedHead')
@@ -67,10 +72,10 @@ const downloadPlugin = async (id: number) => {
           <SortableHead keyName="createdAt" label="Date" :sort-key="sortKey" class=" w-11/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
           <SortableHead keyName="weight" label="Weight" :sort-key="sortKey" class="  w-7/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
           <TableHead class="w-7/100 pr-4!"></TableHead>
-
         </TableRow>
     </TableHeader>
-      <TransitionGroup name="slide-fade">
+      <LoadingTable :colspan="7" v-if="isLoading"/>
+      <TransitionGroup v-else tag="tbody" name="slide-fade">
         <TableRow
           class=" cursor-pointer duration-0 hover:bg-accent"
           v-for="plugin in plugins"
@@ -85,19 +90,19 @@ const downloadPlugin = async (id: number) => {
           </TableCell>
           <TableCell >
             <img
-              v-if="plugin.language === Language.PYTHON"
+              v-if="isPython(plugin.language)"
               alt="python_icon"
               src="@/components/icons/python_icon.png"
               class="size-7 "
             />
             <img
-              v-if="[Language.BASH, Language.SH].includes(plugin.language)"
+              v-if="isBash(plugin.language)"
               alt="bash_icon"
               src="@/components/icons/bash_icon.png"
               class="size-7 "
             />
             <img
-              v-if="[Language.POWERSHELL, Language.POWERSHELL_MODULE].includes(plugin.language)"
+              v-if="isPowerShell(plugin.language)"
               alt="powershell_icon"
               src="@/components/icons/powershell_icon.png"
               class="size-7 "
@@ -123,8 +128,5 @@ const downloadPlugin = async (id: number) => {
           </TableCell>
         </TableRow>
       </TransitionGroup>
-
-    <TableFooter>
-    </TableFooter>
   </Table>
 </template>

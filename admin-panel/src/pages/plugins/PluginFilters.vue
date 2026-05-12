@@ -15,7 +15,7 @@ import {
   IconFilterShare,
   IconFilterX
 } from "@tabler/icons-vue";
-import DialogLabel from "@/helpers/DialogLabel.vue";
+import DialogLabel from "@/helpers_components/DialogLabel.vue";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/select";
 import {onMounted, reactive, ref, useTemplateRef} from "vue";
 import {Language, type LibraryPluginFilters} from "@/types/types.ts";
-import MyTagInput from "@/helpers/MyTagInput.vue";
+import MyTagInput from "@/helpers_components/MyTagInput.vue";
 import {
   NumberField,
   NumberFieldContent,

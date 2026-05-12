@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/empty'
 import {topButtonGroup, topDiv, topH1} from "@/assets/cssFunctions.ts";
 import {ButtonGroup} from "@/components/ui/button-group";
-import GoBackButton from "@/helpers/GoBackButton.vue";
+import GoBackButton from "@/helpers_components/GoBackButton.vue";
 </script>
 
 <template>
