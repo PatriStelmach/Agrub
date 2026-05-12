@@ -204,6 +204,15 @@ export enum Language {
   POWERSHELL_MODULE = ".psm1"
 }
 
+export enum MatchType {
+  EXACT = "EXACT",
+  STARTS_WITH = "STARTS_WITH",
+  ENDS_WITH = "ENDS_WITH",
+  CONTAINS = "CONTAINS",
+  REGEX = "REGEX",
+}
+
+
 export const isBash = (lang: string)  =>
   lang === Language.SH || lang === Language.BASH
 

@@ -1,11 +1,10 @@
 import {defineStore} from "pinia";
 import {
-  type ApiResponse,
   type MyPlugin,
   type MyPluginsFromApi,
   type PluginDetails
 } from "@/types/types.ts";
-import {computed, ref} from "vue";
+import { ref} from "vue";
 import api from "@/lib/axios";
 import {toast} from "vue-sonner";
 

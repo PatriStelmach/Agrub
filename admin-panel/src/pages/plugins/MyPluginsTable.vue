@@ -46,7 +46,6 @@ import {inputText} from "@/assets/cssFunctions.ts";
 import GoBackButton from "@/helpers_components/GoBackButton.vue";
 import SeveritySelect from "@/helpers_components/SeveritySelect.vue";
 import SeverityDiv from "@/helpers_components/SeverityDiv.vue";
-import {Skeleton} from "@/components/ui/skeleton";
 import LoadingTable from "@/helpers_components/LoadingTable.vue";
 const MyTagInput = defineAsyncComponent(() => import('@/helpers_components/MyTagInput.vue'))
 
@@ -151,7 +150,7 @@ const updateDetails = (code: string, description: string) => {
           <IconStatusChange/>
         </Button>
         <Button
-          class="border-l!"
+          class="border-l-2!"
           @click="deletePlugins"
           :disabled="blockedRemoveAndChange"
           variant="red_outline">
@@ -197,164 +196,167 @@ const updateDetails = (code: string, description: string) => {
               <SortableHead keyName="weight" label="Weight" :sort-key="sortKey" class="  w-7/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
           </TableRow>
         </TableHeader>
-      <LoadingTable :colspan="9" v-if="isLoading"/>
-      <TransitionGroup v-else tag="tbody" name="slide-fade">
-        <TableRow
-          class="cursor-pointer duration-0 border-radius-0  [&_td]:py-2 [&_td]:pr-4 hover:bg-green-badge/20 "
-          v-for="plugin in sortedData"
-          :key="plugin.fullName"
-          @click="isUnwrapped(plugin.fullName) ? null : unwrap(plugin.fullName); "
-          :class="{'hover:bg-destructive/20': !plugin.active,
+      <Transition name="fade" mode="out-in">
+        <LoadingTable :colspan="9" v-if="isLoading"/>
+        <TableBody v-else>
+          <TableRow
+            class="cursor-pointer duration-0 border-radius-0  [&_td]:py-2 [&_td]:pr-4 hover:bg-green-badge/20 "
+            v-for="plugin in sortedData"
+            :key="plugin.fullName"
+            @click="isUnwrapped(plugin.fullName) ? null : unwrap(plugin.fullName); "
+            :class="{'hover:bg-destructive/20': !plugin.active,
              'bg-selected [&_td]:align-top cursor-auto sticky h-40! [&_td]:pt-4! top-11 bottom-11 hover:bg-card z-9 '
                     : isUnwrapped(plugin.fullName) }">
-          <TableCell class="px-4">
-            <input
-              @click.stop
-              :disabled="blockedCheckbox"
-              type="checkbox"
-              :id="cn('my-plugin-no-'+plugin.fullName)" class="size-[1vw] cursor-pointer align-middle"
-              :value="plugin.fullName"
-              v-model="checkedPlugins"
-            />
-          </TableCell>
-          <TableCell v-if="isUnwrapped(plugin.fullName) && unwrappedItem">
-            <InputGroup
-              class="w-full xl:h-10 2xl:h-12 ">
-              <InputGroupInput
-                :class="inputText"
-                v-model="unwrappedItem.name"
-                type="text"
-                placeholder="plugin name"/>
-              <InputGroupAddon><IconLabel class="size-4 lg:size-5 xl:size-6 2xl:size-7 cursor-pointer"/></InputGroupAddon>
-            </InputGroup>
-          </TableCell>
-          <TableCell v-else class=" whitespace-break-spaces">{{plugin.name}}
-          </TableCell>
-
-
-          <!-- Tags -->
-          <TableCell class="whitespace-break-spaces" >
-            <MyTagInput
-              v-if="unwrappedItem && isUnwrapped(plugin.fullName)"
-              v-model:tags="unwrappedItem.tags"
-              :all-tags="availableTags"
-              input-id="tags-input"
-              :can-add-new="true"
-              tags-label="Tags"/>
-            <TransitionGroup v-else name="fade">
-              <Badge
-                v-for="(tag, index) in plugin.tags"
-                variant="tags"
-                :key="index"
-              >{{tag}}</Badge>
-            </TransitionGroup>
-
-          </TableCell>
-
-          <TableCell v-if="!isUnwrapped(plugin.fullName)" class="whitespace-break-spaces">
-            {{ plugin.cronExpression ? cronstrue.toString(plugin.cronExpression) : ''}}
-            <br>
-            <span>Next run: {{ nextRun(plugin) }}
-              </span>
-          </TableCell>
-          <TableCell v-else class="grid space-y-2">
-            <InputGroup class="relative w-full xl:h-10 2xl:h-12 mb-2">
-              <InputGroupInput
-                class=" text-center input-text"
-                type="text"
-                placeholder="cron expression"
-                v-model="unwrappedItem!.cronExpression"
+            <TableCell class="px-4">
+              <input
+                @click.stop
+                :disabled="blockedCheckbox"
+                type="checkbox"
+                :id="cn('my-plugin-no-'+plugin.fullName)" class="size-[1vw] cursor-pointer align-middle"
+                :value="plugin.fullName"
+                v-model="checkedPlugins"
               />
-              <InputGroupAddon><IconClockBolt class="absolute left-4 size-4 lg:size-5 xl:size-6 2xl:size-8"/></InputGroupAddon>
-            </InputGroup>
-            <span
-              class="grid gap-y-2 w-full text-center whitespace-break-spaces t"
-              :class="{'text-destructive' : !cronDescription[2]}"
-            >
+            </TableCell>
+            <TableCell v-if="isUnwrapped(plugin.fullName) && unwrappedItem">
+              <InputGroup
+                class="w-full xl:h-10 2xl:h-12 ">
+                <InputGroupInput
+                  :class="inputText"
+                  v-model="unwrappedItem.name"
+                  type="text"
+                  placeholder="plugin name"/>
+                <InputGroupAddon><IconLabel class="size-4 lg:size-5 xl:size-6 2xl:size-7 cursor-pointer"/></InputGroupAddon>
+              </InputGroup>
+            </TableCell>
+            <TableCell v-else class=" whitespace-break-spaces">{{plugin.name}}
+            </TableCell>
+
+
+            <!-- Tags -->
+            <TableCell class="whitespace-break-spaces" >
+              <MyTagInput
+                v-if="unwrappedItem && isUnwrapped(plugin.fullName)"
+                v-model:tags="unwrappedItem.tags"
+                :all-tags="availableTags"
+                input-id="tags-input"
+                :can-add-new="true"
+                tags-label="Tags"/>
+              <TransitionGroup v-else name="fade">
+                <Badge
+                  v-for="(tag, index) in plugin.tags"
+                  variant="tags"
+                  :key="index"
+                >{{tag}}</Badge>
+              </TransitionGroup>
+
+            </TableCell>
+
+            <TableCell v-if="!isUnwrapped(plugin.fullName)" class="whitespace-break-spaces">
+              {{ plugin.cronExpression ? cronstrue.toString(plugin.cronExpression) : ''}}
+              <br>
+              <span>Next run: {{ nextRun(plugin) }}
+              </span>
+            </TableCell>
+            <TableCell v-else class="grid space-y-2">
+              <InputGroup class="relative w-full xl:h-10 2xl:h-12 mb-2">
+                <InputGroupInput
+                  class=" text-center input-text"
+                  type="text"
+                  placeholder="cron expression"
+                  v-model="unwrappedItem!.cronExpression"
+                />
+                <InputGroupAddon><IconClockBolt class="absolute left-4 size-4 lg:size-5 xl:size-6 2xl:size-8"/></InputGroupAddon>
+              </InputGroup>
+              <span
+                class="grid gap-y-2 w-full text-center whitespace-break-spaces t"
+                :class="{'text-destructive' : !cronDescription[2]}"
+              >
                   <span>{{ cronDescription[0]}}</span>
                   <span v-if="cronDescription[2]">
                     Next run: {{ cronDescription[1]}}</span>
                 </span>
-          </TableCell>
-          <TableCell v-if="isUnwrapped(plugin.fullName) && unwrappedItem" >
-            <SeveritySelect
-              v-model:severity="unwrappedItem.severity"
-            />
-          </TableCell>
-          <TableCell v-else  >
-            <SeverityDiv
-              :severity="plugin.severity"
-            />
-          </TableCell>
-          <TableCell >
-            <img
-              v-if="plugin.language === Language.PYTHON"
-              alt="python_icon"
-              src="@/components/icons/python_icon.png"
-              class="size-7 lg:size-8"
-            />
-            <img
-              v-if="[Language.BASH, Language.SH].includes(plugin.language)"
-              alt="bash_icon"
-              src="@/components/icons/bash_icon.png"
-              class="size-7 lg:size-8 "
-            />
-            <img
-              v-if="[Language.POWERSHELL, Language.POWERSHELL_MODULE].includes(plugin.language)"
-              alt="powershell_icon"
-              src="@/components/icons/powershell_icon.png"
-              class="size-7 lg:size-8 "
-            />
-          </TableCell>
-          <DateCell class="" v-if="plugin.updatedAt" :date="plugin.updatedAt"></DateCell>
-          <TableCell v-if="isUnwrapped(plugin.fullName) && unwrappedItem" >
-            <RadioGroup
-              @update:model-value="unwrappedItem.active = $event === 'on'"
-              :model-value="unwrappedItem.active ? 'on' : 'off'"
-              :default-value="plugin.active ? 'on' : 'off'"
-              class="">
-              <div class="flex items-center space-x-2">
-                <RadioGroupItem class="size-4 lg:size-5 xl:size-6 2xl:size-8" id=radio-on value="on" />
-                <Label class="cursor-pointer text-green-badge"  for="radio-on">On</Label>
-              </div>
-              <div class="flex items-center space-x-2">
-                <RadioGroupItem class="size-4 lg:size-5 xl:size-6 2xl:size-8" id="radio-off" value="off" />
-                <Label class="cursor-pointer text-destructive" for="radio-off">Off</Label>
-              </div>
-            </RadioGroup>
-          </TableCell>
-          <TableCell v-else class=" text-green-badge" :class="{'text-destructive' : !plugin.active}">{{ plugin.active ? 'On' : 'Off'}}</TableCell>
-          <TableCell class="">{{plugin.weight}} KB
-            <ButtonGroup v-if="isUnwrapped(plugin.fullName) && unwrappedItem" class="flex  absolute bottom-4 right-3 *:items-center *:align-middle *:flex">
-              <Button
-                @click.stop="wrap"
-                variant="red_outline">
-                Cancel<IconCancel class="size-4 xl:size-5"/>
-              </Button>
-              <Button variant="orange_outline" class="p-0">
-                <PluginDetailsDialog
-                  :code="unwrappedItem.code ?? ''"
-                  :description="unwrappedItem.description ?? ''"
-                  @update:save-changes="updateDetails"
-                >
-                  <Button
-                    @click.stop="getDetails(plugin.fullName)"
-                    class="border-0! m-0 rounded-none bg-transparent! text-severity-3 hover:text-primary"
+            </TableCell>
+            <TableCell v-if="isUnwrapped(plugin.fullName) && unwrappedItem" >
+              <SeveritySelect
+                v-model:severity="unwrappedItem.severity"
+              />
+            </TableCell>
+            <TableCell v-else  >
+              <SeverityDiv
+                :severity="plugin.severity"
+              />
+            </TableCell>
+            <TableCell >
+              <img
+                v-if="plugin.language === Language.PYTHON"
+                alt="python_icon"
+                src="@/components/icons/python_icon.png"
+                class="size-7 lg:size-8"
+              />
+              <img
+                v-if="[Language.BASH, Language.SH].includes(plugin.language)"
+                alt="bash_icon"
+                src="@/components/icons/bash_icon.png"
+                class="size-7 lg:size-8 "
+              />
+              <img
+                v-if="[Language.POWERSHELL, Language.POWERSHELL_MODULE].includes(plugin.language)"
+                alt="powershell_icon"
+                src="@/components/icons/powershell_icon.png"
+                class="size-7 lg:size-8 "
+              />
+            </TableCell>
+            <DateCell class="" v-if="plugin.updatedAt" :date="plugin.updatedAt"></DateCell>
+            <TableCell v-if="isUnwrapped(plugin.fullName) && unwrappedItem" >
+              <RadioGroup
+                @update:model-value="unwrappedItem.active = $event === 'on'"
+                :model-value="unwrappedItem.active ? 'on' : 'off'"
+                :default-value="plugin.active ? 'on' : 'off'"
+                class="">
+                <div class="flex items-center space-x-2">
+                  <RadioGroupItem class="size-4 lg:size-5 xl:size-6 2xl:size-8" id=radio-on value="on" />
+                  <Label class="cursor-pointer text-green-badge"  for="radio-on">On</Label>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <RadioGroupItem class="size-4 lg:size-5 xl:size-6 2xl:size-8" id="radio-off" value="off" />
+                  <Label class="cursor-pointer text-destructive" for="radio-off">Off</Label>
+                </div>
+              </RadioGroup>
+            </TableCell>
+            <TableCell v-else class=" text-green-badge" :class="{'text-destructive' : !plugin.active}">{{ plugin.active ? 'On' : 'Off'}}</TableCell>
+            <TableCell class="">{{plugin.weight}} KB
+              <ButtonGroup v-if="isUnwrapped(plugin.fullName) && unwrappedItem" class="flex  absolute bottom-4 right-3 *:items-center *:align-middle *:flex">
+                <Button
+                  @click.stop="wrap"
+                  variant="red_outline">
+                  Cancel<IconCancel class="size-4 xl:size-5"/>
+                </Button>
+                <Button variant="orange_outline" class="p-0">
+                  <PluginDetailsDialog
+                    :code="unwrappedItem.code ?? ''"
+                    :description="unwrappedItem.description ?? ''"
+                    @update:save-changes="updateDetails"
                   >
-                    Details<IconMessageCode class="size-4 xl:size-5"/>
-                  </Button>
-                </PluginDetailsDialog>
-              </Button>
+                    <Button
+                      @click.stop="getDetails(plugin.fullName)"
+                      class="border-0! m-0 rounded-none bg-transparent! text-severity-3 hover:text-primary"
+                    >
+                      Details<IconMessageCode class="size-4 xl:size-5"/>
+                    </Button>
+                  </PluginDetailsDialog>
+                </Button>
 
-              <Button
-                @click.stop="save(async ()=> await myPluginStore.editMyPlugin(unwrappedItem!))"
-                variant="green_outline">
-                Save<IconDeviceFloppy class="size-4 xl:size-5"/>
-              </Button>
-            </ButtonGroup></TableCell>
+                <Button
+                  @click.stop="save(async ()=> await myPluginStore.editMyPlugin(unwrappedItem!))"
+                  variant="green_outline">
+                  Save<IconDeviceFloppy class="size-4 xl:size-5"/>
+                </Button>
+              </ButtonGroup></TableCell>
 
-        </TableRow>
-      </TransitionGroup>
+          </TableRow>
+        </TableBody>
+      </Transition>
+
 
       <TableFooter>
       </TableFooter>

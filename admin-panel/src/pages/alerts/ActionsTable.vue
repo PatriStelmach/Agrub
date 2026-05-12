@@ -2,9 +2,8 @@
 import {Badge} from "@/components/ui/badge";
 import type {ActionResponse} from "@/types/types.ts";
 import {dateParser} from "@/composables/dateParser.ts";
-import {Skeleton} from "@/components/ui/skeleton";
 
-const props = defineProps<{
+defineProps<{
   actions: ActionResponse[] | undefined;
 }>()
 

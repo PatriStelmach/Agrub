@@ -1,34 +1,17 @@
 <script setup lang="ts">
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion'
-import {
   IconAlertTriangle, IconDatabase,
-  IconHistory,
-  IconLogs, IconPhoneRinging,
-  IconScript, IconSitemap, IconSitemapOff,
-  IconUpload, IconUserCircle, IconUsers
+  IconHistory, IconPhoneRinging,
+  IconScript, IconSettings, IconSitemap, IconSitemapOff,
+  IconUpload, IconUsers, IconUsersGroup
 } from "@tabler/icons-vue";
 import TeamBar from "@/pages/globals/navbar/TeamBar.vue";
 import {
-  Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader,
-  SidebarInput,
-  SidebarInset, SidebarMenu,
-  SidebarMenuButton, SidebarMenuItem,
-  SidebarProvider
+  Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu,
+  SidebarMenuButton, SidebarMenuItem
 } from "@/components/ui/sidebar";
-import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuGroup,
-  DropdownMenuItem, DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
-import {Avatar, AvatarFallback} from "@/components/ui/avatar";
-import {usersData} from "@/data/usersData.js";
-import {sidebarData} from "@/data/sidebarData.js";
+
+
 import NavUser from "@/pages/globals/navbar/NavUser.vue";
 import {useRoute} from "vue-router";
 
@@ -58,12 +41,20 @@ const navItems = [
       { label: 'All systems', to: 'all_systems', icon: IconSitemapOff },
     ]
   },
+  {
+    label: 'Team',
+    links: [
+      { label: 'Team members', to: 'team_members', icon: IconUsers },
+      { label: 'Groups', to: 'groups', icon: IconUsersGroup },
+    ]
+  },
+
 ]
 </script>
 
 <template>
 
-  <Sidebar class="">
+  <Sidebar>
           <SidebarHeader>
             <div class="text-xl space-x-2 flex pt-4"><IconPhoneRinging/>
               <span>Alert</span>
@@ -78,38 +69,20 @@ const navItems = [
                 <SidebarGroupLabel class="hover:bg-transparent pl-1 flex items-center text-center" >
                   {{ item.label }}
                 </SidebarGroupLabel>
-
                   <RouterLink
-                    :class="{'bg-blue-badge/50' : route.name === link.to}"
+                    :class="{'bg-blue-badge/50 border-blue-badge' : route.name === link.to}"
                     class="flex xl:text-lg ml-3 border-l-3 w-full hover:bg-input rounded-[0_0.5rem_0.5rem_0]"
                     v-for="link in item.links" :key="link.to" :to="{ name: link.to}">
                     <div class="flex items-center gap-x-2 p-2 ml-1 ">
                       <component class="size-4  xl:size-6" :is="link.icon"/> {{link.label}}
                     </div>
                   </RouterLink>
-
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroupContent>
       </SidebarGroup>
-      <SidebarGroupContent class="mt-auto mb-3">
-        <SidebarMenu>
-
-            <SidebarMenuItem class="border-y-4">
-              <SidebarMenuButton class="flex items-center text-center justify-center my-2 text-lg">
-                <IconUsers class="xl:size-5! 2xl:size-6!"/>
-                <RouterLink to="/team">
-                  Team
-                </RouterLink>
-              </SidebarMenuButton>
-            </SidebarMenuItem >
-            <TeamBar  />
-            <NavUser class="border-t-4 pt-2"/>
-
-
-        </SidebarMenu>
-      </SidebarGroupContent>
     </SidebarContent>
+    <NavUser class="py-4"/>
   </Sidebar>
 </template>

@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {watch} from "vue";
 
-const props = defineProps<{
+defineProps<{
   total: number
 }>()
 

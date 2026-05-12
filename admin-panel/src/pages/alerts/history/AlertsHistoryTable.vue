@@ -7,7 +7,7 @@ import {
 
 } from "@/assets/cssFunctions.ts";
 import {
-  Table,
+  Table, TableBody,
   TableCaption,
   TableCell,
   TableHead,
@@ -15,7 +15,7 @@ import {
   TableRow
 } from "@/components/ui/table";
 import SortableHead from "@/helpers_components/SortableHead.vue";
-import {computed, defineAsyncComponent, ref, watch, watchEffect} from "vue";
+import {computed, defineAsyncComponent, ref, watchEffect} from "vue";
 import {type AlertDetails, type HistoryAlert} from "@/types/types.ts";
 import {Badge} from "@/components/ui/badge";
 import {IconCircleDashedCheck, IconCircleDashedX, IconHistory} from "@tabler/icons-vue";
@@ -78,53 +78,55 @@ watchEffect(() => {
             <TableHead class="max-md:w-9/100 w-6/100 lg:w-5/100 font-bold text-sm lg:text-md xl:text-lg 2xl:text:xl">Actions</TableHead>
           </TableRow>
         </TableHeader>
-        <LoadingTable :colspan="9" v-if="isLoading"/>
-        <TransitionGroup v-else tag="tbody" name="fade">
-          <TableRow
-            :id="`${alert.id}_row`"
-            class="relative cursor-pointer duration-0  hover:bg-accent/50"
-            v-for="alert in alerts"
-            :key="alert.id">
+        <Transition name="fade" mode="out-in">
+          <LoadingTable :colspan="9" v-if="isLoading"/>
+          <TableBody v-else>
+            <TableRow
+              :id="`${alert.id}_row`"
+              class="relative cursor-pointer duration-0  hover:bg-accent/50"
+              v-for="alert in alerts"
+              :key="alert.id">
 
-            <TableCell class="pl-4  whitespace-break-spaces">{{alert.subject}}</TableCell>
-            <TableCell>
-              <SeverityDiv
-                :severity="alert.severity"
-              />
-            </TableCell>
-            <TableCell
-              @mouseenter="hoveredId = alert.id"
-              @mouseleave="hoveredId = null"
-              class="truncate"
-            >{{alert.message}}</TableCell>
-            <TableCell >
-              <Badge class="whitespace-break-spaces"
-                     variant="source"
-              >{{alert.source}}</Badge>
-            </TableCell>
-            <TableCell >
-              <Badge class="whitespace-break-spaces"
-                     variant="origin"
-              >{{alert.originType}}</Badge>
-            </TableCell>
+              <TableCell class="pl-4  whitespace-break-spaces">{{alert.subject}}</TableCell>
+              <TableCell>
+                <SeverityDiv
+                  :severity="alert.severity"
+                />
+              </TableCell>
+              <TableCell
+                @mouseenter="hoveredId = alert.id"
+                @mouseleave="hoveredId = null"
+                class="truncate"
+              >{{alert.message}}</TableCell>
+              <TableCell >
+                <Badge class="whitespace-break-spaces"
+                       variant="source"
+                >{{alert.source}}</Badge>
+              </TableCell>
+              <TableCell >
+                <Badge class="whitespace-break-spaces"
+                       variant="origin"
+                >{{alert.originType}}</Badge>
+              </TableCell>
 
-            <TableCell class=" gap-x-2 items-center">
-              <IconCircleDashedCheck v-if="alert.acknowledged" class="text-green-badge"/>
-              <IconCircleDashedX v-else class="text-red-badge"/>
-            </TableCell>
-            <DateCell  :date="alert.createdAt "></DateCell>
-            <DateCell  :date="alert.closedAt "></DateCell>
-            <TableCell>
-              <AlertHistoryDialog
-                :alert="alert"
-              >
-                <Button size="icon-lg" variant="green_outline">
-                  <IconHistory class="size-5"/>
-                </Button>
-              </AlertHistoryDialog>
+              <TableCell class=" gap-x-2 items-center">
+                <IconCircleDashedCheck v-if="alert.acknowledged" class="text-green-badge"/>
+                <IconCircleDashedX v-else class="text-red-badge"/>
+              </TableCell>
+              <DateCell  :date="alert.createdAt "></DateCell>
+              <DateCell  :date="alert.closedAt "></DateCell>
+              <TableCell>
+                <AlertHistoryDialog
+                  :alert="alert"
+                >
+                  <Button size="icon-lg" variant="green_outline">
+                    <IconHistory class="size-5"/>
+                  </Button>
+                </AlertHistoryDialog>
 
-            </TableCell>
-          </TableRow>
-        </TransitionGroup>
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Transition>
       </Table>
 </template>

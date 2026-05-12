@@ -19,8 +19,6 @@ import api from "@/lib/axios.ts";
 import {toast} from "vue-sonner";
 const DetailsCard = defineAsyncComponent(() => import('@/pages/alerts/DetailsCard.vue'))
 
-const isLoading = ref(true);
-
 const getAlertsHistory = async () => {
   try {
     const response = await api.get('/alerts/history', {
@@ -73,6 +71,7 @@ const {
   currentPage,
   totalElements,
   sortedHead,
+  isLoading,
   updateFilters
 } = useServerSearchFilter<HistoryAlert, AlertHistoryFilters>(
   getAlertsHistory,

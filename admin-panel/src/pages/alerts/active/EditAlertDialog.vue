@@ -12,16 +12,11 @@ import {
 import {Textarea} from "@/components/ui/textarea";
 import { ref} from "vue";
 import {IconX, IconCheck, IconSend2} from "@tabler/icons-vue";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from "@/components/ui/select";
+
+
 import {useAlertStore} from "@/stores/alertStore.js";
 import DialogLabel from "@/helpers_components/DialogLabel.vue";
-import type {ActionResponse, ActiveAlert} from "@/types/types.js";
+import type { ActiveAlert} from "@/types/types.js";
 import {Badge} from "@/components/ui/badge";
 import ActionsTable from "@/pages/alerts/ActionsTable.vue";
 import {useAuthStore} from "@/stores/authStore.ts";
@@ -31,7 +26,6 @@ const props = defineProps<{
   alert: ActiveAlert
 }>()
 
-const isLoading = ref(true);
 const alertStore = useAlertStore()
 const authStore = useAuthStore()
 
@@ -43,7 +37,7 @@ const sentAction = async () => {
   if(newAck.value !== props.alert.acknowledged || newSeverity.value !== props.alert.severity || newMessage.value) {
     await alertStore.updateAlertRequest({
       id: props.alert.id,
-      author: authStore.user!,
+      author: authStore.userEmail!,
       ack: newAck.value === props.alert.acknowledged ? undefined : newAck.value,
       message: newMessage.value ?? undefined,
       newSeverity: newSeverity.value === props.alert.severity ? undefined : newSeverity.value,

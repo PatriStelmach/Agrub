@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm, Field as VeeField } from 'vee-validate'
-import { toast } from 'vue-sonner'
 import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
@@ -21,7 +20,6 @@ import {
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import {useAuthStore} from "@/stores/authStore.ts";
-import router from "@/router";
 import {onMounted, ref} from "vue";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
 import { IconAlertCircle, IconX, IconLoader} from "@tabler/icons-vue";
