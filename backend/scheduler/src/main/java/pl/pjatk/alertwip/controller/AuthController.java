@@ -19,13 +19,9 @@ public class AuthController {
     @Value("${app.cookie.secure:false}")
     private boolean cookieSecure;
 
-    @Value("${app.cookie.same-site:Lax}")
-    private String cookieSameSite;
-
     public AuthController(AuthenticationService authenticationService) {
         this.authenticationService = authenticationService;
     }
-
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestBody AuthenticationRequestDTO request) {
@@ -36,7 +32,7 @@ public class AuthController {
                 .secure(cookieSecure)
                 .path("/")
                 .maxAge(7 * 24 * 60 * 60)
-                .sameSite(cookieSameSite)
+                .sameSite("Lax")
                 .build();
 
         return ResponseEntity.ok()
@@ -47,20 +43,30 @@ public class AuthController {
     @PostMapping("/refresh")
     public ResponseEntity<Map<String, String>> refresh(@CookieValue(name = "refresh_token", required = false) String refreshToken) {
         if (refreshToken == null || refreshToken.isEmpty()) {
-            return ResponseEntity.status(401).body(Map.of("error", "Brak Refresh Tokena w ciasteczkach"));
+            return ResponseEntity.status(401).body(Map.of("error", "Brak Refresh Tokena"));
         }
-
-        String newAccessToken = authenticationService.refreshAccessToken(refreshToken);
-        return ResponseEntity.ok(Map.of("access_token", newAccessToken));
+        try {
+            String newAccessToken = authenticationService.refreshAccessToken(refreshToken);
+            return ResponseEntity.ok(Map.of("access_token", newAccessToken));
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body(Map.of("error", e.getMessage()));
+        }
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Map<String, String>> logout(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+    public ResponseEntity<Map<String, String>> logout(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @CookieValue(name = "refresh_token", required = false) String refreshToken) {
+
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String jwt = authHeader.substring(7).trim();
             if (!jwt.isEmpty() && !jwt.equals("undefined") && !jwt.equals("null")) {
-                 authenticationService.logout(jwt);
+                authenticationService.blacklistToken(jwt);
             }
+        }
+
+        if (refreshToken != null && !refreshToken.isEmpty()) {
+            authenticationService.blacklistToken(refreshToken.trim());
         }
 
         ResponseCookie deleteCookie = ResponseCookie.from("refresh_token", "")
@@ -68,11 +74,11 @@ public class AuthController {
                 .secure(cookieSecure)
                 .path("/")
                 .maxAge(0)
-                .sameSite(cookieSameSite)
+                .sameSite("Lax")
                 .build();
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, deleteCookie.toString())
-                .body(Map.of("message", "Wylogowano pomyślnie"));
+                .body(Map.of("message", "Wylogowano pomyślnie. Tokeny zablokowane."));
     }
 }
