@@ -28,24 +28,52 @@ public class PluginManagerService {
 
     private final ScheduledTaskRepository taskRepository;
     private final DynamicSchedulerConfig dynamicSchedulerConfig;
+    private final ScriptExecutionService scriptExecutionService;
 
     @Value("${app.scripts.path}")
     private String scriptsPath;
 
     public PluginManagerService(ScheduledTaskRepository taskRepository,
-                                DynamicSchedulerConfig dynamicSchedulerConfig) {
+                                DynamicSchedulerConfig dynamicSchedulerConfig,
+                                ScriptExecutionService scriptExecutionService) {
         this.taskRepository = taskRepository;
         this.dynamicSchedulerConfig = dynamicSchedulerConfig;
+        this.scriptExecutionService = scriptExecutionService;
     }
 
+    @Transactional
+    public ScriptExecutionService.ScriptResult runManualScript(String fileName) {
+        Path path = resolveSecurePath(fileName);
+        if (!Files.exists(path)) {
+            throw new RuntimeException("Plik nie istnieje: " + fileName);
+        }
+
+        // Szukamy zadania lub tworzymy techniczne
+        ScheduledTask task = taskRepository.findByScriptName(fileName)
+                .orElseGet(() -> {
+                    ScheduledTask newTask = new ScheduledTask();
+                    newTask.setTaskName("Manual: " + fileName);
+                    newTask.setScriptName(fileName);
+                    newTask.setArguments("");
+
+                    // Ustawiamy severity
+                    newTask.setSeverity(parseFileHeaders(path).severity);
+
+                    // martwy cron
+                    newTask.setCronExpression("0 0 1 1 * ? 2099");
+                    newTask.setActive(false);
+
+                    System.out.println("[SYSTEM] Automatyczna rejestracja skryptu w bazie do wykonania ręcznego: " + fileName);
+                    return taskRepository.save(newTask);
+                });
+
+        return scriptExecutionService.runScript(task);
+    }
 
     private Path resolveSecurePath(String fileName) {
-        // Pobieramy absolutną i znormalizowaną ścieżkę bazową
         Path basePath = Paths.get(scriptsPath).toAbsolutePath().normalize();
-        // Rozwiązujemy nazwę pliku względem ścieżki bazowej i normalizujemy (usuwamy np. /../)
         Path resolvedPath = basePath.resolve(fileName).normalize();
 
-        // Jeśli po rozwiązaniu ścieżka nie zaczyna się od ścieżki bazowej, mamy próbę ataku
         if (!resolvedPath.startsWith(basePath)) {
             throw new SecurityException("Niedozwolona ścieżka pliku (próba Path Traversal): " + fileName);
         }
@@ -53,7 +81,6 @@ public class PluginManagerService {
     }
 
 
-    // --- KLASY I METODY POMOCNICZE DO PLIKÓW ---
     private static class ParsedHeaders {
         String description = "Brak opisu w pliku";
         String creator = "Nieznany";
@@ -99,7 +126,6 @@ public class PluginManagerService {
         }
     }
 
-    // --- GŁÓWNE METODY BIZNESOWE ---
 
     public List<PluginDTO> listLocalScripts() {
         List<ScheduledTask> allTasks = taskRepository.findAll();
@@ -274,7 +300,7 @@ public class PluginManagerService {
         Path directory = Paths.get(scriptsPath).toAbsolutePath().normalize();
         if (!Files.exists(directory)) Files.createDirectories(directory);
 
-        Path filePath = resolveSecurePath(fileName); // ZABEZPIECZONO
+        Path filePath = resolveSecurePath(fileName);
 
         StringBuilder fileContent = new StringBuilder();
         fileContent.append("# Creator: ").append(plugin.getCreator() != null ? plugin.getCreator() : "Unknown").append("\n");
@@ -305,7 +331,7 @@ public class PluginManagerService {
 
     @Transactional
     public void deletePluginByFileName(String fileName) {
-        Path path = resolveSecurePath(fileName); // ZABEZPIECZONO
+        Path path = resolveSecurePath(fileName);
         Optional<ScheduledTask> taskOpt = taskRepository.findByScriptName(fileName);
         if (taskOpt.isPresent()) {
             ScheduledTask task = taskOpt.get();
