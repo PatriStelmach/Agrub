@@ -14,11 +14,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class PythonScriptService {
+public class ScriptExecutionService {
 
     private final GlobalProblemRepository problemRepository;
     private final TaskExecutionLogRepository logRepository;
@@ -30,11 +29,13 @@ public class PythonScriptService {
     @Value("${app.scripts.path}")
     private String scriptsPath;
 
-    public PythonScriptService(TaskExecutionLogRepository logRepository,
-                               GlobalProblemRepository problemRepository,
-                               SseNotifService sseService,
-                               AlertRoutingService routingService,
-                               ActiveAlertCache activeAlertCache) {
+    public record ScriptResult(int exitCode, String output) {}
+
+    public ScriptExecutionService(TaskExecutionLogRepository logRepository,
+                                  GlobalProblemRepository problemRepository,
+                                  SseNotifService sseService,
+                                  AlertRoutingService routingService,
+                                  ActiveAlertCache activeAlertCache) {
         this.problemRepository = problemRepository;
         this.logRepository = logRepository;
         this.sseService = sseService;
@@ -45,7 +46,7 @@ public class PythonScriptService {
     /**
      * Uruchamia fizyczny plik skryptu.
      */
-    public int runScript(ScheduledTask task) {
+    public ScriptResult runScript(ScheduledTask task) {
         String scriptName = task.getScriptName();
         String[] args = (task.getArguments() != null && !task.getArguments().isEmpty())
                 ? task.getArguments().split(" ") : new String[0];
@@ -61,8 +62,25 @@ public class PythonScriptService {
                 throw new Exception("Plik nie istnieje w lokalizacji: " + fullScriptPath);
             }
 
+            // --- NOWOŚĆ: Wykrywanie interpretera po rozszerzeniu ---
+            String extension = scriptName.substring(scriptName.lastIndexOf('.')).toLowerCase();
+            String interpreter;
+            switch (extension) {
+                case ".py":
+                    interpreter = "python"; // lub "python3" zależnie od Twojego OS
+                    break;
+                case ".sh":
+                    interpreter = "bash";
+                    break;
+                case ".ps1":
+                    interpreter = "pwsh"; // lub "powershell" w starym Windowsie
+                    break;
+                default:
+                    throw new Exception("Nieobsługiwane rozszerzenie pliku: " + extension);
+            }
+
             String[] command = new String[args.length + 2];
-            command[0] = "python"; // Jeśli kiedyś dodasz wsparcie dla Bash, tutaj sprawdzisz rozszerzenie pliku
+            command[0] = interpreter;
             command[1] = fullScriptPath.toString();
             System.arraycopy(args, 0, command, 2, args.length);
 
@@ -99,11 +117,9 @@ public class PythonScriptService {
             outputCollector.append("BŁĄD SYSTEMOWY: ").append(e.getMessage());
         } finally {
             saveLogToDatabase(task, outputCollector.toString(), status);
-
-            // Wywołujemy mechanizm alertowania
             handleAlerting(task, exitCode, outputCollector.toString());
         }
-        return exitCode;
+        return new ScriptResult(exitCode, outputCollector.toString());
     }
 
     private void handleAlerting(ScheduledTask task, int exitCode, String output) {
