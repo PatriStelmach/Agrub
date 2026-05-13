@@ -1,0 +1,9 @@
+<script setup lang="ts">
+import {Skeleton} from "@/components/ui/skeleton";
+</script>
+<template>
+  <div
+    class=" px-6 py-2 pr-3  gap-6 max-h-[85vh] overflow-y-auto">
+    <Skeleton class="w-full h-[80vh]"/>
+  </div>
+</template>

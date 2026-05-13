@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {gridSkeletons} from "@/assets/cssFunctions.ts";
+import {gridSkeletons} from "@/assets/cssFunctions.js";
 </script>
 
 <template>

@@ -3,11 +3,11 @@ import type { User } from '@/types/types'
 import { Card, CardDescription, CardHeader } from '@/components/ui/card'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import { nameLabel } from '@/assets/cssFunctions'
+import {gridCard, nameLabel} from '@/assets/cssFunctions'
 import {
   IconUsersGroup, IconEdit, IconKey, IconTool,
 } from "@tabler/icons-vue";
-import EditUser from "@/pages/users/EditUser.vue";
+import EditUser from "@/pages/team/users/EditUser.vue";
 
 defineProps<{
   user: User
@@ -16,7 +16,7 @@ defineProps<{
 </script>
 
 <template>
-  <Card class="border-2 my-2 user-box flex hover:shadow-md hover:border-blue-badge/50 hover:shadow-blue-badge/50 transition-all duration-200 hover:translate-y-2">
+  <Card :class="gridCard">
     <CardHeader class="px-3 flex space-x-1 items-center relative">
       <div class="relative">
         <Avatar class="size-9 rounded-lg">
