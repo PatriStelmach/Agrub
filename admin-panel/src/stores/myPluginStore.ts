@@ -1,11 +1,10 @@
 import {defineStore} from "pinia";
 import {
-  type ApiResponse,
   type MyPlugin,
   type MyPluginsFromApi,
   type PluginDetails
 } from "@/types/types.ts";
-import {computed, ref} from "vue";
+import { ref} from "vue";
 import api from "@/lib/axios";
 import {toast} from "vue-sonner";
 
@@ -25,7 +24,7 @@ export const useMyPluginStore = defineStore('my-plugins', () => {
         active: plugin.active
       })
       if(response.status === 200)
-        getAllMyPlugins().finally(() => toast.success(`Plugin ${plugin.name} successfully updated`))
+        getAllMyPluginsRequest().finally(() => toast.success(`Plugin ${plugin.name} successfully updated`))
       else
         toast.error(`Plugin ${plugin.name} failed with status ${response.status}`);
     }
@@ -46,7 +45,7 @@ export const useMyPluginStore = defineStore('my-plugins', () => {
     }
   }
 
-  const getAllMyPlugins = async () => {
+  const getAllMyPluginsRequest = async () => {
     try {
       const response= await api.get('/local-scripts/list')
       if(response.status === 200) {
@@ -84,7 +83,7 @@ export const useMyPluginStore = defineStore('my-plugins', () => {
       toast.error(`Error changing status: ${error}`)
     }
     finally {
-      await getAllMyPlugins()
+      await getAllMyPluginsRequest()
     }
   }
 
@@ -99,13 +98,13 @@ export const useMyPluginStore = defineStore('my-plugins', () => {
       toast.error(`Error deleting plugins: ${error}`)
     }
     finally {
-      await getAllMyPlugins()
+      await getAllMyPluginsRequest()
     }
   }
 
   return {
     allMyPlugins,
-    getAllMyPlugins,
+    getAllMyPluginsRequest,
     getMyPluginDetails,
     changeStatus,
     deleteMyPlugins,

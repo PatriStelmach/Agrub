@@ -1,5 +1,4 @@
 import {type Ref, ref, toRaw} from "vue";
-import type {ApiResponse} from "@/types/types.ts";
 
 export function useWrapping<T extends object>(
   data: Ref<T[]>,
@@ -15,8 +14,8 @@ export function useWrapping<T extends object>(
   }
 
   const wrap = () => {
-    if(originalItem.value !== unwrappedItem.value) {
-      Object.assign(unwrappedItem.value, originalItem.value)
+    if (unwrappedItem.value && originalItem.value) {
+      Object.assign(originalItem.value, toRaw(unwrappedItem.value))  // cofnij zmiany
     }
     originalItem.value = null
     unwrappedItem.value = null

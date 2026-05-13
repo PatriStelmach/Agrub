@@ -40,7 +40,9 @@ export interface AlertDetails {
 }
 
 export interface MyJWTPayload {
-  authorities: string[];
+  role: "ADMINISTRATOR" | "TECHNICIAN";
+  firstname: string,
+  surname: string,
   sub: string;
   iat: number;
   exp: number;
@@ -78,6 +80,8 @@ export interface LibraryPluginFilters {
   name?: string,
   language?: Language,
   creator?: string,
+  tags?: string[],
+  maxWeight?: number,
 }
 
 export const undefinedLibraryFilters = {
@@ -87,13 +91,21 @@ export const undefinedLibraryFilters = {
 }
 
 export interface User {
-  id: number,
+  id?: number,
   firstname: string,
   surname: string,
   active?: boolean,
   email: string,
   role: "ADMINISTRATOR" | "TECHNICIAN"
   groups: string[]
+}
+
+export const blankUser = {
+  firstname: '',
+  surname: '',
+  email: '',
+  role: "TECHNICIAN",
+  groups: []
 }
 
 export interface UserGroup {
@@ -187,7 +199,25 @@ export interface ApiResponse {
 export enum Language {
   PYTHON = ".py",
   SH = ".sh",
-  BASH = ".bash",
+  BASH = ".bash" ,
   POWERSHELL = ".ps1",
   POWERSHELL_MODULE = ".psm1"
 }
+
+export enum MatchType {
+  EXACT = "EXACT",
+  STARTS_WITH = "STARTS_WITH",
+  ENDS_WITH = "ENDS_WITH",
+  CONTAINS = "CONTAINS",
+  REGEX = "REGEX",
+}
+
+
+export const isBash = (lang: string)  =>
+  lang === Language.SH || lang === Language.BASH
+
+export const isPython = (lang: string)  =>
+  lang === Language.PYTHON
+
+export const isPowerShell = (lang: string)  =>
+  lang === Language.POWERSHELL_MODULE || lang === Language.POWERSHELL

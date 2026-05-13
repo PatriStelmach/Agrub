@@ -7,20 +7,23 @@ import {useSSEstore} from "@/stores/SSEstore.ts";
 import {SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
 import {useAuthStore} from "@/stores/authStore.ts";
 import LoginPage from "@/pages/login/LoginPage.vue";
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
 import {Skeleton} from "@/components/ui/skeleton";
 
 
 
 const authStore = useAuthStore()
 const isLoading = ref(true);
-authStore.refreshToken().finally(() => {
+onMounted(() => {
+  authStore.refreshToken().finally(() => {
     isLoading.value = false
     if (authStore.isAuthenticated) {
       useSSEstore()
       console.log(authStore.accessToken)
     }
-});
+  });
+})
+
 
 </script>
 

@@ -20,12 +20,10 @@ import {
   IconFileImport,
   IconListCheck
 } from "@tabler/icons-vue";
-import {ArrowLeftIcon} from "lucide-vue-next";
 import type {fileType} from "@/types/types.ts";
 import { Label } from "@/components/ui/label"
-import {Progress} from "@/components/ui/progress";
 import {topButtonGroup, topH1} from "@/assets/cssFunctions.ts";
-import GoBackButton from "@/helpers/GoBackButton.vue";
+import GoBackButton from "@/helpers_components/GoBackButton.vue";
 
 const idCounter = ref(0)
 const files = ref<fileType[]>()
@@ -65,23 +63,6 @@ function handleFileUpload(e: Event) {
     files.value = newFiles;
   input.value = '';
 }
-
-const readFile = (id: number) => {
-  const item = files.value?.find(i => i.id === id)
-  if (!item) return
-
-  const reader = new FileReader()
-  reader.addEventListener("progress", (e: ProgressEvent) => {
-    if (e.lengthComputable)
-      item.progress = Math.round((e.loaded / e.total) * 100)
-  })
-
-  reader.addEventListener("load", () => {
-    item.progress = 100
-  })
-  reader.readAsArrayBuffer(item.file)
-}
-
 
 function removeFiles(ids:number[]) {
   if (files.value)

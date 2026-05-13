@@ -21,8 +21,8 @@ import type {System} from "@/types/types.ts";
 import {Field, FieldGroup, FieldLabel} from "@/components/ui/field";
 import {Input} from "@/components/ui/input";
 import {ButtonGroup} from "@/components/ui/button-group";
-import {tableDiv, topButtonGroup, topDiv, topH1} from "@/assets/cssFunctions.ts";
-import GoBackButton from "@/helpers/GoBackButton.vue";
+import { topButtonGroup, topDiv, topH1} from "@/assets/cssFunctions.ts";
+import GoBackButton from "@/helpers_components/GoBackButton.vue";
 
 const isOpen = ref(false);
 const openSystem = ref<System | null | undefined>(null);

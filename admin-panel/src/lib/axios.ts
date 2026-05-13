@@ -25,18 +25,18 @@ api.interceptors.response.use(
     const authStore = useAuthStore();
     const originalRequest = error.config;
 
-    if (originalRequest.url?.includes(['refresh', 'login', 'logout']) ) {
+    if (originalRequest.url?.includes(['refresh', 'logout', 'login']) ) {
       authStore.accessToken = null
       authStore.isAuthenticated = false
       return Promise.reject(error);
     }
 
-    if (error.response?.status === 403 && !originalRequest._retry) {
+    else if (error.response?.status === 403 && !originalRequest._retry) {
       originalRequest._retry = true
 
       try {
-        await authStore.refreshToken()
-        const newToken = authStore.accessToken;
+        let newToken
+        await authStore.refreshToken().finally(()=>  newToken = authStore.accessToken)
         if (newToken) {
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
         }

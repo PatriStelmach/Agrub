@@ -95,7 +95,6 @@ public class AlertController {
     public ResponseEntity<?> performAction(
             @PathVariable Long id,
             @RequestBody String rawBody) {
-        // ... (Reszta Twojej metody performAction bez zmian)
         System.out.println("====== DEBUG: SUROWY JSON Z SIECI ======");
         System.out.println(rawBody);
         System.out.println("========================================");

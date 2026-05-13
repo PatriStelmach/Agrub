@@ -1,18 +1,14 @@
 <script setup lang="ts">
-import { ScrollArea } from '@/components/ui/scroll-area'
-import type {User} from "@/types/types.js";
-import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
-import {SidebarMenu, SidebarMenuButton, SidebarMenuItem} from "@/components/ui/sidebar";
+import {Avatar, AvatarFallback} from "@/components/ui/avatar";
+import { SidebarMenuButton, SidebarMenuItem} from "@/components/ui/sidebar";
 import {
   DropdownMenu,
   DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator, DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import {IconUser, IconNotification, IconUserCircle, IconUsers} from "@tabler/icons-vue";
-import {sidebarData} from "@/data/sidebarData.js";
+import { IconNotification, IconUserCircle} from "@tabler/icons-vue";
 import {usersData} from "@/data/usersData.js";
-import NavUser from "@/pages/globals/navbar/NavUser.vue";
 
 </script>
 
@@ -31,7 +27,6 @@ import NavUser from "@/pages/globals/navbar/NavUser.vue";
           >
             <div class="relative">
               <Avatar class="size-8 rounded-lg ">
-                <AvatarImage class="size-8" :src="user.avatar ? user.avatar : ''" :alt="`${user.surname}_${user.surname}`"/>
                 <AvatarFallback class="rounded-full grayscale">
                   {{user.firstname.slice(0,1) + user.surname.slice(0,1)}}
                 </AvatarFallback>

@@ -1,15 +1,18 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from "vue"
-import {api_url, type MyJWTPayload} from "@/types/types.ts"
+import { type MyJWTPayload} from "@/types/types.ts"
 import { jwtDecode } from "jwt-decode"
 import api from "@/lib/axios"
-import axios from "axios";
 
 export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = ref<boolean>(false)
   const accessToken = ref<string | null>(null)
-  const user = computed(() => userPayload.value?.sub || null)
-  const userRoles = computed(() => userPayload.value?.authorities || [])
+  const fullName = computed(() => `${userFirstname.value} ${userSurname.value}`)
+  const avFallback = computed(() =>  `${userFirstname.value?.slice(0,1)}${userSurname.value?.slice(0,1)}`)
+  const userEmail = computed(() => userPayload.value?.sub)
+  const userFirstname = computed(() => userPayload.value?.firstname)
+  const userSurname = computed(() => userPayload.value?.surname)
+  const userRole = computed(() => userPayload.value?.role)
   const userPayload = computed(() => {
     if (!accessToken.value) return null
     try {
@@ -24,9 +27,10 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const response = await api.post('/auth/login', credentials)
 
-      if (response.status === 200 && response.data.token) {
-        accessToken.value = response.data.token as string
+      if (response.status === 200 && response.data.access_token) {
+        accessToken.value = response.data.access_token
         isAuthenticated.value = true
+        console.log(response.data.access_token)
         return true
       }
 
@@ -38,7 +42,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function logout() {
     try {
-      // await axios.post(`${api_url}/auth/logout`, {}, { withCredentials: true });
+       await api.post(`/auth/logout`,  { withCredentials: true });
     } catch (error) {
       console.error('Logout error context:', error)
     } finally {
@@ -49,22 +53,27 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function refreshToken() {
     try {
-      const response = await axios.post(`${api_url}/auth/refresh`, {}, { withCredentials: true });
-      accessToken.value = response.data.token
-      isAuthenticated.value = true
-
-      return true;
-    } catch (err) {
-      throw err;
+      const response = await api.post(`/auth/refresh`, { withCredentials: true });
+      if (response.status === 200 && response.data.access_token) {
+        accessToken.value = response.data.access_token
+        isAuthenticated.value = true
+      }
+      else isAuthenticated.value = false
+    } catch  {
+      isAuthenticated.value = false
     }
   }
 
   return {
     userPayload,
-    userRoles,
-    user,
+    userRole,
+    fullName,
+    userEmail,
+    userFirstname,
+    userSurname,
     accessToken,
     isAuthenticated,
+    avFallback,
     login,
     logout,
     refreshToken

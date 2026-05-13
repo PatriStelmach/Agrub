@@ -1,5 +1,6 @@
 package pl.pjatk.alertwip.service;
 
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -12,7 +13,9 @@ import pl.pjatk.alertwip.repository.UserRepository;
 import pl.pjatk.alertwip.repository.UserGroupRepository;
 import pl.pjatk.alertwip.security.JwtService;
 
+import java.util.Date;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class AuthenticationService {
@@ -22,16 +25,19 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final UserGroupRepository groupRepository;
+    private final StringRedisTemplate redisTemplate;
 
     public AuthenticationService(UserRepository repository, JwtService jwtService,
                                  AuthenticationManager authenticationManager,
                                  PasswordEncoder passwordEncoder,
-                                 UserGroupRepository groupRepository) {
+                                 UserGroupRepository groupRepository,
+                                 StringRedisTemplate redisTemplate) {
         this.repository = repository;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
         this.groupRepository = groupRepository;
+        this.redisTemplate = redisTemplate;
     }
 
     public Map<String, String> authenticate(AuthenticationRequestDTO request) {
@@ -65,6 +71,15 @@ public class AuthenticationService {
                 "access_token", jwtService.generateAccessToken(user),
                 "refresh_token", jwtService.generateRefreshToken(user)
         );
+    }
+
+    public void logout(String token) {
+        Date expiryDate = jwtService.extractClaim(token, io.jsonwebtoken.Claims::getExpiration);
+        long diffInMillis = expiryDate.getTime() - System.currentTimeMillis();
+
+        if (diffInMillis > 0) {
+            redisTemplate.opsForValue().set(token, "blacklisted", diffInMillis, TimeUnit.MILLISECONDS);
+        }
     }
 
     public String refreshAccessToken(String refreshToken) {

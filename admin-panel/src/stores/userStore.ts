@@ -3,7 +3,6 @@ import type {User, UserGroup} from "@/types/types.ts";
 import {ref} from "vue";
 import api from "@/lib/axios.ts";
 import {toast} from "vue-sonner";
-import {sidebarData} from "@/data/sidebarData.ts";
 
 export const useUserStore = defineStore('user-store',() => {
   const allUsers = ref<User[]>([])
@@ -36,21 +35,19 @@ export const useUserStore = defineStore('user-store',() => {
   }
 
   const getUserByIdRequest = async (id: number) => {
-    // try {
-    //   const res = await api.get(`/users/${id}`)
-    //   if (res.status === 200) return res.data
-    //   else toast.error(`Error retrieving user: ${id}`)
-    // }
-    // catch (error) {
-    //   toast.error(`Error retrieving user: ${error}`)
-    // }
-
-    return sidebarData.loggedUser
+    try {
+      const res = await api.get(`/users/${id}`)
+      if (res.status === 200) return res.data
+      else toast.error(`Error retrieving user: ${id}`)
+    }
+    catch (error) {
+      toast.error(`Error retrieving user: ${error}`)
+    }
   }
 
   const editUserRequest = async (user: User) => {
     try {
-      const res = await api.put(`/users/${user.id}`, user)
+      const res = await api.put(`/users/${user.id}`, user, )
       if (res.status === 200){
         toast.success(`User ${user.email} updated successfully.`)
         await getAllUsersRequest()
@@ -63,12 +60,22 @@ export const useUserStore = defineStore('user-store',() => {
     }
   }
 
+  const avFallback = (user: User) =>  {
+    return `${user.firstname.slice(0, 1).toUpperCase()} ${user.surname.slice(0,1).toUpperCase()}`
+  }
+  const fullName = (user: User) =>  {
+   return `${user.firstname} ${user.surname}`
+  }
+
   return {
     allUsers,
+    allGroups,
     getAllUsersRequest,
     editUserRequest,
     getUserByIdRequest,
-    getAllGroupsRequest
+    getAllGroupsRequest,
+    fullName,
+    avFallback
 
   }
 })

@@ -347,9 +347,24 @@ public class PluginManagerService {
                 ? p.getLanguage() : "." + p.getLanguage();
         boolean installed = Files.exists(Paths.get(scriptsPath).resolve(p.getName() + ext));
 
+        long weightInKb = 0;
+        if (p.getWeight() != null && p.getWeight() > 0) {
+            weightInKb = Math.max(1, (long) Math.ceil((double) p.getWeight() / 1024));
+        }
+
         return new PluginDTO(
-                p.getId(), p.getName(), p.getCreator(), p.getDescription(),
-                ext, 0, p.getTags(), null, null, false, p.getSeverity(), installed
+                p.getId(),
+                p.getName(),
+                p.getCreator(),
+                p.getDescription(),
+                ext,
+                weightInKb,
+                p.getTags(),
+                null,
+                p.getCreatedAt(),
+                p.isActive(),
+                p.getSeverity(),
+                installed
         );
     }
 
