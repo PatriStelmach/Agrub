@@ -30,9 +30,9 @@ import {
   tableCaption,
   dataTable,
   tableHeaders,
-  topH1,
-  topButtonGroup, tableDiv
+  tableDiv
 } from "@/assets/cssFunctions.ts";
+import TopH1Div from "@/helpers_components/TopH1Div.vue";
 import {useWrapping} from "@/composables/unwrapping.ts";
 import {Button} from "@/components/ui/button";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
@@ -43,7 +43,6 @@ import {ButtonGroup} from "@/components/ui/button-group";
 import {dateParser} from "@/composables/dateParser.ts";
 import {useMyPluginStore} from "@/stores/myPluginStore.ts";
 import {inputText} from "@/assets/cssFunctions.ts";
-import GoBackButton from "@/helpers_components/GoBackButton.vue";
 import SeveritySelect from "@/helpers_components/SeveritySelect.vue";
 import SeverityDiv from "@/helpers_components/SeverityDiv.vue";
 import LoadingTable from "@/helpers_components/LoadingTable.vue";
@@ -121,7 +120,7 @@ const getDetails = async (fileName: string) => {
 }
 
 const nextRun = (plugin: MyPlugin) => {
-  return plugin.cronExpression ?  dateParser(cronParser.parse(plugin.cronExpression).next().toDate()).fullDate : ''
+  return plugin.cronExpression ?  dateParser(cronParser.parse(plugin.cronExpression).next().toDate()).fullDate.toString() : ''
 }
 
 
@@ -135,40 +134,34 @@ const updateDetails = (code: string, description: string) => {
 </script>
 
 <template>
-<div class="relative">
-  <h1 :class="topH1">Your plugins</h1>
-    <ButtonGroup :class="topButtonGroup">
-      <ButtonGroup class=" flex">
-        <GoBackButton/>
-      </ButtonGroup>
-      <ButtonGroup >
-        <Button
-          @click="changeStatus"
-          :disabled="blockedRemoveAndChange"
-          variant="orange_outline">
-          On/Off
-          <IconStatusChange/>
-        </Button>
-        <Button
-          class="border-l-2!"
-          @click="deletePlugins"
-          :disabled="blockedRemoveAndChange"
-          variant="red_outline">
-          Delete
-          <IconTrash/>
-        </Button>
-        <InputGroup class=" border-l-2! " >
-          <InputGroupInput
-            v-model="searchFilter"
-            type="search"
-            placeholder="Search for plugin"/>
-          <InputGroupAddon>
-            <Search/>
-          </InputGroupAddon>
-        </InputGroup>
-      </ButtonGroup>
-    </ButtonGroup>
-</div>
+<TopH1Div h1="Your plugins">
+  <ButtonGroup >
+    <Button
+      @click="changeStatus"
+      :disabled="blockedRemoveAndChange"
+      variant="orange_outline">
+      On/Off
+      <IconStatusChange/>
+    </Button>
+    <Button
+      class="border-l-2!"
+      @click="deletePlugins"
+      :disabled="blockedRemoveAndChange"
+      variant="red_outline">
+      Delete
+      <IconTrash/>
+    </Button>
+    <InputGroup class=" border-l-2! " >
+      <InputGroupInput
+        v-model="searchFilter"
+        type="search"
+        placeholder="Search for plugin"/>
+      <InputGroupAddon>
+        <Search/>
+      </InputGroupAddon>
+    </InputGroup>
+  </ButtonGroup>
+</TopH1Div>
 
   <div :class="tableDiv ">
     <Table id="my-plugin-table" :class="dataTable">

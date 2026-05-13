@@ -21,8 +21,7 @@ import type {System} from "@/types/types.ts";
 import {Field, FieldGroup, FieldLabel} from "@/components/ui/field";
 import {Input} from "@/components/ui/input";
 import {ButtonGroup} from "@/components/ui/button-group";
-import { topButtonGroup, topDiv, topH1} from "@/assets/cssFunctions.ts";
-import GoBackButton from "@/helpers_components/GoBackButton.vue";
+import TopH1Div from "@/helpers_components/TopH1Div.vue";
 
 const isOpen = ref(false);
 const openSystem = ref<System | null | undefined>(null);
@@ -42,19 +41,15 @@ const closeDialog = () => {
 
 <template>
   <div class="relative">
-    <div :class="topDiv">
-      <h1
-        class="transition-all duration-300"
-        :class="[topH1, {'blur-3xl' : isOpen}]">Available systems</h1>
-      <ButtonGroup :class="topButtonGroup">
-      <GoBackButton/>
+    <TopH1Div h1="Available systems" :h1Class="['transition-all duration-300', {'blur-3xl' : isOpen}]">
+      <ButtonGroup>
       </ButtonGroup>
-    </div>
+    </TopH1Div>
 
-      <div
-        class="transition-all duration-300 pt-4 grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 overflow-auto max-h-[85vh]"
-        :class="{'blur-3xl' : isOpen}"
-      >
+    <div
+      class="transition-all duration-300 pt-4 grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 overflow-auto max-h-[85vh]"
+      :class="{'blur-3xl' : isOpen}"
+    >
         <div
           v-for="system in systemsLibraryData"
           :key="system.id"

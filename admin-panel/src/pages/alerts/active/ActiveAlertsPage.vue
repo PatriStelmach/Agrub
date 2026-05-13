@@ -9,10 +9,8 @@ import { useAlertStore } from "@/stores/alertStore";
 import { defineAsyncComponent, onMounted, ref} from "vue";
 import {
   tableDiv,
-  topH1,
-  topDiv, topButtonGroup
 } from "@/assets/cssFunctions.js";
-import GoBackButton from "@/helpers_components/GoBackButton.vue";
+import TopH1Div from "@/helpers_components/TopH1Div.vue";
 import ActiveAlertsTable from "@/pages/alerts/active/ActiveAlertsTable.vue";
 import MyClientPagination from "@/helpers_components/MyClientPagination.vue";
 const DetailsCard = defineAsyncComponent(() => import('@/pages/alerts/DetailsCard.vue'))
@@ -30,21 +28,19 @@ const {pageSize, filteredData, updateData, currentPage, searchFilter, tableData 
 
 <template>
   <div>
-    <div :class="topDiv">
-      <h1 :class="topH1">Alerts dashboard</h1>
-        <ButtonGroup :class="topButtonGroup">
-          <GoBackButton/>
-            <InputGroup >
-              <InputGroupInput
-                v-model="searchFilter"
-                type="search"
-                placeholder="Search..."/>
-              <InputGroupAddon>
-                <Search/>
-              </InputGroupAddon>
-            </InputGroup>
-        </ButtonGroup>
-    </div>
+    <TopH1Div h1="Alerts dashboard">
+      <ButtonGroup>
+        <InputGroup >
+          <InputGroupInput
+            v-model="searchFilter"
+            type="search"
+            placeholder="Search..."/>
+          <InputGroupAddon>
+            <Search/>
+          </InputGroupAddon>
+        </InputGroup>
+      </ButtonGroup>
+    </TopH1Div>
     <div :class="tableDiv">
       <DetailsCard
         v-if="hoveredAlert"

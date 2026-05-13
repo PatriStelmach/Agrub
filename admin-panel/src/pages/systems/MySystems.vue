@@ -9,22 +9,15 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '@/components/ui/empty'
-import {topButtonGroup, topDiv, topH1} from "@/assets/cssFunctions.ts";
-import {ButtonGroup} from "@/components/ui/button-group";
-import GoBackButton from "@/helpers_components/GoBackButton.vue";
+import TopH1Div from "@/helpers_components/TopH1Div.vue";
 </script>
 
 <template>
   <div>
 
 
-  <div :class="topDiv">
-    <h1 :class="topH1">Connected systems</h1>
+  <TopH1Div h1="Connected systems"/>
 
-    <ButtonGroup :class="topButtonGroup">
-      <GoBackButton/>
-    </ButtonGroup>
-  </div>
     <Empty>
     <EmptyHeader>
       <EmptyMedia variant="icon">

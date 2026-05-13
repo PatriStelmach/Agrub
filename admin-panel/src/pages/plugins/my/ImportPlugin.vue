@@ -22,8 +22,7 @@ import {
 } from "@tabler/icons-vue";
 import type {fileType} from "@/types/types.ts";
 import { Label } from "@/components/ui/label"
-import {topButtonGroup, topH1} from "@/assets/cssFunctions.ts";
-import GoBackButton from "@/helpers_components/GoBackButton.vue";
+import TopH1Div from "@/helpers_components/TopH1Div.vue";
 
 const idCounter = ref(0)
 const files = ref<fileType[]>()
@@ -89,36 +88,31 @@ else {
 
 <template>
   <div>
-    <div class="relative">
-      <h1 :class="topH1">Import plugin</h1>
-
-  <ButtonGroup :class="topButtonGroup">
-    <ButtonGroup>
-      <GoBackButton/>
-    </ButtonGroup>
-    <ButtonGroup >
-      <Button
-        @click="toggleAllChecked"
-        variant="orange_outline"
-        :disabled="blockedAdd">
-        {{ checkText }}
-        <IconListCheck/>
-      </Button>
-      <Button variant="green_outline"
-              :disabled="blockedAddRemove">
-        Add to your plugins
-        <IconFileImport/>
-      </Button>
-      <Button
-        @click="removeFiles(checkedFiles)"
-        variant="red_outline"
-        :disabled="blockedAddRemove">
-        Remove
-        <IconTrash/>
-      </Button>
-    </ButtonGroup>
-  </ButtonGroup>
-  </div>
+    <TopH1Div h1="Import plugin">
+      <ButtonGroup>
+      </ButtonGroup>
+      <ButtonGroup >
+        <Button
+          @click="toggleAllChecked"
+          variant="orange_outline"
+          :disabled="blockedAdd">
+          {{ checkText }}
+          <IconListCheck/>
+        </Button>
+        <Button variant="green_outline"
+                :disabled="blockedAddRemove">
+          Add to your plugins
+          <IconFileImport/>
+        </Button>
+        <Button
+          @click="removeFiles(checkedFiles)"
+          variant="red_outline"
+          :disabled="blockedAddRemove">
+          Remove
+          <IconTrash/>
+        </Button>
+      </ButtonGroup>
+    </TopH1Div>
 
   <Empty class=" ">
     <EmptyHeader>
