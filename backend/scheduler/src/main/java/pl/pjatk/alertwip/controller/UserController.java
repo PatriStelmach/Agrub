@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import pl.pjatk.alertwip.dto.GroupResponseDTO;
 import pl.pjatk.alertwip.dto.UserResponseDTO;
 import pl.pjatk.alertwip.model.User;
 import pl.pjatk.alertwip.model.UserGroup;
@@ -49,7 +50,6 @@ public class UserController {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
         User savedUser = userRepository.save(user);
-
         return ResponseEntity.ok(mapToDTO(savedUser));
     }
 
@@ -76,8 +76,8 @@ public class UserController {
     }
 
     private UserResponseDTO mapToDTO(User user) {
-        List<String> groupNames = user.getGroups().stream()
-                .map(UserGroup::getName)
+        List<GroupResponseDTO> groups = user.getGroups().stream()
+                .map(group -> new GroupResponseDTO(group.getId(), group.getName()))
                 .collect(Collectors.toList());
 
         return new UserResponseDTO(
@@ -87,7 +87,7 @@ public class UserController {
                 user.getSurname(),
                 user.getRole().name(),
                 user.isActive(),
-                groupNames
+                groups
         );
     }
 }

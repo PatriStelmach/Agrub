@@ -9,5 +9,5 @@ public record UserResponseDTO(
         String surname,
         String role,
         boolean active,
-        List<String> groups
+        List<GroupResponseDTO> groups
 ) {}
