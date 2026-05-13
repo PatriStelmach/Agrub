@@ -2,6 +2,7 @@ package pl.pjatk.alertwip.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import pl.pjatk.alertwip.dto.UserResponseDTO;
 import pl.pjatk.alertwip.model.User;
@@ -16,9 +17,11 @@ import java.util.stream.Collectors;
 public class UserController {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserController(UserRepository userRepository) {
+    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping
@@ -27,6 +30,7 @@ public class UserController {
         List<UserResponseDTO> users = userRepository.findAll().stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
+
         return ResponseEntity.ok(users);
     }
 
@@ -38,11 +42,23 @@ public class UserController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PostMapping
+    @PreAuthorize("hasAuthority('ROLE_ADMINISTRATOR')")
+    public ResponseEntity<UserResponseDTO> addUser(@RequestBody User user) {
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
+        User savedUser = userRepository.save(user);
+
+        return ResponseEntity.ok(mapToDTO(savedUser));
+    }
+
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMINISTRATOR')")
     public ResponseEntity<UserResponseDTO> editUser(@PathVariable Long id, @RequestBody User userDetails) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Użytkownik nie istnieje"));
+
         user.setFirstname(userDetails.getFirstname());
         user.setSurname(userDetails.getSurname());
         user.setRole(userDetails.getRole());
