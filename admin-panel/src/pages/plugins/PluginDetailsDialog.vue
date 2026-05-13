@@ -5,7 +5,6 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -14,7 +13,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {ref, watchEffect} from "vue";
-import CodeEditor from "@/helpers/CodeEditor.vue";
+import CodeEditor from "@/helpers_components/CodeEditor.vue";
 
 const props = defineProps<{
   description: string,

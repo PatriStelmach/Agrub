@@ -9,7 +9,7 @@ import {
   TagsInputItemText
 } from "@/components/ui/tags-input";
 import { useTagsFilter} from "@/composables/useTagsFilter.ts";
-import DialogLabel from "@/helpers/DialogLabel.vue";
+import DialogLabel from "@/helpers_components/DialogLabel.vue";
 import {Button} from "@/components/ui/button";
 import {IconEye, IconEyeOff, IconTrash} from "@tabler/icons-vue";
 import {type HTMLAttributes, onMounted} from "vue";

@@ -25,13 +25,13 @@ api.interceptors.response.use(
     const authStore = useAuthStore();
     const originalRequest = error.config;
 
-    if (originalRequest.url?.includes(['refresh', 'logout']) ) {
+    if (originalRequest.url?.includes(['refresh', 'logout', 'login']) ) {
       authStore.accessToken = null
       authStore.isAuthenticated = false
       return Promise.reject(error);
     }
 
-    if (error.response?.status === 403 && !originalRequest._retry) {
+    else if (error.response?.status === 403 && !originalRequest._retry) {
       originalRequest._retry = true
 
       try {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-const props = defineProps<{
+defineProps<{
   severity: 0 | 1 | 2 | 3 | 4 | 5 | undefined
 }>();
 </script>

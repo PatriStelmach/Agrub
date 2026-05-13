@@ -1,28 +1,30 @@
 <script setup lang="ts">
 
 import {
-  Table,
+  Table, TableBody,
   TableCaption,
-  TableCell, TableFooter,
+  TableCell,
   TableHead,
   TableHeader,
   TableRow
 } from "@/components/ui/table";
 import {IconCircleDashedCheck, IconCircleDashedX, IconEdit} from "@tabler/icons-vue";
-import SortableHead from "@/helpers/SortableHead.vue";
+import SortableHead from "@/helpers_components/SortableHead.vue";
 import EditAlertDialog from "@/pages/alerts/active/EditAlertDialog.vue";
 import {Button} from "@/components/ui/button";
-import DateCell from "@/helpers/DateCell.vue";
+import DateCell from "@/helpers_components/DateCell.vue";
 import {Badge} from "@/components/ui/badge";
 import {dataTable, tableHeaders, tableCaption} from "@/assets/cssFunctions.js";
 import type {ActiveAlert, AlertDetails} from "@/types/types.js";
 import {useSort} from "@/composables/sorting.js";
-import {computed, ref, watch, watchEffect} from "vue";
-import SeverityDiv from "@/helpers/SeverityDiv.vue";
+import {computed, ref, watchEffect} from "vue";
+import SeverityDiv from "@/helpers_components/SeverityDiv.vue";
 import {dateParser} from "@/composables/dateParser.ts";
+import LoadingTable from "@/helpers_components/LoadingTable.vue";
 
 const props = defineProps<{
-  tableData: ActiveAlert[];
+  tableData: ActiveAlert[]
+  isLoading: boolean
 }>()
 
 const hoveredAlert = defineModel<AlertDetails | null>('hoveredAlert')
@@ -62,50 +64,52 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<ActiveAlert>(() =
         <TableHead class="max-md:w-9/100 w-6/100 lg:w-5/100 font-bold text-sm lg:text-md xl:text-lg 2xl:text:xl">Actions</TableHead>
       </TableRow>
     </TableHeader>
-    <TransitionGroup tag="tbody" name="slide-fade">
-      <TableRow
-        :id="`${alert.id}_row`"
-        class="relative duration-0  hover:bg-accent/50"
-        v-for="alert in sortedData"
-        :key="alert.id">
+    <Transition name="fade" mode="out-in">
+      <LoadingTable :colspan="8" v-if="isLoading"/>
+      <TableBody v-else>
+        <TableRow
+          :id="`${alert.id}_row`"
+          class="relative duration-0  hover:bg-accent/50"
+          v-for="alert in sortedData"
+          :key="alert.id">
 
-        <TableCell class="pl-4  whitespace-break-spaces">{{alert.subject}}</TableCell>
-        <TableCell>
-          <SeverityDiv :severity="alert.severity"/>
-        </TableCell>
-        <TableCell
-          @mouseenter="hoveredId = alert.id"
-          @mouseleave="hoveredId = null"
-          class="truncate"
-        >{{alert.message}}</TableCell>
-        <TableCell >
-          <Badge class="whitespace-break-spaces"
-                 variant="source"
-          >{{alert.source}}</Badge>
-        </TableCell>
-        <TableCell >
-          <Badge class="whitespace-break-spaces"
-                 variant="origin"
-          >{{alert.originType}}</Badge>
-        </TableCell>
+          <TableCell class="pl-4  whitespace-break-spaces">{{alert.subject}}</TableCell>
+          <TableCell>
+            <SeverityDiv :severity="alert.severity"/>
+          </TableCell>
+          <TableCell
+            @mouseenter="hoveredId = alert.id"
+            @mouseleave="hoveredId = null"
+            class="truncate"
+          >{{alert.message}}</TableCell>
+          <TableCell >
+            <Badge class="whitespace-break-spaces"
+                   variant="source"
+            >{{alert.source}}</Badge>
+          </TableCell>
+          <TableCell >
+            <Badge class="whitespace-break-spaces"
+                   variant="origin"
+            >{{alert.originType}}</Badge>
+          </TableCell>
 
-        <TableCell class=" gap-x-2 items-center">
-          <IconCircleDashedCheck v-if="alert.acknowledged" class="text-green-badge"/>
-          <IconCircleDashedX v-else class="text-red-badge"/>
-        </TableCell>
-        <DateCell   :date="dateParser(alert.createdAt).toDate "></DateCell>
-        <TableCell>
-          <EditAlertDialog
-            :alert="alert"
-          >
-            <Button size="icon-lg" variant="green_outline">
-              <IconEdit class="size-5"/>
-            </Button>
-          </EditAlertDialog>
+          <TableCell class=" gap-x-2 items-center">
+            <IconCircleDashedCheck v-if="alert.acknowledged" class="text-green-badge"/>
+            <IconCircleDashedX v-else class="text-red-badge"/>
+          </TableCell>
+          <DateCell   :date="dateParser(alert.createdAt).toDate "></DateCell>
+          <TableCell>
+            <EditAlertDialog
+              :alert="alert"
+            >
+              <Button size="icon-lg" variant="green_outline">
+                <IconEdit class="size-5"/>
+              </Button>
+            </EditAlertDialog>
 
-        </TableCell>
-      </TableRow>
-    </TransitionGroup>
-
+          </TableCell>
+        </TableRow>
+      </TableBody>
+    </Transition>
   </Table>
 </template>

@@ -15,12 +15,12 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {watch} from "vue";
 
-const props = defineProps<{
+defineProps<{
   total: number
 }>()
 
 const currentPage = defineModel<number>('pageIndex', { default: 1 })
-const pageSize = defineModel<number>('pageSize', { default: 20 })
+const pageSize = defineModel<number>('pageSize', { default: 50 })
 
 watch(pageSize, () => {
   currentPage.value = 1

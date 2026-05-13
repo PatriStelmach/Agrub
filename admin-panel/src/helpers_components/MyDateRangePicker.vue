@@ -5,7 +5,7 @@ import {
   DateRangeFieldRoot,
 } from 'reka-ui'
 import {now, getLocalTimeZone,  } from '@internationalized/date'
-import DialogLabel from "@/helpers/DialogLabel.vue";
+import DialogLabel from "@/helpers_components/DialogLabel.vue";
 
 const range = defineModel<DateRange>('range', { required: true })
 const props = defineProps<{
