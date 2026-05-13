@@ -9,8 +9,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.pjatk.alertwip.dto.AuthenticationRequestDTO;
 import pl.pjatk.alertwip.model.User;
-import pl.pjatk.alertwip.repository.UserRepository;
 import pl.pjatk.alertwip.repository.UserGroupRepository;
+import pl.pjatk.alertwip.repository.UserRepository;
 import pl.pjatk.alertwip.security.JwtService;
 
 import java.util.Date;
@@ -42,7 +42,6 @@ public class AuthenticationService {
 
     public Map<String, String> authenticate(AuthenticationRequestDTO request) {
         try {
-            // uderza równolegle do bazy danych i do Active Directory
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.email(), request.password())
             );
@@ -52,16 +51,13 @@ public class AuthenticationService {
             throw new RuntimeException("Wystąpił nieoczekiwany błąd podczas logowania.");
         }
 
-        // Jeśli logowanie się powiodło, szukamy usera u nas w bazie.
-        // Jeśli go nie ma (bo loguje się pierwszy raz przez AD), to automatycznie tworzymy mu lokalny profil.
         User user = repository.findByEmail(request.email())
                 .orElseGet(() -> {
                     User newUser = new User();
                     newUser.setEmail(request.email());
-                    newUser.setPassword(""); // Hasło puste, bo jest zarządzane przez AD
+                    newUser.setPassword("");
                     newUser.setFirstname(request.email().split("@")[0]);
                     newUser.setSurname("AD User");
-                    // Ustaw domyślną rolę dla nowych osób z AD
                     newUser.setRole(pl.pjatk.alertwip.model.Role.TECHNICIAN);
                     newUser.setActive(true);
                     return repository.save(newUser);
@@ -73,16 +69,23 @@ public class AuthenticationService {
         );
     }
 
-    public void logout(String token) {
-        Date expiryDate = jwtService.extractClaim(token, io.jsonwebtoken.Claims::getExpiration);
-        long diffInMillis = expiryDate.getTime() - System.currentTimeMillis();
+    public void blacklistToken(String token) {
+        try {
+            Date expiryDate = jwtService.extractClaim(token, io.jsonwebtoken.Claims::getExpiration);
+            long diffInMillis = expiryDate.getTime() - System.currentTimeMillis();
 
-        if (diffInMillis > 0) {
-            redisTemplate.opsForValue().set(token, "blacklisted", diffInMillis, TimeUnit.MILLISECONDS);
+            if (diffInMillis > 0) {
+                redisTemplate.opsForValue().set(token, "blacklisted", diffInMillis, TimeUnit.MILLISECONDS);
+            }
+        } catch (Exception e) {
         }
     }
 
     public String refreshAccessToken(String refreshToken) {
+        if (Boolean.TRUE.equals(redisTemplate.hasKey(refreshToken))) {
+            throw new RuntimeException("Ten token został unieważniony (wylogowano).");
+        }
+
         String userEmail = jwtService.extractUsername(refreshToken);
         User user = repository.findByEmail(userEmail)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
