@@ -2,6 +2,7 @@ package pl.pjatk.alertwip.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import pl.pjatk.alertwip.config.SettingsSeeder;
 import pl.pjatk.alertwip.model.GlobalProblem;
 import pl.pjatk.alertwip.model.ScheduledTask;
 import pl.pjatk.alertwip.model.TaskExecutionLog;
@@ -23,8 +24,8 @@ public class ScriptExecutionService {
     private final TaskExecutionLogRepository logRepository;
     private final SseNotifService sseService;
     private final AlertRoutingService routingService;
-
     private final ActiveAlertCache activeAlertCache;
+    private final SystemSettingService systemSettingService;
 
     @Value("${app.scripts.path}")
     private String scriptsPath;
@@ -35,17 +36,16 @@ public class ScriptExecutionService {
                                   GlobalProblemRepository problemRepository,
                                   SseNotifService sseService,
                                   AlertRoutingService routingService,
-                                  ActiveAlertCache activeAlertCache) {
+                                  ActiveAlertCache activeAlertCache,
+                                  SystemSettingService systemSettingService) {
         this.problemRepository = problemRepository;
         this.logRepository = logRepository;
         this.sseService = sseService;
         this.routingService = routingService;
         this.activeAlertCache = activeAlertCache;
+        this.systemSettingService = systemSettingService;
     }
 
-    /**
-     * Uruchamia fizyczny plik skryptu.
-     */
     public ScriptResult runScript(ScheduledTask task) {
         String scriptName = task.getScriptName();
         String[] args = (task.getArguments() != null && !task.getArguments().isEmpty())
@@ -62,12 +62,11 @@ public class ScriptExecutionService {
                 throw new Exception("Plik nie istnieje w lokalizacji: " + fullScriptPath);
             }
 
-            // --- NOWOŚĆ: Wykrywanie interpretera po rozszerzeniu ---
             String extension = scriptName.substring(scriptName.lastIndexOf('.')).toLowerCase();
             String interpreter;
             switch (extension) {
                 case ".py":
-                    interpreter = "python"; // lub "python3" zależnie od Twojego OS
+                    interpreter = "python";
                     break;
                 case ".sh":
                     interpreter = "bash";
@@ -96,7 +95,16 @@ public class ScriptExecutionService {
                 }
             }
 
-            boolean exited = process.waitFor(30, TimeUnit.SECONDS);
+            //customowy timeout
+            long timeoutSeconds = 30L; // Wartość domyślna
+            try {
+                String timeoutStr = systemSettingService.getValue("scripts_execution_timeout_seconds", "30");
+                timeoutSeconds = Long.parseLong(timeoutStr);
+            } catch (Exception e) {
+                System.err.println("Nie udało się sparsować timeoutu z bazy, używam domyślnych 30s.");
+            }
+
+            boolean exited = process.waitFor(timeoutSeconds, TimeUnit.SECONDS);
 
             if (!exited) {
                 process.destroyForcibly();

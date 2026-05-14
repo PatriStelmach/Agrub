@@ -10,8 +10,6 @@ public class DummyAdapter implements AlertSourceAdapter {
 
     @Override
     public boolean supports(String originType) {
-        // Ten adapter zgłasza się na ochotnika, jeśli źródło to "SCRIPT"
-        // lub kiedy w ogóle nie zdefiniowano źródła.
         return originType == null || originType.equalsIgnoreCase("SCRIPT");
     }
 
