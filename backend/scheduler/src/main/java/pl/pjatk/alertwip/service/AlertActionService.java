@@ -8,6 +8,7 @@ import pl.pjatk.alertwip.repository.GlobalProblemRepository;
 import pl.pjatk.alertwip.repository.ProblemActionRepository;
 import pl.pjatk.alertwip.service.adapter.AlertSourceAdapter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -46,6 +47,9 @@ public class AlertActionService {
 
         // 2. Dynamiczna aktualizacja stanu alertu na podstawie przesłanych danych
         if (request.acknowledge() != null && problem.isAcknowledged() != request.acknowledge()) {
+            if (problem.getAcknowledgedAt() == null) {
+                problem.setAcknowledgedAt(LocalDateTime.now());
+            }
             problem.setAcknowledged(request.acknowledge());
             stateChanged = true;
             inferredActionType = request.acknowledge() ? ActionType.ACK : ActionType.UNACK;
