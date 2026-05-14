@@ -12,7 +12,6 @@ import pl.pjatk.alertwip.service.SystemSettingService;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
-import java.util.Map;
 import java.util.function.Function;
 
 @Service
@@ -37,14 +36,8 @@ public class JwtService {
     }
 
     public String generateAccessToken(User user) {
-        long expirationMins = 15L;
-        Map<String, String> settings = settingService.getAllSettings();
-        if (settings != null && settings.containsKey("SECURITY_ACCESS_TOKEN_EXP_MINUTES")) {
-            try {
-                expirationMins = Long.parseLong(settings.get("SECURITY_ACCESS_TOKEN_EXP_MINUTES"));
-            } catch (NumberFormatException ignored) {}
-        }
-        long jwtExpiration = expirationMins * 60 * 1000;
+        long minutes = Long.parseLong(settingService.getValue("SECURITY_ACCESS_TOKEN_EXP_MINUTES", "1440"));
+        long jwtExpiration = minutes * 60 * 1000;
 
         return Jwts.builder()
                 .claim("firstname", user.getFirstname())
@@ -58,14 +51,8 @@ public class JwtService {
     }
 
     public String generateRefreshToken(UserDetails userDetails) {
-        long expirationHours = 168L;
-        Map<String, String> settings = settingService.getAllSettings();
-        if (settings != null && settings.containsKey("SECURITY_REFRESH_TOKEN_EXP_HOURS")) {
-            try {
-                expirationHours = Long.parseLong(settings.get("SECURITY_REFRESH_TOKEN_EXP_HOURS"));
-            } catch (NumberFormatException ignored) {}
-        }
-        long refreshExpiration = expirationHours * 60 * 60 * 1000;
+        long hours = Long.parseLong(settingService.getValue("SECURITY_REFRESH_TOKEN_EXP_HOURS", "168"));
+        long refreshExpiration = hours * 60 * 60 * 1000;
 
         return Jwts.builder()
                 .subject(userDetails.getUsername())
