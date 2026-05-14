@@ -31,7 +31,7 @@ public class SystemSettingService {
                 .orElse(defaultValue);
     }
 
-    // Pobieranie wszystkich ustawień jako mapa (idealne dla Vue)
+    // Pobieranie wszystkich ustawień jako mapa
     public Map<String, String> getAllSettings() {
         return repository.findAll().stream()
                 .collect(Collectors.toMap(SystemSetting::getSettingKey, SystemSetting::getSettingValue));

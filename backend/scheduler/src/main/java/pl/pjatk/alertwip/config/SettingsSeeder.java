@@ -32,22 +32,43 @@ public class SettingsSeeder implements CommandLineRunner {
         // 1. Definiujemy nasz słownik wartości domyślnych
         // TODO: zmienić to potem z tego mocka
         Map<String, String> defaultSettings = Map.ofEntries(
+
+                // Zabbix
                 Map.entry("zabbix_enabled", "true"),
                 Map.entry("zabbix_url", "http://localhost:10000/api/mock/zabbix"),
                 Map.entry("zabbix_api_token", "asdasd"),
 
+                // Wazuh
                 Map.entry("wazuh_enabled", "false"),
                 Map.entry("wazuh_url", "https://localhost:55000"),
                 Map.entry("wazuh_user", "admin"),
                 Map.entry("wazuh_password", ""),
                 Map.entry("wazuh_min_active_level", "8"),
 
+                // Nagios
                 Map.entry("nagios_enabled", "true"),
                 Map.entry("nagios_url", "http://localhost:8080/nagios/cgi-bin/statusjson.cgi"),
                 Map.entry("nagios_user", "nagiosadmin"),
                 Map.entry("nagios_pass", "nagiosadmin"),
 
-                Map.entry("external_system_sync_timer", "60")
+                // sync timer
+                Map.entry("external_system_sync_timer", "60"),
+
+                // local scripts
+                Map.entry("scripts_execution_timeout_seconds", "30"),
+
+                // Security/JWT (Mati tutaj dodawaj)
+                // uuu tutaj
+
+                // Email config
+                Map.entry("smtp_enabled", "false"),
+                Map.entry("smtp_host", "smtp.example.com"),
+                Map.entry("smtp_port", "587"),
+                Map.entry("smtp_user", "alerts@example.com"),
+                Map.entry("smtp_password", ""),
+
+                // Alert settings
+                Map.entry("max_active_alerts_threshold", "1000")
 
                 //  Tu dodawać nowe ustawienia
         );

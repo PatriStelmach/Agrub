@@ -71,7 +71,7 @@ public class UserGroupController {
         List<pl.pjatk.alertwip.dto.UserSummaryDTO> userDTOs = users.stream()
                 .map(u -> new pl.pjatk.alertwip.dto.UserSummaryDTO(
                         u.getId(),
-                        u.getUsername(), // Korzysta z Twojej metody z UserDetails (zwraca email)
+                        u.getUsername(),
                         u.getFirstname(),
                         u.getSurname()
                 ))
