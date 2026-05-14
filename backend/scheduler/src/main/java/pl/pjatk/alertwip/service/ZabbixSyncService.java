@@ -1,18 +1,20 @@
 package pl.pjatk.alertwip.service;
 
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.annotation.SchedulingConfigurer;
+import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.pjatk.alertwip.model.GlobalProblem;
 import pl.pjatk.alertwip.repository.GlobalProblemRepository;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
-public class ZabbixSyncService {
+public class ZabbixSyncService implements SchedulingConfigurer {
 
     private final ZabbixApiService zabbixApiService;
     private final GlobalProblemRepository problemRepository;
@@ -36,7 +38,30 @@ public class ZabbixSyncService {
         this.alertCache = alertCache;
     }
 
-    @Scheduled(fixedRate = 60000)
+    // ==========================================
+    // DYNAMICZNY SCHEDULER BAZUJĄCY NA BAZIE DANYCH
+    // ==========================================
+    @Override
+    public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
+        taskRegistrar.addTriggerTask(
+                this::syncAlerts, // Metoda do wykonania
+                triggerContext -> {
+                    Map<String, String> settings = settingService.getAllSettings();
+                    String timerValue = settings.getOrDefault("external_system_sync_timer", "60");
+
+                    long intervalMs;
+                    try {
+                        intervalMs = Long.parseLong(timerValue) * 1000L;
+                    } catch (NumberFormatException e) {
+                        intervalMs = 60000L; // Fallback na 60 sekund w razie błędnej wartości w bazie
+                    }
+
+                    return Instant.now().plusMillis(intervalMs);
+                }
+        );
+    }
+
+
     @Transactional
     public void syncAlerts() {
         if (!settingService.getBoolean("zabbix_enabled", false)) {
@@ -62,7 +87,6 @@ public class ZabbixSyncService {
         // Pobieramy wszystkie aktualnie "Otwarte" problemy z Zabbixa
         List<GlobalProblem> activeDbZabbixProblems = problemRepository.findByOriginTypeAndStatusNot("ZABBIX", "Done");
 
-        // Zmieniamy listę na HashMape po kluczu
         Map<String, GlobalProblem> existingProblemsMap = activeDbZabbixProblems.stream()
                 .collect(Collectors.toMap(GlobalProblem::getUniqueKey, Function.identity(), (existing, replacement) -> existing));
 
@@ -162,7 +186,6 @@ public class ZabbixSyncService {
             problem.setCreatedAt(LocalDateTime.now());
             routingService.processVisibility(problem);
 
-            // POPRAWKA: Zapis do bazy NAJPIERW, aby encja otrzymała poprawne ID!
             GlobalProblem saved = problemRepository.save(problem);
             alertCache.updateAlert(saved);
             sseService.sendAlert("NEW_ALERT", saved);
