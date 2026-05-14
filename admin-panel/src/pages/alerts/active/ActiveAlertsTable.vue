@@ -14,7 +14,7 @@ import EditAlertDialog from "@/pages/alerts/active/EditAlertDialog.vue";
 import {Button} from "@/components/ui/button";
 import DateCell from "@/helpers_components/DateCell.vue";
 import {Badge} from "@/components/ui/badge";
-import {dataTable, tableHeaders, tableCaption} from "@/assets/cssFunctions.js";
+import {dataTable, tableHeaders, tableCaption, hoverListRow} from "@/assets/cssFunctions.js";
 import type {ActiveAlert, AlertDetails} from "@/types/types.js";
 import {useSort} from "@/composables/sorting.js";
 import {computed, ref, watchEffect} from "vue";
@@ -69,7 +69,7 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<ActiveAlert>(() =
       <TableBody v-else>
         <TableRow
           :id="`${alert.id}_row`"
-          class="relative duration-0  hover:bg-accent/50"
+          :class="hoverListRow('relative duration-0')"
           v-for="alert in sortedData"
           :key="alert.id">
 

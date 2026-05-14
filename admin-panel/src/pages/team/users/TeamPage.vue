@@ -6,15 +6,16 @@ import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/inpu
 import {ButtonGroup, ButtonGroupSeparator} from "@/components/ui/button-group";
 import {Search} from "lucide-vue-next";
 import {Button} from "@/components/ui/button";
-import {defineAsyncComponent, onMounted, ref} from "vue";
+import {onMounted, ref} from "vue";
 import {useClientSearchFilter} from "@/composables/useClientSearchFilter.js";
 import {blankUser, type User} from "@/types/types.ts";
 import TopH1Div from "@/helpers_components/TopH1Div.vue";
-import UserCard from "@/pages/team/users/UserCard.vue";
 import {useUserStore} from "@/stores/userStore.ts";
 import GridCardLoader from "@/helpers_components/loaders/GridCardLoader.vue";
-const EditUser = defineAsyncComponent(() => import("@/pages/team/users/EditUser.vue"))
-const GridCardTransitionGroup = defineAsyncComponent(() => import("@/helpers_components/loaders/GridCardTransitionGroup.vue"))
+import UserCard from './UserCard.vue'
+import EditUser from "./EditUser.vue"
+import GridCardTransitionGroup from "@/helpers_components/loaders/GridCardTransitionGroup.vue"
+import {getAllGroupsRequest} from "@/helpers_functions/requests.ts";
 
 const userStore = useUserStore();
 const isLoading = ref(true);
@@ -23,10 +24,12 @@ const { filteredData,  searchFilter } =
   useClientSearchFilter<User>(() => userStore.allUsers,(user) => `${user.firstname} ${user.surname}` )
 
 onMounted(async () => {
-  await userStore.getAllUsersRequest().finally(() => {
-    userStore.getAllGroupsRequest().finally(() => isLoading.value = false)
-  })
+  await Promise.all([
+    userStore.getAllUsersRequest(),
+    userStore.getAllGroupsRequest()
+  ]).finally(() => isLoading.value = false)
 })
+
 
 </script>
 

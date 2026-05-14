@@ -224,6 +224,7 @@ export interface GroupDetails {
 export interface Rule {
   id?: number
   userGroup?: UserGroup
+  userGroupId?: number,
   sourcePattern: string
   sourceType: MatchType
   contentPattern: string
@@ -236,22 +237,26 @@ export interface Rule {
   playSound: boolean
 }
 
-export const initialRule: Rule = {
+export const initialRule = (userGroupId?: number): Rule =>{
+  return {
+    userGroupId: userGroupId,
     sourcePattern: '',
-    sourceType: MatchType.EXACT,
+    sourceType: MatchType.CONTAINS,
     contentPattern: '',
-    contentType: MatchType.EXACT,
+    contentType: MatchType.CONTAINS,
     subjectPattern: '',
-    subjectMatchType: MatchType.EXACT,
+    subjectMatchType: MatchType.CONTAINS,
     originPattern: '',
-    originMatchType: MatchType.EXACT,
+    originMatchType: MatchType.CONTAINS,
     minSeverity: 0,
     playSound: false,
+
+  }
 }
 
 export const InitialGroupDetails: GroupDetails = {
   name: '',
-  rules: Array.of(initialRule),
+  rules: Array.of(initialRule()),
   users: []
 }
 

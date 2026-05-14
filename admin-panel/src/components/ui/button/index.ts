@@ -4,7 +4,7 @@ import { cva } from "class-variance-authority"
 export { default as Button } from "./Button.vue"
 
 export const buttonVariants = cva(
-  "inline-flex  cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all duration-150! disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-red-badge/20 aria-invalid:ring-red-badge/40 aria-invalid:border-red-badge",
+  "inline-flex  cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all duration-100! disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-red-badge/20 aria-invalid:ring-red-badge/40 aria-invalid:border-red-badge",
   {
     variants: {
       variant: {
@@ -27,7 +27,7 @@ export const buttonVariants = cva(
         red_outline:
           "bg-background border-2  font-bold border-input hover:bg-red-badge/70 light:hover:bg-red-badge/80  bg-input/30 text-red-badge  hover:border-red-badge hover:text-primary",
         blue_outline:
-          "bg-background border-2  font-bold border-input hover:bg-blue-badge/50  bg-input/30 text-blue-badge/90 hover:bg-blue-badge/80 hover:border-blue-badge hover:text-primary",
+          "bg-background border-2  font-bold border-input hover:bg-blue-badge/50  bg-input/30 text-blue-badge/90 hover:bg-blue-badge/60 hover:border-blue-badge hover:text-primary",
         orange_outline:
           "bg-background border-2  font-bold border-input  bg-input/30 text-orange-badge/90 light: hover:bg-orange-badge/60 hover:bg-orange-badge/70 hover:border-orange-badge hover:text-primary",
 

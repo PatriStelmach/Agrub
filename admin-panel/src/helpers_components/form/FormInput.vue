@@ -7,12 +7,11 @@ import MyFieldLabel from "@/helpers_components/form/MyFieldLabel.vue";
 const props = defineProps<{
   name: string
   label: string
-  ruleId: number
   placeholder?: string
   type?: string
 }>()
 
-const fieldId = `${props.name}-${props.ruleId}`
+const fieldId = props.name
 </script>
 
 <template>

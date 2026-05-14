@@ -14,19 +14,18 @@ import { ref} from "vue";
 import {IconX, IconCheck, IconSend2} from "@tabler/icons-vue";
 
 
-import {useAlertStore} from "@/stores/alertStore.js";
 import DialogLabel from "@/helpers_components/DialogLabel.vue";
 import type { ActiveAlert} from "@/types/types.js";
 import {Badge} from "@/components/ui/badge";
 import ActionsTable from "@/pages/alerts/ActionsTable.vue";
 import {useAuthStore} from "@/stores/authStore.ts";
 import SeveritySelect from "@/helpers_components/SeveritySelect.vue";
+import {updateAlertRequest} from "@/helpers_functions/requests.ts";
 
 const props = defineProps<{
   alert: ActiveAlert
 }>()
 
-const alertStore = useAlertStore()
 const authStore = useAuthStore()
 
 const newAck = ref(props.alert.acknowledged)
@@ -35,7 +34,7 @@ const newMessage = ref("")
 
 const sentAction = async () => {
   if(newAck.value !== props.alert.acknowledged || newSeverity.value !== props.alert.severity || newMessage.value) {
-    await alertStore.updateAlertRequest({
+    await updateAlertRequest({
       id: props.alert.id,
       author: authStore.userEmail!,
       ack: newAck.value === props.alert.acknowledged ? undefined : newAck.value,

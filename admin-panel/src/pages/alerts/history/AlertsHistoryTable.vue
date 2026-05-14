@@ -15,7 +15,7 @@ import {
   TableRow
 } from "@/components/ui/table";
 import SortableHead from "@/helpers_components/SortableHead.vue";
-import {computed, defineAsyncComponent, ref, watchEffect} from "vue";
+import {computed, ref, watchEffect} from "vue";
 import {type AlertDetails, type HistoryAlert} from "@/types/types.ts";
 import {Badge} from "@/components/ui/badge";
 import {IconCircleDashedCheck, IconCircleDashedX, IconHistory} from "@tabler/icons-vue";
@@ -23,10 +23,9 @@ import {Button} from "@/components/ui/button";
 import DateCell from "@/helpers_components/DateCell.vue";
 import {useSortRequests} from "@/composables/useSortRequests.ts";
 import SeverityDiv from "@/helpers_components/SeverityDiv.vue";
+import {hoverListRow} from "@/assets/cssFunctions.ts";
 import LoadingTable from "@/helpers_components/LoadingTable.vue";
-const AlertHistoryDialog = defineAsyncComponent(
-  () => import('@/pages/alerts/history/AlertHistoryDialog.vue')
-)
+import AlertHistoryDialog from '@/pages/alerts/history/AlertHistoryDialog.vue'
 
 const props = defineProps<{
   alerts: HistoryAlert[]
@@ -83,7 +82,7 @@ watchEffect(() => {
           <TableBody v-else>
             <TableRow
               :id="`${alert.id}_row`"
-              class="relative cursor-pointer duration-0  hover:bg-accent/50"
+              :class="hoverListRow('relative cursor-pointer duration-0')"
               v-for="alert in alerts"
               :key="alert.id">
 
