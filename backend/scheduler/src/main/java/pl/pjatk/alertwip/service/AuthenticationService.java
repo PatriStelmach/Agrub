@@ -1,6 +1,5 @@
 package pl.pjatk.alertwip.service;
 
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -15,7 +14,8 @@ import pl.pjatk.alertwip.security.JwtService;
 
 import java.util.Date;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class AuthenticationService {
@@ -25,19 +25,19 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final UserGroupRepository groupRepository;
-    private final StringRedisTemplate redisTemplate;
+
+    // Zastępstwo dla Redisa
+    private final Set<String> localBlacklist = ConcurrentHashMap.newKeySet();
 
     public AuthenticationService(UserRepository repository, JwtService jwtService,
                                  AuthenticationManager authenticationManager,
                                  PasswordEncoder passwordEncoder,
-                                 UserGroupRepository groupRepository,
-                                 StringRedisTemplate redisTemplate) {
+                                 UserGroupRepository groupRepository) {
         this.repository = repository;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
         this.groupRepository = groupRepository;
-        this.redisTemplate = redisTemplate;
     }
 
     public Map<String, String> authenticate(AuthenticationRequestDTO request) {
@@ -75,14 +75,16 @@ public class AuthenticationService {
             long diffInMillis = expiryDate.getTime() - System.currentTimeMillis();
 
             if (diffInMillis > 0) {
-                redisTemplate.opsForValue().set(token, "blacklisted", diffInMillis, TimeUnit.MILLISECONDS);
+                // Dodajemy do lokalnej listy zamiast do Redisa
+                localBlacklist.add(token);
             }
         } catch (Exception e) {
         }
     }
 
     public String refreshAccessToken(String refreshToken) {
-        if (Boolean.TRUE.equals(redisTemplate.hasKey(refreshToken))) {
+        // Sprawdzamy na lokalnej liście zamiast w Redisie
+        if (localBlacklist.contains(refreshToken)) {
             throw new RuntimeException("Ten token został unieważniony (wylogowano).");
         }
 

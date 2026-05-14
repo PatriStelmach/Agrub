@@ -4,7 +4,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,12 +20,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
-    private final StringRedisTemplate redisTemplate;
 
-    public JwtAuthenticationFilter(JwtService jwtService, UserDetailsService userDetailsService, StringRedisTemplate redisTemplate) {
+    public JwtAuthenticationFilter(JwtService jwtService, UserDetailsService userDetailsService) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
-        this.redisTemplate = redisTemplate;
     }
 
     @Override
@@ -50,11 +47,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         try {
-            if (Boolean.TRUE.equals(redisTemplate.hasKey(jwt))) {
-                filterChain.doFilter(request, response);
-                return;
-            }
-
             userEmail = jwtService.extractUsername(jwt);
 
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -67,6 +59,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
         } catch (Exception e) {
+            System.err.println("[JWT Filter] Błąd podczas weryfikacji tokenu: " + e.getMessage());
         }
 
         filterChain.doFilter(request, response);
