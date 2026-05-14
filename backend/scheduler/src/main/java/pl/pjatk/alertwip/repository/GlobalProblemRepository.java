@@ -4,6 +4,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import pl.pjatk.alertwip.model.GlobalProblem;
 import org.springframework.data.jpa.repository.Query;
+
+import java.time.LocalDateTime;
 import java.util.Set;
 
 import java.util.List;
@@ -29,4 +31,5 @@ public interface GlobalProblemRepository extends JpaRepository<GlobalProblem, Lo
     List<GlobalProblem> findByOriginTypeAndStatusNot(String originType, String status);
 
     List<GlobalProblem> findByOriginType(String nagios);
+    List<GlobalProblem> findAllByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 }
