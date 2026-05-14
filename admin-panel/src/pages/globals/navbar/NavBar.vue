@@ -22,7 +22,7 @@ const navItems = [
   {
     label: 'Alerts',
     links: [
-      { label: 'Active', to: 'alerts', icon: IconAlertTriangle },
+      { label: 'Active', to: 'active_alerts', icon: IconAlertTriangle },
       { label: 'History', to: 'alerts_history', icon: IconHistory },
     ]
   },
@@ -70,7 +70,7 @@ const navItems = [
                   {{ item.label }}
                 </SidebarGroupLabel>
                   <RouterLink
-                    :class="{'bg-blue-badge/50 border-blue-badge' : route.name === link.to}"
+                    :class="{'bg-blue-badge/50 border-blue-badge' : route.name?.toString().includes(link.to.toString())}"
                     class="flex xl:text-lg ml-3 border-l-3 w-full hover:bg-input rounded-[0_0.5rem_0.5rem_0]"
                     v-for="link in item.links" :key="link.to" :to="{ name: link.to}">
                     <div class="flex items-center gap-x-2 p-2 ml-1 ">

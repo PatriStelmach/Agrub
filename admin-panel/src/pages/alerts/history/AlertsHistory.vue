@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import {tableDiv, topButtonGroup, topDiv, topH1} from "@/assets/cssFunctions.js";
+import {tableDiv} from "@/assets/cssFunctions.js";
 import {Button} from "@/components/ui/button";
 import {ButtonGroup} from "@/components/ui/button-group";
+import TopH1Div from "@/helpers_components/TopH1Div.vue";
 import {
   type AlertDetails,
   type AlertHistoryFilters,
@@ -10,7 +11,6 @@ import {
 } from "@/types/types.js";
 import {defineAsyncComponent, onMounted, ref} from "vue";
 import {IconFilterCog} from "@tabler/icons-vue";
-import GoBackButton from "@/helpers_components/GoBackButton.vue";
 import AlertsHistoryTable from "@/pages/alerts/history/AlertsHistoryTable.vue";
 import MyServerPagination from "@/helpers_components/MyServerPagination.vue";
 import AlertsFilters from "@/pages/alerts/history/AlertsFilters.vue";
@@ -87,22 +87,17 @@ const hoveredAlert = ref<AlertDetails | null>(null)
 
 <template>
   <div>
-    <div :class="topDiv">
-      <h1 :class="topH1">Alerts history</h1>
-      <ButtonGroup :class="topButtonGroup">
-        <ButtonGroup>
-          <GoBackButton />
-        </ButtonGroup>
-        <ButtonGroup>
-
-          <AlertsFilters @update:filters="updateFilters">
-            <Button variant="outline">
-              Filters <IconFilterCog />
-            </Button>
-          </AlertsFilters>
-        </ButtonGroup>
+    <TopH1Div h1="Alerts history">
+      <ButtonGroup>
       </ButtonGroup>
-    </div>
+      <ButtonGroup>
+        <AlertsFilters @update:filters="updateFilters">
+          <Button variant="outline">
+            Filters <IconFilterCog />
+          </Button>
+        </AlertsFilters>
+      </ButtonGroup>
+    </TopH1Div>
     <div :class="tableDiv">
       <DetailsCard
         v-if="hoveredAlert"

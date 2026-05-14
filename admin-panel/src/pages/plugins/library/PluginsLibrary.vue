@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import PluginsLibraryTable from "@/pages/plugins/PluginsLibraryTable.vue";
+import PluginsLibraryTable from "@/pages/plugins/library/PluginsLibraryTable.vue";
 import {
   IconFilterCog,
 } from "@tabler/icons-vue";
@@ -9,15 +9,15 @@ import {Button} from "@/components/ui/button";
 import {
   type LibraryPlugin,
   type LibraryPluginFilters, undefinedLibraryFilters
-} from "@/types/types.ts"
-import {tableDiv, topButtonGroup, topDiv, topH1} from "@/assets/cssFunctions.ts";
-import GoBackButton from "@/helpers_components/GoBackButton.vue";
+} from "@/types/types.js"
+import {tableDiv} from "@/assets/cssFunctions.js";
+import TopH1Div from "@/helpers_components/TopH1Div.vue";
 import MyServerPagination from "@/helpers_components/MyServerPagination.vue";
-import {useServerSearchFilter} from "@/composables/useServerSearchFilter.ts";
-import api from "@/lib/axios.ts";
+import {useServerSearchFilter} from "@/composables/useServerSearchFilter.js";
+import api from "@/lib/axios.js";
 import PluginFilters from "@/pages/plugins/PluginFilters.vue";
 import {onMounted, ref} from "vue";
-import {getPluginTagsResponse} from "@/helpers_functions/requests.ts";
+import {getPluginTagsResponse} from "@/helpers_functions/requests.js";
 
 const tags = ref<string[]>([])
 const getLibraryPluginsRequest = async () => {
@@ -72,22 +72,17 @@ const {filters, items, pageSize, currentPage, totalElements, sortedHead, updateF
 
 <template>
   <div>
-    <div :class="topDiv">
-      <h1 :class="topH1">Plugins library</h1>
-      <ButtonGroup :class="topButtonGroup">
-        <ButtonGroup>
-          <GoBackButton />
-        </ButtonGroup>
-        <ButtonGroup>
-
-          <PluginFilters @update:filters="updateFilters">
-            <Button variant="outline">
-              Filters <IconFilterCog />
-            </Button>
-          </PluginFilters>
-        </ButtonGroup>
+    <TopH1Div h1="Plugins library">
+      <ButtonGroup>
       </ButtonGroup>
-    </div>
+      <ButtonGroup>
+        <PluginFilters @update:filters="updateFilters">
+          <Button variant="outline">
+            Filters <IconFilterCog />
+          </Button>
+        </PluginFilters>
+      </ButtonGroup>
+    </TopH1Div>
     <div :class="tableDiv">
     <PluginsLibraryTable
       :isLoading="isLoading"

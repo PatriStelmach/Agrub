@@ -3,7 +3,7 @@ import {ref, watchEffect} from "vue"
 import { useForm, useField } from 'vee-validate'
 import { toTypedSchema } from "@vee-validate/zod"
 import z from "zod"
-import { useUserStore } from "@/stores/userStore.ts"
+import { useUserStore } from "@/stores/userStore.js"
 import type { User } from "@/types/types"
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -15,7 +15,7 @@ import { IconKey, IconTool, IconDeviceFloppy, IconLoader } from '@tabler/icons-v
 import { Field, FieldError, FieldGroup } from "@/components/ui/field"
 import { SheetFooter, SheetClose } from '@/components/ui/sheet'
 import MyTagInput from "@/helpers_components/MyTagInput.vue"
-import MyFieldLabel from "@/helpers_components/MyFieldLabel.vue"
+import MyFieldLabel from "@/helpers_components/form/MyFieldLabel.vue"
 import DialogLabel from "@/helpers_components/DialogLabel.vue"
 import { inputText, nameLabel } from '@/assets/cssFunctions'
 
@@ -24,8 +24,9 @@ const props = defineProps<{
 }>()
 
 const userStore = useUserStore()
-const isLoading = ref(false)
 const updatedUser = ref<User>({ ...props.user })
+const isLoading = ref(false)
+
 
 const formSchema = toTypedSchema(
   z.object({
@@ -62,7 +63,7 @@ const onSubmit = handleSubmit(async () => {
     <div class="grid space-y-2 w-3/4">
       <Avatar class="size-12 rounded-lg">
         <AvatarFallback class="rounded-full text-xl grayscale">
-          {{ updatedUser.firstname.slice(0, 1).toUpperCase() + updatedUser.surname.slice(0, 1).toUpperCase() }}
+          {{ userStore.avFallback(updatedUser)}}
         </AvatarFallback>
       </Avatar>
 

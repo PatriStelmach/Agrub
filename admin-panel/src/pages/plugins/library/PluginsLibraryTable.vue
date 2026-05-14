@@ -10,16 +10,16 @@ import {Badge} from "@/components/ui/badge";
 import {
   type LibraryPlugin,
   isPowerShell, isBash, isPython
-} from "@/types/types.ts"
+} from "@/types/types.js"
 import SortableHead from "@/helpers_components/SortableHead.vue";
-import {tableCaption, dataTable, tableHeaders} from "@/assets/cssFunctions.ts";
-import {useSort} from "@/composables/sorting.ts";
+import {tableCaption, dataTable, tableHeaders} from "@/assets/cssFunctions.js";
+import {useSort} from "@/composables/sorting.js";
 import {ButtonGroup} from "@/components/ui/button-group";
 import {Button} from "@/components/ui/button";
 import { IconDownload, IconSourceCode} from "@tabler/icons-vue";
 import {watchEffect} from "vue";
-import {dateParser} from "@/composables/dateParser.ts";
-import api from "@/lib/axios.ts";
+import {dateParser} from "@/composables/dateParser.js";
+import api from "@/lib/axios.js";
 import {toast} from "vue-sonner";
 import LoadingTable from "@/helpers_components/LoadingTable.vue";
 
@@ -92,19 +92,19 @@ const downloadPlugin = async (id: number) => {
               <img
                 v-if="isPython(plugin.language)"
                 alt="python_icon"
-                src="@/components/icons/python_icon.png"
+                src="../../../components/icons/python_icon.png"
                 class="size-7 "
               />
               <img
                 v-if="isBash(plugin.language)"
                 alt="bash_icon"
-                src="@/components/icons/bash_icon.png"
+                src="../../../components/icons/bash_icon.png"
                 class="size-7 "
               />
               <img
                 v-if="isPowerShell(plugin.language)"
                 alt="powershell_icon"
-                src="@/components/icons/powershell_icon.png"
+                src="../../../components/icons/powershell_icon.png"
                 class="size-7 "
               />
             </TableCell>
