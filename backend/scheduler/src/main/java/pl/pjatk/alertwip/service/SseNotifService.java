@@ -4,7 +4,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import pl.pjatk.alertwip.model.GlobalProblem;
-import pl.pjatk.alertwip.dto.AlertUpdateEventDTO; // <--- Nowy import!
+import pl.pjatk.alertwip.dto.AlertUpdateEventDTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +37,6 @@ public class SseNotifService {
         return emitter;
     }
 
-    // 1. Zostawiamy tę metodę bez zmian - Zabbix i Wazuh z niej korzystają (NEW_ALERT, ALERT_RESOLVED)
     public void sendAlert(String status, GlobalProblem alert) {
         List<SseEmitter> deadEmitters = new ArrayList<>();
 
@@ -69,7 +68,7 @@ public class SseNotifService {
         deadEmitters.forEach(userSubscriptions::remove);
     }
 
-    // 2. NOWA METODA - Wysyłanie tylko "Diffa" (zmian) dla istniejących alertów
+    // wysyłamy tylko różnice a nie cały
     public void sendAlertUpdate(String status, AlertUpdateEventDTO payload, GlobalProblem alertContext) {
         List<SseEmitter> deadEmitters = new ArrayList<>();
 
@@ -85,9 +84,9 @@ public class SseNotifService {
                             .name("message")
                             .data(Map.of(
                                     "status", "success",
-                                    "eventType", status,       // "ALERT_UPDATE"
-                                    "notification", false,     // Aktualizacje nie robią hałasu w przeglądarce
-                                    "message", payload         // <--- Wysyłamy nasz lekki DTO ze zmianami
+                                    "eventType", status,
+                                    "notification", false,
+                                    "message", payload
                             ), MediaType.APPLICATION_JSON);
 
                     emitter.send(event);

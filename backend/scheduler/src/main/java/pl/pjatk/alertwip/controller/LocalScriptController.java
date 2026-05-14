@@ -1,16 +1,15 @@
 package pl.pjatk.alertwip.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import pl.pjatk.alertwip.dto.PluginDTO;
 import pl.pjatk.alertwip.dto.PluginDetailsDTO;
 import pl.pjatk.alertwip.dto.PluginSaveDTO;
+import pl.pjatk.alertwip.model.ScheduledTask;
+import pl.pjatk.alertwip.repository.ScheduledTaskRepository;
 import pl.pjatk.alertwip.service.PluginManagerService;
-import pl.pjatk.alertwip.service.PythonScriptService;
+import pl.pjatk.alertwip.service.ScriptExecutionService;
 
-import java.io.Console;
 import java.util.List;
 
 @RestController
@@ -18,9 +17,15 @@ import java.util.List;
 public class LocalScriptController {
 
     private final PluginManagerService pluginManagerService;
+    private final ScheduledTaskRepository taskRepository;
+    private final ScriptExecutionService scriptExecutionService;
 
-    public LocalScriptController(PluginManagerService pluginManagerService) {
+    public LocalScriptController(PluginManagerService pluginManagerService,
+                                 ScheduledTaskRepository taskRepository,
+                                 ScriptExecutionService scriptExecutionService) {
         this.pluginManagerService = pluginManagerService;
+        this.taskRepository = taskRepository;
+        this.scriptExecutionService = scriptExecutionService;
     }
 
     // Lista wszystkich plików na dysku + dane z ScheduledTask (jeśli istnieją)
@@ -30,11 +35,22 @@ public class LocalScriptController {
     }
 
     // Podgląd kodu i opisu na podstawie nazwy pliku (nie ID!)
-    // Regex {fileName:.+} pozwala na przesyłanie kropek w nazwie pliku
     @GetMapping("/{fileName:.+}/details")
     public PluginDetailsDTO getDetails(@PathVariable String fileName) {
         return pluginManagerService.getPluginDetailsByFileName(fileName);
     }
+
+    @PostMapping("/{fileName:.+}/run")
+    public ResponseEntity<String> runScriptByFileName(@PathVariable String fileName) {
+        try {
+            // Wywołujemy jedną spójną metodę z Menedżera Pluginów
+            ScriptExecutionService.ScriptResult result = pluginManagerService.runManualScript(fileName);
+            return ResponseEntity.ok(result.output());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Błąd wykonania: " + e.getMessage());
+        }
+    }
+
 
     @PutMapping("/{fileName:.+}/edit")
     public ResponseEntity<String> editScript(

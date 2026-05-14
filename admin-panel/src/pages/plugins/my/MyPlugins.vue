@@ -1,11 +1,11 @@
 <script setup lang="ts" >
-import MyPluginsTable from "@/pages/plugins/MyPluginsTable.vue";
-import type { MyPlugin } from "@/types/types.ts";
+import MyPluginsTable from "@/pages/plugins/my/MyPluginsTable.vue";
+import type { MyPlugin } from "@/types/types.js";
 import {useClientSearchFilter} from "@/composables/useClientSearchFilter.js";
-import {useMyPluginStore} from "@/stores/myPluginStore.ts";
+import {useMyPluginStore} from "@/stores/myPluginStore.js";
 import MyClientPagination from "@/helpers_components/MyClientPagination.vue";
 import {onMounted, ref} from "vue";
-import {getPluginTagsResponse} from "@/helpers_functions/requests.ts";
+import {getPluginTagsResponse} from "@/helpers_functions/requests.js";
 
 const myPluginStore = useMyPluginStore()
 const isLoading = ref<boolean>(true)
@@ -28,7 +28,6 @@ const {filteredData, tableData, updateData, updateSearchData, currentPage, pageS
 
 <template>
   <div>
-  <div>
     <MyPluginsTable
       :isLoading="isLoading"
       :data="tableData"
@@ -43,5 +42,4 @@ const {filteredData, tableData, updateData, updateSearchData, currentPage, pageS
       />
     </MyPluginsTable>
   </div>
-</div>
 </template>

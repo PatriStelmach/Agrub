@@ -1,5 +1,5 @@
 import {defineStore} from "pinia";
-import type {User, UserGroup} from "@/types/types.ts";
+import type {GroupDetails, User, UserGroup, UserGroupStats} from "@/types/types.ts";
 import {ref} from "vue";
 import api from "@/lib/axios.ts";
 import {toast} from "vue-sonner";
@@ -17,6 +17,39 @@ export const useUserStore = defineStore('user-store',() => {
     }
     catch (error) {
       toast.error(`Error retrieving users: ${error}`)
+    }
+  }
+
+  const getGroupDataRequest = async (id: number) => {
+    try {
+      const res = await api.get(`/groups/${id}/details`)
+      if (res.status === 200 && res.data.length > 0) {
+        console.log(res.data)
+        return res.data as GroupDetails
+      }
+      else {
+        toast.error(`Error retrieving groups: ${res.data}`)
+      }
+
+    }
+    catch (error) {
+      toast.error(`Error retrieving groups: ${error}`)
+    }
+  }
+
+  const getGroupsStatsRequest = async () => {
+    try {
+      const res = await api.get(`/groups/stats`)
+      if (res.status === 200) {
+        return res.data as UserGroupStats[]
+      }
+      else {
+        toast.error(`Error retrieving stats: ${res.data}`)
+        return []
+      }
+    }
+    catch (error) {
+      toast.error(`Error retrieving stats: ${error}`)
     }
   }
 
@@ -61,7 +94,7 @@ export const useUserStore = defineStore('user-store',() => {
   }
 
   const avFallback = (user: User) =>  {
-    return `${user.firstname.slice(0, 1).toUpperCase()} ${user.surname.slice(0,1).toUpperCase()}`
+    return `${user.firstname.slice(0, 1).toUpperCase()}${user.surname.slice(0,1).toUpperCase()}`
   }
   const fullName = (user: User) =>  {
    return `${user.firstname} ${user.surname}`
@@ -75,7 +108,9 @@ export const useUserStore = defineStore('user-store',() => {
     getUserByIdRequest,
     getAllGroupsRequest,
     fullName,
-    avFallback
+    avFallback,
+    getGroupDataRequest,
+    getGroupsStatsRequest
 
   }
 })

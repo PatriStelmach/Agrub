@@ -2,6 +2,7 @@ package pl.pjatk.alertwip.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import pl.pjatk.alertwip.config.SettingsSeeder;
 import pl.pjatk.alertwip.model.GlobalProblem;
 import pl.pjatk.alertwip.model.ScheduledTask;
 import pl.pjatk.alertwip.model.TaskExecutionLog;
@@ -14,38 +15,38 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class PythonScriptService {
+public class ScriptExecutionService {
 
     private final GlobalProblemRepository problemRepository;
     private final TaskExecutionLogRepository logRepository;
     private final SseNotifService sseService;
     private final AlertRoutingService routingService;
-
     private final ActiveAlertCache activeAlertCache;
+    private final SystemSettingService systemSettingService;
 
     @Value("${app.scripts.path}")
     private String scriptsPath;
 
-    public PythonScriptService(TaskExecutionLogRepository logRepository,
-                               GlobalProblemRepository problemRepository,
-                               SseNotifService sseService,
-                               AlertRoutingService routingService,
-                               ActiveAlertCache activeAlertCache) {
+    public record ScriptResult(int exitCode, String output) {}
+
+    public ScriptExecutionService(TaskExecutionLogRepository logRepository,
+                                  GlobalProblemRepository problemRepository,
+                                  SseNotifService sseService,
+                                  AlertRoutingService routingService,
+                                  ActiveAlertCache activeAlertCache,
+                                  SystemSettingService systemSettingService) {
         this.problemRepository = problemRepository;
         this.logRepository = logRepository;
         this.sseService = sseService;
         this.routingService = routingService;
         this.activeAlertCache = activeAlertCache;
+        this.systemSettingService = systemSettingService;
     }
 
-    /**
-     * Uruchamia fizyczny plik skryptu.
-     */
-    public int runScript(ScheduledTask task) {
+    public ScriptResult runScript(ScheduledTask task) {
         String scriptName = task.getScriptName();
         String[] args = (task.getArguments() != null && !task.getArguments().isEmpty())
                 ? task.getArguments().split(" ") : new String[0];
@@ -61,8 +62,24 @@ public class PythonScriptService {
                 throw new Exception("Plik nie istnieje w lokalizacji: " + fullScriptPath);
             }
 
+            String extension = scriptName.substring(scriptName.lastIndexOf('.')).toLowerCase();
+            String interpreter;
+            switch (extension) {
+                case ".py":
+                    interpreter = "python";
+                    break;
+                case ".sh":
+                    interpreter = "bash";
+                    break;
+                case ".ps1":
+                    interpreter = "pwsh"; // lub "powershell" w starym Windowsie
+                    break;
+                default:
+                    throw new Exception("Nieobsługiwane rozszerzenie pliku: " + extension);
+            }
+
             String[] command = new String[args.length + 2];
-            command[0] = "python"; // Jeśli kiedyś dodasz wsparcie dla Bash, tutaj sprawdzisz rozszerzenie pliku
+            command[0] = interpreter;
             command[1] = fullScriptPath.toString();
             System.arraycopy(args, 0, command, 2, args.length);
 
@@ -78,7 +95,16 @@ public class PythonScriptService {
                 }
             }
 
-            boolean exited = process.waitFor(30, TimeUnit.SECONDS);
+            //customowy timeout
+            long timeoutSeconds = 30L; // Wartość domyślna
+            try {
+                String timeoutStr = systemSettingService.getValue("scripts_execution_timeout_seconds", "30");
+                timeoutSeconds = Long.parseLong(timeoutStr);
+            } catch (Exception e) {
+                System.err.println("Nie udało się sparsować timeoutu z bazy, używam domyślnych 30s.");
+            }
+
+            boolean exited = process.waitFor(timeoutSeconds, TimeUnit.SECONDS);
 
             if (!exited) {
                 process.destroyForcibly();
@@ -99,11 +125,9 @@ public class PythonScriptService {
             outputCollector.append("BŁĄD SYSTEMOWY: ").append(e.getMessage());
         } finally {
             saveLogToDatabase(task, outputCollector.toString(), status);
-
-            // Wywołujemy mechanizm alertowania
             handleAlerting(task, exitCode, outputCollector.toString());
         }
-        return exitCode;
+        return new ScriptResult(exitCode, outputCollector.toString());
     }
 
     private void handleAlerting(ScheduledTask task, int exitCode, String output) {
@@ -122,7 +146,7 @@ public class PythonScriptService {
                     problem.setUniqueKey(uniqueKey);
                     problem.setSubject(task.getTaskName());
                     problem.setSource("Local Script");
-                    problem.setOriginType("PYTHON");
+                    problem.setOriginType(task.getTaskName());
                     problem.setStatus("Sent");
                     problem.setCreatedAt(LocalDateTime.now());
                     problem.setMessage(newMessage);

@@ -29,26 +29,59 @@ public class SettingsSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        // 1. Definiujemy nasz słownik wartości domyślnych
-        // TODO: zmienić to potem z tego mocka
         Map<String, String> defaultSettings = Map.ofEntries(
+                // Zabbix
                 Map.entry("zabbix_enabled", "true"),
                 Map.entry("zabbix_url", "http://localhost:10000/api/mock/zabbix"),
                 Map.entry("zabbix_api_token", "asdasd"),
 
+                // Wazuh
                 Map.entry("wazuh_enabled", "false"),
                 Map.entry("wazuh_url", "https://localhost:55000"),
                 Map.entry("wazuh_user", "admin"),
                 Map.entry("wazuh_password", ""),
                 Map.entry("wazuh_min_active_level", "8"),
 
+                // Nagios
                 Map.entry("nagios_enabled", "true"),
                 Map.entry("nagios_url", "http://localhost:8080/nagios/cgi-bin/statusjson.cgi"),
                 Map.entry("nagios_user", "nagiosadmin"),
-                Map.entry("nagios_pass", "nagiosadmin")
+                Map.entry("nagios_pass", "nagiosadmin"),
 
-                //  Tu dodawać nowe ustawienia
+                // Sync timer
+                Map.entry("external_system_sync_timer", "60"),
+
+                // Local scripts
+                Map.entry("scripts_execution_timeout_seconds", "30"),
+
+                // SECURITY / JWT
+                // 1440 min = 24h
+                Map.entry("SECURITY_ACCESS_TOKEN_EXP_MINUTES", "1440"),
+                // 168h = 7 dni
+                Map.entry("SECURITY_REFRESH_TOKEN_EXP_HOURS", "168"),
+                Map.entry("SECURITY_PASSWORD_LIFETIME_DAYS", "90"),
+
+                // Konfiguracja AD / LDAP
+                Map.entry("SECURITY_AD_DOMAIN", "example.com"),
+                Map.entry("SECURITY_AD_URL", "ldap://ldap.forumsys.com:389"),
+                Map.entry("SECURITY_LDAP_BASE_DN", "dc=example,dc=com"),
+                Map.entry("SECURITY_LDAP_USER_DN_PATTERN", "uid={0}"),
+
+                // Email config
+                Map.entry("smtp_enabled", "false"),
+                Map.entry("smtp_host", "smtp.example.com"),
+                Map.entry("smtp_port", "587"),
+                Map.entry("smtp_user", "alerts@example.com"),
+                Map.entry("smtp_password", "")
         );
+
+        // Reszta logiki zapisu (repository.existsById...) pozostaje bez zmian
+        defaultSettings.forEach((key, value) -> {
+            if (!repository.existsById(key)) {
+                repository.save(new SystemSetting(key, value));
+                System.out.println("[SYSTEM] Dodano domyślne ustawienie do bazy: " + key);
+            }
+        });
 
         // 2. Przechodzimy przez każdy klucz
         defaultSettings.forEach((key, value) -> {

@@ -7,7 +7,7 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.scheduling.support.CronTrigger;
 import pl.pjatk.alertwip.model.ScheduledTask;
 import pl.pjatk.alertwip.repository.ScheduledTaskRepository;
-import pl.pjatk.alertwip.service.PythonScriptService;
+import pl.pjatk.alertwip.service.ScriptExecutionService;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,13 +17,13 @@ import java.util.concurrent.ScheduledFuture;
 public class DynamicSchedulerConfig implements SchedulingConfigurer {
 
     private final ScheduledTaskRepository repository;
-    private final PythonScriptService pythonService;
+    private final ScriptExecutionService pythonService;
     private final TaskScheduler taskScheduler;
 
     private final Map<Long, ScheduledFuture<?>> scheduledTasks = new ConcurrentHashMap<>();
 
     public DynamicSchedulerConfig(ScheduledTaskRepository repository,
-                                  PythonScriptService pythonService,
+                                  ScriptExecutionService pythonService,
                                   TaskScheduler taskScheduler) {
         this.repository = repository;
         this.pythonService = pythonService;
@@ -59,7 +59,7 @@ public class DynamicSchedulerConfig implements SchedulingConfigurer {
 
                             try {
                                 // Właściwe wykonanie skryptu
-                               int exitCode = pythonService.runScript(task);
+                               int exitCode = pythonService.runScript(task).exitCode();
                                System.out.println("[CRON FINISHED] Zakończono zadanie: " + task.getTaskName() + " | Exit code: " + exitCode);
                             } catch (Exception e) {
                                 System.err.println("[CRON ERROR] Błąd w trakcie wykonywania " + task.getScriptName() + ": " + e.getMessage());

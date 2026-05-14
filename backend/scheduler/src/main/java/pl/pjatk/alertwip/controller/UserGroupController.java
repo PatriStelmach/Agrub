@@ -55,6 +55,56 @@ public class UserGroupController {
         return ResponseEntity.ok(statsList);
     }
 
+    //endpoint na pobranie wszystkich userów oraz wszystkich zasad dla konkretnej grupy
+    @GetMapping("/{id}/details")
+    public ResponseEntity<pl.pjatk.alertwip.dto.UserGroupDetailsDTO> getGroupDetails(@PathVariable Long id) {
+
+        // 1. Sprawdzamy czy grupa w ogóle istnieje
+        UserGroup group = groupRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Nie znaleziono grupy o id: " + id));
+
+        // 2. Pobieramy dane powiązane
+        List<User> users = userRepository.findAllByGroupsId(id);
+        List<pl.pjatk.alertwip.model.AlertRule> rules = alertRuleRepository.findAllByUserGroupId(id);
+
+        // 3. Mapujemy listę Użytkowników
+        List<pl.pjatk.alertwip.dto.UserSummaryDTO> userDTOs = users.stream()
+                .map(u -> new pl.pjatk.alertwip.dto.UserSummaryDTO(
+                        u.getId(),
+                        u.getUsername(),
+                        u.getFirstname(),
+                        u.getSurname()
+                ))
+                .collect(java.util.stream.Collectors.toList());
+
+        // 4. Mapujemy listę Zasad Alertowania
+        List<pl.pjatk.alertwip.dto.AlertRuleRequestDTO> ruleDTOs = rules.stream()
+                .map(r -> new pl.pjatk.alertwip.dto.AlertRuleRequestDTO(
+                        r.getId(),
+                        r.getSourcePattern(),
+                        r.getSourceType(),
+                        r.getContentPattern(),
+                        r.getContentType(),
+                        r.getSubjectPattern(),
+                        r.getSubjectMatchType(),
+                        r.getOriginPattern(),
+                        r.getOriginMatchType(),
+                        r.getMinSeverity(),
+                        r.isPlaySound()
+                ))
+                .collect(java.util.stream.Collectors.toList());
+
+        // 5. Składamy w finalny obiekt JSON
+        pl.pjatk.alertwip.dto.UserGroupDetailsDTO response = new pl.pjatk.alertwip.dto.UserGroupDetailsDTO(
+                group.getId(),
+                group.getName(),
+                userDTOs,
+                ruleDTOs
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMINISTRATOR')")
     public ResponseEntity<Void> deleteGroup(@PathVariable Long id) {

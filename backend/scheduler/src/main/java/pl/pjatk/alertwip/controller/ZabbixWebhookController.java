@@ -56,7 +56,7 @@ public class ZabbixWebhookController {
                 problem.setSeverity(severity);
                 problem.setCreatedAt(LocalDateTime.now());
 
-                // --- MAGIA: Procesowanie widoczności przed zapisem! ---
+                // Procesowanie widoczności przed zapisem
                 routingService.processVisibility(problem);
 
                 GlobalProblem saved = problemRepository.save(problem);

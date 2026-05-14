@@ -1,5 +1,21 @@
 export const api_url = 'http://localhost:10000/api'
 
+export enum Language {
+  PYTHON = ".py",
+  SH = ".sh",
+  BASH = ".bash" ,
+  POWERSHELL = ".ps1",
+  POWERSHELL_MODULE = ".psm1"
+}
+
+export enum MatchType {
+  EXACT = "EXACT",
+  STARTS_WITH = "STARTS_WITH",
+  ENDS_WITH = "ENDS_WITH",
+  CONTAINS = "CONTAINS",
+  REGEX = "REGEX",
+}
+
 export interface ActiveAlert {
   id: number
   externalEventId: string
@@ -97,7 +113,7 @@ export interface User {
   active?: boolean,
   email: string,
   role: "ADMINISTRATOR" | "TECHNICIAN"
-  groups: string[]
+  groups?: string[]
 }
 
 export const blankUser = {
@@ -111,6 +127,11 @@ export const blankUser = {
 export interface UserGroup {
   id: number,
   name: string,
+}
+
+export interface UserGroupStats extends UserGroup {
+  userCount: number,
+  ruleCount: number
 }
 
 export interface MyPlugin
@@ -189,29 +210,50 @@ export interface fileType
   progress:number
 }
 
-export interface ApiResponse {
-  success: boolean,
-  message: string,
-  code: number,
+
+
+export interface GroupDetails {
+  id?: number,
+  name: string,
+  rules: Rule[],
+  users: User[]
 }
 
 
-export enum Language {
-  PYTHON = ".py",
-  SH = ".sh",
-  BASH = ".bash" ,
-  POWERSHELL = ".ps1",
-  POWERSHELL_MODULE = ".psm1"
+
+export interface Rule {
+  id?: number
+  userGroup?: UserGroup
+  sourcePattern: string
+  sourceType: MatchType
+  contentPattern: string
+  contentType: MatchType
+  subjectPattern: string
+  subjectMatchType: MatchType
+  originPattern: string
+  originMatchType: MatchType
+  minSeverity: number
+  playSound: boolean
 }
 
-export enum MatchType {
-  EXACT = "EXACT",
-  STARTS_WITH = "STARTS_WITH",
-  ENDS_WITH = "ENDS_WITH",
-  CONTAINS = "CONTAINS",
-  REGEX = "REGEX",
+export const initialRule: Rule = {
+    sourcePattern: '',
+    sourceType: MatchType.EXACT,
+    contentPattern: '',
+    contentType: MatchType.EXACT,
+    subjectPattern: '',
+    subjectMatchType: MatchType.EXACT,
+    originPattern: '',
+    originMatchType: MatchType.EXACT,
+    minSeverity: 0,
+    playSound: false,
 }
 
+export const InitialGroupDetails: GroupDetails = {
+  name: '',
+  rules: [initialRule],
+  users: []
+}
 
 export const isBash = (lang: string)  =>
   lang === Language.SH || lang === Language.BASH

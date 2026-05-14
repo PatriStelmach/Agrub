@@ -18,7 +18,6 @@ public class TaskController {
     private final DynamicSchedulerConfig schedulerConfig;
     private final PluginManagerService pluginManagerService;
 
-    // Wstrzykujemy PluginManagerService
     public TaskController(ScheduledTaskRepository repository,
                           DynamicSchedulerConfig schedulerConfig,
                           PluginManagerService pluginManagerService) {
@@ -33,8 +32,6 @@ public class TaskController {
         task.setTaskName(dto.taskName());
         task.setScriptName(dto.scriptName());
 
-        // --- ZMIANA TUTAJ ---
-        // Magia dzieje się tutaj - serwer sam decyduje na podstawie zawartości pliku!
         int severity = pluginManagerService.getScriptSeverity(dto.scriptName());
         task.setSeverity(severity);
 
@@ -45,7 +42,7 @@ public class TaskController {
             task.setCronExpression(dto.cronExpression());
         }
 
-        // Domyślnie nowe zadanie jest od razu aktywne (możesz to zmienić wg uznania)
+        // Domyślnie nowe zadanie jest od razu aktywne
         task.setActive(true);
 
         ScheduledTask saved = repository.save(task);
@@ -55,8 +52,6 @@ public class TaskController {
 
     @PutMapping("/edit")
     public ScheduledTask editTask(@RequestBody ScheduledTask task) {
-        // --- ZMIANA TUTAJ ---
-        // Nadpisujemy severity tym, co faktycznie jest w pliku, żeby zapobiec oszustwom z frontu
         int realSeverity = pluginManagerService.getScriptSeverity(task.getScriptName());
         task.setSeverity(realSeverity);
 
@@ -82,7 +77,6 @@ public class TaskController {
 
     @GetMapping("/list")
     public ResponseEntity<List<ScheduledTask>> getAllTasks() {
-        // Pobiera wszystkie zaplanowane zadania (aktywne i nieaktywne) prosto z bazy danych
         List<ScheduledTask> tasks = repository.findAll();
         return ResponseEntity.ok(tasks);
     }
