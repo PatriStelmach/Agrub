@@ -2,24 +2,26 @@ package pl.pjatk.alertwip.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.annotation.SchedulingConfigurer;
+import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.stereotype.Service;
 import pl.pjatk.alertwip.model.GlobalProblem;
 import pl.pjatk.alertwip.repository.GlobalProblemRepository;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 
 @Service
-public class NagiosSyncService {
+public class NagiosSyncService implements SchedulingConfigurer {
 
     private final NagiosApiService nagiosApi;
     private final GlobalProblemRepository problemRepository;
     private final ObjectMapper mapper = new ObjectMapper();
     private final AlertRoutingService routingService;
     private final ActiveAlertCache alertCache;
-    private final SseNotifService sseService; // Zaktualizowana nazwa!
+    private final SseNotifService sseService;
     private final SystemSettingService settingService;
 
     public NagiosSyncService(NagiosApiService nagiosApi,
@@ -36,7 +38,26 @@ public class NagiosSyncService {
         this.settingService = settingService;
     }
 
-    @Scheduled(fixedDelay = 30000)
+    @Override
+    public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
+        taskRegistrar.addTriggerTask(
+                this::sync,
+                triggerContext -> {
+                    Map<String, String> settings = settingService.getAllSettings();
+                    String timerValue = settings.getOrDefault("external_system_sync_timer", "60");
+
+                    long intervalMs;
+                    try {
+                        intervalMs = Long.parseLong(timerValue) * 1000L;
+                    } catch (NumberFormatException e) {
+                        intervalMs = 60000L;
+                    }
+
+                    return Instant.now().plusMillis(intervalMs);
+                }
+        );
+    }
+
     public void sync() {
         if (!settingService.getBoolean("nagios_enabled", false)) return;
 

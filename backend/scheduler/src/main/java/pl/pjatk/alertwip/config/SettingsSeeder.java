@@ -45,7 +45,9 @@ public class SettingsSeeder implements CommandLineRunner {
                 Map.entry("nagios_enabled", "true"),
                 Map.entry("nagios_url", "http://localhost:8080/nagios/cgi-bin/statusjson.cgi"),
                 Map.entry("nagios_user", "nagiosadmin"),
-                Map.entry("nagios_pass", "nagiosadmin")
+                Map.entry("nagios_pass", "nagiosadmin"),
+
+                Map.entry("external_system_sync_timer", "60")
 
                 //  Tu dodawać nowe ustawienia
         );

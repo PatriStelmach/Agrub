@@ -2,18 +2,21 @@ package pl.pjatk.alertwip.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.annotation.SchedulingConfigurer;
+import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.pjatk.alertwip.model.GlobalProblem;
 import pl.pjatk.alertwip.repository.GlobalProblemRepository;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 @Service
-public class WazuhSyncService {
+public class WazuhSyncService implements SchedulingConfigurer {
 
     private final WazuhApiService wazuhApi;
     private final GlobalProblemRepository problemRepository;
@@ -39,7 +42,26 @@ public class WazuhSyncService {
         this.settingService = settingService;
     }
 
-    @Scheduled(fixedDelay = 30000)
+    @Override
+    public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
+        taskRegistrar.addTriggerTask(
+                this::sync,
+                triggerContext -> {
+                    Map<String, String> settings = settingService.getAllSettings();
+                    String timerValue = settings.getOrDefault("external_system_sync_timer", "60");
+
+                    long intervalMs;
+                    try {
+                        intervalMs = Long.parseLong(timerValue) * 1000L;
+                    } catch (NumberFormatException e) {
+                        intervalMs = 60000L;
+                    }
+
+                    return Instant.now().plusMillis(intervalMs);
+                }
+        );
+    }
+
     @Transactional
     public void sync() {
         if (!settingService.getBoolean("wazuh_enabled", false)) {
@@ -60,13 +82,11 @@ public class WazuhSyncService {
                 throw new RuntimeException("Wazuh API zwróciło null podczas pobierania logów.");
             }
         } catch (Exception e) {
-            //Zgłaszanie awarii integracji do frontendu!
             System.err.println("[WAZUH SYNC] Awaria połączenia API. Generuję alert systemowy...");
             triggerSystemAlert(API_ERROR_UNIQUE_KEY, "Brak komunikacji z Wazuh API: " + e.getMessage());
             return;
         }
 
-        // Usunięcie ewentualnego alertu systemowego, bo połączenie wróciło
         resolveSystemAlert(API_ERROR_UNIQUE_KEY);
 
         try {
@@ -81,7 +101,7 @@ public class WazuhSyncService {
                 try {
                     minActiveLevel = Integer.parseInt(settingService.getValue("wazuh_min_active_level", "8"));
                 } catch (Exception e) {
-                    minActiveLevel = 8; // Fallback w przypadku błędu
+                    minActiveLevel = 8;
                 }
 
                 for (JsonNode logNode : logs) {
@@ -112,27 +132,22 @@ public class WazuhSyncService {
                             problem.setSeverity(2);
                         }
 
-                        // sprawdzamy poziom alertu z wazuha (0-15)
                         int wazuhRuleLevel = 0;
                         try {
                             wazuhRuleLevel = Integer.parseInt(level);
                         } catch (NumberFormatException ignored) {}
 
-                        // sprawdzamy czy więcej niż nasz próg alertowania
                         if (wazuhRuleLevel > 0 && wazuhRuleLevel < minActiveLevel) {
-                            // Jeśli nie to nie powiadamiamy
                             problem.setStatus("Done");
                             problem.setAcknowledged(true);
                             problem.setClosedAt(LocalDateTime.now());
 
-                            // Zapisujemy TYLKO do bazy (na potrzeby zakładki Historia)
                             problemRepository.save(problem);
                             existingKeys.add(uniqueKey);
                             added++;
-                            continue; // Przerywamy dalsze instrukcje dla tego loga - brak cache i SSE!
+                            continue;
                         }
 
-                        // Standardowe przetwarzanie dla alertów powiększych od progu
                         problem.setStatus("New");
                         routingService.processVisibility(problem);
 
