@@ -1,4 +1,4 @@
-package pl.pjatk.alertwip.config;
+package pl.pjatk.alertwip.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
