@@ -10,7 +10,14 @@ public class DummyAdapter implements AlertSourceAdapter {
 
     @Override
     public boolean supports(String originType) {
-        return originType == null || originType.equalsIgnoreCase("SCRIPT");
+        if (originType == null) {
+            return false;
+        }
+
+        String lowerOrigin = originType.toLowerCase();
+        return lowerOrigin.endsWith(".py") ||
+                lowerOrigin.endsWith(".ps1") ||
+                lowerOrigin.endsWith(".sh");
     }
 
     @Override
