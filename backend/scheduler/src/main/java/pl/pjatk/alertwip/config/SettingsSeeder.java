@@ -65,10 +65,10 @@ public class SettingsSeeder implements CommandLineRunner {
                 Map.entry("smtp_host", "smtp.example.com"),
                 Map.entry("smtp_port", "587"),
                 Map.entry("smtp_user", "alerts@example.com"),
-                Map.entry("smtp_password", ""),
+                Map.entry("smtp_password", "")
 
                 // Alert settings
-                Map.entry("max_active_alerts_threshold", "1000")
+
 
                 //  Tu dodawać nowe ustawienia
         );
