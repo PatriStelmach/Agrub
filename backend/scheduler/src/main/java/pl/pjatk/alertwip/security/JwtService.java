@@ -8,9 +8,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import pl.pjatk.alertwip.model.User;
+import pl.pjatk.alertwip.service.SystemSettingService;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.Map;
 import java.util.function.Function;
 
 @Service
@@ -19,11 +21,11 @@ public class JwtService {
     @Value("${jwt.secret}")
     private String secretKey;
 
-    @Value("${jwt.expiration}")
-    private long jwtExpiration;
+    private final SystemSettingService settingService;
 
-    @Value("${jwt.refresh-token.expiration}")
-    private long refreshExpiration;
+    public JwtService(SystemSettingService settingService) {
+        this.settingService = settingService;
+    }
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -35,6 +37,15 @@ public class JwtService {
     }
 
     public String generateAccessToken(User user) {
+        long expirationMins = 15L;
+        Map<String, String> settings = settingService.getAllSettings();
+        if (settings != null && settings.containsKey("SECURITY_ACCESS_TOKEN_EXP_MINUTES")) {
+            try {
+                expirationMins = Long.parseLong(settings.get("SECURITY_ACCESS_TOKEN_EXP_MINUTES"));
+            } catch (NumberFormatException ignored) {}
+        }
+        long jwtExpiration = expirationMins * 60 * 1000;
+
         return Jwts.builder()
                 .claim("firstname", user.getFirstname())
                 .claim("surname", user.getSurname())
@@ -47,6 +58,15 @@ public class JwtService {
     }
 
     public String generateRefreshToken(UserDetails userDetails) {
+        long expirationHours = 168L;
+        Map<String, String> settings = settingService.getAllSettings();
+        if (settings != null && settings.containsKey("SECURITY_REFRESH_TOKEN_EXP_HOURS")) {
+            try {
+                expirationHours = Long.parseLong(settings.get("SECURITY_REFRESH_TOKEN_EXP_HOURS"));
+            } catch (NumberFormatException ignored) {}
+        }
+        long refreshExpiration = expirationHours * 60 * 60 * 1000;
+
         return Jwts.builder()
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))

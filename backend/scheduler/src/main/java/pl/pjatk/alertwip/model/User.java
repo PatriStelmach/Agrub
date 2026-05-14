@@ -5,6 +5,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -24,6 +25,7 @@ public class User implements UserDetails {
     private String password;
 
     private String firstname;
+
     private String surname;
 
     private boolean active = true;
@@ -40,11 +42,15 @@ public class User implements UserDetails {
     )
     private List<UserGroup> groups = new ArrayList<>();
 
+    @Column(name = "auto_logout_minutes", nullable = false)
+    private Integer autoLogoutMinutes = 480;
+
+    @Column(name = "last_password_change_date")
+    private LocalDateTime lastPasswordChangeDate = LocalDateTime.now();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
-
         authorities.add(new SimpleGrantedAuthority("ROLE_" + role.name()));
 
         if (groups != null) {
@@ -85,26 +91,79 @@ public class User implements UserDetails {
         return active;
     }
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public void setPassword(String password) { this.password = password; }
+    public String getEmail() {
+        return email;
+    }
 
-    public String getFirstname() { return firstname; }
-    public void setFirstname(String firstname) { this.firstname = firstname; }
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-    public String getSurname() { return surname; }
-    public void setSurname(String surname) { this.surname = surname; }
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-    public boolean isActive() { return active; }
-    public void setActive(boolean active) { this.active = active; }
+    public String getFirstname() {
+        return firstname;
+    }
 
-    public Role getRole() { return role; }
-    public void setRole(Role role) { this.role = role; }
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
+    }
 
-    public List<UserGroup> getGroups() { return groups; }
-    public void setGroups(List<UserGroup> groups) { this.groups = groups; }
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public List<UserGroup> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(List<UserGroup> groups) {
+        this.groups = groups;
+    }
+
+    public Integer getAutoLogoutMinutes() {
+        return autoLogoutMinutes;
+    }
+
+    public void setAutoLogoutMinutes(Integer autoLogoutMinutes) {
+        this.autoLogoutMinutes = autoLogoutMinutes;
+    }
+
+    public LocalDateTime getLastPasswordChangeDate() {
+        return lastPasswordChangeDate;
+    }
+
+    public void setLastPasswordChangeDate(LocalDateTime lastPasswordChangeDate) {
+        this.lastPasswordChangeDate = lastPasswordChangeDate;
+    }
 }

@@ -2,8 +2,10 @@ package pl.pjatk.alertwip.controller;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.web.bind.annotation.*;
 import pl.pjatk.alertwip.dto.AuthenticationRequestDTO;
 import pl.pjatk.alertwip.service.AuthenticationService;
@@ -24,20 +26,29 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody AuthenticationRequestDTO request) {
-        Map<String, String> tokens = authenticationService.authenticate(request);
+    public ResponseEntity<?> login(@RequestBody AuthenticationRequestDTO request) {
+        try {
+            Map<String, String> tokens = authenticationService.authenticate(request);
 
-        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", tokens.get("refresh_token"))
-                .httpOnly(true)
-                .secure(cookieSecure)
-                .path("/")
-                .maxAge(7 * 24 * 60 * 60)
-                .sameSite("Lax")
-                .build();
+            ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", tokens.get("refresh_token"))
+                    .httpOnly(true)
+                    .secure(cookieSecure)
+                    .path("/")
+                    .maxAge(7 * 24 * 60 * 60)
+                    .sameSite("Lax")
+                    .build();
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
-                .body(Map.of("access_token", tokens.get("access_token")));
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                    .body(Map.of("access_token", tokens.get("access_token")));
+
+        } catch (CredentialsExpiredException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Nieprawidłowy login lub hasło"));
+        }
     }
 
     @PostMapping("/refresh")

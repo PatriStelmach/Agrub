@@ -2,17 +2,18 @@ package pl.pjatk.alertwip.service;
 
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.pjatk.alertwip.dto.AuthenticationRequestDTO;
+import pl.pjatk.alertwip.model.Role;
 import pl.pjatk.alertwip.model.User;
-import pl.pjatk.alertwip.repository.UserGroupRepository;
 import pl.pjatk.alertwip.repository.UserRepository;
 import pl.pjatk.alertwip.security.JwtService;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -23,21 +24,18 @@ public class AuthenticationService {
     private final UserRepository repository;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-    private final PasswordEncoder passwordEncoder;
-    private final UserGroupRepository groupRepository;
     private final StringRedisTemplate redisTemplate;
+    private final SystemSettingService settingService;
 
     public AuthenticationService(UserRepository repository, JwtService jwtService,
                                  AuthenticationManager authenticationManager,
-                                 PasswordEncoder passwordEncoder,
-                                 UserGroupRepository groupRepository,
-                                 StringRedisTemplate redisTemplate) {
+                                 StringRedisTemplate redisTemplate,
+                                 SystemSettingService settingService) {
         this.repository = repository;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
-        this.passwordEncoder = passwordEncoder;
-        this.groupRepository = groupRepository;
         this.redisTemplate = redisTemplate;
+        this.settingService = settingService;
     }
 
     public Map<String, String> authenticate(AuthenticationRequestDTO request) {
@@ -46,22 +44,36 @@ public class AuthenticationService {
                     new UsernamePasswordAuthenticationToken(request.email(), request.password())
             );
         } catch (AuthenticationException e) {
-            throw new RuntimeException("Nieprawidłowy login, hasło lub błąd połączenia z serwerem: " + e.getMessage());
-        } catch (Exception e) {
-            throw new RuntimeException("Wystąpił nieoczekiwany błąd podczas logowania.");
+            throw new RuntimeException("Nieprawidłowy login lub hasło");
         }
 
         User user = repository.findByEmail(request.email())
                 .orElseGet(() -> {
                     User newUser = new User();
                     newUser.setEmail(request.email());
-                    newUser.setPassword("");
-                    newUser.setFirstname(request.email().split("@")[0]);
-                    newUser.setSurname("AD User");
-                    newUser.setRole(pl.pjatk.alertwip.model.Role.TECHNICIAN);
+                    newUser.setPassword("EXTERNAL_AD_AUTH");
+                    newUser.setFirstname(request.email());
+                    newUser.setSurname("AD_USER");
+                    newUser.setRole(Role.TECHNICIAN);
+
                     newUser.setActive(true);
+                    newUser.setLastPasswordChangeDate(null);
                     return repository.save(newUser);
                 });
+
+        if (user.getLastPasswordChangeDate() != null) {
+            long passwordLifetimeDays = 90L;
+            Map<String, String> settings = settingService.getAllSettings();
+            if (settings != null && settings.containsKey("SECURITY_PASSWORD_LIFETIME_DAYS")) {
+                try {
+                    passwordLifetimeDays = Long.parseLong(settings.get("SECURITY_PASSWORD_LIFETIME_DAYS"));
+                } catch (NumberFormatException ignored) {}
+            }
+
+            if (user.getLastPasswordChangeDate().plusDays(passwordLifetimeDays).isBefore(LocalDateTime.now())) {
+                throw new CredentialsExpiredException("Twoje hasło wygasło. Wymagana zmiana hasła.");
+            }
+        }
 
         return Map.of(
                 "access_token", jwtService.generateAccessToken(user),
@@ -73,19 +85,16 @@ public class AuthenticationService {
         try {
             Date expiryDate = jwtService.extractClaim(token, io.jsonwebtoken.Claims::getExpiration);
             long diffInMillis = expiryDate.getTime() - System.currentTimeMillis();
-
             if (diffInMillis > 0) {
                 redisTemplate.opsForValue().set(token, "blacklisted", diffInMillis, TimeUnit.MILLISECONDS);
             }
-        } catch (Exception e) {
-        }
+        } catch (Exception ignored) {}
     }
 
     public String refreshAccessToken(String refreshToken) {
         if (Boolean.TRUE.equals(redisTemplate.hasKey(refreshToken))) {
-            throw new RuntimeException("Ten token został unieważniony (wylogowano).");
+            throw new RuntimeException("Token unieważniony");
         }
-
         String userEmail = jwtService.extractUsername(refreshToken);
         User user = repository.findByEmail(userEmail)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));

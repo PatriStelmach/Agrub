@@ -7,10 +7,11 @@ import org.springframework.web.bind.annotation.*;
 import pl.pjatk.alertwip.dto.GroupResponseDTO;
 import pl.pjatk.alertwip.dto.UserResponseDTO;
 import pl.pjatk.alertwip.model.User;
-import pl.pjatk.alertwip.model.UserGroup;
 import pl.pjatk.alertwip.repository.UserRepository;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -89,5 +90,31 @@ public class UserController {
                 user.isActive(),
                 groups
         );
+    }
+
+    @GetMapping("/me/settings")
+    public ResponseEntity<?> getMySettings(org.springframework.security.core.Authentication authentication) {
+        User user = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Map<String, Object> settings = new HashMap<>();
+        settings.put("autoLogoutMinutes", user.getAutoLogoutMinutes() != null ? user.getAutoLogoutMinutes() : 480);
+        settings.put("lastPasswordChangeDate", user.getLastPasswordChangeDate());
+
+        return ResponseEntity.ok(settings);
+    }
+
+    @PatchMapping("/me/auto-logout")
+    public ResponseEntity<?> updateAutoLogout(@RequestParam Integer minutes, org.springframework.security.core.Authentication authentication) {
+        if (minutes == null || minutes < 1) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Minimalny czas to 1 minuta"));
+        }
+        User user = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setAutoLogoutMinutes(minutes);
+        userRepository.save(user);
+
+        return ResponseEntity.ok(Map.of("message", "Zaktualizowano czas wylogowania"));
     }
 }
