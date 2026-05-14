@@ -52,7 +52,7 @@ public class PluginManagerService {
         ScheduledTask task = taskRepository.findByScriptName(fileName)
                 .orElseGet(() -> {
                     ScheduledTask newTask = new ScheduledTask();
-                    newTask.setTaskName("Manual: " + fileName);
+                    newTask.setTaskName(fileName);
                     newTask.setScriptName(fileName);
                     newTask.setArguments("");
 
@@ -60,7 +60,7 @@ public class PluginManagerService {
                     newTask.setSeverity(parseFileHeaders(path).severity);
 
                     // martwy cron
-                    newTask.setCronExpression("0 0 1 1 * ? 2099");
+                    newTask.setCronExpression("* * * * * *");
                     newTask.setActive(false);
 
                     System.out.println("[SYSTEM] Automatyczna rejestracja skryptu w bazie do wykonania ręcznego: " + fileName);

@@ -138,7 +138,7 @@ public class ScriptExecutionService {
                     problem.setUniqueKey(uniqueKey);
                     problem.setSubject(task.getTaskName());
                     problem.setSource("Local Script");
-                    problem.setOriginType("PYTHON");
+                    problem.setOriginType(task.getTaskName());
                     problem.setStatus("Sent");
                     problem.setCreatedAt(LocalDateTime.now());
                     problem.setMessage(newMessage);
