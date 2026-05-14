@@ -73,7 +73,8 @@ public class UserGroupController {
                         u.getId(),
                         u.getUsername(),
                         u.getFirstname(),
-                        u.getSurname()
+                        u.getSurname(),
+                        u.getRole()
                 ))
                 .collect(java.util.stream.Collectors.toList());
 
