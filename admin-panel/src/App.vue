@@ -38,7 +38,7 @@ onMounted(() => {
   <div v-else-if="!isLoading && !authStore.isAuthenticated ">
     <LoginPage/>
   </div>
-  <div v-else-if="!isLoading && authStore.isAuthenticated" >
+  <div v-else-if="!isLoading && authStore.isAuthenticated" class="font-mono!">
     <Toaster
       theme="system"
       richColors

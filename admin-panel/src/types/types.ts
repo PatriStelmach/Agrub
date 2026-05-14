@@ -112,7 +112,7 @@ export interface User {
   surname: string,
   active?: boolean,
   email: string,
-  role: "ADMINISTRATOR" | "TECHNICIAN"
+  role?: "ADMINISTRATOR" | "TECHNICIAN"
   groups?: string[]
 }
 
@@ -251,7 +251,7 @@ export const initialRule: Rule = {
 
 export const InitialGroupDetails: GroupDetails = {
   name: '',
-  rules: [initialRule],
+  rules: Array.of(initialRule),
   users: []
 }
 

@@ -23,11 +23,12 @@ export const useUserStore = defineStore('user-store',() => {
   const getGroupDataRequest = async (id: number) => {
     try {
       const res = await api.get(`/groups/${id}/details`)
-      if (res.status === 200 && res.data.length > 0) {
+      if (res.status === 200) {
         console.log(res.data)
         return res.data as GroupDetails
       }
       else {
+        console.log(res.data)
         toast.error(`Error retrieving groups: ${res.data}`)
       }
 

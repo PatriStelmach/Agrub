@@ -2,30 +2,27 @@
 import { useRoute } from "vue-router";
 import TopH1Div from "@/helpers_components/TopH1Div.vue";
 import {onMounted, ref} from "vue";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious
-} from "@/components/ui/carousel";
-import RulesCard from "@/pages/team/groups/RulesCard.vue";
+
+import EditRulesCard from "@/pages/team/groups/EditRulesCard.vue";
 import {useUserStore} from "@/stores/userStore.ts";
 import {type GroupDetails, InitialGroupDetails} from "@/types/types.ts";
 import BigLoadingBlock from "@/helpers_components/loaders/BigLoadingBlock.vue";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar";
-import {IconTrash} from "@tabler/icons-vue";
+import {IconFilterPlus, IconTrash} from "@tabler/icons-vue";
+import {Button} from "@/components/ui/button";
+import ShowRuleDiv from "@/pages/team/groups/ShowRuleDiv.vue";
 
 const route = useRoute();
 const userStore = useUserStore();
 const groupId = route.params.id;
 const isEditMode = !!groupId
 const isLoading = ref(true)
-const data =  isEditMode ? ref<GroupDetails | null | undefined>(null) : ref<GroupDetails>(InitialGroupDetails)
+const data =  ref<GroupDetails | null | undefined>(null)
 
 onMounted(async () => {
   data.value = await userStore.getGroupDataRequest(Number(groupId)).finally(() => isLoading.value = false)
 })
+
 
 
 </script>
@@ -39,29 +36,39 @@ onMounted(async () => {
         <div v-else-if="!isLoading && data" class="px-6 max-h-[85vh] w-full">
           <TransitionGroup tag="div"
                            class="flex space-x-20 *:max-lg:w-1/2" name="fade" mode="out-in">
-            <div class="w-3/4">
-              <h1 class="w-fit mx-auto pb-1 mb-2 border-b-4 text-center">Group rules settings</h1>
-              <Carousel  v-if="data" class="mx-auto w-4/5">
-                <CarouselContent>
-                  <CarouselItem v-for="rule in data.rules" :key="rule.id">
-                    <div class="p-1">
-                      <RulesCard
-                        :rule-id="rule.id!"
-                        :is-loading="isLoading"
-                        :rule="rule"
-                      />
+            <div class="w-2/3!">
+              <h1 class="pb-1 mb-2 border-b-4  text-center">Group rules settings</h1>
+              <div class="mx-auto border-b-4">
+                <ul>
+                  <li v-if="data.rules.length < 1">
+                    <div class="my-4 w-full text-center">
+                      <span class=" mx-auto">No rules added yet</span>
                     </div>
-                  </CarouselItem>
-                </CarouselContent>
-                <CarouselPrevious />
-                <CarouselNext />
-              </Carousel>
+                  </li>
+                  <li v-else
+                      v-for="rule in data.rules" :key="rule.id"
+                      class="hover:bg-blue-badge/10 cursor-pointer odd:bg-accent/50"
+                  >
+                    <ShowRuleDiv
+                      :rule-id="rule.id! "
+                      :rule="rule"
+                    />
+                  </li>
+                </ul>
+              </div>
+              <div class="flex w-full my-4 justify-center">
+                <Button size="icon-sm" variant="green_outline" class=" w-1/3">
+                  Add new group
+                  <IconFilterPlus/>
+                </Button>
+              </div>
+
             </div>
-            <div class="w-1/4">
+            <div class="w-1/3!">
               <h1 class="pb-1 mb-2 border-b-4  text-center">Assigned users</h1>
               <ul class="max-h-[50vh] overflow-auto">
                 <li v-for="user in data.users" :key="user.id"
-                    class="hover:bg-blue-badge/20 odd:bg-accent/50 space-x-2 flex items-center py-2 px-2 pr-6 relative">
+                    class="hover:bg-blue-badge/10 odd:bg-accent/50 space-x-2 flex items-center py-2 px-2 pr-6 relative">
                   <Avatar class="size-9 rounded-lg">
                     <AvatarFallback class="text-sm rounded-full grayscale">
                       {{ userStore.avFallback(user)}}

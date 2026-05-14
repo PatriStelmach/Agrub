@@ -16,7 +16,6 @@ import FormSelect from "@/helpers_components/form/FormSelect.vue";
 import FormCheckbox from "@/helpers_components/form/FormCheckbox.vue";
 
 const props = defineProps<{
-  isLoading: boolean
   rule: Rule
   ruleId: number
 }>()
@@ -50,7 +49,7 @@ const onSubmit = handleSubmit(() => emits('update:rule', updatedRule.value))
 </script>
 
 <template>
-  <Card class="mx-auto max-w-4xl border-2">
+  <Card class="mx-auto max-w-4xl border-2 p-1">
     <CardHeader>
       <CardTitle class="text-xl">Edit rule</CardTitle>
     </CardHeader>
@@ -92,7 +91,7 @@ const onSubmit = handleSubmit(() => emits('update:rule', updatedRule.value))
       <Button variant="red_outline" type="button" @click="updatedRule = props.rule">
         Cancel
       </Button>
-      <Button :form="`rule-form-${ruleId}`" type="submit" :disabled="isLoading" />
+      <Button :form="`rule-form-${ruleId}`" type="submit"  />
     </CardFooter>
   </Card>
 </template>
