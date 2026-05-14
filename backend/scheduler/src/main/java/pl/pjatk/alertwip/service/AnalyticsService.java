@@ -87,7 +87,7 @@ public class AnalyticsService {
             case WEEK -> date.with(DayOfWeek.MONDAY).truncatedTo(ChronoUnit.DAYS); // Cofa do najbliższego poniedziałku 00:00:00
             case MONTH -> date.withDayOfMonth(1).truncatedTo(ChronoUnit.DAYS); // Cofa do 1. dnia miesiąca 00:00:00
         };
-        
+
         return truncated.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 }
