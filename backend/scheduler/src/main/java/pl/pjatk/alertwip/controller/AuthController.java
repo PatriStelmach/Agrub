@@ -92,4 +92,19 @@ public class AuthController {
                 .header(HttpHeaders.SET_COOKIE, deleteCookie.toString())
                 .body(Map.of("message", "Wylogowano pomyślnie. Tokeny zablokowane."));
     }
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestParam String email) {
+        authenticationService.initiatePasswordReset(email);
+        return ResponseEntity.ok(Map.of("message", "Jeśli adres istnieje w bazie, instrukcje zostały wysłane na e-mail."));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody pl.pjatk.alertwip.dto.ResetPasswordRequestDTO request) {
+        try {
+            authenticationService.completePasswordReset(request.token(), request.newPassword());
+            return ResponseEntity.ok(Map.of("message", "Hasło zostało pomyślnie zmienione."));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        }
+    }
 }
