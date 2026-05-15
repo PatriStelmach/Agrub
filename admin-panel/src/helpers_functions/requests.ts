@@ -82,6 +82,7 @@ export const addNewRuleRequest = async (rule: Rule) => {
   try {
     const res = await api.post(`/rules`, rule)
     if (res.status === 200) {
+      toast.success('New rule added successfully!')
       return res.data
     }
   } catch (error) {
@@ -96,7 +97,6 @@ export const assignUserToGroup = async (userId: number, groupId: number) => {
       toast.success(`Successfully assigned user: ${res.data.email}`)
     }
   } catch (error) {
-    toast.error(`Error assigning user: ${error}`)
     throw (error)
   }
 }
@@ -108,7 +108,17 @@ export const deleteUserFromGroup = async (userId: number, groupId: number) => {
       toast.success(`Successfully deleted user: ${res.data.email} from group`)
     }
   } catch (error) {
-    toast.error(`Error deleting user: ${error}`)
+    throw (error)
+  }
+}
+
+export const deleteRuleFromGroup = async (ruleId: number) => {
+  try {
+   const res = await api.delete(`/rules/${ruleId}`)
+    if (res.status === 200) {
+      toast.success(`Successfully deleted rule`)
+    }
+  } catch (error) {
     throw (error)
   }
 }

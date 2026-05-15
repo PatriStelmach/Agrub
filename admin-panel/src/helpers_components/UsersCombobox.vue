@@ -7,7 +7,7 @@ import type { User } from "@/types/types.ts";
 import {IconTool, IconKey, IconUserPlus, IconLoader} from "@tabler/icons-vue";
 import {Button} from "@/components/ui/button";
 import {assignUserToGroup} from "@/helpers_functions/requests.ts";
-import {ref} from "vue";
+import {computed, ref} from "vue";
 import {toast} from "vue-sonner";
 
 const props = defineProps<{
@@ -24,6 +24,9 @@ if(userStore.allUsers.length === 0){
   userStore.getAllUsersRequest()
 }
 
+const availableUsers = computed(() =>
+  userStore.allUsers.filter(u => !props.currentUsers.map(cu => cu.id).includes(u.id)))
+
 const assignUser = async (user: User) => {
   if(user.id) {
     loadingButtons.value.push(user.id)
@@ -34,7 +37,7 @@ const assignUser = async (user: User) => {
       .catch((err) => {
         toast.error(err.message)
       })
-      .finally(() => loadingButtons.value.filter(i => i !== user.id))
+      .finally(() => loadingButtons.value.pop())
   }
 }
 
@@ -50,10 +53,12 @@ const assignUser = async (user: User) => {
         <CommandInput placeholder="Search users..." />
         <CommandList>
           <CommandEmpty>No users found.</CommandEmpty>
+          <div v-if="availableUsers.length === 0" class="py-6 text-center text-sm text-muted-foreground">
+            All users already in group.
+          </div>
           <CommandGroup>
             <CommandItem
-              v-for="user in
-              userStore.allUsers.filter(u => !currentUsers.map(cu => cu.id).includes(u.id))"
+              v-for="user in availableUsers"
               :key="user.id"
               :value="userStore.fullName(user)"
               class="flex items-center gap-2 hover:bg-blue-badge/10 odd:bg-accent/50"

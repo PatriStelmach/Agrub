@@ -325,7 +325,7 @@ const updateDetails = (code: string, description: string) => {
                   variant="red_outline">
                   Cancel<IconCancel class="size-4 xl:size-5"/>
                 </Button>
-                <Button variant="orange_outline" class="p-0">
+                <Button variant="orange_outline" class="border-l-2! p-0">
                   <PluginDetailsDialog
                     :code="unwrappedItem.code ?? ''"
                     :description="unwrappedItem.description ?? ''"
@@ -333,7 +333,7 @@ const updateDetails = (code: string, description: string) => {
                   >
                     <Button
                       @click.stop="getDetails(plugin.fullName)"
-                      class="border-0! m-0 rounded-none bg-transparent! text-severity-3 hover:text-primary"
+                      class=" m-0 rounded-none bg-transparent! text-severity-3 hover:text-primary"
                     >
                       Details<IconMessageCode class="size-4 xl:size-5"/>
                     </Button>
@@ -341,6 +341,7 @@ const updateDetails = (code: string, description: string) => {
                 </Button>
 
                 <Button
+                  class="border-l-2!"
                   @click.stop="save(async ()=> await myPluginStore.editMyPlugin(unwrappedItem!))"
                   variant="green_outline">
                   Save<IconDeviceFloppy class="size-4 xl:size-5"/>

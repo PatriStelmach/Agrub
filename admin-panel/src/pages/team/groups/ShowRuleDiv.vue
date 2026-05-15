@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { Badge } from "@/components/ui/badge";
-
+import {IconLoader, IconTrash} from "@tabler/icons-vue";
 import { type Rule } from "@/types/types.ts";
+import {Button} from "@/components/ui/button";
 
 const props = defineProps<{
   rule: Rule
-  ruleId: number
+  isRuleDeleting: boolean
 }>()
 </script>
 
@@ -46,9 +47,15 @@ const props = defineProps<{
         <div class="flex items-center gap-2">
           <span class="text-comment w-32 shrink-0">Play sound</span>
           <span class="font-medium">{{ rule.playSound ? 'Yes' : 'No' }}</span>
+          <Button @click="$emit('delete-rule', rule.id)" variant="red_outline" class="ml-auto" size="icon-sm">
+            <IconLoader v-if="isRuleDeleting" class="animate-spin"/>
+            <IconTrash v-else />
+          </Button>
+
         </div>
 
       </div>
     </div>
+
   </div>
 </template>

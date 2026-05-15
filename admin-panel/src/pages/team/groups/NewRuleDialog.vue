@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Field, FieldError } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
-import { IconSend} from "@tabler/icons-vue";
+import { IconLoader, IconSend} from "@tabler/icons-vue";
 import {initialRule, MatchType, type Rule, type UserGroup} from "@/types/types.ts";
 import MyFieldLabel from "@/helpers_components/form/MyFieldLabel.vue";
 import SeveritySelect from "@/helpers_components/SeveritySelect.vue";
@@ -120,7 +120,8 @@ const onSubmit = handleSubmit( async (data) => {
           Cancel
         </Button>
         <Button variant="green_outline" form="rule-form" type="submit">
-          Save <IconSend />
+          <IconLoader v-if="isLoading" class="animate-spin" />
+          <span v-else>Save <IconSend /></span>
         </Button>
       </DialogFooter>
     </DialogContent>

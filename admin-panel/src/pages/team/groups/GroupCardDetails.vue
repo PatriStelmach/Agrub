@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { useRoute } from "vue-router";
 import TopH1Div from "@/helpers_components/TopH1Div.vue";
-import {onMounted, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {useUserStore} from "@/stores/userStore.ts";
 import {type GroupDetails, type Rule, type User} from "@/types/types.ts";
 import BigLoadingBlock from "@/helpers_components/loaders/BigLoadingBlock.vue";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar";
-import {IconFilterPlus, IconTrash, IconUserPlus} from "@tabler/icons-vue";
+import {IconEdit, IconLoader, IconFilterPlus, IconTrash, IconUserPlus} from "@tabler/icons-vue";
 import {Button} from "@/components/ui/button";
 import ShowRuleDiv from "@/pages/team/groups/ShowRuleDiv.vue";
 import NewRuleDialog from './NewRuleDialog.vue';
 import {
-  assignUserToGroup,
+  deleteRuleFromGroup,
   deleteUserFromGroup,
   getGroupDataRequest
 } from "@/helpers_functions/requests.ts";
@@ -27,32 +27,61 @@ const isEditMode = !!groupId
 const isLoading = ref(true)
 const isDialogOpen = ref(false)
 const groupDetails =  ref<GroupDetails>()
-const loadingDelete = ref<number[]>([])
+const loadingUserDelete = ref<number[]>([])
+const loadingGroupsDelete = ref<number[]>([])
+const editNameOpen = ref(false)
+
+const groupUsers = computed({
+  get() { return groupDetails.value?.users ?? [] },
+  set(val) {
+    if (groupDetails.value) {
+      groupDetails.value.users = val ?? []
+    }
+  }
+})
+
+const groupRules = computed({
+  get() { return groupDetails.value?.rules ?? [] },
+  set(val) {
+    if (groupDetails.value) {
+      groupDetails.value.rules = val ?? []
+    }
+  }
+})
 
 onMounted(async () => {
   groupDetails.value = await getGroupDataRequest(groupId).finally(() => isLoading.value = false)
 })
 
 const addNewRule = (data: Rule) => {
-  groupDetails.value?.rules.push(data)
+  groupRules.value = [...groupRules.value, data]
 }
 const assignUser = (data: User) => {
-  groupDetails.value?.users.push(data)
+  groupUsers.value = [...groupUsers.value, data]
 }
 const deleteUser = async (userId: number) => {
-  if(userId) {
-    loadingDelete.value.push(userId)
-    await deleteUserFromGroup(userId, groupId)
-      .then(() => {
-        groupDetails.value?.users.filter(i => i.id !== userId)
-      })
-      .catch((err) => {
-        toast.error(err.message)
-      })
-      .finally(() => loadingDelete.value.filter(i => i !== userId))
-  }
+  loadingUserDelete.value.push(userId)
+  await deleteUserFromGroup(userId, groupId)
+    .then(() => {
+      groupUsers.value = groupUsers.value.filter((u) => u.id !== userId)
+    })
+    .catch((err) => {
+      toast.error(err.message)
+    })
+    .finally(() => loadingUserDelete.value.pop())
 }
 
+const deleteRule = async (ruleId: number) => {
+  loadingGroupsDelete.value.push(ruleId)
+  await deleteRuleFromGroup(ruleId)
+    .then(() => {
+      groupRules.value = groupRules.value.filter((r) => r.id !== ruleId)
+    })
+    .catch((err) => {
+      toast.error(err.message)
+    })
+    .finally(() => loadingGroupsDelete.value.pop())
+}
 
 </script>
 
@@ -66,7 +95,7 @@ const deleteUser = async (userId: number) => {
         >
           <Button
             @click="isDialogOpen = true" variant="green_outline" >
-            Add rules config
+            Add rules
             <IconFilterPlus/>
           </Button>
         </NewRuleDialog>
@@ -84,8 +113,17 @@ const deleteUser = async (userId: number) => {
         </UsersCombobox>
       </ButtonGroup>
     </TopH1Div>
-    <h1 class="font-bold italic mb-6 border-b-3 border-blue-badge/70 w-fit mx-6 text-xl">Group name:
-      {{ groupDetails?.name }}</h1>
+    <div class="flex">
+      <h1 class="font-bold italic mb-6 border-b-3 border-blue-badge/70 w-fit mx-6 text-xl">
+        Group name: {{ groupDetails?.name }}
+      </h1>
+      <Button
+        size="icon-sm"
+        variant="green_outline"
+        @click="editNameOpen = !editNameOpen"
+      ><IconEdit/>
+      </Button>
+    </div>
       <Transition name="fade" mode="out-in">
         <BigLoadingBlock v-if="isLoading"/>
         <div v-else-if="!isLoading && groupDetails" class="px-6 max-h-[75vh] overflow-y-auto w-full">
@@ -94,32 +132,34 @@ const deleteUser = async (userId: number) => {
               <h1 class="pb-1 mb-2 border-b-4  text-center">Group rules configuration: {{groupDetails.rules.length }}</h1>
               <div class="mx-auto pb-2 border-b-4 max-h-[70vh] overflow-y-auto">
                 <ul>
-                  <li v-if="groupDetails.rules.length < 1">
+                  <li v-if="groupRules.length < 1">
                     <div class="my-4 w-full text-center">
                       <span class=" mx-auto">No rules added yet</span>
                     </div>
                   </li>
                   <li v-else
-                      v-for="rule in groupDetails.rules" :key="rule.id"
+                      v-for="rule in groupRules" :key="rule.id"
                       :class="hoverListRow('cursor-pointer')"
                   >
                     <ShowRuleDiv
-                      :rule-id="rule.id! "
+                      :is-rule-deleting="loadingGroupsDelete.some(r => r === rule.id)"
                       :rule="rule"
+                      @delete-rule="deleteRule"
                     />
                   </li>
                 </ul>
               </div>
             </div>
             <div class="w-3/10! " key="users">
-              <h1 class="pb-1 mb-2 border-b-4  text-center">Assigned users: {{groupDetails.users.length }}</h1>
+              <h1 class="pb-1 mb-2 border-b-4  text-center">Assigned users: {{ groupUsers.length }}</h1>
               <ul class="mx-auto pb-2 border-b-4 max-h-[70vh] overflow-y-auto">
-                <li :class="hoverListRow('px-2')" v-for="user in groupDetails.users" :key="user.id">
-                  <div class="space-x-2 flex items-center py-2 px-2 pr-6"
-                       v-if="loadingDelete.some(i => i === user.id)">
-
+                <li v-if="groupUsers.length < 1">
+                  <div class="my-4 w-full text-center">
+                    <span class=" mx-auto">No users assigned yet</span>
                   </div>
-                  <div v-else class="space-x-2 flex items-center py-2 px-2 pr-6 relative">
+                </li>
+                <li v-else :class="hoverListRow('px-2')" v-for="user in groupUsers" :key="user.id">
+                  <div class="space-x-2 flex items-center py-2 px-2 pr-6 relative">
                     <Avatar class="size-9 rounded-lg">
                       <AvatarFallback class="text-sm rounded-full grayscale">
                         {{ userStore.avFallback(user)}}
@@ -129,9 +169,11 @@ const deleteUser = async (userId: number) => {
                       <span class="whitespace-break-spaces">{{ userStore.fullName(user) }}</span>
                       <span class="text-comment text-sm whitespace-break-spaces">{{ user.email }}</span>
                     </div>
-                    <IconTrash
-                      @click="deleteUser(user.id!)"
-                      class="cursor-pointer hover:scale-102 absolute size-5 right-2 top-1/2 -translate-y-1/2 text-red-badge"/>
+                    <Button variant="red_outline" class="absolute right-2 top-1/2 -translate-y-1/2" size="icon-sm">
+                      <IconLoader v-if="loadingUserDelete.some(i => i === user.id)" class="animate-spin "/>
+                      <IconTrash v-else @click="deleteUser(user.id!)"/>
+                    </Button>
+
                   </div>
                   </li>
               </ul>
