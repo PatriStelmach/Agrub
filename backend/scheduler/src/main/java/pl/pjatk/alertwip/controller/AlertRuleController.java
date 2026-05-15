@@ -56,9 +56,32 @@ public class AlertRuleController {
         return ResponseEntity.ok(savedRule);
     }
 
+    //2.5 edycja reguły
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateRule(@PathVariable Long id, @RequestBody AlertRuleRequestDTO request){
+    public ResponseEntity<?> updateRule(@PathVariable Long id, @RequestBody AlertRuleRequestDTO request) {
 
+        AlertRule existingRule = alertRuleRepository.findById(id).orElse(null);
+        if (existingRule == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        existingRule.setSourcePattern(request.sourcePattern());
+        existingRule.setSourceType(request.sourceType());
+
+        existingRule.setContentPattern(request.contentPattern());
+        existingRule.setContentType(request.contentType());
+
+        existingRule.setOriginPattern(request.originPattern());
+        existingRule.setOriginMatchType(request.originMatchType());
+
+        existingRule.setSubjectPattern(request.subjectPattern());
+        existingRule.setSubjectMatchType(request.subjectMatchType());
+
+        existingRule.setMinSeverity(request.minSeverity());
+        existingRule.setPlaySound(request.playSound());
+
+        AlertRule updatedRule = alertRuleRepository.save(existingRule);
+        return ResponseEntity.ok(updatedRule);
     }
 
     // 3. Usuwanie reguły
