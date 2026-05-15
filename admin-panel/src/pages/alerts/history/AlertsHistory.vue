@@ -51,9 +51,6 @@ const getAlertsHistory = async () => {
         closedAt: new Date(a.closedAt)
       }))
       totalElements.value = response.data.totalElements
-      console.log(response.data.totalElements)
-
-      toast.info('Alerts history fetched')
     }
   } catch {
     toast.error('Error getting alerts history')

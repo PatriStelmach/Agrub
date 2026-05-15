@@ -113,7 +113,7 @@ export interface User {
   active?: boolean,
   email: string,
   role?: "ADMINISTRATOR" | "TECHNICIAN"
-  groups?: string[]
+  groups?: UserGroup[],
 }
 
 export const blankUser = {
@@ -225,38 +225,37 @@ export interface Rule {
   id?: number
   userGroup?: UserGroup
   userGroupId?: number,
-  sourcePattern: string
-  sourceType: MatchType
-  contentPattern: string
-  contentType: MatchType
-  subjectPattern: string
-  subjectMatchType: MatchType
-  originPattern: string
-  originMatchType: MatchType
-  minSeverity: number
+  sourcePattern?: string
+  sourceType?: MatchType
+  contentPattern?: string
+  contentType?: MatchType
+  subjectPattern?: string
+  subjectMatchType?: MatchType
+  originPattern?: string
+  originMatchType?: MatchType
+  minSeverity: 0 | 1 | 2 | 3 | 4 | 5
   playSound: boolean
 }
 
-export const initialRule = (userGroupId?: number): Rule =>{
+export const initialRule = (userGroupId: number): Rule =>{
   return {
     userGroupId: userGroupId,
-    sourcePattern: '',
+    sourcePattern: undefined,
     sourceType: MatchType.CONTAINS,
-    contentPattern: '',
+    contentPattern: undefined,
     contentType: MatchType.CONTAINS,
-    subjectPattern: '',
+    subjectPattern: undefined,
     subjectMatchType: MatchType.CONTAINS,
-    originPattern: '',
+    originPattern: undefined,
     originMatchType: MatchType.CONTAINS,
     minSeverity: 0,
     playSound: false,
-
   }
 }
 
-export const InitialGroupDetails: GroupDetails = {
+export const initialGroupDetails: GroupDetails = {
   name: '',
-  rules: Array.of(initialRule()),
+  rules: [],
   users: []
 }
 

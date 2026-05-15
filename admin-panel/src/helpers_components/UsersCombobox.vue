@@ -6,7 +6,7 @@ import { useUserStore } from "@/stores/userStore.ts";
 import type { User } from "@/types/types.ts";
 import {IconTool, IconKey, IconUserPlus, IconLoader} from "@tabler/icons-vue";
 import {Button} from "@/components/ui/button";
-import {assignUserToGroup} from "@/helpers_functions/requests.ts";
+import {assignUserToGroupRequest} from "@/helpers_functions/requests.ts";
 import {computed, ref} from "vue";
 import {toast} from "vue-sonner";
 
@@ -30,7 +30,7 @@ const availableUsers = computed(() =>
 const assignUser = async (user: User) => {
   if(user.id) {
     loadingButtons.value.push(user.id)
-    await assignUserToGroup(user.id, props.groupId)
+    await assignUserToGroupRequest(user.id, props.groupId)
       .then(() => {
         emit('update:add-user', user)
       })

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {ref, watchEffect} from "vue"
+import {computed, ref, watch, watchEffect} from "vue"
 import { useForm, useField } from 'vee-validate'
 import { toTypedSchema } from "@vee-validate/zod"
 import z from "zod"
@@ -18,6 +18,7 @@ import MyTagInput from "@/helpers_components/MyTagInput.vue"
 import MyFieldLabel from "@/helpers_components/form/MyFieldLabel.vue"
 import DialogLabel from "@/helpers_components/DialogLabel.vue"
 import { inputText, nameLabel } from '@/assets/cssFunctions'
+import {toast} from "vue-sonner";
 
 const props = defineProps<{
   user: User
@@ -26,7 +27,17 @@ const props = defineProps<{
 const userStore = useUserStore()
 const updatedUser = ref<User>({ ...props.user })
 const isLoading = ref(false)
+const tagsForEdit = ref<string[]>(
+  updatedUser.value.groups?.map(g => g.name) ?? []
+)
 
+watch(tagsForEdit, (val) => {
+  updatedUser.value.groups = userStore.allGroups.filter(g => val.includes(g.name))
+  console.log(updatedUser.value)
+}, { deep: true })
+// watch(() => updatedUser.value.groups, (val) => {
+//   tagsForEdit.value = val?.map(g => g.name) ?? []
+// }, { immediate: true })
 
 const formSchema = toTypedSchema(
   z.object({
@@ -35,10 +46,6 @@ const formSchema = toTypedSchema(
     surname: z.string().min(2, 'Surname must be at least 2 characters.')
   })
 )
-
-watchEffect(() => {
-  console.log(props.user.firstname)
-})
 
 const { handleSubmit } = useForm({ validationSchema: formSchema })
 
@@ -54,7 +61,10 @@ const onSubmit = handleSubmit(async () => {
   updatedUser.value.firstname = firstname.value
   updatedUser.value.surname = surname.value
   updatedUser.value.email = email.value
-  await userStore.editUserRequest(updatedUser.value).finally(() => (isLoading.value = false))
+  await userStore.editUserRequest(updatedUser.value)
+    .then((res) => toast.success(`User ${res} updated successfully.`))
+    .catch((err) => toast.error(`${err.message}`))
+    .finally(() => isLoading.value = false)
 })
 </script>
 
@@ -102,7 +112,7 @@ const onSubmit = handleSubmit(async () => {
           </RadioGroup>
         </div>
         <MyTagInput
-          v-model:tags="updatedUser.groups"
+          v-model:tags="tagsForEdit"
           :all-tags="userStore.allGroups.map(g => g.name)"
           :can-add-new="false"
           tags-label="Groups"
@@ -112,12 +122,10 @@ const onSubmit = handleSubmit(async () => {
   </form>
 
   <SheetFooter class="mt-6">
-    <SheetClose as-child>
       <Button v-if="!isLoading" type="submit" form="edit-user-form" variant="green_outline" class="flex items-center">
         Save <IconDeviceFloppy />
       </Button>
       <IconLoader v-else class="animate-spin" />
-    </SheetClose>
     <SheetClose as-child>
       <Button variant="red_outline">Cancel</Button>
     </SheetClose>

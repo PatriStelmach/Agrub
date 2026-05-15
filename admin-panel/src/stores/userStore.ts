@@ -21,14 +21,14 @@ export const useUserStore = defineStore('user-store',() => {
   }
   const editUserRequest = async (user: User) => {
     try {
-      const res = await api.put(`/users/${user.id}`, user, )
+      const res = await api.put(`/users/${user.id}`, user )
       if (res.status === 200){
-        toast.success(`User ${user.email} updated successfully.`)
         await getAllUsersRequest()
+        return res.data.email
       }
     }
     catch (error) {
-      toast.error(`Error updating user: ${error}`)
+      throw error;
     }
   }
 
