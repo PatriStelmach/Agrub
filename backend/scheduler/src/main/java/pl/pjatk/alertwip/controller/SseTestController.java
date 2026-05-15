@@ -56,13 +56,18 @@ public class SseTestController {
                             }
 
                             const authData = await loginResponse.json();
-                            // Zakładam, że w obiekcie DTO z logowania zmienna to 'token'
-                            const token = authData.token; 
+                            
+                            // POPRAWKA: Pobieramy 'access_token', bo tak to zdefiniowaliśmy w backendzie!
+                            const token = authData.access_token; 
+
+                            if (!token) {
+                                throw new Error('Logowanie się powiodło, ale backend nie zwrócił pola access_token!');
+                            }
 
                             status.innerText = "2. ZALOGOWANO. Łączenie z SSE...";
                             logMessage(`Uzyskano token JWT: ${token.substring(0, 20)}...`);
 
-                            // KROK 2: Połączenie z SSE za pomocą tokena JWT w nagłówku!
+                            // KROK 2: Połączenie z SSE za pomocą tokena JWT w nagłówku
                             fetchEventSource('/api/alerts/stream', {
                                 headers: {
                                     'Authorization': `Bearer ${token}`
