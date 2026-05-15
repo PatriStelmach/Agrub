@@ -56,6 +56,11 @@ public class AlertRuleController {
         return ResponseEntity.ok(savedRule);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateRule(@PathVariable Long id, @RequestBody AlertRuleRequestDTO request){
+
+    }
+
     // 3. Usuwanie reguły
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteRule(@PathVariable Long id) {
