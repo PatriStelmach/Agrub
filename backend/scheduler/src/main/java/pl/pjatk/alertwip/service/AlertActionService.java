@@ -8,6 +8,7 @@ import pl.pjatk.alertwip.repository.GlobalProblemRepository;
 import pl.pjatk.alertwip.repository.ProblemActionRepository;
 import pl.pjatk.alertwip.service.adapter.AlertSourceAdapter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -42,42 +43,46 @@ public class AlertActionService {
         problem.setSeverityLocked(wasLocked);
 
         boolean stateChanged = false;
-        ActionType inferredActionType = ActionType.COMMENT; // Domyślny typ akcji dla historii
 
-        // 2. Dynamiczna aktualizacja stanu alertu na podstawie przesłanych danych
-        if (request.acknowledge() != null && problem.isAcknowledged() != request.acknowledge()) {
+        ProblemAction action = new ProblemAction();
+        action.setProblem(problem);
+        action.setAuthor(request.author() != null && !request.author().isBlank() ? request.author() : "System");  // Jesli author to null, zmieniamy na System
+        action.setMessage(request.message());
+        action.setSyncStatus(SyncStatus.PENDING);
+
+        //zmieniamy acka jesli w request jest inny
+        if (request.acknowledge() != null && problem.isAcknowledged() != request.acknowledge()){
             problem.setAcknowledged(request.acknowledge());
+
+            //czas pierwszego acka dla audytu
+            if(request.acknowledge() && problem.getAcknowledgedAt() == null){
+                problem.setAcknowledgedAt(LocalDateTime.now());
+            }
+
+            action.setAckUpdate(request.acknowledge());
             stateChanged = true;
-            inferredActionType = request.acknowledge() ? ActionType.ACK : ActionType.UNACK;
         }
 
-        if (request.newSeverity() != null && !request.newSeverity().equals(problem.getSeverity())) {
+        //zmiana severity
+        if (request.newSeverity() != null && !request.newSeverity().equals(problem.getSeverity())){
+            action.setPreviousSeverity(problem.getSeverity());
+            action.setNewSeverity(request.newSeverity());
+
             problem.setSeverity(request.newSeverity());
-            stateChanged = true;
-            inferredActionType = ActionType.SEVERITY_CHANGE;
-
             problem.setSeverityLocked(true);
+            stateChanged = true;
         }
+
+
 
         // Jeśli zmienił się stan głównego alertu, nadpisujemy go w bazie i aktualizujemy Cache
         if (stateChanged) {
             problem = problemRepository.save(problem);
 
-            if (wasLocked || inferredActionType == ActionType.SEVERITY_CHANGE) {
-                problem.setSeverityLocked(true);
-            }
-
             alertCache.updateAlert(problem);
             // tu NIE ma być sse
         }
 
-        // 3. Utworzenie wpisu w historii operacji (Audyt)
-        ProblemAction action = new ProblemAction();
-        action.setProblem(problem);
-        action.setAuthor(request.author() != null && !request.author().isBlank() ? request.author() : "System");
-        action.setMessage(request.message());
-        action.setActionType(inferredActionType); // Zapisujemy wywnioskowany typ
-        action.setSyncStatus(SyncStatus.PENDING);
 
         ProblemAction savedAction = actionRepository.save(action);
         problem.getActions().add(savedAction);
@@ -87,10 +92,11 @@ public class AlertActionService {
                 savedAction.getId(),
                 problem.getId(),
                 savedAction.getAuthor(),
-                request.acknowledge(), // null jeśli nie zmieniono w żądaniu
-                request.message(),     // null jeśli brak wiadomości
+                action.getAckUpdate(), // null jeśli nie zmieniono w żądaniu
+                action.getMessage(),     // null jeśli brak wiadomości
                 savedAction.getCreatedAt(),
-                request.newSeverity()  // null jeśli nie zmieniono w żądaniu
+                action.getPreviousSeverity(),
+                action.getNewSeverity()  // null jeśli nie zmieniono w żądaniu
         );
 
         // Wysyłamy wyłącznie zmiany (eventPayload).

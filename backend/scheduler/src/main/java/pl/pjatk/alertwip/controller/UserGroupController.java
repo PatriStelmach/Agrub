@@ -11,6 +11,7 @@ import pl.pjatk.alertwip.repository.UserGroupRepository;
 import pl.pjatk.alertwip.repository.UserRepository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -73,7 +74,8 @@ public class UserGroupController {
                         u.getId(),
                         u.getUsername(),
                         u.getFirstname(),
-                        u.getSurname()
+                        u.getSurname(),
+                        u.getRole()
                 ))
                 .collect(java.util.stream.Collectors.toList());
 
@@ -110,6 +112,23 @@ public class UserGroupController {
     public ResponseEntity<Void> deleteGroup(@PathVariable Long id) {
         groupRepository.deleteById(id);
         return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/change-name")
+    @PreAuthorize("hasAuthority('ROLE_ADMINISTRATOR')")
+    public ResponseEntity<UserGroup> renameGroup(@PathVariable long id, @RequestBody Map<String, String> payload) {
+        String newName = payload.get("name");
+
+        if(newName == null || newName.trim().isEmpty()){
+            return ResponseEntity.badRequest().build();
+        }
+        return groupRepository.findById(id)
+                .map(group -> {
+                    group.setName(newName);
+                    UserGroup updatedGroup = groupRepository.save(group);
+                    return ResponseEntity.ok(updatedGroup);
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping("/{groupId}/users/{userId}")

@@ -17,7 +17,7 @@ public class GlobalProblem {
 
     private String uniqueKey;
     private String subject;
-
+    private LocalDateTime acknowledgedAt;
     @Column(columnDefinition = "TEXT")
     private String message;
 
@@ -98,5 +98,13 @@ public class GlobalProblem {
 
     public void setSeverityLocked(boolean severityLocked) {
         isSeverityLocked = severityLocked;
+    }
+
+    public LocalDateTime getAcknowledgedAt() {
+        return acknowledgedAt;
+    }
+
+    public void setAcknowledgedAt(LocalDateTime acknowledgedAt) {
+        this.acknowledgedAt = acknowledgedAt;
     }
 }

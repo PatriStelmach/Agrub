@@ -9,7 +9,8 @@ public record AlertUpdateEventDTO(
         Long alertId,         // ID głównego problemu (GlobalProblem)
         String author,
         Boolean ack,          // Opcjonalne (może być null)
-        String message,       // Opcjonalne
+        String message,
         LocalDateTime createdAt,
-        Integer newSeverity   // Opcjonalne
+        Integer previousSeverity,
+        Integer newSeverity
 ) {}
