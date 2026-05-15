@@ -2,7 +2,6 @@ import {defineStore} from "pinia";
 import { ref} from "vue";
 import {
   type ActionResponse,
-  type Actions,
   type ActiveAlert
 } from "@/types/types.ts";
 import api from "@/lib/axios";
@@ -57,28 +56,6 @@ export const useAlertStore = defineStore('alert-store', () => {
   }
 
 
-  const updateAlertRequest = async (action: Actions) => {
-    console.log(action)
-    try {
-      const response = await api.post(`/alerts/${action.id}/ack`, {
-          ack: action.ack,
-          newSeverity: action.newSeverity,
-          message: action.message,
-          author: action.author,
-
-      })
-      if(response.status === 200) {
-        toast.success(`Alert updated \n ${response.data.message}`)
-      }
-      else {
-        toast.error(response.data.message)
-      }
-    }
-    catch {
-      toast.error('Failed to send ack!')
-    }
-  }
-
 
 
   return {
@@ -86,7 +63,6 @@ export const useAlertStore = defineStore('alert-store', () => {
     addCurrentAlert,
     deleteCurrentAlert,
     getCurrentAlertsRequest,
-    updateAlertRequest,
     updateAlert,
     updateAlertActions,
     findAlert,

@@ -6,14 +6,14 @@ import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/inpu
 
 import {useClientSearchFilter} from "@/composables/useClientSearchFilter";
 import { useAlertStore } from "@/stores/alertStore";
-import { defineAsyncComponent, onMounted, ref} from "vue";
+import { onMounted, ref} from "vue";
 import {
   tableDiv,
 } from "@/assets/cssFunctions.js";
 import TopH1Div from "@/helpers_components/TopH1Div.vue";
 import ActiveAlertsTable from "@/pages/alerts/active/ActiveAlertsTable.vue";
 import MyClientPagination from "@/helpers_components/MyClientPagination.vue";
-const DetailsCard = defineAsyncComponent(() => import('@/pages/alerts/DetailsCard.vue'))
+import DetailsCard from '@/pages/alerts/DetailsCard.vue'
 
 const isLoading = ref(true)
 const alertStore = useAlertStore();

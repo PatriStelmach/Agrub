@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, defineAsyncComponent } from 'vue'
+import { ref } from 'vue'
 import {
   Sheet,
   SheetContent,
@@ -10,12 +10,11 @@ import {
 } from '@/components/ui/sheet'
 import { IconLoader } from '@tabler/icons-vue'
 import type { User } from "@/types/types"
+import EditUserForm from './EditUserForm.vue'
 
 defineProps<{
   user: User
 }>()
-
-const EditUserForm = defineAsyncComponent(() => import('./EditUserForm.vue'))
 
 const isOpen = ref(false)
 </script>

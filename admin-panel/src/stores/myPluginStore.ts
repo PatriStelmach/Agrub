@@ -1,8 +1,7 @@
 import {defineStore} from "pinia";
 import {
   type MyPlugin,
-  type MyPluginsFromApi,
-  type PluginDetails
+  type MyPluginsFromApi
 } from "@/types/types.ts";
 import { ref} from "vue";
 import api from "@/lib/axios";
@@ -30,18 +29,6 @@ export const useMyPluginStore = defineStore('my-plugins', () => {
     }
     catch (error) {
       toast.error(`Plugin ${plugin.name} failed with error ${error}`);
-    }
-  }
-
-  const getMyPluginDetails = async (fileName: string) => {
-    try {
-      const response = await api.get(`/local-scripts/${fileName}/details`)
-      if (response.status === 200)
-        return response.data as PluginDetails
-      else
-        toast.error(`Failed to fetch plugin details with status ${response.status}`)
-    } catch (error) {
-      toast.error(`Error fetching plugin details: ${error}`)
     }
   }
 
@@ -105,7 +92,6 @@ export const useMyPluginStore = defineStore('my-plugins', () => {
   return {
     allMyPlugins,
     getAllMyPluginsRequest,
-    getMyPluginDetails,
     changeStatus,
     deleteMyPlugins,
     editMyPlugin,

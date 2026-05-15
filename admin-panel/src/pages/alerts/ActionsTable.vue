@@ -2,6 +2,7 @@
 import {Badge} from "@/components/ui/badge";
 import type {ActionResponse} from "@/types/types.ts";
 import {dateParser} from "@/composables/dateParser.ts";
+import {hoverListRow} from "@/assets/cssFunctions.ts";
 
 defineProps<{
   actions: ActionResponse[] | undefined;
@@ -29,7 +30,7 @@ defineProps<{
         <li v-else
           v-for="action in actions"
           :key="action.id"
-          class="flex items-center px-2 space-x-2 py-3 transition-colors hover:bg-list-hover"
+          :class="hoverListRow('flex items-center px-2 space-x-2 py-3 transition-colors')"
         >
           <div class="w-25/100">
             <Badge variant="ack_type">

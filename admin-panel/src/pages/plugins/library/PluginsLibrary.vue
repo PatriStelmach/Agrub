@@ -74,8 +74,6 @@ const {filters, items, pageSize, currentPage, totalElements, sortedHead, updateF
   <div>
     <TopH1Div h1="Plugins library">
       <ButtonGroup>
-      </ButtonGroup>
-      <ButtonGroup>
         <PluginFilters @update:filters="updateFilters">
           <Button variant="outline">
             Filters <IconFilterCog />

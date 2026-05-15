@@ -8,6 +8,8 @@ import PluginsLibrary from '../pages/plugins/library/PluginsLibrary.vue'
 import MyPlugins from '../pages/plugins/my/MyPlugins.vue'
 import TeamPage from '../pages/team/users/TeamPage.vue'
 import Groups from '../pages/team/groups/Groups.vue'
+import ImportPlugin from '../pages/plugins/my/ImportPlugin.vue'
+import GroupCardDetails from '../pages/team/groups/GroupCardDetails.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -21,9 +23,9 @@ const router = createRouter({
     { path: '/my_plugins',      name: 'my_plugins',      component: MyPlugins },
     { path: '/team_members',    name: 'team_members',    component: TeamPage },
     { path: '/groups',          name: 'groups',          component: Groups },
-    { path: '/import_plugins',  name: 'import_plugins',  component:() => import('../pages/plugins/my/ImportPlugin.vue') },
-    { path: '/groups/edit_group/:id',  name: 'groups/edit_group',      component: () => import('../pages/team/groups/GroupCardDetails.vue') },
-    { path: '/groups/create_group',    name: 'groups/create_group',    component: () => import('../pages/team/groups/GroupCardDetails.vue') },
+    { path: '/import_plugins',  name: 'import_plugins',  component: ImportPlugin },
+    { path: '/groups/edit_group/:id/:name',  name: 'groups/edit_group',      component: GroupCardDetails },
+    { path: '/groups/create_group',    name: 'groups/create_group',    component: GroupCardDetails },
   ],
 })
 

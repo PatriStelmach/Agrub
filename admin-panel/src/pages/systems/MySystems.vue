@@ -17,7 +17,6 @@ import TopH1Div from "@/helpers_components/TopH1Div.vue";
 
 
   <TopH1Div h1="Connected systems"/>
-
     <Empty>
     <EmptyHeader>
       <EmptyMedia variant="icon">

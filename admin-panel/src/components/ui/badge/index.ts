@@ -28,9 +28,9 @@ export const badgeVariants = cva(
         origin:
           "border-blue-badge border-2  bg-blue-badge/10 hover:bg-transparent cursor-pointer " +
           " hover:shadow-blue-badge  text-blue-badge hover:scale-102",
-        ack_type:"border-blue-400/50 border-2  text-blue-400  bg-blue-400/20  text-xs",
+        ack_type:"border-green-badge/50 border-2  text-green-badge  bg-green-badge/20  text-xs",
         number:
-        " items-baseline bg-green-badge/60 h-5 min-w-5 rounded-full lg:h-6 lg:min-w-6 2xl:h-8 2xl:min-w-8 px-1 font-mono font-bold tabular-nums text-primary"
+        " items-baseline bg-green-badge/60 h-5 min-w-5 rounded-full lg:h-6 lg:min-w-6 2xl:h-8 2xl:min-w-8 px-1  font-bold tabular-nums text-primary"
       },
     },
     defaultVariants: {

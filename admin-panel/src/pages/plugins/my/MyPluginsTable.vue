@@ -23,7 +23,7 @@ import {
   IconStatusChange,
   IconTrash,
 } from "@tabler/icons-vue"
-import {computed, defineAsyncComponent, ref, watch} from "vue";
+import {computed, ref, watch} from "vue";
 import {useSort} from "@/composables/sorting.ts";
 import SortableHead from "@/helpers_components/SortableHead.vue";
 import {
@@ -34,6 +34,7 @@ import {
 } from "@/assets/cssFunctions.ts";
 import TopH1Div from "@/helpers_components/TopH1Div.vue";
 import {useWrapping} from "@/composables/unwrapping.ts";
+import {getMyPluginDetails} from "@/helpers_functions/requests.ts";
 import {Button} from "@/components/ui/button";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
 import {Search} from "lucide-vue-next";
@@ -46,7 +47,7 @@ import {inputText} from "@/assets/cssFunctions.ts";
 import SeveritySelect from "@/helpers_components/SeveritySelect.vue";
 import SeverityDiv from "@/helpers_components/SeverityDiv.vue";
 import LoadingTable from "@/helpers_components/LoadingTable.vue";
-const MyTagInput = defineAsyncComponent(() => import('@/helpers_components/MyTagInput.vue'))
+import MyTagInput from '@/helpers_components/MyTagInput.vue'
 
 const props = defineProps<{
   data: MyPlugin[];
@@ -58,7 +59,7 @@ const emit = defineEmits<{
 }>()
 
 
-const PluginDetailsDialog = defineAsyncComponent( () => import ("@/pages/plugins/PluginDetailsDialog.vue"))
+import PluginDetailsDialog from '@/pages/plugins/PluginDetailsDialog.vue'
 const myPluginStore = useMyPluginStore()
 const { sortedData, sortKey, sortOrder, toggleSort } = useSort<MyPlugin>(() => props.data, 'updatedAt')
 const { wrap, isUnwrapped, unwrap, unwrappedItem, save } = useWrapping(sortedData, 'fullName')
@@ -113,7 +114,7 @@ const deletePlugins = () => {
 
 const getDetails = async (fileName: string) => {
   if(unwrappedItem.value) {
-    const details = await myPluginStore.getMyPluginDetails(fileName)
+    const details = await getMyPluginDetails(fileName)
     unwrappedItem.value.code = details?.code
     unwrappedItem.value.description = details?.description
   }
@@ -193,7 +194,7 @@ const updateDetails = (code: string, description: string) => {
         <LoadingTable :colspan="9" v-if="isLoading"/>
         <TableBody v-else>
           <TableRow
-            class="cursor-pointer duration-0 border-radius-0  [&_td]:py-2 [&_td]:pr-4 hover:bg-green-badge/20 "
+            class="cursor-pointer duration-0 border-radius-0  [&_td]:py-2 [&_td]:pr-4 hover:bg-green-badge/20"
             v-for="plugin in sortedData"
             :key="plugin.fullName"
             @click="isUnwrapped(plugin.fullName) ? null : unwrap(plugin.fullName); "
@@ -324,7 +325,7 @@ const updateDetails = (code: string, description: string) => {
                   variant="red_outline">
                   Cancel<IconCancel class="size-4 xl:size-5"/>
                 </Button>
-                <Button variant="orange_outline" class="p-0">
+                <Button variant="orange_outline" class="border-l-2! p-0">
                   <PluginDetailsDialog
                     :code="unwrappedItem.code ?? ''"
                     :description="unwrappedItem.description ?? ''"
@@ -332,7 +333,7 @@ const updateDetails = (code: string, description: string) => {
                   >
                     <Button
                       @click.stop="getDetails(plugin.fullName)"
-                      class="border-0! m-0 rounded-none bg-transparent! text-severity-3 hover:text-primary"
+                      class=" m-0 rounded-none bg-transparent! text-severity-3 hover:text-primary"
                     >
                       Details<IconMessageCode class="size-4 xl:size-5"/>
                     </Button>
@@ -340,6 +341,7 @@ const updateDetails = (code: string, description: string) => {
                 </Button>
 
                 <Button
+                  class="border-l-2!"
                   @click.stop="save(async ()=> await myPluginStore.editMyPlugin(unwrappedItem!))"
                   variant="green_outline">
                   Save<IconDeviceFloppy class="size-4 xl:size-5"/>

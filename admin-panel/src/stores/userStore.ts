@@ -1,5 +1,5 @@
 import {defineStore} from "pinia";
-import type {GroupDetails, User, UserGroup, UserGroupStats} from "@/types/types.ts";
+import type {User, UserGroup} from "@/types/types.ts";
 import {ref} from "vue";
 import api from "@/lib/axios.ts";
 import {toast} from "vue-sonner";
@@ -19,65 +19,6 @@ export const useUserStore = defineStore('user-store',() => {
       toast.error(`Error retrieving users: ${error}`)
     }
   }
-
-  const getGroupDataRequest = async (id: number) => {
-    try {
-      const res = await api.get(`/groups/${id}/details`)
-      if (res.status === 200 && res.data.length > 0) {
-        console.log(res.data)
-        return res.data as GroupDetails
-      }
-      else {
-        toast.error(`Error retrieving groups: ${res.data}`)
-      }
-
-    }
-    catch (error) {
-      toast.error(`Error retrieving groups: ${error}`)
-    }
-  }
-
-  const getGroupsStatsRequest = async () => {
-    try {
-      const res = await api.get(`/groups/stats`)
-      if (res.status === 200) {
-        return res.data as UserGroupStats[]
-      }
-      else {
-        toast.error(`Error retrieving stats: ${res.data}`)
-        return []
-      }
-    }
-    catch (error) {
-      toast.error(`Error retrieving stats: ${error}`)
-    }
-  }
-
-  const getAllGroupsRequest = async () => {
-    try {
-      const res = await api.get('/groups')
-      if (res.status === 200 && res.data.length > 0) {
-        allGroups.value = res.data
-      }
-      else allGroups.value = []
-    }
-    catch (error) {
-      toast.error(`Error retrieving groups: ${error}`)
-    }
-    return allGroups.value
-  }
-
-  const getUserByIdRequest = async (id: number) => {
-    try {
-      const res = await api.get(`/users/${id}`)
-      if (res.status === 200) return res.data
-      else toast.error(`Error retrieving user: ${id}`)
-    }
-    catch (error) {
-      toast.error(`Error retrieving user: ${error}`)
-    }
-  }
-
   const editUserRequest = async (user: User) => {
     try {
       const res = await api.put(`/users/${user.id}`, user, )
@@ -85,11 +26,46 @@ export const useUserStore = defineStore('user-store',() => {
         toast.success(`User ${user.email} updated successfully.`)
         await getAllUsersRequest()
       }
-    else
-      toast.error(`Error updating user: ${user.email}`)
     }
     catch (error) {
       toast.error(`Error updating user: ${error}`)
+    }
+  }
+
+  const getUserByIdRequest = async (id: number) => {
+    try {
+      const res = await api.get(`/users/${id}`)
+      if (res.status === 200) return res.data
+    }
+    catch (error) {
+      toast.error(`Error retrieving user: ${error}`)
+    }
+  }
+
+  const createUserRequest = async (user: User) => {
+    try {
+      const res = await api.post('/users', user)
+      if (res.status === 200) {
+        toast.success(`User ${user.email} created successfully.`)
+        await getAllUsersRequest()
+      }
+    } catch (error) {
+      toast.error(`Error creating user: ${error}`)
+      throw error
+    }
+  }
+
+
+  const getAllGroupsRequest = async () => {
+    try {
+      const res = await api.get('/groups')
+      if (res.status === 200 && res.data.length > 0) {
+        allGroups.value =  res.data
+      }
+      else return  []
+    }
+    catch (error) {
+      toast.error(`Error retrieving groups: ${error}`)
     }
   }
 
@@ -97,20 +73,18 @@ export const useUserStore = defineStore('user-store',() => {
     return `${user.firstname.slice(0, 1).toUpperCase()}${user.surname.slice(0,1).toUpperCase()}`
   }
   const fullName = (user: User) =>  {
-   return `${user.firstname} ${user.surname}`
+    return `${user.firstname} ${user.surname}`
   }
 
   return {
     allUsers,
     allGroups,
     getAllUsersRequest,
-    editUserRequest,
     getUserByIdRequest,
-    getAllGroupsRequest,
     fullName,
     avFallback,
-    getGroupDataRequest,
-    getGroupsStatsRequest
-
+    editUserRequest,
+    getAllGroupsRequest,
+    createUserRequest,
   }
 })
