@@ -83,14 +83,15 @@ public class UserGroupController {
         List<pl.pjatk.alertwip.dto.AlertRuleRequestDTO> ruleDTOs = rules.stream()
                 .map(r -> new pl.pjatk.alertwip.dto.AlertRuleRequestDTO(
                         r.getId(),
+                        r.getUserGroup().getId(),
                         r.getSourcePattern(),
                         r.getSourceType(),
                         r.getContentPattern(),
                         r.getContentType(),
-                        r.getSubjectPattern(),
-                        r.getSubjectMatchType(),
                         r.getOriginPattern(),
                         r.getOriginMatchType(),
+                        r.getSubjectPattern(),
+                        r.getSubjectMatchType(),
                         r.getMinSeverity(),
                         r.isPlaySound()
                 ))
