@@ -24,11 +24,20 @@ public class ProblemAction {
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Enumerated(EnumType.STRING)
-    private ActionType actionType;
+    @Column(nullable = true)
+    private Boolean ackUpdate; // true dla ack, false dla unack, null dla bez zmiany
+
+    @Column(nullable = true)
+    private Integer previousSeverity;
+
+    @Column(nullable = true)
+    private Integer newSeverity;
 
     @Enumerated(EnumType.STRING)
     private SyncStatus syncStatus = SyncStatus.PENDING;
+
+    // GETTERY I SETTERY
+    //-------------------------------------
 
     public Long getId() {
         return id;
@@ -70,12 +79,28 @@ public class ProblemAction {
         this.createdAt = createdAt;
     }
 
-    public ActionType getActionType() {
-        return actionType;
+    public Boolean getAckUpdate() {
+        return ackUpdate;
     }
 
-    public void setActionType(ActionType actionType) {
-        this.actionType = actionType;
+    public void setAckUpdate(Boolean ackUpdate) {
+        this.ackUpdate = ackUpdate;
+    }
+
+    public Integer getPreviousSeverity() {
+        return previousSeverity;
+    }
+
+    public void setPreviousSeverity(Integer previousSeverity) {
+        this.previousSeverity = previousSeverity;
+    }
+
+    public Integer getNewSeverity() {
+        return newSeverity;
+    }
+
+    public void setNewSeverity(Integer newSeverity) {
+        this.newSeverity = newSeverity;
     }
 
     public SyncStatus getSyncStatus() {
