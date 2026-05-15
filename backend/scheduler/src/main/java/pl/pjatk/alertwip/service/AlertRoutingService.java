@@ -51,12 +51,22 @@ public class AlertRoutingService {
         // 1. Tani warunek (Severity)
         if (alert.getSeverity() < rule.getMinSeverity()) return false;
 
-        // 2. Warunek źródła (Host)
+        // 2. Warunek systemu pochodzenia (np. "ZABBIX", "WAZUH")
+        if (!isMatch(alert.getOriginType(), rule.getOriginPattern(), rule.getOriginMatchType())) {
+            return false;
+        }
+
+        // 3. Warunek źródła / hosta (IP lub nazwa hosta)
         if (!isMatch(alert.getSource(), rule.getSourcePattern(), rule.getSourceType())) {
             return false;
         }
 
-        // 3. Warunek treści komunikatu
+        // 4. Warunek tematu alertu (Krótkie zdanie)
+        if (!isMatch(alert.getSubject(), rule.getSubjectPattern(), rule.getSubjectMatchType())) {
+            return false;
+        }
+
+        // 5. Warunek treści komunikatu (Najdłuższy tekst, sprawdzamy na samym końcu)
         return isMatch(alert.getMessage(), rule.getContentPattern(), rule.getContentType());
     }
 
