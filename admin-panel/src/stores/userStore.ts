@@ -3,7 +3,6 @@ import type {GroupDetails, User, UserGroup, UserGroupStats} from "@/types/types.
 import {ref} from "vue";
 import api from "@/lib/axios.ts";
 import {toast} from "vue-sonner";
-import {groupsData} from "@/data/groupsData.ts";
 
 export const useUserStore = defineStore('user-store',() => {
   const allUsers = ref<User[]>([])

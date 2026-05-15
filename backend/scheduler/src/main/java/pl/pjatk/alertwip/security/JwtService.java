@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import pl.pjatk.alertwip.model.User;
+import pl.pjatk.alertwip.service.SystemSettingService;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -19,11 +20,11 @@ public class JwtService {
     @Value("${jwt.secret}")
     private String secretKey;
 
-    @Value("${jwt.expiration}")
-    private long jwtExpiration;
+    private final SystemSettingService settingService;
 
-    @Value("${jwt.refresh-token.expiration}")
-    private long refreshExpiration;
+    public JwtService(SystemSettingService settingService) {
+        this.settingService = settingService;
+    }
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -35,6 +36,9 @@ public class JwtService {
     }
 
     public String generateAccessToken(User user) {
+        long minutes = Long.parseLong(settingService.getValue("SECURITY_ACCESS_TOKEN_EXP_MINUTES", "1440"));
+        long jwtExpiration = minutes * 60 * 1000;
+
         return Jwts.builder()
                 .claim("firstname", user.getFirstname())
                 .claim("surname", user.getSurname())
@@ -47,6 +51,9 @@ public class JwtService {
     }
 
     public String generateRefreshToken(UserDetails userDetails) {
+        long hours = Long.parseLong(settingService.getValue("SECURITY_REFRESH_TOKEN_EXP_HOURS", "168"));
+        long refreshExpiration = hours * 60 * 60 * 1000;
+
         return Jwts.builder()
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
