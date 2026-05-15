@@ -41,7 +41,7 @@ const authStore = useAuthStore()
                 {{ authStore.avFallback}}
               </AvatarFallback>
             </Avatar>
-            <div class="grid flex-1 text-left text-sm leading-tight">
+            <div class="grid flex-1 text-left text-sm ">
               <span class="truncate font-medium">
                 {{ authStore.fullName }}
               </span>
@@ -65,7 +65,7 @@ const authStore = useAuthStore()
                   AP
                 </AvatarFallback>
               </Avatar>
-              <div class="grid flex-1 text-left text-sm leading-tight">
+              <div class="grid flex-1 text-left text-sm ">
                 <span class="truncate font-medium">
                   {{ authStore.fullName }}
                 </span>

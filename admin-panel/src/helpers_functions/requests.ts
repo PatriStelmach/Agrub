@@ -90,7 +90,7 @@ export const addNewRuleRequest = async (rule: Rule) => {
   }
 }
 
-export const assignUserToGroup = async (userId: number, groupId: number) => {
+export const assignUserToGroupRequest = async (userId: number, groupId: number) => {
   try {
     const res = await api.post(`/groups/${groupId}/users/${userId}`)
     if (res.status === 200) {
@@ -101,7 +101,7 @@ export const assignUserToGroup = async (userId: number, groupId: number) => {
   }
 }
 
-export const deleteUserFromGroup = async (userId: number, groupId: number) => {
+export const deleteUserFromGroupRequest = async (userId: number, groupId: number) => {
   try {
     const res = await api.delete(`/groups/${groupId}/users/${userId}`)
     if (res.status === 200) {
@@ -112,7 +112,20 @@ export const deleteUserFromGroup = async (userId: number, groupId: number) => {
   }
 }
 
-export const deleteRuleFromGroup = async (ruleId: number) => {
+export const updateRuleRequest = async (rule: Rule) => {
+  try {
+    const res = await api.put(`/rules/${rule.id}`, rule)
+    if (res.status === 200) {
+      console.log(rule)
+      toast.success('Rule updated successfully!')
+      return res.data
+    }
+  } catch (error) {
+    throw (error)
+  }
+}
+
+export const deleteRuleFromGroupRequest = async (ruleId: number) => {
   try {
    const res = await api.delete(`/rules/${ruleId}`)
     if (res.status === 200) {
@@ -122,3 +135,28 @@ export const deleteRuleFromGroup = async (ruleId: number) => {
     throw (error)
   }
 }
+
+export const changeGroupNameRequest = async (groupId: number, name: string) => {
+  try {
+    const res = await api.put(`/groups/${groupId}/change-name`, {name: name})
+    if (res.status === 200) {
+      toast.success(`Successfully updated group name`)
+      return res.data
+    }
+  } catch (error) {
+    throw (error)
+  }
+}
+
+export const triggerScript = async (groupId: number, name: string) => {
+  try {
+    const res = await api.put(`/groups/${groupId}/change-name`, {name: name})
+    if (res.status === 200) {
+      toast.success(`Successfully updated group name`)
+      return res.data
+    }
+  } catch (error) {
+    throw (error)
+  }
+}
+

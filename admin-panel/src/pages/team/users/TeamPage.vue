@@ -15,7 +15,6 @@ import GridCardLoader from "@/helpers_components/loaders/GridCardLoader.vue";
 import UserCard from './UserCard.vue'
 import EditUser from "./EditUser.vue"
 import GridCardTransitionGroup from "@/helpers_components/loaders/GridCardTransitionGroup.vue"
-import {getAllGroupsRequest} from "@/helpers_functions/requests.ts";
 
 const userStore = useUserStore();
 const isLoading = ref(true);

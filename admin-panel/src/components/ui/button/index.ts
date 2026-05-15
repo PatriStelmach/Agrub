@@ -18,8 +18,6 @@ export const buttonVariants = cva(
           " hover:bg-accent hover:text-accent-foreground hover:bg-accent/50",
         link: "cursor-pointer text-primary underline-offset-4 hover:underline",
 
-
-
         green_outline:
         "bg-background border-2  font-bold border-input  hover:bg-green-badge/60 bg-input/30 text-green-badge/90 light:hover:bg-green-badge/70 hover:border-green-badge hover:text-primary",
         yellow_outline:
@@ -30,17 +28,14 @@ export const buttonVariants = cva(
           "bg-background border-2  font-bold border-input hover:bg-blue-badge/50  bg-input/30 text-blue-badge/90 hover:bg-blue-badge/60 hover:border-blue-badge hover:text-primary",
         orange_outline:
           "bg-background border-2  font-bold border-input  bg-input/30 text-orange-badge/90 light: hover:bg-orange-badge/60 hover:bg-orange-badge/70 hover:border-orange-badge hover:text-primary",
-
-
-
-        green_inside:
-        "bg-background bg-input/30 border-green-badge border-2 text-green-badge  hover:shadow-[0_0_10px_1px] hover:shadow-green-badge ",
-        orange_inside:
-          "bg-background bg-input/30 border-orange-badge border-2 text-orange-badge  hover:shadow-[0_0_10px_1px] hover:shadow-orange-badge ",
-        red_inside:
-          "bg-background bg-input/30 border-red-badge border-2 text-red-badge   hover:shadow-[0_0_10px_1px] hover:shadow-red-badge ",
-        yellow_inside:
-          "bg-background bg-input/30 border-yellow-badge border-2 text-yellow-badge   hover:shadow-[0_0_10px_1px] hover:shadow-yellow-badge ",
+        // green_inside:
+        // "bg-background bg-input/30 border-green-badge border-2 text-green-badge  hover:shadow-[0_0_10px_1px] hover:shadow-green-badge ",
+        // orange_inside:
+        //   "bg-background bg-input/30 border-orange-badge border-2 text-orange-badge  hover:shadow-[0_0_10px_1px] hover:shadow-orange-badge ",
+        // red_inside:
+        //   "bg-background bg-input/30 border-red-badge border-2 text-red-badge   hover:shadow-[0_0_10px_1px] hover:shadow-red-badge ",
+        // yellow_inside:
+        //   "bg-background bg-input/30 border-yellow-badge border-2 text-yellow-badge   hover:shadow-[0_0_10px_1px] hover:shadow-yellow-badge ",
       },
       size: {
         "default": "h-9 px-4 py-2 has-[>svg]:px-3",

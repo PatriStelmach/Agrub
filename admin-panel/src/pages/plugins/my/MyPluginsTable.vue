@@ -22,6 +22,7 @@ import {
   IconMessageCode,
   IconStatusChange,
   IconTrash,
+  IconPlayerPlay
 } from "@tabler/icons-vue"
 import {computed, ref, watch} from "vue";
 import {useSort} from "@/composables/sorting.ts";
@@ -69,8 +70,16 @@ const checkedPlugins = ref<string[]>([])
 
 const blockedCheckbox = computed(() => !!unwrappedItem.value)
 
-const blockedRemoveAndChange = computed(() =>
-  !checkedPlugins.value.length || (checkedPlugins.value.length && unwrappedItem.value))
+const blockDeleteAndChangeStatus = computed(() =>
+  !checkedPlugins.value.length ||
+  !!unwrappedItem.value
+)
+
+const blockTrigger = computed(() =>
+  !checkedPlugins.value.length ||
+  !!unwrappedItem.value ||
+  checkedPlugins.value.length > 1
+)
 
 const allChecked = computed(() =>  props.data.length > 0 &&
   checkedPlugins.value.length === props.data.length)
@@ -124,12 +133,15 @@ const nextRun = (plugin: MyPlugin) => {
   return plugin.cronExpression ?  dateParser(cronParser.parse(plugin.cronExpression).next().toDate()).fullDate.toString() : ''
 }
 
-
 const updateDetails = (code: string, description: string) => {
   if(unwrappedItem.value) {
     unwrappedItem.value.code = code
     unwrappedItem.value.description = description
   }
+}
+
+const triggerScript = () => {
+
 }
 
 </script>
@@ -138,8 +150,17 @@ const updateDetails = (code: string, description: string) => {
 <TopH1Div h1="Your plugins">
   <ButtonGroup >
     <Button
+      @click="triggerScript"
+      :disabled="blockTrigger"
+      variant="green_outline"
+    >
+     Trigger
+      <IconPlayerPlay/>
+    </Button>
+    <Button
+      class="border-l-2!"
       @click="changeStatus"
-      :disabled="blockedRemoveAndChange"
+      :disabled="blockDeleteAndChangeStatus"
       variant="orange_outline">
       On/Off
       <IconStatusChange/>
@@ -147,7 +168,7 @@ const updateDetails = (code: string, description: string) => {
     <Button
       class="border-l-2!"
       @click="deletePlugins"
-      :disabled="blockedRemoveAndChange"
+      :disabled="blockDeleteAndChangeStatus"
       variant="red_outline">
       Delete
       <IconTrash/>
