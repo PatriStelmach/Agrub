@@ -20,7 +20,7 @@ public class SystemSettingService {
     }
 
     // Pobieranie wartości tekstowej
-    @Cacheable(value = "systemSettings", key = "#key")
+    //@Cacheable(value = "systemSettings", key = "#key")
     public String getValue(String key, String defaultValue) {
         return repository.findById(key)
                 .map(SystemSetting::getSettingValue)
@@ -28,7 +28,7 @@ public class SystemSettingService {
     }
 
     // Pobieranie wartości logicznej (np. czy zabbix jest włączony)
-    @Cacheable(value = "systemSettingsBoolean", key = "#key")
+    //@Cacheable(value = "systemSettingsBoolean", key = "#key")
     public boolean getBoolean(String key, boolean defaultValue) {
         return repository.findById(key)
                 .map(setting -> Boolean.parseBoolean(setting.getSettingValue()))
@@ -36,14 +36,14 @@ public class SystemSettingService {
     }
 
     // Pobieranie wszystkich ustawień jako mapa
-    @Cacheable(value = "allSystemSettings")
+    //@Cacheable(value = "allSystemSettings")
     public Map<String, String> getAllSettings() {
         return repository.findAll().stream()
                 .collect(Collectors.toMap(SystemSetting::getSettingKey, SystemSetting::getSettingValue));
     }
 
     // Masowy zapis z poziomu Vue
-    @CacheEvict(value = {"systemSettings", "systemSettingsBoolean", "allSystemSettings"}, allEntries = true)
+    //@CacheEvict(value = {"systemSettings", "systemSettingsBoolean", "allSystemSettings"}, allEntries = true)
     public void saveSettings(Map<String, String> settingsMap) {
         List<SystemSetting> entities = settingsMap.entrySet().stream()
                 .map(entry -> new SystemSetting(entry.getKey(), entry.getValue()))

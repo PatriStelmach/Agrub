@@ -75,13 +75,6 @@ public class SettingsSeeder implements CommandLineRunner {
                 Map.entry("smtp_password", "")
         );
 
-        // Reszta logiki zapisu (repository.existsById...) pozostaje bez zmian
-        defaultSettings.forEach((key, value) -> {
-            if (!repository.existsById(key)) {
-                repository.save(new SystemSetting(key, value));
-                System.out.println("[SYSTEM] Dodano domyślne ustawienie do bazy: " + key);
-            }
-        });
 
         // 2. Przechodzimy przez każdy klucz
         defaultSettings.forEach((key, value) -> {
