@@ -26,8 +26,8 @@ defineProps<{
         </Avatar>
         <span class="absolute bottom-0 right-0 size-2.5 rounded-full bg-green-badge" :class="{ 'bg-red-badge': !user.active }" />
       </div>
-      <div class="grid flex-1 text-left text-sm leading-tight">
-        <span class="truncate font-medium">{{ `${user.firstname} ${user.surname}` }}</span>
+      <div class="grid flex-1 text-left text-sm mr-4">
+        <span class="whitespace-break-spaces font-medium">{{ `${user.firstname} ${user.surname}` }}</span>
         <span class="text-muted-foreground truncate text-xs">{{ user.email }}</span>
       </div>
       <EditUser
@@ -51,7 +51,13 @@ defineProps<{
           <h1 :class="nameLabel">Groups:</h1>
         </div>
         <div>
-          <Badge variant="tags" v-for="(group, index) in user.groups" :key="index">{{ group }}</Badge>
+          <Badge
+            @click="$router.push(`/groups/edit_group/${group.id}/${group.name}`)"
+            variant="tags"
+            v-for="(group, index) in user.groups"
+            :key="index">
+            {{ group.name }}
+          </Badge>
         </div>
       </div>
     </CardDescription>

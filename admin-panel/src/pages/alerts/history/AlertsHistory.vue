@@ -9,7 +9,7 @@ import {
   type HistoryAlert,
   undefinedAlertsFilters
 } from "@/types/types.js";
-import {defineAsyncComponent, onMounted, ref} from "vue";
+import {onMounted, ref} from "vue";
 import {IconFilterCog} from "@tabler/icons-vue";
 import AlertsHistoryTable from "@/pages/alerts/history/AlertsHistoryTable.vue";
 import MyServerPagination from "@/helpers_components/MyServerPagination.vue";
@@ -17,7 +17,7 @@ import AlertsFilters from "@/pages/alerts/history/AlertsFilters.vue";
 import {useServerSearchFilter} from "@/composables/useServerSearchFilter.ts";
 import api from "@/lib/axios.ts";
 import {toast} from "vue-sonner";
-const DetailsCard = defineAsyncComponent(() => import('@/pages/alerts/DetailsCard.vue'))
+import DetailsCard from '@/pages/alerts/DetailsCard.vue'
 
 const getAlertsHistory = async () => {
   try {
@@ -51,9 +51,6 @@ const getAlertsHistory = async () => {
         closedAt: new Date(a.closedAt)
       }))
       totalElements.value = response.data.totalElements
-      console.log(response.data.totalElements)
-
-      toast.info('Alerts history fetched')
     }
   } catch {
     toast.error('Error getting alerts history')
@@ -88,8 +85,6 @@ const hoveredAlert = ref<AlertDetails | null>(null)
 <template>
   <div>
     <TopH1Div h1="Alerts history">
-      <ButtonGroup>
-      </ButtonGroup>
       <ButtonGroup>
         <AlertsFilters @update:filters="updateFilters">
           <Button variant="outline">

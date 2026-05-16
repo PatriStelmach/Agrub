@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/empty'
 import {Input} from "@/components/ui/input";
 import {computed, ref, watch} from "vue";
+import {hoverListRow} from "@/assets/cssFunctions.ts";
 import {
   IconUpload
 } from "@tabler/icons-vue";
@@ -89,8 +90,6 @@ else {
 <template>
   <div>
     <TopH1Div h1="Import plugin">
-      <ButtonGroup>
-      </ButtonGroup>
       <ButtonGroup >
         <Button
           @click="toggleAllChecked"
@@ -142,7 +141,7 @@ else {
         hidden
       />
       <ul>
-        <li class="list-none p-2 w-[40vw]"
+        <li :class="hoverListRow('list-none p-2 w-[40vw]')"
             v-for="(item) in files"
             :key="item.id">
 

@@ -22,6 +22,7 @@ public class ConfigurationController {
 
     @GetMapping
     public Map<String, String> getAllSettings() {
+        System.out.println(settingService.getAllSettings());
         return settingService.getAllSettings();
     }
 

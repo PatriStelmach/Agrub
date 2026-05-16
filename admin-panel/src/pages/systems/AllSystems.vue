@@ -42,8 +42,6 @@ const closeDialog = () => {
 <template>
   <div class="relative">
     <TopH1Div h1="Available systems" :h1Class="['transition-all duration-300', {'blur-3xl' : isOpen}]">
-      <ButtonGroup>
-      </ButtonGroup>
     </TopH1Div>
 
     <div

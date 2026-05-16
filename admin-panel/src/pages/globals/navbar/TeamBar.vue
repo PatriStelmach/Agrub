@@ -8,7 +8,9 @@ import {
   DropdownMenuSeparator, DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { IconNotification, IconUserCircle} from "@tabler/icons-vue";
-import {usersData} from "@/data/usersData.js";
+import type {User} from "@/types/types.ts";
+import {ref} from "vue";
+const usersData = ref<User[]>([])
 
 </script>
 
@@ -36,7 +38,7 @@ import {usersData} from "@/data/usersData.js";
                 :class="{'bg-red-500' : !user.active}"
               ></span>
             </div>
-            <div class="grid flex-1 text-left text-sm leading-tight">
+            <div class="grid flex-1 text-left text-sm ">
               <span class="truncate font-medium">{{ user.firstname + ' ' + user.surname }}</span>
               <span class="text-muted-foreground truncate text-xs">
                 {{ user.email }}
@@ -57,7 +59,7 @@ import {usersData} from "@/data/usersData.js";
                   {{user.firstname.slice(0,1) + user.surname.slice(0,1)}}
                 </AvatarFallback>
               </Avatar>
-              <div class="grid flex-1 text-left text-sm leading-tight">
+              <div class="grid flex-1 text-left text-sm ">
                 <span class="truncate font-medium">{{ user.firstname + ' ' + user.surname }}</span>
                 <span class="text-muted-foreground truncate text-xs">
                   {{ user.email }}

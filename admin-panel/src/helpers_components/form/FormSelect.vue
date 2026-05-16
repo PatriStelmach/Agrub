@@ -14,11 +14,10 @@ const props = defineProps<{
   name: string
   label: string
   options: string[]
-  ruleId: number
   placeholder?: string
 }>()
 
-const fieldId = `${props.name}-${props.ruleId}`
+const fieldId = props.name
 </script>
 
 <template>

@@ -17,7 +17,7 @@ export function useClientSearchFilter<T>(data: () => T[], filter: (item: T) => s
 
   const updateFilter = useDebounceFn((filter: string)=> {
     debounceFilter.value = filter
-  }, 60)
+  }, 30)
   const updateData = (data:T[]) => {
     tableData.value = data as T[]
   }

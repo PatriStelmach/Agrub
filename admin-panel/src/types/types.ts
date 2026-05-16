@@ -112,8 +112,8 @@ export interface User {
   surname: string,
   active?: boolean,
   email: string,
-  role: "ADMINISTRATOR" | "TECHNICIAN"
-  groups?: string[]
+  role?: "ADMINISTRATOR" | "TECHNICIAN"
+  groups?: UserGroup[],
 }
 
 export const blankUser = {
@@ -224,34 +224,38 @@ export interface GroupDetails {
 export interface Rule {
   id?: number
   userGroup?: UserGroup
-  sourcePattern: string
-  sourceType: MatchType
-  contentPattern: string
-  contentType: MatchType
-  subjectPattern: string
-  subjectMatchType: MatchType
-  originPattern: string
-  originMatchType: MatchType
-  minSeverity: number
+  userGroupId?: number,
+  sourcePattern?: string
+  sourceType?: MatchType
+  contentPattern?: string
+  contentType?: MatchType
+  subjectPattern?: string
+  subjectMatchType?: MatchType
+  originPattern?: string
+  originMatchType?: MatchType
+  minSeverity: 0 | 1 | 2 | 3 | 4 | 5
   playSound: boolean
 }
 
-export const initialRule: Rule = {
-    sourcePattern: '',
-    sourceType: MatchType.EXACT,
-    contentPattern: '',
-    contentType: MatchType.EXACT,
-    subjectPattern: '',
-    subjectMatchType: MatchType.EXACT,
-    originPattern: '',
-    originMatchType: MatchType.EXACT,
+export const initialRule = (userGroupId: number): Rule =>{
+  return {
+    userGroupId: userGroupId,
+    sourcePattern: undefined,
+    sourceType: MatchType.CONTAINS,
+    contentPattern: undefined,
+    contentType: MatchType.CONTAINS,
+    subjectPattern: undefined,
+    subjectMatchType: MatchType.CONTAINS,
+    originPattern: undefined,
+    originMatchType: MatchType.CONTAINS,
     minSeverity: 0,
     playSound: false,
+  }
 }
 
-export const InitialGroupDetails: GroupDetails = {
+export const initialGroupDetails: GroupDetails = {
   name: '',
-  rules: [initialRule],
+  rules: [],
   users: []
 }
 
