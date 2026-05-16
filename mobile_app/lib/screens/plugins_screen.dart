@@ -49,7 +49,7 @@ else {
                             },
                             items:const[
                             DropdownMenuItem<String>(value: 'fileName', child: Text('File Name',style:TextStyle(fontSize: 30))),
-                            DropdownMenuItem<String>(value: 'name', child: Text('Name',style:TextStyle(fontSize: 30))),
+                            DropdownMenuItem<String>(value: 'creator', child: Text('Creator',style:TextStyle(fontSize: 30))),
                             DropdownMenuItem<String>(value: 'language', child: Text('Language',style:TextStyle(fontSize: 30))),
                             ]
                             ),

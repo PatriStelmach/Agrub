@@ -9,7 +9,7 @@ late final Dio _dio;
   AuthService() {
 
     _dio = Dio(BaseOptions(
-      baseUrl: 'http://10.0.2.2:10000',
+      baseUrl: 'https://10.0.2.2:10000',
       connectTimeout: const Duration(seconds: 5),
       receiveTimeout: const Duration(seconds: 3),
       headers: {
@@ -41,7 +41,7 @@ late final Dio _dio;
       });
 
       if (response.statusCode == 200) {
-        final token = response.data['token'];
+        final token = response.data['access_token'];
         await _storage.write(key: 'jwt_token', value: token);
         return token;
         

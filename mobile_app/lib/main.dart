@@ -44,7 +44,7 @@ Future<void> main() async {
   final dioInstance = authService.dio;
   //Creation of repositories instances
   final alertRepository = AlertRepository(dio: dioInstance);
-  final pluginRepository = PluginsRepository();
+  final pluginRepository = PluginsRepository(dio: dioInstance);
   final userRepository = UserRepository();
 
   
@@ -152,19 +152,14 @@ const MainApp({super.key});
 
 T0D0:
 
+- oprogramowanie start/stop/force pluginów
+- pluginy z library plus my plugins?
+- podpięcie się do serwerowej wersji backendu
+- retencja pamięci, żeby już otrzymane alerty się nie odpalały przy odpalaniu apki
+- FCM!!!!!!!!!
+- komentarze porządne
+- refactoring, uporządkowanie tego co robią servicy/repo/view models zgodnie z MVVM, uporządkowanie rzeczy zgodnie z DRY itd.
 
-5. Co z tymi pluginami? Gdzie biblioteka pluginów? ( Debug pokazuje że przychodzi pusta lista, investigate)
-6. Uruchamianie pluginów/logi itd w tle
-7. ekran logowanie na potem
-8. Czy notifications z zamockowanymi alertami działają dobrze?
-9. Jak dodać takie z updatem, żeby robiły się w tle?
-10. FCM - co jest potrzebne na backendzie żeby wysyłać notifications?
-???. Ogarnięcie logowania do backendu
-??? Zmiana mapowania kolorów
-??? Mam dwa sposoby na handling enumów ze stringów - wybrać jeden, żeby kod był spójny.
 
-App Theme:
-- odpicowanie elementów stałych, żeby nie wyglądały tak szkolnie
-- uporządkowanie obramowań containerów/usunięcie jak będzie lepiej
 
   */

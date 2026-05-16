@@ -17,17 +17,15 @@ class _LoginScreenState extends State<LoginScreen> {
   void _handleLogin() async {
     final userVM = context.read<UserViewModel>();
     
-    // Wywołujemy metodę logowania z ViewModelu
     bool success = await userVM.signIn(
       _emailController.text.trim(),
       _passwordController.text,
     );
 
     if (!success && mounted) {
-      // Prosty komunikat o błędzie
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Błąd logowania. Sprawdź dane i połączenie."),
+          content: Text("Loggin error. Check connection and try again"),
           backgroundColor: Colors.red,
         ),
       );
@@ -36,7 +34,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Obserwujemy stan ładowania z ViewModelu
     final isLoading = context.watch<UserViewModel>().isLoading;
 
     return Scaffold(
@@ -49,7 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
               const Icon(Icons.lock_outline, size: 80, color: Colors.blue),
               const SizedBox(height: 20),
               const Text(
-                "Witaj w AlertWIP",
+                "ALERT APP",
                 style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 40),
@@ -82,7 +79,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 30),
               
-              // Przycisk Logowania
               SizedBox(
                 width: double.infinity,
                 height: 50,
@@ -93,7 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   child: isLoading 
                     ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text("ZALOGUJ SIĘ", style: TextStyle(fontSize: 18)),
+                    : const Text("LOG IN", style: TextStyle(fontSize: 18)),
                 ),
               ),
             ],

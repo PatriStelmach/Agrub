@@ -62,7 +62,7 @@ class HomeScreen extends StatelessWidget {
                   ),
                   title: Text(latestCritical.subject, 
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                  subtitle: Text("Source: ${latestCritical.source}\nTime: ${latestCritical.createdAt}"),
+                  subtitle: Text("Acknowledged? ${latestCritical.acknowledged}\nTime: ${latestCritical.createdAt}"),
                   isThreeLine: true,
                 ),
               )

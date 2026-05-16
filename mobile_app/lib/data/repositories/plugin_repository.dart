@@ -1,10 +1,6 @@
-import 'dart:convert';
-
 import 'package:alert_app/data/models/plugin_model.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:alert_app/services/navigation_service.dart';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 
 
 class PluginsRepository extends ChangeNotifier {
@@ -12,28 +8,54 @@ class PluginsRepository extends ChangeNotifier {
 
 final Map<String, Plugin> pluginsCache = {};
 
-
+final Dio dio;
+PluginsRepository({required this.dio});
 //MOCK: getting alerts from local JSON
 //FINAL: updating full list via REST when opening the app
 Future<void> updateAllPlugins() async {
 
   try {
     
-    //Backend connection version:
-    //final url = Uri.parse('http://10.0.2.2:10000/api/plugins/library');
-    //final response = await http.get(url);
-    //final List<dynamic> decodedData = jsonDecode(response.body);
+List<Plugin> allPlugins = [];
+    int currentPage = 0;
+    bool hasMorePages = true;
+
+    while (hasMorePages) {
+      final response = await dio.get(
+        'http://10.0.2.2:10000/api/plugins/library',
+        queryParameters: {
+          'page': currentPage,
+          'size': 20, 
+        },
+      );
 
     //mock version:
-    final String response = await rootBundle.loadString('assets/mocks/plugins.json');
-    final List<dynamic> decodedData = jsonDecode(response);
+    //final String response = await rootBundle.loadString('assets/mocks/plugins.json');
+    //final List<dynamic> decodedData = jsonDecode(response);
 
+//final response = await dio.get('http://10.0.2.2:10000/api/plugins/library');
+final Map<String, dynamic> responseData = response.data as Map<String, dynamic>;
+   
+final List<dynamic> data = responseData['content'] ?? [];
 
-    final List<Plugin> parsedPlugins = decodedData.map((item) {
-      return Plugin.fromJson(item as Map<String, dynamic>);
-    }).toList();
+final List<Plugin> pagePlugins = data.map((item) {
+          return Plugin.fromJson(item as Map<String, dynamic>);
+        }).toList();
+        
+        allPlugins.addAll(pagePlugins);
 
-  for (var plugin in parsedPlugins) {
+int totalPages = responseData['totalPages'] ?? 0;
+currentPage++;
+
+if (currentPage >= totalPages) {
+          hasMorePages = false;
+        }
+       else {
+        hasMorePages = true; 
+      }
+    }
+
+  for (var plugin in allPlugins) {
       pluginsCache[plugin.fileName] = plugin;
 
 
