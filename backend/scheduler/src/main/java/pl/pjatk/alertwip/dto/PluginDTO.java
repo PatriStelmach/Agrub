@@ -15,5 +15,6 @@ public record PluginDTO(
         LocalDateTime updatedAt,
         boolean active,
         int severity,
-        boolean isInstalled
+        boolean isInstalled,
+        String arguments
 ) {}

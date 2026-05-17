@@ -11,5 +11,7 @@ public record PluginSaveDTO(
         List<String> tags,
         String cronExpression,
         Integer severity,
+
+        String arguments,
         Boolean active
 ) {}

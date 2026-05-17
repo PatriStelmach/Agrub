@@ -46,10 +46,22 @@ public class ScriptExecutionService {
         this.systemSettingService = systemSettingService;
     }
 
+    // Jak odpalamy bez argumentów
     public ScriptResult runScript(ScheduledTask task) {
+        return runScript(task, null);
+    }
+
+    // Jak odpalamy z argumentami
+    public ScriptResult runScript(ScheduledTask task, String overrideArgs) {
         String scriptName = task.getScriptName();
-        String[] args = (task.getArguments() != null && !task.getArguments().isEmpty())
-                ? task.getArguments().split(" ") : new String[0];
+
+        // Jeśli nie podaliśmy overrideArgs to bierzemy z bazy
+        String rawArgs = (overrideArgs != null) ? overrideArgs : task.getArguments();
+
+        // czyścimy argumenty i parsujemy
+        String[] args = (rawArgs != null && !rawArgs.isBlank())
+                ? rawArgs.trim().split("\\s+") : new String[0];
+
 
         StringBuilder outputCollector = new StringBuilder();
         String status = "SUCCESS";
@@ -68,11 +80,15 @@ public class ScriptExecutionService {
                 case ".py":
                     interpreter = "python";
                     break;
+
+                case ".bash":
                 case ".sh":
                     interpreter = "bash";
                     break;
+
+                case ".psm1":
                 case ".ps1":
-                    interpreter = "pwsh"; // lub "powershell" w starym Windowsie
+                    interpreter = "pwsh"; // lub "powershell"?
                     break;
                 default:
                     throw new Exception("Nieobsługiwane rozszerzenie pliku: " + extension);
