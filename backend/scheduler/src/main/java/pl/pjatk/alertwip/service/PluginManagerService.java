@@ -42,7 +42,7 @@ public class PluginManagerService {
     }
 
     @Transactional
-    public ScriptExecutionService.ScriptResult runManualScript(String fileName) {
+    public ScriptExecutionService.ScriptResult runManualScript(String fileName, String args) {
         Path path = resolveSecurePath(fileName);
         if (!Files.exists(path)) {
             throw new RuntimeException("Plik nie istnieje: " + fileName);
@@ -54,6 +54,7 @@ public class PluginManagerService {
                     ScheduledTask newTask = new ScheduledTask();
                     newTask.setTaskName(fileName);
                     newTask.setScriptName(fileName);
+                    newTask.setArguments("");
                     newTask.setArguments("");
 
                     // Ustawiamy severity
@@ -67,7 +68,7 @@ public class PluginManagerService {
                     return taskRepository.save(newTask);
                 });
 
-        return scriptExecutionService.runScript(task);
+        return scriptExecutionService.runScript(task, args);
     }
 
     private Path resolveSecurePath(String fileName) {
@@ -134,7 +135,7 @@ public class PluginManagerService {
             return paths.filter(Files::isRegularFile)
                     .filter(path -> {
                         String name = path.toString().toLowerCase();
-                        return name.endsWith(".py") || name.endsWith(".sh") || name.endsWith(".ps1");
+                        return name.endsWith(".py") || name.endsWith(".sh") || name.endsWith(".ps1") || name.endsWith(".psm1") || name.endsWith(".bash");
                     })
                     .map(path -> {
                         String fileName = path.getFileName().toString();
@@ -222,6 +223,7 @@ public class PluginManagerService {
         task.setCronExpression(dto.cronExpression());
         task.setSeverity(dto.severity());
         task.setActive(dto.active());
+        task.setArguments(dto.arguments());
 
         ScheduledTask savedTask = taskRepository.save(task);
 
@@ -253,6 +255,7 @@ public class PluginManagerService {
         String finalName = partialDto.name() != null ? partialDto.name() : currentName;
         String finalCode = partialDto.code() != null ? partialDto.code() : currentDetails.code();
         String finalDescription = partialDto.description() != null ? partialDto.description() : currentDetails.description();
+        String finalArguments = partialDto.arguments() != null ? partialDto.arguments() : taskOpt.map(ScheduledTask::getArguments).orElse("");
         List<String> finalTags = partialDto.tags() != null ? partialDto.tags() : currentHeaders.tags;
 
         String finalCron = partialDto.cronExpression() != null
@@ -277,6 +280,7 @@ public class PluginManagerService {
                 finalTags,
                 finalCron,
                 finalSeverity,
+                finalArguments,
                 finalActive
         );
 
@@ -390,7 +394,8 @@ public class PluginManagerService {
                 p.getCreatedAt(),
                 p.isActive(),
                 p.getSeverity(),
-                installed
+                installed,
+                ""
         );
     }
 
@@ -415,7 +420,8 @@ public class PluginManagerService {
                 getFileUpdatedAt(path),
                 taskOpt.map(ScheduledTask::isActive).orElse(false),
                 taskOpt.map(ScheduledTask::getSeverity).orElse(headers.severity),
-                true
+                true,
+                taskOpt.map(ScheduledTask::getArguments).orElse("")
         );
     }
 }

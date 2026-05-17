@@ -11,6 +11,7 @@ import pl.pjatk.alertwip.service.PluginManagerService;
 import pl.pjatk.alertwip.service.ScriptExecutionService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/local-scripts")
@@ -41,10 +42,16 @@ public class LocalScriptController {
     }
 
     @PostMapping("/{fileName:.+}/run")
-    public ResponseEntity<String> runScriptByFileName(@PathVariable String fileName) {
+    public ResponseEntity<String> runScriptByFileName(
+            @PathVariable String fileName,
+            @RequestBody(required = true) Map<String, String> payload) {
         try {
+            String args = null;
+            if (payload != null && payload.containsKey("arguments")) {
+                args = payload.get("arguments");
+            }
             // Wywołujemy jedną spójną metodę z Menedżera Pluginów
-            ScriptExecutionService.ScriptResult result = pluginManagerService.runManualScript(fileName);
+            ScriptExecutionService.ScriptResult result = pluginManagerService.runManualScript(fileName, args);
             return ResponseEntity.ok(result.output());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Błąd wykonania: " + e.getMessage());
