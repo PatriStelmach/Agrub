@@ -37,17 +37,6 @@ const getLibraryPluginsRequest = async () => {
       indexes: null
     }
   })
-  console.log(`params: {
-    name: ${filters.value.name},
-      page: ${currentPage.value},
-      language: ${filters.value.language},
-      creator: ${filters.value.creator},
-      pageSize: ${pageSize.value},
-      sortKey: ${sortedHead.value.sortKey},
-      sortOrder: ${sortedHead.value.sortOrder},
-      tags: ${filters.value.tags},
-      maxWeight: ${filters.value.maxWeight}
-  }`);
 
   if (response.status === 200) {
     items.value = response.data.content.map((p: any) => ({

@@ -22,9 +22,14 @@ import {Field, FieldGroup, FieldLabel} from "@/components/ui/field";
 import {Input} from "@/components/ui/input";
 import {ButtonGroup} from "@/components/ui/button-group";
 import TopH1Div from "@/helpers_components/TopH1Div.vue";
+import {gridCard} from "@/assets/cssFunctions.ts";
+import GridCardTransitionGroup from "@/helpers_components/loaders/GridCardTransitionGroup.vue";
+import GridCardLoader from "@/helpers_components/loaders/GridCardLoader.vue";
+import UserCard from "@/pages/team/users/UserCard.vue";
 
 const isOpen = ref(false);
 const openSystem = ref<System | null | undefined>(null);
+const isLoading = ref<boolean>(false);
 
 const openDialog = (id: number) => {
   isOpen.value = true
@@ -43,54 +48,42 @@ const closeDialog = () => {
   <div class="relative">
     <TopH1Div h1="Available systems" :h1Class="['transition-all duration-300', {'blur-3xl' : isOpen}]">
     </TopH1Div>
-
-    <div
-      class="transition-all duration-300 pt-4 grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 overflow-auto max-h-[85vh]"
-      :class="{'blur-3xl' : isOpen}"
-    >
-        <div
+    <Transition name="fade" mode="out-in">
+      <GridCardLoader v-if="isLoading"/>
+      <GridCardTransitionGroup
+        class="transition-all duration-300"
+        :class="{'blur-3xl' : isOpen}"
+        v-else>
+        <Card
           v-for="system in systemsLibraryData"
           :key="system.id"
-          class="  mx-6 center">
-          <Card
-            class=" m-4 gap-2 h-[40vh] xl:h-[35vh] hover:shadow-[0_0_20px_1px] border-2 w-full duration-200"
-            :class="{' hover:shadow-blue-badge hover:border-blue-badge': !system.openSource,
-           ' hover:shadow-green-badge hover:border-green-badge': system.openSource}">
-            <div class=" flex justify-between items-center">
-              <CardHeader class=" text-3xl xl:text-4xl 2xl:text-6xl text-shadow-sky-800 text-shadow-sm font-bold ">
-                {{system.name}}</CardHeader>
-              <img :alt="system.name+'_image'" :src="system.img"  class="rounded-full size-[6vh] mr-4">
-            </div>
-            <CardAction class="mx-4 text-md lg:text-lg xl:text-xl 2xl:text:3xl flex items-center gap-2"
-                        v-if="system.openSource">
-              <IconBrandOpenSource class="text-green-badge  size-8 xl:size-12 2xl:size-16"/>
-              Open Source
-            </CardAction>
-            <CardAction v-else class="mx-4 text-md lg:text-lg xl:text-xl 2xl:text:3xl flex items-center gap-1">
-              <IconCurrencyDollar class="text-blue-badge size-8 xl:size-12 2xl:size-16"/>
-              Commercial
-            </CardAction>
-            <CardDescription class="h-1/3">
-              <Item variant="outline" class="m-4 bg-secondary">
-                <ItemContent class="h-full text-lg xl:text-xl 2xl:text-4xl">
-                  {{system.description}}
-                </ItemContent>
-              </Item>
-            </CardDescription>
-
-            <CardFooter class="flex mb-0 mt-[9vh] xl:mt-[7vh] 2xl:mt-[10vh] justify-end relative bottom-5 xl:bottom-10 2xl:bottom-15">
-              <Button
-                class="cursor-pointer hover:shadow-[0_0_10px_3px] size-[4vh]  text-sm xl:text-xl 2xl:text-4xl "
-                @click="openDialog(system.id)"
-              >
-                <component :is="IconPlus" class="size-6 xl:size-8 2xl:size-12"></component>
-              </Button>
-            </CardFooter>
+          @click="openDialog(system.id)"
+          class="cursor-pointer"
+          :class="[{ ' hover:shadow-green-badge/50! hover:border-green-badge/50!': system.openSource}, gridCard ]">
+          <div class=" flex justify-between items-center">
+            <CardHeader class=" text-3xl xl:text-4xl 2xl:text-6xl text-shadow-sky-800 text-shadow-sm font-bold ">
+              {{system.name}}</CardHeader>
+            <img :alt="system.name+'_image'" :src="system.img"  class="rounded-full size-[6vh] mr-4">
+          </div>
+          <CardAction class="mx-4 text-md lg:text-lg xl:text-xl 2xl:text:3xl flex items-center gap-2"
+                      v-if="system.openSource">
+            <IconBrandOpenSource class="text-green-badge  size-8 xl:size-12 2xl:size-16"/>
+            Open Source
+          </CardAction>
+          <CardAction v-else class="mx-4 text-md lg:text-lg xl:text-xl 2xl:text:3xl flex items-center gap-1">
+            <IconCurrencyDollar class="text-blue-badge size-8 xl:size-12 2xl:size-16"/>
+            Commercial
+          </CardAction>
+          <CardDescription class="h-1/3">
+            <Item variant="outline" class="m-4 bg-secondary">
+              <ItemContent class="h-full text-lmd xl:text-lg 2xl:text-xl">
+                {{system.description}}
+              </ItemContent>
+            </Item>
+          </CardDescription>
           </Card>
-
-        </div>
-
-      </div>
+      </GridCardTransitionGroup>
+    </Transition>
 
 
     <Transition name="fade" tag="div"

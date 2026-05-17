@@ -175,7 +175,7 @@ const changeName = async () => {
 
 
       <Transition name="fade" mode="out-in">
-        <BigLoadingBlock v-if="isLoading"/>
+        <BigLoadingBlock class="h-[80vh]" v-if="isLoading"/>
         <div v-else-if="!isLoading && groupDetails" class="px-6 max-h-[75vh] overflow-y-auto w-full">
           <TransitionGroup tag="div" class="flex space-x-20 *:max-lg:w-1/2" name="fade" mode="out-in">
             <RulesList

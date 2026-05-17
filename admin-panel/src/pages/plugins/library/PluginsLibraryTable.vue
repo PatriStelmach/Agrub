@@ -7,9 +7,9 @@ import {
   TableHeader, TableRow
 } from "@/components/ui/table";
 import {Badge} from "@/components/ui/badge";
+import LanguageImage from "@/helpers_components/LanguageImage.vue";
 import {
-  type LibraryPlugin,
-  isPowerShell, isBash, isPython
+  type LibraryPlugin
 } from "@/types/types.js"
 import SortableHead from "@/helpers_components/SortableHead.vue";
 import {tableCaption, dataTable, tableHeaders, hoverListRow} from "@/assets/cssFunctions.js";
@@ -17,17 +17,20 @@ import {useSort} from "@/composables/sorting.js";
 import {ButtonGroup} from "@/components/ui/button-group";
 import {Button} from "@/components/ui/button";
 import { IconDownload, IconSourceCode} from "@tabler/icons-vue";
-import {watchEffect} from "vue";
+import {ref, watchEffect} from "vue";
 import {dateParser} from "@/composables/dateParser.js";
-import api from "@/lib/axios.js";
-import {toast} from "vue-sonner";
 import LoadingTable from "@/helpers_components/LoadingTable.vue";
+import {downloadPluginRequest, getPluginDetailsRequest} from "@/helpers_functions/requests.ts";
+import {toast} from "vue-sonner";
+import PluginDetailsDialog from "@/pages/plugins/PluginDetailsDialog.vue";
 
 const props = defineProps<{
   plugins: LibraryPlugin[]
   totalElements: number
   isLoading: boolean;
 }>()
+
+const getDetailsLoading = ref<boolean>(false);
 
 const sortedHead =  defineModel<{ sortKey: string; sortOrder: string }>('sortedHead')
 const { sortKey, sortOrder, toggleSort } =
@@ -37,21 +40,18 @@ watchEffect(() => {
   sortedHead.value = { sortKey: sortKey.value, sortOrder: sortOrder.value };
 });
 
-const downloadPlugin = async (id: number) => {
-  try {
-    const res = await api.post(`/plugins/download/${id}`)
-    if (res.status === 200) {
-      toast.success(res.data);
-    }
-    else {
-      toast.error(`Error downloading plugin: ${res.data}`)
-    }
-  }
-  catch (error) {
-    toast.error(`Error downloading plugin: ${error}`);
+const getDetails = async (plugin: LibraryPlugin) => {
+  if(plugin.id) {
+    getDetailsLoading.value = true
+    await getPluginDetailsRequest(plugin.id, 'plugins')
+      .then((res) => {
+        plugin.code = res?.code
+        plugin.description = res?.description
+      })
+      .catch((err) => toast.error(`Error fetching plugin details: ${err}`))
+      .finally(() => getDetailsLoading.value = false)
   }
 }
-
 
 </script>
 
@@ -88,37 +88,29 @@ const downloadPlugin = async (id: number) => {
                 variant="tags"
                 :key="index">{{tag}}</Badge>
             </TableCell>
-            <TableCell >
-              <img
-                v-if="isPython(plugin.language)"
-                alt="python_icon"
-                src="../../../components/icons/python_icon.png"
-                class="size-7 "
-              />
-              <img
-                v-if="isBash(plugin.language)"
-                alt="bash_icon"
-                src="../../../components/icons/bash_icon.png"
-                class="size-7 "
-              />
-              <img
-                v-if="isPowerShell(plugin.language)"
-                alt="powershell_icon"
-                src="../../../components/icons/powershell_icon.png"
-                class="size-7 "
-              />
+            <TableCell>
+              <LanguageImage :language="plugin.language" sizeClass="size-7" />
             </TableCell>
             <DateCell  :date="dateParser(plugin.createdAt).toDate"></DateCell>
             <TableCell >{{plugin.weight}} Kb</TableCell>
             <TableCell>
               <ButtonGroup>
-                <Button
-                  variant="orange_outline"
+                <PluginDetailsDialog
+                  :editable="false"
+                  :code="plugin.code ?? ''"
+                  :description="plugin.description ?? ''"
+                  :is-loading="getDetailsLoading"
                 >
-                  <IconSourceCode/>
-                </Button>
+                  <Button
+                    @click="getDetails(plugin)"
+                    variant="orange_outline"
+                  >
+                    <IconSourceCode/>
+                  </Button>
+                </PluginDetailsDialog>
+
                 <Button
-                  @click="downloadPlugin(plugin.id)"
+                  @click="downloadPluginRequest(plugin)"
                   variant="green_outline"
                   class="border-l-2!"
                 >
