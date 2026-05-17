@@ -44,7 +44,7 @@ public class LocalScriptController {
     @PostMapping("/{fileName:.+}/run")
     public ResponseEntity<String> runScriptByFileName(
             @PathVariable String fileName,
-            @RequestBody(required = true) Map<String, String> payload) {
+            @RequestBody(required = false) Map<String, String> payload) {
         try {
             String args = null;
             if (payload != null && payload.containsKey("arguments")) {
