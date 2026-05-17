@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import wazuh_logo from '@/components/icons/wazuh_logo.png'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import {Card, CardContent, CardFooter, CardHeader} from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { ButtonGroup } from '@/components/ui/button-group'
 import { IconEdit, IconDeviceFloppy, IconX } from '@tabler/icons-vue'
@@ -58,15 +58,17 @@ const onSubmit = handleSubmit((values) => {
       <img :src="wazuh_logo" alt="wazuh_logo" class="size-16" />
       <span class="font-bold text-lg">Wazuh</span>
     </CardHeader>
-    <CardContent class="space-y-3">
+    <CardContent class="space-y-3 ">
       <form v-if="isEditing" @submit="onSubmit" class="space-y-3">
         <FormInput name="wazuh_url" label="URL" />
         <FormInput name="wazuh_user" label="User" />
         <FormInput name="wazuh_password" label="Password" type="password" />
         <FormInput name="wazuh_min_active_level" label="Min Active Level" />
         <FormInput name="wazuh_enabled" label="Enabled" />
+        <div class="flex justify-end ml-auto! gap-2">
           <Button type="button" variant="red_outline" size="icon-sm" @click="cancelEdit"><IconX /></Button>
-          <Button type="submit"  variant="green_outline" size="icon-sm"><IconDeviceFloppy /></Button>
+          <Button type="submit" variant="green_outline" size="icon-sm"><IconDeviceFloppy /></Button>
+        </div>
       </form>
       <div v-else class="space-y-3">
         <div class="space-y-1 text-sm">
@@ -76,8 +78,10 @@ const onSubmit = handleSubmit((values) => {
           <p><span class="font-semibold">Enabled:</span> {{ config.wazuh_enabled }}</p>
           <p><span class="font-semibold">Min Level:</span> {{ config.wazuh_min_active_level }}</p>
         </div>
-        <Button variant="orange_outline" size="sm" @click="startEdit"><IconEdit class="size-4" /></Button>
       </div>
     </CardContent>
+    <CardFooter v-if="!isEditing">
+      <Button variant="green_outline" class="ml-auto mt-auto" size="icon-sm" @click="startEdit"><IconEdit/></Button>
+    </CardFooter>
   </Card>
 </template>

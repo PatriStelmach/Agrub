@@ -18,14 +18,18 @@ import NagiosConfigCard from "@/pages/systems/NagiosConfigCard.vue";
 import WazuhConfigCard from "@/pages/systems/WazuhConfigCard.vue";
 import ZabbixConfigCard from "@/pages/systems/ZabbixConfigCard.vue";
 import type {NagiosConfig, WazuhConfig, ZabbixConfig} from "@/types/types.ts";
+import {toast} from "vue-sonner";
 
 const isPageLoading = ref(true);
 const systemsStore = useSystemStore()
 
 onMounted(async () => {
-  await systemsStore.getAllStatusesRequest()
-  await systemsStore.getSystemConfigRequest()
-  isPageLoading.value = false
+  await Promise.all([
+    systemsStore.getAllStatusesRequest(),
+    systemsStore.getSystemConfigRequest()
+  ])
+    .catch((err) => toast.error(err.message))
+    .finally(() => isPageLoading.value = false)
 })
 
 const isAnySystemConnected = computed(() =>

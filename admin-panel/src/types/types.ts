@@ -1,4 +1,4 @@
-export const api_url = 'http://141.95.41.41:8080/api'
+export const api_url = 'http://localhost:10000/api'
 
 export enum Language {
   PYTHON = ".py",
@@ -44,7 +44,8 @@ export interface Actions {
 }
 
 export interface ActionResponse extends Actions {
-  actionType: string
+  ackUpdate: boolean,
+  previousSeverity: 0 | 1 | 2 | 3 | 4 | 5,
   problemId: number,
   createdAt: Date,
 }
@@ -235,6 +236,10 @@ export interface SystemConfig {
   nagios_enabled: string
   nagios_user: string
   nagios_pass: string
+
+  zabbix_enabled: string
+  zabbix_url: string
+  zabbix_api_token: string
 
   smtp_host: string
   smtp_port: string

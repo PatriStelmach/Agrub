@@ -16,6 +16,7 @@ export const useSystemStore = defineStore('system-store', () => {
     try {
       const res = await api.get('/settings/enabled')
       if (res.status === 200) {
+        console.log(res.data)
         systemsStatus.value = res.data
         return res.data;
       }
@@ -69,7 +70,14 @@ export const useSystemStore = defineStore('system-store', () => {
     }
   })
 
-  const zabbixConfig = ref<ZabbixConfig | null>(null)
+  const zabbixConfig = computed((): ZabbixConfig | null => {
+    if (!systemConfig.value) return null
+    return {
+      zabbix_url: systemConfig.value.zabbix_url,
+      zabbix_enabled: systemConfig.value.zabbix_enabled,
+      zabbix_api_token: systemConfig.value.zabbix_api_token,
+    }
+  })
 
   return {
     systemsStatus,
