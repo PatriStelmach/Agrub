@@ -5,7 +5,7 @@
     "hostName": "DB-PROD-PRIMARY",
     "ipAddress": "10.0.0.50",
     "severity": "extreme",
-    "status": "problem",
+    "status": "sent",
     "createdAt": "2026-04-22T20:25:00Z",
     "source": "Zabbix",
     "description": "Baza danych nie odpowiada na zapytania od 5 minut. Wszystkie serwisy zależne leżą."
@@ -16,7 +16,7 @@
     "hostName": "WEB-SERVER-01",
     "ipAddress": "10.0.0.11",
     "severity": "high",
-    "status": "acknowledged",
+    "status": "inProgress",
     "createdAt": "2026-04-22T18:30:00Z",
     "source": "Nagios",
     "description": "Proces \"nginx\" zużywa 98% zasobów procesora."
@@ -27,7 +27,7 @@
     "hostName": "BACKUP-NODE",
     "ipAddress": "192.168.1.100",
     "severity": "medium",
-    "status": "problem",
+    "status": "sent",
     "createdAt": "2026-04-21T20:30:00Z",
     "source": "Zabbix",
     "description": "Partycja /home zapełniona w 85%. Sugerowane czyszczenie logów."
@@ -38,7 +38,7 @@
     "hostName": "kamil-kornatowski.pl",
     "ipAddress": "1.1.1.1",
     "severity": "low",
-    "status": "resolved",
+    "status": "done",
     "createdAt": "2026-04-22T08:30:00Z",
     "source": "Manual Check",
     "description": "Certyfikat SSL wygaśnie za 14 dni. (Odnowiono pomyślnie)"
@@ -49,7 +49,7 @@
     "hostName": "OFFICE-PC-05",
     "ipAddress": "10.0.1.205",
     "severity": "info",
-    "status": "problem",
+    "status": "done",
     "createdAt": "2026-04-22T20:00:00Z",
     "source": "Prometheus",
     "description": "Dostępna jest nowa wersja kernela systemu Linux. Ten opis jest celowo bardzo długi, abyś mógł sprawdzić, czy Twój Box w aplikacji mobilnej poprawnie zawija tekst, czy może brzydko go ucina lub powoduje błąd \"overflow\". Pamiętaj o użyciu TextOverflow.ellipsis!"

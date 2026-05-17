@@ -21,6 +21,7 @@ import {
   IconFileImport,
   IconListCheck
 } from "@tabler/icons-vue";
+import LanguageImage from "@/helpers_components/LanguageImage.vue";
 import type {fileType} from "@/types/types.ts";
 import { Label } from "@/components/ui/label"
 import TopH1Div from "@/helpers_components/TopH1Div.vue";
@@ -165,24 +166,7 @@ else {
             />
             <span class="flex justify-start   w-[15vw]">{{item.file.name}} </span>
             <span class="lex justify-start   w-[5vw]">{{item.file.size < 1000 ? item.file.size + ' KB' : (item.file.size/1000).toFixed(2) + ' MB'}}</span>
-            <img
-              v-if="item.file.type.includes('python')"
-              alt="python_icon"
-              src="@/components/icons/python_icon.png"
-              class="size-6"
-            />
-            <img
-              v-if="item.file.type.includes('x-sh') || item.file.type.includes('x-bash') || item.file.type.includes('x-shellscript')"
-              alt="bash_icon"
-              src="@/components/icons/bash_icon.png"
-              class="size-6 "
-            />
-            <img
-              v-if="item.file.type.includes('powershell')"
-              alt="powershell_icon"
-              src="@/components/icons/powershell_icon.png"
-              class="size-6"
-            />
+            <LanguageImage :language="item.file.type" sizeClass="size-6" />
           </div>
         </li>
       </ul>

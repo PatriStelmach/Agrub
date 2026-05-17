@@ -5,11 +5,13 @@ import 'package:alert_app/services/alarm_service.dart';
 class NavigationService {
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   final AlarmService alarmService = AlarmService();
-  bool _isOverlayVisible = false; // Nowa flaga
+  bool _isOverlayVisible = false; 
 
   void showEmergencyOverlay() {
-    if (_isOverlayVisible) return; // Jeśli już wisi na ekranie, nic nie rób
+    // If there is an alarm overlay already, return
+    if (_isOverlayVisible) return; 
 
+    _isOverlayVisible = true;
     alarmService.triggerAlarm();
 
    

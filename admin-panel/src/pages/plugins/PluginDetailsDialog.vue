@@ -14,10 +14,13 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {ref, watchEffect} from "vue";
 import CodeEditor from "@/helpers_components/CodeEditor.vue";
+import BigLoadingBlock from "@/helpers_components/loaders/BigLoadingBlock.vue";
 
 const props = defineProps<{
   description: string,
   code: string
+  isLoading: boolean
+  editable: boolean
 }>()
 
 const newCode = ref<string>(props.code)
@@ -54,12 +57,34 @@ const emits = defineEmits<{
         </DialogHeader>
         <div class="grid gap-4">
           <div class="grid gap-3">
-            <Label for="my-plugin-description">Description</Label>
-            <Input class="m-2 badge-focus max-w-95/100 blue-badge-focus" id="my-plugin-description" name="description" v-model="newDescription" :default-value="description" />
+            <Label class="text-lg" for="my-plugin-description">Description</Label>
+            <Transition name="fade" mode="out-in">
+              <BigLoadingBlock class="h-10" v-if="isLoading" />
+              <Input
+                v-else-if="editable && !isLoading" class="m-2 badge-focus max-w-95/100 blue-badge-focus"
+                id="my-plugin-description"
+                name="description"
+                v-model="newDescription"
+                :default-value="description" />
+              <h1 class="border-b-2 border-accent pl-2 pr-8 w-fit" v-else>{{ description}}</h1>
+            </Transition>
           </div>
           <div class="grid gap-3  h-full">
-            <Label for="my-plugin-code">Code</Label>
-            <CodeEditor  id="my-plugin-code" name="code" v-model="newCode" :default-value="code" />
+            <Label class="text-lg" for="my-plugin-code">Code</Label>
+            <Transition name="fade" mode="out-in">
+              <BigLoadingBlock class="h-100" v-if="isLoading"/>
+              <CodeEditor
+                v-else-if="editable && !isLoading"
+                id="my-plugin-code"
+                name="code"
+                v-model="newCode"
+                :default-value="code" />
+              <div v-else class="code-area min-h-96 max-h-[50vh] m-2 w-95/100 !">
+                <code class="">
+                  {{ code }}
+                </code>
+              </div>
+            </Transition>
           </div>
         </div>
         <DialogFooter>
@@ -67,10 +92,10 @@ const emits = defineEmits<{
             <Button
               @click="cancel"
               variant="red_outline">
-              Cancel
+              {{ editable ? 'Cancel' : 'Exit' }}
             </Button>
           </DialogClose>
-          <DialogClose>
+          <DialogClose as-child v-if="editable">
             <Button
               variant="green_outline"
               type="submit"

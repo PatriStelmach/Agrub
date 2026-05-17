@@ -142,7 +142,3 @@ function onInput(e: Event) {
     @keydown="handleKeydown"
   />
 </template>
-
-<style scoped>
-
-</style>

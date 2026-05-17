@@ -44,7 +44,8 @@ export interface Actions {
 }
 
 export interface ActionResponse extends Actions {
-  actionType: string
+  ackUpdate: boolean,
+  previousSeverity: 0 | 1 | 2 | 3 | 4 | 5,
   problemId: number,
   createdAt: Date,
 }
@@ -170,6 +171,12 @@ export interface PluginDetails
   code: string,
 }
 
+export interface SystemsStatus {
+  wazuh_enabled: boolean
+  nagios_enabled: boolean
+  zabbix_enabled: boolean
+}
+
 export interface ImportPlugin {
   name: string,
   creator: string,
@@ -193,6 +200,64 @@ export interface LibraryPlugin
   tags: string[],
 }
 
+export interface WazuhConfig {
+  wazuh_user: string
+  wazuh_password: string
+  wazuh_url: string
+  wazuh_enabled: string
+  wazuh_min_active_level: string
+}
+
+export interface NagiosConfig {
+  nagios_url: string
+  nagios_enabled: string
+  nagios_user: string
+  nagios_pass: string
+}
+
+export interface ZabbixConfig {
+  zabbix_enabled: string
+  zabbix_url: string
+  zabbix_api_token: string
+}
+
+export interface MonitoringSystemsConfig {
+  system: ZabbixConfig | NagiosConfig | WazuhConfig
+}
+
+export interface SystemConfig {
+  wazuh_user: string
+  wazuh_password: string
+  wazuh_url: string
+  wazuh_enabled: string
+  wazuh_min_active_level: string
+
+  nagios_url: string
+  nagios_enabled: string
+  nagios_user: string
+  nagios_pass: string
+
+  zabbix_enabled: string
+  zabbix_url: string
+  zabbix_api_token: string
+
+  smtp_host: string
+  smtp_port: string
+  smtp_user: string
+  smtp_password: string
+  smtp_enabled: string
+
+  external_system_sync_timer: string
+  scripts_execution_timeout_seconds: string
+
+  SECURITY_PASSWORD_LIFETIME_DAYS: string
+  SECURITY_ACCESS_TOKEN_EXP_MINUTES: string
+  SECURITY_REFRESH_TOKEN_EXP_HOURS: string
+  SECURITY_AD_DOMAIN: string
+  SECURITY_AD_URL: string
+  SECURITY_LDAP_BASE_DN: string
+  SECURITY_LDAP_USER_DN_PATTERN: string
+}
 
 export interface System
 {

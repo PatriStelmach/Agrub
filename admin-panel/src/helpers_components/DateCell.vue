@@ -14,7 +14,7 @@ const parsed = computed(() => dateParser(props.date))
 
 <template>
   <TableCell class="px-2 relative">
-    <span class="tabular-nums" v-if="props.date">
+    <span class="tabular-nums whitespace-break-spaces" v-if="props.date">
           {{ parsed.day }}/{{ parsed.month }}/{{ parsed.year }} -
     {{ parsed.hours + ":" + parsed.minutes   }}
     </span>

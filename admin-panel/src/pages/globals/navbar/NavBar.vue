@@ -2,10 +2,9 @@
 import {
   IconAlertTriangle, IconDatabase,
   IconHistory, IconPhoneRinging,
-  IconScript, IconSettings, IconSitemap, IconSitemapOff,
+  IconScript, IconSitemap, IconDeviceDesktopAnalytics,
   IconUpload, IconUsers, IconUsersGroup
 } from "@tabler/icons-vue";
-import TeamBar from "@/pages/globals/navbar/TeamBar.vue";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu,
   SidebarMenuButton, SidebarMenuItem
@@ -38,7 +37,7 @@ const navItems = [
     label: 'Systems',
     links: [
       { label: 'Connected', to: 'my_systems', icon: IconSitemap },
-      { label: 'All systems', to: 'all_systems', icon: IconSitemapOff },
+      { label: 'Available systems', to: 'available_systems', icon: IconDeviceDesktopAnalytics },
     ]
   },
   {

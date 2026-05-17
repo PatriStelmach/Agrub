@@ -5,7 +5,6 @@ import {
   Table, TableBody,
   TableCaption,
   TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
   TableRow
@@ -13,7 +12,8 @@ import {
 import DateCell from "@/helpers_components/DateCell.vue";
 import {cn} from "@/lib/utils.ts";
 import {Badge} from "@/components/ui/badge";
-import {Language, type MyPlugin} from "@/types/types.ts"
+import LanguageImage from "@/helpers_components/LanguageImage.vue";
+import {type MyPlugin} from "@/types/types.ts"
 import {
   IconCancel,
   IconClockBolt,
@@ -22,7 +22,8 @@ import {
   IconMessageCode,
   IconStatusChange,
   IconTrash,
-  IconPlayerPlay
+  IconPlayerPlay,
+  IconLoader
 } from "@tabler/icons-vue"
 import {computed, ref, watch} from "vue";
 import {useSort} from "@/composables/sorting.ts";
@@ -35,7 +36,7 @@ import {
 } from "@/assets/cssFunctions.ts";
 import TopH1Div from "@/helpers_components/TopH1Div.vue";
 import {useWrapping} from "@/composables/unwrapping.ts";
-import {getMyPluginDetails} from "@/helpers_functions/requests.ts";
+import {getPluginDetailsRequest, runScriptRequest} from "@/helpers_functions/requests.ts";
 import {Button} from "@/components/ui/button";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
 import {Search} from "lucide-vue-next";
@@ -61,14 +62,17 @@ const emit = defineEmits<{
 
 
 import PluginDetailsDialog from '@/pages/plugins/PluginDetailsDialog.vue'
+import {toast} from "vue-sonner";
 const myPluginStore = useMyPluginStore()
 const { sortedData, sortKey, sortOrder, toggleSort } = useSort<MyPlugin>(() => props.data, 'updatedAt')
 const { wrap, isUnwrapped, unwrap, unwrappedItem, save } = useWrapping(sortedData, 'fullName')
 
 const searchFilter = ref<string>("")
 const checkedPlugins = ref<string[]>([])
-
+const loadingTrigger = ref<boolean>(false)
 const blockedCheckbox = computed(() => !!unwrappedItem.value)
+const getDetailsLoading = ref<boolean>(false)
+const isEditLoading = ref<boolean>(false)
 
 const blockDeleteAndChangeStatus = computed(() =>
   !checkedPlugins.value.length ||
@@ -123,9 +127,14 @@ const deletePlugins = () => {
 
 const getDetails = async (fileName: string) => {
   if(unwrappedItem.value) {
-    const details = await getMyPluginDetails(fileName)
-    unwrappedItem.value.code = details?.code
-    unwrappedItem.value.description = details?.description
+    getDetailsLoading.value = true
+    await getPluginDetailsRequest(fileName, 'local-scripts')
+      .then((res) => {
+        unwrappedItem.value!.code = res?.code
+        unwrappedItem.value!.description = res?.description
+      })
+      .catch((err) => toast.error(`Error fetching plugin details: ${err}`))
+      .finally(() => getDetailsLoading.value = false)
   }
 }
 
@@ -140,8 +149,30 @@ const updateDetails = (code: string, description: string) => {
   }
 }
 
-const triggerScript = () => {
+const triggerScript = async () => {
+  if (checkedPlugins.value.length === 1) {
+    loadingTrigger.value = true
+    await runScriptRequest(checkedPlugins.value.pop())
+      .catch((error) => toast.error(error))
+      .finally(() => loadingTrigger.value = false)
+  }
+  else {
+    toast.info('You can trigger only one script at once')
+  }
+}
 
+const editPlugin = async () => {
+  isEditLoading.value = true
+  try {
+    if (unwrappedItem.value) {
+      await save(() => myPluginStore.editMyPlugin(unwrappedItem.value!))
+    }
+  } catch (e) {
+    toast.error(`Editing "${unwrappedItem.value?.name}" failed with error ${e}`);
+  }
+  finally {
+    isEditLoading.value = false
+  }
 }
 
 </script>
@@ -204,7 +235,7 @@ const triggerScript = () => {
               <SortableHead keyName="name" label="Name" :sort-key="sortKey" class=" w-fit" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
               <SortableHead keyName="tags" label="Tags" :sort-key="sortKey" class=" w-fit" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
               <SortableHead keyName="cronExpression" label="Cron" :sort-key="sortKey" class=" w-fit" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-              <SortableHead keyName="severity" label="Severity" :sort-key="sortKey" class=" w-1/15" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+              <SortableHead keyName="severity" label="Severity" :sort-key="sortKey" class=" w-10/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
               <SortableHead keyName="language" label="Language" :sort-key="sortKey" class=" w-8/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
               <SortableHead keyName="updatedAt" label="Last modified" :sort-key="sortKey" class=" w-13/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
               <SortableHead keyName="active" label="Status" :sort-key="sortKey" class=" w-7/100" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
@@ -220,7 +251,7 @@ const triggerScript = () => {
             :key="plugin.fullName"
             @click="isUnwrapped(plugin.fullName) ? null : unwrap(plugin.fullName); "
             :class="{'hover:bg-destructive/20': !plugin.active,
-             'bg-selected [&_td]:align-top cursor-auto sticky h-40! [&_td]:pt-4! top-11 bottom-11 hover:bg-card z-9 '
+             'bg-selected [&_td]:align-top cursor-auto sticky h-40! [&_td]:pt-4! top-9 bottom-22 hover:bg-card z-9 '
                     : isUnwrapped(plugin.fullName) }">
             <TableCell class="px-4">
               <input
@@ -246,7 +277,6 @@ const triggerScript = () => {
             <TableCell v-else class=" whitespace-break-spaces">{{plugin.name}}
             </TableCell>
 
-
             <!-- Tags -->
             <TableCell class="whitespace-break-spaces" >
               <MyTagInput
@@ -263,9 +293,7 @@ const triggerScript = () => {
                   :key="index"
                 >{{tag}}</Badge>
               </TransitionGroup>
-
             </TableCell>
-
             <TableCell v-if="!isUnwrapped(plugin.fullName)" class="whitespace-break-spaces">
               {{ plugin.cronExpression ? cronstrue.toString(plugin.cronExpression) : ''}}
               <br>
@@ -301,25 +329,8 @@ const triggerScript = () => {
                 :severity="plugin.severity"
               />
             </TableCell>
-            <TableCell >
-              <img
-                v-if="plugin.language === Language.PYTHON"
-                alt="python_icon"
-                src="@/components/icons/python_icon.png"
-                class="size-7 lg:size-8"
-              />
-              <img
-                v-if="[Language.BASH, Language.SH].includes(plugin.language)"
-                alt="bash_icon"
-                src="@/components/icons/bash_icon.png"
-                class="size-7 lg:size-8 "
-              />
-              <img
-                v-if="[Language.POWERSHELL, Language.POWERSHELL_MODULE].includes(plugin.language)"
-                alt="powershell_icon"
-                src="@/components/icons/powershell_icon.png"
-                class="size-7 lg:size-8 "
-              />
+            <TableCell>
+              <LanguageImage :language="plugin.language" sizeClass="size-7 lg:size-8" />
             </TableCell>
             <DateCell class="" v-if="plugin.updatedAt" :date="plugin.updatedAt"></DateCell>
             <TableCell v-if="isUnwrapped(plugin.fullName) && unwrappedItem" >
@@ -340,7 +351,7 @@ const triggerScript = () => {
             </TableCell>
             <TableCell v-else class=" text-green-badge" :class="{'text-destructive' : !plugin.active}">{{ plugin.active ? 'On' : 'Off'}}</TableCell>
             <TableCell class="">{{plugin.weight}} KB
-              <ButtonGroup v-if="isUnwrapped(plugin.fullName) && unwrappedItem" class="flex  absolute bottom-4 right-3 *:items-center *:align-middle *:flex">
+              <ButtonGroup v-if="isUnwrapped(plugin.fullName) && unwrappedItem" class="flex **:truncate absolute bottom-4 right-3 *:items-center *:align-middle *:flex">
                 <Button
                   @click.stop="wrap"
                   variant="red_outline">
@@ -348,34 +359,33 @@ const triggerScript = () => {
                 </Button>
                 <Button variant="orange_outline" class="border-l-2! p-0">
                   <PluginDetailsDialog
+                    :editable="true"
                     :code="unwrappedItem.code ?? ''"
                     :description="unwrappedItem.description ?? ''"
+                    :is-loading="getDetailsLoading"
                     @update:save-changes="updateDetails"
                   >
                     <Button
                       @click.stop="getDetails(plugin.fullName)"
                       class=" m-0 rounded-none bg-transparent! text-severity-3 hover:text-primary"
                     >
-                      Details<IconMessageCode class="size-4 xl:size-5"/>
+                      Details
+                      <IconMessageCode class="size-4 xl:size-5"/>
                     </Button>
                   </PluginDetailsDialog>
                 </Button>
-
                 <Button
                   class="border-l-2!"
-                  @click.stop="save(async ()=> await myPluginStore.editMyPlugin(unwrappedItem!))"
+                  @click.stop="editPlugin"
                   variant="green_outline">
-                  Save<IconDeviceFloppy class="size-4 xl:size-5"/>
+                  Save
+                  <IconLoader v-if="isEditLoading" class="animate-spin"/>
+                  <IconDeviceFloppy v-else class="size-4 xl:size-5"/>
                 </Button>
               </ButtonGroup></TableCell>
-
           </TableRow>
         </TableBody>
       </Transition>
-
-
-      <TableFooter>
-      </TableFooter>
       </Table>
     </div>
 </template>

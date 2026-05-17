@@ -2,7 +2,7 @@ import api from "@/lib/axios.ts";
 import {toast} from "vue-sonner";
 import type {
   Actions,
-  GroupDetails,
+  GroupDetails, LibraryPlugin,
   PluginDetails,
   Rule,
   UserGroupStats
@@ -51,13 +51,13 @@ export const getGroupsStatsRequest = async () => {
 }
 
 
-export const getMyPluginDetails = async (fileName: string) => {
+export const getPluginDetailsRequest = async (key: string | number, type: 'local-scripts' | 'plugins') => {
   try {
-    const response = await api.get(`/local-scripts/${fileName}/details`)
+    const response = await api.get(`/${type}/${key}/details`)
     if (response.status === 200)
       return response.data as PluginDetails
   } catch (error) {
-    toast.error(`Error fetching plugin details: ${error}`)
+    throw error
   }
 }
 
@@ -148,15 +148,29 @@ export const changeGroupNameRequest = async (groupId: number, name: string) => {
   }
 }
 
-export const triggerScript = async (groupId: number, name: string) => {
+export const runScriptRequest = async (fileName: string | undefined) => {
   try {
-    const res = await api.put(`/groups/${groupId}/change-name`, {name: name})
+    const res = await api.post(`/local-scripts/${fileName}/run`)
     if (res.status === 200) {
-      toast.success(`Successfully updated group name`)
-      return res.data
+      toast.success(`${fileName} TRIGGER: ${res.data}`)
     }
   } catch (error) {
     throw (error)
   }
 }
+
+export const downloadPluginRequest = async (plugin: LibraryPlugin) => {
+  try {
+    const res = await api.post(`/plugins/download/${plugin.id}`)
+    if (res.status === 200) {
+      toast.success(`Successfully downloaded "${plugin.fileName}"`);
+    }
+  }
+  catch (error) {
+    toast.error(`Error downloading plugin: ${error}`);
+  }
+}
+
+
+
 

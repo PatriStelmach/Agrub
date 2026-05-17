@@ -35,9 +35,7 @@ watch(tagsForEdit, (val) => {
   updatedUser.value.groups = userStore.allGroups.filter(g => val.includes(g.name))
   console.log(updatedUser.value)
 }, { deep: true })
-// watch(() => updatedUser.value.groups, (val) => {
-//   tagsForEdit.value = val?.map(g => g.name) ?? []
-// }, { immediate: true })
+
 
 const formSchema = toTypedSchema(
   z.object({
@@ -122,10 +120,10 @@ const onSubmit = handleSubmit(async () => {
   </form>
 
   <SheetFooter class="mt-6">
-      <Button v-if="!isLoading" type="submit" form="edit-user-form" variant="green_outline" class="flex items-center">
-        Save <IconDeviceFloppy />
+      <Button  type="submit" form="edit-user-form" variant="green_outline" class="flex items-center">
+        Save <IconDeviceFloppy v-if="!isLoading" />
+        <IconLoader v-else class="animate-spin" />
       </Button>
-      <IconLoader v-else class="animate-spin" />
     <SheetClose as-child>
       <Button variant="red_outline">Cancel</Button>
     </SheetClose>

@@ -1,4 +1,5 @@
 import {type Ref, ref, toRaw} from "vue";
+import {toast} from "vue-sonner";
 
 export function useWrapping<T extends object>(
   data: Ref<T[]>,
@@ -14,15 +15,18 @@ export function useWrapping<T extends object>(
   }
 
   const wrap = () => {
-    if (unwrappedItem.value && originalItem.value) {
-      Object.assign(originalItem.value, toRaw(unwrappedItem.value))  // cofnij zmiany
-    }
     originalItem.value = null
     unwrappedItem.value = null
   }
 
-  const save = (request: () => void) => {
-    request()
+// Dodajemy async przed definicją funkcji oraz zmieniamy typ requestu na Promise
+  const save = async (request: () => Promise<void> | void) => {
+    const hasChanged = JSON.stringify(toRaw(unwrappedItem.value)) !== JSON.stringify(toRaw(originalItem.value))
+    if (hasChanged) {
+      await request()
+    } else {
+      toast.message('No changes have been made')
+    }
     wrap()
   }
 
