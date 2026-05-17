@@ -11,7 +11,6 @@ export const useMyPluginStore = defineStore('my-plugins', () => {
   const allMyPlugins = ref<MyPlugin[]>([]);
 
   const editMyPlugin = async (plugin: MyPlugin) => {
-    console.log(plugin)
     try {
       const response = await api.put(`/local-scripts/${plugin.fullName}/edit`, {
         name: plugin.name,
@@ -23,12 +22,10 @@ export const useMyPluginStore = defineStore('my-plugins', () => {
         active: plugin.active
       })
       if(response.status === 200)
-        getAllMyPluginsRequest().finally(() => toast.success(`Plugin ${plugin.name} successfully updated`))
-      else
-        toast.error(`Plugin ${plugin.name} failed with status ${response.status}`);
+        getAllMyPluginsRequest().then(() => toast.success(`Plugin ${plugin.name} successfully updated`))
     }
     catch (error) {
-      toast.error(`Plugin ${plugin.name} failed with error ${error}`);
+      throw error;
     }
   }
 

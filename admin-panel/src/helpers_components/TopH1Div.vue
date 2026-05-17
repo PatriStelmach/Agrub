@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {topButtonGroup, topH1} from "@/assets/cssFunctions.ts";
 import {ButtonGroup} from "@/components/ui/button-group";
-import GoBackButton from "@/helpers_components/GoBackButton.vue";
+import NavigatingButtons from "@/helpers_components/NavigatingButtons.vue";
 
 defineProps<{
   h1: string;
@@ -14,7 +14,7 @@ defineProps<{
     <h1 :class="[topH1, h1Class]">{{ h1 }}</h1>
     <ButtonGroup :class="topButtonGroup">
       <ButtonGroup class="flex">
-        <GoBackButton/>
+        <NavigatingButtons/>
       </ButtonGroup>
       <slot/>
     </ButtonGroup>
