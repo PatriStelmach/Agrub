@@ -1,95 +1,105 @@
-import 'package:alert_app/screens/scripts_screen.dart';
+import 'package:alert_app/logic/general_layout_view_model.dart';
+import 'package:alert_app/screens/debug_screen.dart';
+import 'package:alert_app/screens/plugins_screen.dart';
 import 'package:alert_app/screens/home_screen.dart';
 import 'package:alert_app/screens/alerts_screen.dart';
 import 'package:alert_app/screens/settings_screen.dart';
 import 'package:alert_app/screens/user_screen.dart';
-import 'package:alert_app/screens/debug_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 
 
-class GeneralLayout extends StatefulWidget {
+class GeneralLayout extends StatelessWidget {
   const GeneralLayout({super.key});
 
-  @override
-  State<GeneralLayout> createState() => _GeneralLayoutState();
-}
+  
 
-class _GeneralLayoutState extends State<GeneralLayout> {
-
-String activeScreenName = 'Home';
-String dropDownValue = 'Home';
-
-
-  @override
+@override
   Widget build(BuildContext context) {
+    final layoutViewModel = context.watch<GeneralLayoutViewModel>();
+
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ALERT APP'),
-        bottom: PreferredSize(preferredSize: const Size.fromHeight(4.0), child: Container(color: Colors.black, height: 4.0,)),
-        
-        actions: <Widget>[
+        title: Text(layoutViewModel.activeScreenName.toUpperCase()), // Dynamiczny tytuł
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(4.0),
+          child: Container(color: Colors.black, height: 4.0),
+        ),
 
-          ElevatedButton(onPressed: () {  setState(() {
-                activeScreenName = 'Debug';
-              });
-              }, child: Icon(Icons.settings_applications_rounded, size: 45, color: Colors.red)),
-
-          DropdownButton<String>(
-            padding: EdgeInsets.all(6),
-            borderRadius: BorderRadius.all(Radius.circular(16)),
-            value: dropDownValue, 
-            icon: const Icon(Icons.menu),
-            style: const TextStyle(color: Colors.black),
-            onChanged: (String? newValue) {
-              print("Zmieniam na: $newValue");
-              setState(() {
-                activeScreenName = newValue!;
-              });
-            },
-            items:const[
-            DropdownMenuItem<String>(value: 'Home', child: Text('Home')),
-            DropdownMenuItem<String>(value: 'Alerts', child: Text('Alerts')),
-            DropdownMenuItem<String>(value: 'Scripts', child: Text('Scripts')),
-            DropdownMenuItem<String>(value: 'Settings', child: Text('Settings')),
-            
-            ]
-            ),
-            IconButton(onPressed: () {
-
-              setState(() {
-                activeScreenName = 'User';
-              });
-              
-            
-            }, 
-            icon: Icon(
-              Icons.account_circle_rounded, 
-              size: 45
-              )
-              ),
-        ],
       ),
 
-      body: () {
-        switch (activeScreenName) {
-          case 'Home': return HomeScreen();
-          case 'Alerts': return AlertsScreen();
-          case 'Settings': return SettingsScreen();
-          case 'Scripts': return ScriptsScreen();
-          case 'User': return UserScreen();
-          case 'Debug': return DebugScreen();
-          default: return HomeScreen();
-      }
-      }(),
+ 
+      drawer: Drawer(
+        child: Column(
+          children: [
+            const DrawerHeader(child: Center(child: Text("ALERT MENU"))),
+            ListTile(
+              leading: const Icon(Icons.home),
+              title: const Text("Home"),
+              onTap: () {
+                layoutViewModel.changePage('Home');
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.warning),
+              title: const Text("Alerts"),
+              onTap: () {
+                layoutViewModel.changePage('Alerts');
+                Navigator.pop(context);
+              },
+            ),
+               ListTile(
+              leading: const Icon(Icons.computer_rounded),
+              title: const Text("Plugins"),
+              onTap: () {
+                layoutViewModel.changePage('Plugins');
+                Navigator.pop(context);
+              },
+            ),
+               ListTile(
+              leading: const Icon(Icons.settings),
+              title: const Text("Settings"),
+              onTap: () {
+                layoutViewModel.changePage('Settings');
+                Navigator.pop(context);
+              },
+            ),
+                          ListTile(
+              leading: const Icon(Icons.person_3_outlined),
+              title: const Text("User"),
+              onTap: () {
+                layoutViewModel.changePage('User');
+                Navigator.pop(context);
+              },
+            ),
+               ListTile(
+              leading: const Icon(Icons.warning),
+              title: const Text("Debug"),
+              onTap: () {
+                layoutViewModel.changePage('Debug');
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      ),
+
+      body: _buildBody(layoutViewModel.activeScreenName),
     );
-    
-    
+  }
+
+Widget _buildBody(String screenName) {
+    switch (screenName) {
+      case 'Alerts': return const AlertsScreen();
+      case 'Plugins': return const PluginsScreen();
+      case 'Settings': return const SettingsScreen();
+      case 'Debug': return const DebugScreen();
+      case 'User': return const UserScreen();
+      default: return const HomeScreen();
+    }
   }
 }
-
-
-
-
-
 

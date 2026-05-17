@@ -10,24 +10,28 @@ class AlertsScreen extends StatefulWidget {
 }
 
 class _AlertsScreenState extends State<AlertsScreen> {
+
+  
   String dropDownValue = 'id';
   
   @override
   Widget build(BuildContext context) {
 
+    debugPrint("--- REBUILD ---");
     final alertsViewModel = context.watch<AlertsViewModel>();
+
+    final currentSort = alertsViewModel.currentSortProperty;
+    final isAsc = alertsViewModel.isAscending;
     
-if (alertsViewModel.alertsList.isEmpty) {
+    if (alertsViewModel.alertsList.isEmpty) {
     return const Scaffold( 
       body: Center(
         child: Text("No alerts found. Consider checking the button in Debug Screen!"),
       ),
     );
 }
-else {
-  alertsViewModel.sortAlertsBy(dropDownValue);
-}
 
+final sortedList = alertsViewModel.sortedAlerts;
     
     return Column(
       
@@ -39,38 +43,42 @@ else {
                 DropdownButton<String>(
                             padding: EdgeInsets.all(6),
                             borderRadius: BorderRadius.all(Radius.circular(16)),
-                            value: dropDownValue, 
+                            value: currentSort, 
                             icon: const Icon(Icons.menu),
                             style: const TextStyle(color: Colors.black), 
                             onChanged: (String? newValue) {
-                              setState(() {
-                dropDownValue = newValue!;
-                              });
+                              if (newValue != null) {
+                alertsViewModel.sortAlertsBy(newValue);
+              }
                             },
                             items:const[
                             DropdownMenuItem<String>(value: 'id', child: Text('ID',style:TextStyle(fontSize: 30))),
                             DropdownMenuItem<String>(value: 'title', child: Text('Title',style:TextStyle(fontSize: 30))),
                             DropdownMenuItem<String>(value: 'createdAt', child: Text('CreatedAt',style:TextStyle(fontSize: 30))),
+                            DropdownMenuItem<String>(value: 'acknowledged', child: Text('Acknowledged',style:TextStyle(fontSize: 30))),
+                            DropdownMenuItem<String>(value: 'severity', child: Text('Severity',style:TextStyle(fontSize: 30))),
                             ]
                             ),
+                              IconButton(icon: Icon(isAsc ? Icons.arrow_upward : Icons.arrow_downward),
+            onPressed: () {
+              alertsViewModel.sortAlertsBy(currentSort, ascending: !isAsc);
+            },
+            ),
               ]
             ),
-                
-
-          
 
 
             Expanded(
               child: ListView.builder(
-              itemCount: alertsViewModel.sortedAlerts.length,
+              itemCount: sortedList.length,
               itemBuilder: (context, index) {
                 final alert = alertsViewModel.sortedAlerts[index];
               
                 return Card (
                   color: alert?.severityColor,
                    child: ExpansionTile(
-                   title: Text(alert?.title ?? 'No Title'),
-                  subtitle: Text(alert?.hostName ?? 'Unknown Host'),
+                   title: Text(alert?.subject ?? 'No Title'),
+                  subtitle: Text(alert.acknowledged ? 'ACKNOWLEDGED' : 'NOT ACKNOWLEDGED'),
                   leading: Icon(Icons.warning, color: Colors.black),
                   children: [
                     Column(
@@ -90,7 +98,7 @@ else {
                      
                         SizedBox(
                           width: double.infinity,
-                          child:ElevatedButton(onPressed:() { alertsViewModel.acknowledgeAlert(alert!.id);}, child: Text('Acknowledge')) 
+                          child:ElevatedButton(onPressed:() { _openAckDialog(context, alert.id);}, child: Text('Actions')) 
                           )
                         
                       ]
@@ -113,4 +121,84 @@ else {
   
 
   }
+
+
+  
+}
+
+
+class AckDialog extends StatefulWidget {
+  final int alertId;
+  const AckDialog({super.key, required this.alertId});
+
+  @override
+  State<AckDialog> createState() => _AckDialogState();
+}
+
+class _AckDialogState extends State<AckDialog> {
+  late TextEditingController _controller;
+
+  bool isAck = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose(); 
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+title: Text('Actions for Alert ${widget.alertId}'),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _controller,
+              decoration: const InputDecoration(labelText: 'Your comment'),
+            ),
+            const SizedBox(height: 15),
+            CheckboxListTile(
+              title: const Text("Acknowledge alert"),
+              value: isAck,
+              contentPadding: EdgeInsets.zero,
+              onChanged: (bool? value) {
+                setState(() {
+                  isAck = value ?? false;
+                });
+              },
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+
+        ElevatedButton(
+          onPressed: () {
+            final String commentValue = _controller.text;
+            context.read<AlertsViewModel>().acknowledgeAlert(widget.alertId, comment: commentValue, isAck: this.isAck );
+            Navigator.pop(context);
+          },
+          child: const Text('Update'),
+        ),
+      ],
+    );
+  }
+}
+
+
+void _openAckDialog(BuildContext context, int alertId) {
+
+  showDialog(
+    context: context,
+    builder: (context) => AckDialog(alertId: alertId),
+  );
 }
