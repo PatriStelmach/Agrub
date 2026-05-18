@@ -48,6 +48,7 @@ export const useUserStore = defineStore('user-store',() => {
       if (res.status === 200) {
         toast.success(`User ${user.email} created successfully.`)
         await getAllUsersRequest()
+        return res.data.email
       }
     } catch (error) {
       toast.error(`Error creating user: ${error}`)

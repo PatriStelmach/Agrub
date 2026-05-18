@@ -64,6 +64,7 @@ public class UserController {
         user.setSurname(userDetails.getSurname());
         user.setRole(userDetails.getRole());
         user.setActive(userDetails.isActive());
+        user.setGroups(userDetails.getGroups());
 
         User updatedUser = userRepository.save(user);
         return ResponseEntity.ok(mapToDTO(updatedUser));
