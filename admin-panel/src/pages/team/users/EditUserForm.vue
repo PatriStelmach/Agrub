@@ -22,6 +22,7 @@ import {toast} from "vue-sonner";
 
 const props = defineProps<{
   user: User
+  actionType: "create" | "edit"
 }>()
 
 const userStore = useUserStore()
@@ -41,7 +42,8 @@ const formSchema = toTypedSchema(
   z.object({
     email: z.string().email('Invalid email address'),
     firstname: z.string().min(2, 'Firstname must be at least 2 characters.'),
-    surname: z.string().min(2, 'Surname must be at least 2 characters.')
+    surname: z.string().min(2, 'Surname must be at least 2 characters.'),
+    //password: z.string().op
   })
 )
 
@@ -59,10 +61,20 @@ const onSubmit = handleSubmit(async () => {
   updatedUser.value.firstname = firstname.value
   updatedUser.value.surname = surname.value
   updatedUser.value.email = email.value
-  await userStore.editUserRequest(updatedUser.value)
-    .then((res) => toast.success(`User ${res} updated successfully.`))
-    .catch((err) => toast.error(`${err.message}`))
-    .finally(() => isLoading.value = false)
+  if(props.actionType === "edit") {
+    await userStore.editUserRequest(updatedUser.value)
+      .then((res) => toast.success(`User ${res} updated successfully.`))
+      .catch((err) => toast.error(`${err.message}`))
+      .finally(() => isLoading.value = false)
+  }
+  else {
+    //updatedUser.value.password = password.value
+    await userStore.createUserRequest(updatedUser.value)
+      .then((res) => toast.success(`User ${res} created successfully.`))
+      .catch((err) => toast.error(`${err.message}`))
+      .finally(() => isLoading.value = false)
+  }
+
 })
 </script>
 

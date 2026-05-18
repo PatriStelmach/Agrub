@@ -111,6 +111,7 @@ export interface User {
   id?: number,
   firstname: string,
   surname: string,
+  password?: string,
   active?: boolean,
   email: string,
   role?: "ADMINISTRATOR" | "TECHNICIAN"

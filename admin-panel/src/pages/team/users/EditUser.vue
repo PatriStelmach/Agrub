@@ -12,8 +12,9 @@ import { IconLoader } from '@tabler/icons-vue'
 import type { User } from "@/types/types"
 import EditUserForm from './EditUserForm.vue'
 
-defineProps<{
+const props = defineProps<{
   user: User
+  actionType: "create" | "edit"
 }>()
 
 const isOpen = ref(false)
@@ -31,6 +32,7 @@ const isOpen = ref(false)
         <SheetDescription>Change privileges and user data</SheetDescription>
       </SheetHeader>
       <EditUserForm
+        :action-type="props.actionType"
         v-if="isOpen"
         :user="user" />
       <div v-else class="flex justify-center p-10">
