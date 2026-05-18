@@ -31,6 +31,10 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
 
         String requestApiKey = request.getHeader(API_KEY_HEADER);
 
+        // Logi bo mnie popierdoli zaraz
+        System.out.println("[DIAGNOSTYKA] Sprawdzam URI: " + request.getRequestURI());
+        System.out.println("[DIAGNOSTYKA] Czy nagłówek X-API-KEY dotarł? " + (requestApiKey != null ? "TAK (" + requestApiKey + ")" : "NIE"));
+
         // Sprawdzamy czy jest klucz w bazie
         if (requestApiKey != null && apiKeysService.isValidKey(requestApiKey)) {
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
