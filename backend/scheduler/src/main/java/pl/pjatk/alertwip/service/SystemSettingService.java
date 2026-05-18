@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 @Service
 public class SystemSettingService {
 
+    private static final String SECRET_SUFFIX = "_SECRET";
     private final SystemSettingRepository repository;
 
     public SystemSettingService(SystemSettingRepository repository) {
@@ -36,18 +37,42 @@ public class SystemSettingService {
     }
 
     // Pobieranie wszystkich ustawień jako mapa
+    // UWAGA, tu jbc olewwa sekrety i daje ich wartość, TYLKO DO UŻYTKU WEWNĘTRZEGO
     //@Cacheable(value = "allSystemSettings")
     public Map<String, String> getAllSettings() {
         return repository.findAll().stream()
                 .collect(Collectors.toMap(SystemSetting::getSettingKey, SystemSetting::getSettingValue));
     }
 
+    //tutaj to samo co wyżej ale z zablokowanymi wartościami SECRET
+    public Map<String, String> getMaskedSettings() {
+        return getAllSettings().entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> entry.getKey().toUpperCase().endsWith(SECRET_SUFFIX) ? "" : entry.getValue()
+                ));
+    }
+
     // Masowy zapis z poziomu Vue
     //@CacheEvict(value = {"systemSettings", "systemSettingsBoolean", "allSystemSettings"}, allEntries = true)
     public void saveSettings(Map<String, String> settingsMap) {
+        // Pobieramy aktualny stan z bazy
+        Map<String, String> currentSettings = getAllSettings();
+
         List<SystemSetting> entities = settingsMap.entrySet().stream()
-                .map(entry -> new SystemSetting(entry.getKey(), entry.getValue()))
+                .map(entry -> {
+                    String key = entry.getKey();
+                    String newValue = entry.getValue();
+
+                    // Jeśli to sekret i przyszedł jako "" ignorujemy zmianę
+                    if (key.toUpperCase().endsWith(SECRET_SUFFIX) && (newValue == null || newValue.trim().isEmpty())) {
+                        newValue = currentSettings.getOrDefault(key, "");
+                    }
+
+                    return new SystemSetting(key, newValue);
+                })
                 .toList();
+
         repository.saveAll(entities);
     }
 }

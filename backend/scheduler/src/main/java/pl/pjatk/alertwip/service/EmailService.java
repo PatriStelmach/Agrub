@@ -30,7 +30,7 @@ public class EmailService {
         mailSender.setPort(port);
 
         mailSender.setUsername(settingService.getValue("smtp_user", ""));
-        mailSender.setPassword(settingService.getValue("smtp_password", ""));
+        mailSender.setPassword(settingService.getValue("smtp_password_SECRET", ""));
 
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");

@@ -27,7 +27,7 @@ const formSchema = toTypedSchema(
     nagios_url: z.string().url('Must be a valid URL'),
     nagios_enabled: z.string(),
     nagios_user: z.string().min(1, 'User is required'),
-    nagios_pass: z.string().min(1, 'Password is required'),
+    nagios_pass_SECRET: z.string().min(1, 'Password is required'),
   })
 )
 
@@ -61,7 +61,7 @@ const onSubmit = handleSubmit((values) => {
       <form v-if="isEditing" @submit="onSubmit" class="space-y-3">
         <FormInput name="nagios_url" label="URL" />
         <FormInput name="nagios_user" label="User" />
-        <FormInput name="nagios_pass" label="Password" type="password" />
+        <FormInput name="nagios_pass_SECRET" label="Password" type="password" />
         <FormInput name="nagios_enabled" label="Enabled" />
         <div class="flex justify-end ml-auto! gap-2">
           <Button type="button" variant="red_outline" size="icon-sm" @click="cancelEdit"><IconX /></Button>
