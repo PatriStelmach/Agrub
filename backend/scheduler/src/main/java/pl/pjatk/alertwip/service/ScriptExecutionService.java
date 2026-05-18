@@ -161,9 +161,8 @@ public class ScriptExecutionService {
         GlobalProblem cachedProblem = activeAlertCache.getByUniqueKey(uniqueKey);
 
         if (exitCode != 0) {
+            String newMessage = output.length() > 255 ? output.substring(0, 252) + "..." : output;
             if (task.getSeverity() >= 2) {
-                String newMessage = output.length() > 255 ? output.substring(0, 252) + "..." : output;
-
                 if (cachedProblem == null) {
                     // nowy błąd
                     GlobalProblem problem = new GlobalProblem();
@@ -209,7 +208,30 @@ public class ScriptExecutionService {
                     }
                 }
             } else {
-                System.out.println("[LOG] Skrypt " + task.getTaskName() + " zakończył się błędem, ale ma severity 1.");
+                System.out.println("[LOG] Skrypt " + task.getTaskName() + " zakończył się błędem, ale ma severity " + task.getSeverity() + ". Zapisuję bezpośrednio do historii.");
+
+                //to wszystko to samo
+                GlobalProblem historyProblem = new GlobalProblem();
+                historyProblem.setUniqueKey(uniqueKey);
+                historyProblem.setSubject(task.getTaskName());
+                historyProblem.setSource("Local Script");
+                historyProblem.setOriginType(task.getTaskName());
+
+                //zamykamu od razu
+                historyProblem.setStatus("Done");
+                historyProblem.setCreatedAt(LocalDateTime.now());
+                historyProblem.setClosedAt(LocalDateTime.now());
+
+                historyProblem.setMessage(newMessage);
+                historyProblem.setSeverity(task.getSeverity());
+
+                // Sprawdzamy widoczność
+                routingService.processVisibility(historyProblem);
+
+                // Zapisujemy TYLKO do bazy danych MySQL
+                problemRepository.save(historyProblem);
+
+                // NIE WYWOŁUJEMY SSE ANI CACHE
             }
         } else {
             // Jest ok zamykamy problem
