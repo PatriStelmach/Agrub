@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/webhooks/zabbix")
-@PreAuthorize("hasAnyRole('ADMIN', 'API_CLIENT')")
+@PreAuthorize("hasAnyRole('ROLE_ADMINISTRATOR', 'API_CLIENT')")
 public class ZabbixWebhookController {
 
     private final GlobalProblemRepository problemRepository;
