@@ -1,6 +1,7 @@
 package pl.pjatk.alertwip.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pl.pjatk.alertwip.model.GlobalProblem;
 import pl.pjatk.alertwip.repository.GlobalProblemRepository;
@@ -13,6 +14,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/webhooks/zabbix")
+@PreAuthorize("hasAnyRole('ADMIN', 'API_CLIENT')")
 public class ZabbixWebhookController {
 
     private final GlobalProblemRepository problemRepository;
