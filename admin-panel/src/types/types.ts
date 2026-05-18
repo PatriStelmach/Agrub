@@ -202,7 +202,7 @@ export interface LibraryPlugin
 
 export interface WazuhConfig {
   wazuh_user: string
-  wazuh_password: string
+  wazuh_password_SECRET: string
   wazuh_url: string
   wazuh_enabled: string
   wazuh_min_active_level: string
@@ -212,13 +212,13 @@ export interface NagiosConfig {
   nagios_url: string
   nagios_enabled: string
   nagios_user: string
-  nagios_pass: string
+  nagios_pass_SECRET: string
 }
 
 export interface ZabbixConfig {
   zabbix_enabled: string
   zabbix_url: string
-  zabbix_api_token: string
+  zabbix_api_token_SECRET: string
 }
 
 export interface MonitoringSystemsConfig {
@@ -227,7 +227,7 @@ export interface MonitoringSystemsConfig {
 
 export interface SystemConfig {
   wazuh_user: string
-  wazuh_password: string
+  wazuh_password_SECRET: string
   wazuh_url: string
   wazuh_enabled: string
   wazuh_min_active_level: string
@@ -235,16 +235,16 @@ export interface SystemConfig {
   nagios_url: string
   nagios_enabled: string
   nagios_user: string
-  nagios_pass: string
+  nagios_pass_SECRET: string
 
   zabbix_enabled: string
   zabbix_url: string
-  zabbix_api_token: string
+  zabbix_api_token_SECRET: string
 
   smtp_host: string
   smtp_port: string
   smtp_user: string
-  smtp_password: string
+  smtp_password_SECRET: string
   smtp_enabled: string
 
   external_system_sync_timer: string

@@ -53,7 +53,7 @@ export const useSystemStore = defineStore('system-store', () => {
     if (!systemConfig.value) return null
     return {
       wazuh_user: systemConfig.value.wazuh_user,
-      wazuh_password: systemConfig.value.wazuh_password,
+      wazuh_password_SECRET: systemConfig.value.wazuh_password_SECRET,
       wazuh_url: systemConfig.value.wazuh_url,
       wazuh_enabled: systemConfig.value.wazuh_enabled,
       wazuh_min_active_level: systemConfig.value.wazuh_min_active_level,
@@ -66,7 +66,7 @@ export const useSystemStore = defineStore('system-store', () => {
       nagios_url: systemConfig.value.nagios_url,
       nagios_enabled: systemConfig.value.nagios_enabled,
       nagios_user: systemConfig.value.nagios_user,
-      nagios_pass: systemConfig.value.nagios_pass,
+      nagios_pass_SECRET: systemConfig.value.nagios_pass_SECRET,
     }
   })
 
@@ -75,7 +75,7 @@ export const useSystemStore = defineStore('system-store', () => {
     return {
       zabbix_url: systemConfig.value.zabbix_url,
       zabbix_enabled: systemConfig.value.zabbix_enabled,
-      zabbix_api_token: systemConfig.value.zabbix_api_token,
+      zabbix_api_token_SECRET: systemConfig.value.zabbix_api_token_SECRET,
     }
   })
 

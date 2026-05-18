@@ -26,7 +26,7 @@ const formSchema = toTypedSchema(
   z.object({
     wazuh_url: z.string().url('Must be a valid URL'),
     wazuh_user: z.string().min(1, 'User is required'),
-    wazuh_password: z.string().min(1, 'Password is required'),
+    wazuh_password_SECRET: z.string().min(1, 'Password is required'),
     wazuh_enabled: z.string(),
     wazuh_min_active_level: z.string(),
   })
@@ -62,7 +62,7 @@ const onSubmit = handleSubmit((values) => {
       <form v-if="isEditing" @submit="onSubmit" class="space-y-3">
         <FormInput name="wazuh_url" label="URL" />
         <FormInput name="wazuh_user" label="User" />
-        <FormInput name="wazuh_password" label="Password" type="password" />
+        <FormInput name="wazuh_password_SECRET" label="Password" type="password" />
         <FormInput name="wazuh_min_active_level" label="Min Active Level" />
         <FormInput name="wazuh_enabled" label="Enabled" />
         <div class="flex justify-end ml-auto! gap-2">

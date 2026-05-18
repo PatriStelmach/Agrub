@@ -22,8 +22,7 @@ public class ConfigurationController {
 
     @GetMapping
     public Map<String, String> getAllSettings() {
-        System.out.println(settingService.getAllSettings());
-        return settingService.getAllSettings();
+        return settingService.getMaskedSettings();
     }
 
     @GetMapping("/enabled")
@@ -41,6 +40,7 @@ public class ConfigurationController {
         return ResponseEntity.ok(enabledSettings);
     }
 
+    //TODO:to imo będzie do przeniesienia do service ale na razie za dużo jebanie z tym by było
     @GetMapping("/{system}")
     public ResponseEntity<Map<String, String>> getSystemSettings(@PathVariable String system) {
         String lowerCaseSystem = system.toLowerCase();
@@ -49,8 +49,9 @@ public class ConfigurationController {
             return ResponseEntity.badRequest().build();
         }
 
-        Map<String, String> allSettings = settingService.getAllSettings();
+        Map<String, String> allSettings = settingService.getMaskedSettings();
         String systemPrefix = lowerCaseSystem + "_";
+
         Map<String, String> systemSettings = allSettings.entrySet().stream()
                 .filter(entry -> entry.getKey().toLowerCase().startsWith(systemPrefix))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
@@ -64,10 +65,12 @@ public class ConfigurationController {
         return ResponseEntity.ok("Ustawienia zostały zapisane.");
     }
 
+
+    //TODO: wyjebać te zhardcodowane wartości i zrobić to tak jak trzeba
     @GetMapping("/security")
     @PreAuthorize("hasAuthority('ROLE_ADMINISTRATOR')")
     public ResponseEntity<Map<String, String>> getSecuritySettings() {
-        Map<String, String> settings = settingService.getAllSettings();
+        Map<String, String> settings = settingService.getMaskedSettings();
         return ResponseEntity.ok(Map.of(
                 "access_token_exp_minutes", settings.getOrDefault("SECURITY_ACCESS_TOKEN_EXP_MINUTES", "15"),
                 "refresh_token_exp_hours", settings.getOrDefault("SECURITY_REFRESH_TOKEN_EXP_HOURS", "168"),
@@ -75,6 +78,7 @@ public class ConfigurationController {
         ));
     }
 
+    //TODO: potrzebujemy nowego endpointa na zmiane ustawień jak mamy już na zmiane wszystkich?
     @PutMapping("/security")
     @PreAuthorize("hasAuthority('ROLE_ADMINISTRATOR')")
     public ResponseEntity<Map<String, String>> updateSecuritySettings(@RequestBody Map<String, String> settings) {

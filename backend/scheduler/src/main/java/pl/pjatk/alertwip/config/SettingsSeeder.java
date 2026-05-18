@@ -33,20 +33,20 @@ public class SettingsSeeder implements CommandLineRunner {
                 // Zabbix
                 Map.entry("zabbix_enabled", "true"),
                 Map.entry("zabbix_url", "http://localhost:10000/api/mock/zabbix"),
-                Map.entry("zabbix_api_token", "asdasd"),
+                Map.entry("zabbix_api_token_SECRET", "asdasd"),
 
                 // Wazuh
                 Map.entry("wazuh_enabled", "false"),
                 Map.entry("wazuh_url", "https://localhost:55000"),
                 Map.entry("wazuh_user", "admin"),
-                Map.entry("wazuh_password", ""),
+                Map.entry("wazuh_password_SECRET", ""),
                 Map.entry("wazuh_min_active_level", "8"),
 
                 // Nagios
                 Map.entry("nagios_enabled", "true"),
                 Map.entry("nagios_url", "http://localhost:8080/nagios/cgi-bin/statusjson.cgi"),
                 Map.entry("nagios_user", "nagiosadmin"),
-                Map.entry("nagios_pass", "nagiosadmin"),
+                Map.entry("nagios_pass_SECRET", "nagiosadmin"),
 
                 // Sync timer
                 Map.entry("external_system_sync_timer", "60"),
@@ -72,7 +72,7 @@ public class SettingsSeeder implements CommandLineRunner {
                 Map.entry("smtp_host", "smtp.example.com"),
                 Map.entry("smtp_port", "587"),
                 Map.entry("smtp_user", "alerts@example.com"),
-                Map.entry("smtp_password", "")
+                Map.entry("smtp_password_SECRET", "")
         );
 
 

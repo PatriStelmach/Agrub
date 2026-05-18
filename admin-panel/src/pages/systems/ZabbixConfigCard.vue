@@ -25,7 +25,7 @@ const isEditing = ref(false)
 const formSchema = toTypedSchema(
   z.object({
     zabbix_url: z.string().url('Must be a valid URL'),
-    zabbix_api_token: z.string().min(1, 'API token is required'),
+    zabbix_api_token_SECRET: z.string().min(1, 'API token is required'),
     zabbix_enabled: z.string(),
   })
 )
@@ -59,7 +59,7 @@ const onSubmit = handleSubmit((values) => {
     <CardContent class="space-y-3">
       <form v-if="isEditing" @submit="onSubmit" class="space-y-3">
         <FormInput name="zabbix_url" label="URL" />
-        <FormInput name="zabbix_api_token" label="API Token" type="password" />
+        <FormInput name="zabbix_api_token_SECRET" label="API Token" type="password" />
         <FormInput name="zabbix_enabled" label="Enabled" />
         <div class="flex justify-end ml-auto! gap-2">
           <Button type="button" variant="red_outline" size="icon-sm" @click="cancelEdit"><IconX /></Button>

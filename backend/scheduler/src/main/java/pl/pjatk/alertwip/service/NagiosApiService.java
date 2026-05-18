@@ -31,7 +31,7 @@ public class NagiosApiService {
 
     private String callNagios(String url) {
         String user = settingService.getValue("nagios_user", "");
-        String pass = settingService.getValue("nagios_pass", "");
+        String pass = settingService.getValue("nagios_pass_SECRET", "");
         HttpHeaders headers = new HttpHeaders();
         headers.setBasicAuth(user, pass);
         try {

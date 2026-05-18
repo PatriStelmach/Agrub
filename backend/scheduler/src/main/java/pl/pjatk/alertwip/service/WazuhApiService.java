@@ -20,10 +20,10 @@ public class WazuhApiService {
     public String getAuthToken() {
         String apiUrl = settings.getValue("wazuh_url", "");
         String user = settings.getValue("wazuh_user", "admin");
-        String pass = settings.getValue("wazuh_password", "");
+        String pass = settings.getValue("wazuh_password_SECRET", "");
 
         if (apiUrl.isBlank() || pass.isBlank()) {
-            System.err.println("[WAZUH API] Niepełna konfiguracja w bazie (wazuh_url lub wazuh_password jest puste)!");
+            System.err.println("[WAZUH API] Niepełna konfiguracja w bazie (wazuh_url lub wazuh_password_SECRET jest puste)!");
             return null;
         }
 
