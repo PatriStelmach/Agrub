@@ -88,7 +88,15 @@ public class ScriptExecutionService {
 
                 case ".psm1":
                 case ".ps1":
-                    interpreter = "pwsh"; // lub "powershell"?
+                    //trzeba sprawdzić jako os jest
+                    String os = System.getProperty("os.name").toLowerCase();
+                    if (os.contains("win")) {
+                        interpreter = "powershell";
+                    }
+                    else {
+                        interpreter = "pwsh";
+                    }
+                    interpreter = "pwsh";
                     break;
                 default:
                     throw new Exception("Nieobsługiwane rozszerzenie pliku: " + extension);
