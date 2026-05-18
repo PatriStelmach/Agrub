@@ -11,7 +11,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin/keys")
-@PreAuthorize("hasRole('ROLE_ADMINISTRATOR')")
+@PreAuthorize("hasAuthority('ROLE_ADMINISTRATOR')")
 public class ApiKeyController {
 
     private final ApiKeysService apiKeysService;
