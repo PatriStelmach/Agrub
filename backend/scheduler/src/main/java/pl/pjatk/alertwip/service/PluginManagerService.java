@@ -152,7 +152,7 @@ public class PluginManagerService {
     }
 
     public PluginDetailsDTO getPluginDetailsByFileName(String fileName) {
-        Path path = resolveSecurePath(fileName); // ZABEZPIECZONO
+        Path path = resolveSecurePath(fileName);
         if (!Files.exists(path)) throw new RuntimeException("Plik nie istnieje: " + fileName);
 
         try {
@@ -163,8 +163,13 @@ public class PluginManagerService {
             boolean passedSystemHeaders = false;
 
             for (String line : lines) {
+                String trimmed = line.trim();
                 if (!passedSystemHeaders) {
-                    String trimmed = line.trim();
+                    //pierwsza linia to shebang więc lecimy dalej
+                    if (trimmed.startsWith("#!")) {
+                        cleanCodeLines.add(line);
+                        continue;
+                    }
 
                     // Sprawdzamy, czy to jest jeden z NASZYCH nagłówków (ignorując wielkość liter dla severity)
                     boolean isSystemHeader = trimmed.startsWith("# Creator:") ||
@@ -204,13 +209,36 @@ public class PluginManagerService {
             Files.move(oldPath, newPath, StandardCopyOption.REPLACE_EXISTING);
         }
 
-        // 2. Budowanie nowej zawartości pliku (Nagłówki + Czysty Kod)
+        // 2. Budowanie nowej zawartości pliku (Shebang -> Nagłówki -> Czysty Kod)
+        String rawCode = dto.code() != null ? dto.code() : "";
+        String shebang = "";
+        String cleanCode = rawCode;
+
+        // jeśli jest jużs hebang to go wycinamy i dostawiamy na początek
+        if (rawCode.trim().startsWith("#!")) {
+            int firstNewLine = rawCode.indexOf("\n");
+            if (firstNewLine != -1) {
+                shebang = rawCode.substring(0, firstNewLine + 1);
+                cleanCode = rawCode.substring(firstNewLine + 1);
+            } else {
+                shebang = rawCode + "\n";
+                cleanCode = "";
+            }
+        } else {
+            // jak nie ma to generujemy shebanga na podstawie jezyka
+            String ext = dto.language() != null ? dto.language().toLowerCase() : "";
+            if (ext.endsWith(".py")) shebang = "#!/usr/bin/env python3\n";
+            else if (ext.endsWith(".sh") || ext.endsWith(".bash")) shebang = "#!/bin/bash\n";
+            else if (ext.endsWith(".ps1") || ext.endsWith(".psm1")) shebang = "#!/usr/bin/env pwsh\n";
+        }
+
         StringBuilder content = new StringBuilder();
+        content.append(shebang);
         content.append("# Creator: System\n");
         content.append("# Description: ").append(dto.description()).append("\n");
         content.append("# Tags: ").append(String.join(", ", dto.tags())).append("\n");
         content.append("# Severity: ").append(dto.severity()).append("\n\n");
-        content.append(dto.code());
+        content.append(cleanCode);
 
         Files.writeString(newPath, content.toString());
 
@@ -306,23 +334,47 @@ public class PluginManagerService {
 
         Path filePath = resolveSecurePath(fileName);
 
+        String rawCode = "";
+        if (plugin.getCode() != null) {
+            rawCode = plugin.getCode()
+                    .replace("\\n", "\n")
+                    .replace("\\t", "\t")
+                    .replace("\\\"", "\"")
+                    .replace("\\\\", "\\");
+        }
+
+        String shebang = "";
+        String cleanCode = rawCode;
+
+        //jebany shebangbang
+        if (rawCode.trim().startsWith("#!")) {
+            int firstNewLine = rawCode.indexOf("\n");
+            if (firstNewLine != -1) {
+                shebang = rawCode.substring(0, firstNewLine + 1);
+                cleanCode = rawCode.substring(firstNewLine + 1);
+            } else {
+                shebang = rawCode + "\n";
+                cleanCode = "";
+            }
+        } else {
+            String langExt = ext.toLowerCase();
+            if (langExt.endsWith(".py")) shebang = "#!/usr/bin/env python3\n";
+            else if (langExt.endsWith(".sh") || langExt.endsWith(".bash")) shebang = "#!/bin/bash\n";
+            else if (langExt.endsWith(".ps1") || langExt.endsWith(".psm1")) shebang = "#!/usr/bin/env pwsh\n";
+        }
+
+
         StringBuilder fileContent = new StringBuilder();
+        fileContent.append(shebang); //musi być pierwszy
         fileContent.append("# Creator: ").append(plugin.getCreator() != null ? plugin.getCreator() : "Unknown").append("\n");
         fileContent.append("# Description: ").append(plugin.getDescription() != null ? plugin.getDescription() : "Brak opisu").append("\n");
         if (plugin.getTags() != null && !plugin.getTags().isEmpty()) {
             fileContent.append("# Tags: ").append(String.join(", ", plugin.getTags())).append("\n");
         }
         fileContent.append("# Severity: ").append(plugin.getSeverity()).append("\n\n");
+        fileContent.append(cleanCode);
 
-        if (plugin.getCode() != null) {
-            String unescaped = plugin.getCode()
-                    .replace("\\n", "\n")
-                    .replace("\\t", "\t")
-                    .replace("\\\"", "\"")
-                    .replace("\\\\", "\\");
-            fileContent.append(unescaped);
-        }
-
+        //składanie wszystkiego w całość
         Files.writeString(filePath, fileContent.toString());
     }
 
