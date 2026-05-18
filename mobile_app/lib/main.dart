@@ -2,6 +2,7 @@ import 'package:alert_app/data/repositories/alert_repository.dart';
 import 'package:alert_app/data/repositories/plugin_repository.dart';
 import 'package:alert_app/data/repositories/user_repository.dart';
 import 'package:alert_app/firebase_options.dart';
+import 'package:alert_app/locator.dart';
 import 'package:alert_app/logic/general_layout_view_model.dart';
 import 'package:alert_app/screens/login_screen.dart';
 import 'package:alert_app/services/auth_service.dart';
@@ -18,92 +19,77 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-
 //This process is responsible for handling notifications coming when app is not running.
-//Must be top-level, out of main 
+//Must be top-level, out of main
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  
-  debugPrint("Handling a background message: ${message.messageId}");
 
+  debugPrint("Handling a background message: ${message.messageId}");
 }
 
 Future<void> main() async {
-
-//checking if flutter engine is ready
+  //checking if flutter engine is ready
   WidgetsFlutterBinding.ensureInitialized();
 
   // Firebase initialization
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   final authService = AuthService();
-  final dioInstance = authService.dio;
   //Creation of repositories instances
-  final alertRepository = AlertRepository(dio: dioInstance);
-  final pluginRepository = PluginsRepository(dio: dioInstance);
+  final alertRepository = AlertRepository();
+  final pluginRepository = PluginsRepository();
   final userRepository = UserRepository();
-
-  
 
   final notificationService = PushNotificationService(alertRepository);
 
   await notificationService.initNotificationHandling();
 
+  setupLocator(); // Uruchamia rejestrację GetIt
 
   runApp(
     MultiProvider(
       providers: [
-
-
         ChangeNotifierProvider(create: (_) => GeneralLayoutViewModel()),
         ChangeNotifierProvider.value(value: alertRepository),
         ChangeNotifierProvider.value(value: pluginRepository),
         ChangeNotifierProvider.value(value: notificationService),
         ChangeNotifierProvider.value(value: userRepository),
 
-
-
         ChangeNotifierProvider<UserViewModel>(
-          create: (context) => UserViewModel(
-            repository: context.read<UserRepository>(),
-          ),
+          create: (context) =>
+              UserViewModel(repository: context.read<UserRepository>()),
         ),
 
         ChangeNotifierProxyProvider<UserViewModel, AlertRepository>(
           create: (context) => alertRepository,
           update: (context, userVM, alertRepo) {
             if (userVM.isLoggedIn && alertRepo!.alertsCache.isEmpty) {
-              
               alertRepo.updateAllAlerts();
               alertRepo.initSseConnection();
             }
             return alertRepo!;
           },
         ),
-        
+
         //Creation of view models
         ChangeNotifierProvider<PluginsViewModel>(
           create: (context) => PluginsViewModel(
             pluginsRepository: context.read<PluginsRepository>(),
-          )),
+          ),
+        ),
 
         ChangeNotifierProvider<HomeViewModel>(
-          create: (context) => HomeViewModel(
-            repository: context.read<AlertRepository>(),
-          )..getMyToken(),
-          ),
-
+          create: (context) =>
+              HomeViewModel(repository: context.read<AlertRepository>())
+                ..getMyToken(),
+        ),
 
         ChangeNotifierProvider<AlertsViewModel>(
           create: (context) => AlertsViewModel(
             alertsRepository: context.read<AlertRepository>(),
-          )),
-          
-        
+          ),
+        ),
       ],
       child: MainApp(),
     ),
@@ -111,7 +97,7 @@ Future<void> main() async {
 }
 
 class MainApp extends StatelessWidget {
-const MainApp({super.key});
+  const MainApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -121,11 +107,10 @@ const MainApp({super.key});
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.light,
       navigatorKey: navigationService.navigatorKey,
-      
+
       // Home staje się dynamiczny
       home: Consumer<UserViewModel>(
         builder: (context, userVM, child) {
-          
           // 1. Ekran ładowania (podczas sprawdzania SecureStorage przy starcie)
           if (userVM.isLoading) {
             return const Scaffold(
@@ -144,17 +129,17 @@ const MainApp({super.key});
       ),
     );
   }
-    
-  }
+}
 
   /*
 
 
 T0D0:
-
+- pobieranie i korzystanie z poprawnych danych zalogowanego usera
+- upewnić się, że user otrzymuje własciwe dane zgodne z grupą
+- naprawić pobieranie pluginów
 - oprogramowanie start/stop/force pluginów
 - pluginy z library plus my plugins?
-- podpięcie się do serwerowej wersji backendu
 - retencja pamięci, żeby już otrzymane alerty się nie odpalały przy odpalaniu apki
 - FCM!!!!!!!!!
 - komentarze porządne

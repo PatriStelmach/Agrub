@@ -7,11 +7,10 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 //connecting to server to check authorization of user
 
 class UserRepository extends ChangeNotifier {
-
-final AuthService _authService = AuthService();
+  final AuthService _authService = AuthService();
   final _storage = const FlutterSecureStorage();
 
-Future<bool> login(String email, String password) async {
+  Future<bool> login(String email, String password) async {
     // 1. Pytamy API o token
     final String? token = await _authService.login(email, password);
 
@@ -20,22 +19,21 @@ Future<bool> login(String email, String password) async {
       await _storage.write(key: 'jwt_token', value: token);
       return true;
     }
-    
+
     // 3. Jeśli nie ma tokena, logowanie się nie udało
     return false;
   }
 
   Future<String?> getToken() async => await _storage.read(key: 'jwt_token');
-  
-  Future<void> logout() async => await _storage.delete(key: 'jwt_token');
 
+  Future<void> logout() async => await _storage.delete(key: 'jwt_token');
 
   UserModel? getUserFromToken(String token) {
     if (token.isEmpty) return null;
-    
+
     // Decoding token to get user data
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
-    
+
     return UserModel.fromJwt(decodedToken);
   }
 }
