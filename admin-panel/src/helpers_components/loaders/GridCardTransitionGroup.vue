@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import {gridSkeletons} from "@/assets/cssFunctions.js";
 import type {HTMLAttributes} from "vue";
 const props = defineProps<{
   class?:HTMLAttributes["class"],
@@ -8,7 +7,7 @@ const props = defineProps<{
 
 <template>
   <TransitionGroup
-    :class="[gridSkeletons, props.class]"
+    :class="props.class"
     tag="div"
     name="slide-fade-card"
   >

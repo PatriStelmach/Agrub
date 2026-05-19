@@ -13,6 +13,7 @@ import GridCardLoader from "@/helpers_components/loaders/GridCardLoader.vue";
 import GroupCard from "@/pages/team/groups/GroupCard.vue";
 import GridCardTransitionGroup from "@/helpers_components/loaders/GridCardTransitionGroup.vue"
 import {getGroupsStatsRequest} from "@/helpers_functions/requests.ts";
+import {gridSkeletons} from "@/assets/cssFunctions.ts";
 
 const isLoading = ref(true);
 const groupsStats = ref<UserGroupStats[]>([]);
@@ -50,7 +51,7 @@ const searchFilter = ref("")
     <Transition name="fade" mode="out-in">
       <GridCardLoader
         v-if="isLoading"/>
-      <GridCardTransitionGroup v-else>
+      <GridCardTransitionGroup :class="gridSkeletons" v-else>
         <GroupCard
           v-for="group in groupsStats"
           :group="group"
