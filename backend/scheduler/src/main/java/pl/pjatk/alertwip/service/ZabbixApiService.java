@@ -28,12 +28,16 @@ public class ZabbixApiService {
 
         Map<String, Object> request = Map.of(
                 "jsonrpc", "2.0",
-                "method", "problem.get",
+                "method", "trigger.get",
                 "auth", apiToken,
                 "params", Map.of(
-                        "output", List.of("eventid", "name", "severity"),
-                        "selectHosts", List.of("host"),
-                        "recent", false
+                        "output", List.of("triggerid", "description", "priority"),
+                        "selectHosts", List.of("name"), // nazwa hosta
+                        "selectLastEvent", List.of("eventid"), // do pobrania eventId
+                        "monitored", true,
+                        "active", true,
+                        "skipDependent", true,
+                        "only_true", true
                 ),
                 "id", 1
         );
@@ -50,7 +54,7 @@ public class ZabbixApiService {
             }
             return List.of();
         } catch (Exception e) {
-            throw new RuntimeException("Błąd pobierania problemów: " + e.getMessage());
+            throw new RuntimeException("Błąd pobierania problemów (trigger.get): " + e.getMessage());
         }
     }
 
