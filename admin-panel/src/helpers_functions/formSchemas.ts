@@ -6,7 +6,7 @@ export const nagiosSchema = toTypedSchema(
     nagios_url: z.string().url('Must be a valid URL'),
     nagios_enabled: z.boolean(),
     nagios_user: z.string().min(1, 'User is required'),
-    nagios_pass_SECRET: z.string().min(1, 'Password is required'),
+    nagios_password_SECRET: z.string().min(1, 'Password is required'),
   })
 )
 
@@ -24,6 +24,6 @@ export const zabbixSchema = toTypedSchema(
   z.object({
     zabbix_url: z.string().url('Must be a valid URL'),
     zabbix_enabled: z.boolean(),
-    zabbix_api_token_SECRET: z.string().nonempty( 'Api token cannot be empty'),
+    zabbix_password_SECRET: z.string().nonempty( 'Api token cannot be empty'),
   })
 )
