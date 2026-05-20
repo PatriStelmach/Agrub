@@ -95,27 +95,21 @@ public class ZabbixSyncService implements SchedulingConfigurer {
         // 2. PRZETWARZANIE ALERTÓW Z API
         for (Map<String, Object> problemData : currentProblems) {
 
-            // W triggerach nazwa to 'description'
-            Object nameObj = problemData.get("description");
+            Object nameObj = problemData.get("name");
             String name = (nameObj != null) ? nameObj.toString() : "Nieznany błąd";
 
             String zabbixEventId = null;
-            Object lastEventObj = problemData.get("lastEvent");
-
-            // selectLastEvent zazwyczaj zwraca obiekt lub listę obiektów, sprawdzamy bezpiecznie obie opcje
-            if (lastEventObj instanceof Map<?, ?> eventMap && eventMap.get("eventid") != null) {
-                zabbixEventId = eventMap.get("eventid").toString();
-            } else if (lastEventObj instanceof List<?> eventList && !eventList.isEmpty() && eventList.get(0) instanceof Map<?, ?> eventMap) {
-                if (eventMap.get("eventid") != null) zabbixEventId = eventMap.get("eventid").toString();
+            Object eventIdObj = problemData.get("eventid");
+            if (eventIdObj != null) {
+                zabbixEventId = eventIdObj.toString();
             }
 
             int severity = 0;
-            Object severityObj = problemData.get("priority");
+            Object severityObj = problemData.get("severity");
             if (severityObj != null) {
                 try { severity = Integer.parseInt(severityObj.toString()); } catch (NumberFormatException ignored) {}
             }
 
-            // Wydobycie hosta z zagnieżdżonej tablicy "hosts"
             String hostName = "Nieznany host";
             Object hostsObj = problemData.get("hosts");
             if (hostsObj instanceof List<?> hostList && !hostList.isEmpty()) {
@@ -163,7 +157,7 @@ public class ZabbixSyncService implements SchedulingConfigurer {
 
         // 3. ZAMYKANIE STARYCH ALERTÓW
         for (GlobalProblem dbProblem : activeDbZabbixProblems) {
-            // Ignorujemy nasz alert systemowy, żeby go przypadkiem nie zamknąć "Zabbixem"
+            // Ignorujemy nasz alert systemowy, żeby go przypadkiem nie zamknąć Zabbixem
             if (API_ERROR_UNIQUE_KEY.equals(dbProblem.getUniqueKey())) continue;
 
             if (!activeZabbixProblemKeys.contains(dbProblem.getUniqueKey())) {

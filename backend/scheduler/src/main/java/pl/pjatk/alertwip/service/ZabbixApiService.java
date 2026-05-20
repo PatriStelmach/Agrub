@@ -26,30 +26,25 @@ public class ZabbixApiService {
             throw new IllegalStateException("Konfiguracja Zabbixa jest niekompletna. Skonfiguruj API Token w panelu.");
         }
 
+        // Wracamy do problem.get, ale z poprawnym parametrem "name" dla hosta!
         Map<String, Object> request = Map.of(
                 "jsonrpc", "2.0",
-                "method", "trigger.get",
+                "method", "problem.get",
                 "auth", apiToken,
                 "params", Map.of(
-                        "output", List.of("triggerid", "description", "priority"),
-                        "selectHosts", List.of("name"), // nazwa hosta
-                        "selectLastEvent", List.of("eventid"), // do pobrania eventId
-                        "monitored", true,
-                        "active", true,
-                        "skipDependent", true,
-                        "only_true", true
+                        "output", List.of("eventid", "name", "severity"),
+                        "selectHosts", List.of("name"),
+                        "recent", false // Zwraca tylko AKTUALNIE trwające problemy na Dashboardzie
                 ),
                 "id", 1
         );
 
         try {
-            System.out.println("DIAGNOSTYKA Zaczynamy parsowanie");
             Map<String, Object> response = restClient.post()
                     .uri(apiUrl)
                     .body(request)
                     .retrieve()
                     .body(Map.class);
-
             // ========== LOGOWANIE ===========
             try {
                 com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
@@ -68,7 +63,7 @@ public class ZabbixApiService {
             }
             return List.of();
         } catch (Exception e) {
-            throw new RuntimeException("Błąd pobierania problemów (trigger.get): " + e.getMessage());
+            throw new RuntimeException("Błąd pobierania problemów (problem.get): " + e.getMessage());
         }
     }
 
