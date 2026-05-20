@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Field as VeeField } from "vee-validate";
 import { Field, FieldError } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import { NumberField, NumberFieldContent, NumberFieldDecrement, NumberFieldIncrement, NumberFieldInput } from "@/components/ui/number-field";
 import MyFieldLabel from "@/helpers_components/form/MyFieldLabel.vue";
 import type {HTMLAttributes} from "vue";
 
@@ -9,7 +9,9 @@ const props = defineProps<{
   name: string
   label: string
   placeholder?: string
-  type?: string
+  min?: number
+  max?: number
+  step?: number
   class?: HTMLAttributes["class"]
 }>()
 
@@ -18,17 +20,23 @@ const fieldId = props.name
 
 <template>
   <VeeField v-slot="{ field, errors }" :name="name">
-    <Field :class="props.class" :data-invalid="!!errors.length">
+    <Field :data-invalid="!!errors.length">
       <MyFieldLabel :text="label" :for="fieldId" />
-      <Input
+      <NumberField
         :id="fieldId"
-        :type="type ?? 'text'"
-        :placeholder="placeholder"
+        :min="min"
+        :max="max"
+        :step="step"
+        :default-value="field.value"
         :aria-invalid="!!errors.length"
         @update:model-value="field.onChange"
-        :default-value="field.value"
-        v-bind="field"
-      />
+      >
+        <NumberFieldContent>
+          <NumberFieldDecrement />
+          <NumberFieldInput :placeholder="placeholder" />
+          <NumberFieldIncrement />
+        </NumberFieldContent>
+      </NumberField>
       <FieldError v-if="errors.length" :errors="errors" />
     </Field>
   </VeeField>

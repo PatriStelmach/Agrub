@@ -15,6 +15,7 @@ import GridCardLoader from "@/helpers_components/loaders/GridCardLoader.vue";
 import UserCard from './UserCard.vue'
 import EditUser from "./EditUser.vue"
 import GridCardTransitionGroup from "@/helpers_components/loaders/GridCardTransitionGroup.vue"
+import {gridSkeletons} from "@/assets/cssFunctions.ts";
 
 const userStore = useUserStore();
 const isLoading = ref(true);
@@ -60,7 +61,7 @@ onMounted(async () => {
   </TopH1Div>
   <Transition name="fade" mode="out-in">
     <GridCardLoader v-if="isLoading"/>
-    <GridCardTransitionGroup v-else>
+    <GridCardTransitionGroup :class="gridSkeletons" v-else>
       <UserCard
         v-for="user in filteredData"
         :key="user.id"

@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 import MySystems from '../pages/systems/MySystems.vue'
-import AvailableSystems from '../pages/systems/AvailableSystems.vue'
 import ActiveAlertsPage from '../pages/alerts/active/ActiveAlertsPage.vue'
 import AlertsHistory from '../pages/alerts/history/AlertsHistory.vue'
 import PluginsLibrary from '../pages/plugins/library/PluginsLibrary.vue'
@@ -15,7 +14,6 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     { path: '/my_systems',      name: 'my_systems',      component: MySystems },
-    { path: '/available_systems',     name: 'available_systems',     component: AvailableSystems },
     { path: '/',                name: 'home',            component: ActiveAlertsPage },
     { path: '/active_alerts',   name: 'active_alerts',   component: ActiveAlertsPage },
     { path: '/alerts_history',  name: 'alerts_history',  component: AlertsHistory },
