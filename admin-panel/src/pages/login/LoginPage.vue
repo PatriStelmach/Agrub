@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { toTypedSchema } from '@vee-validate/zod'
 import { useForm, Field as VeeField } from 'vee-validate'
-import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -20,34 +18,17 @@ import {
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import {useAuthStore} from "@/stores/authStore.ts";
-import {onMounted, ref} from "vue";
+import {ref} from "vue";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
 import { IconAlertCircle, IconX, IconLoader} from "@tabler/icons-vue";
+import {loginSchema} from "@/helpers_functions/formSchemas.ts";
 
 const authStore = useAuthStore()
 const showAlert = ref(false)
 const isLoading = ref(false)
-const mounting = ref(true)
-
-onMounted(() => {
-  setTimeout(() => {
-    mounting.value = false
-  }, 300)
-})
-
-const formSchema = toTypedSchema(
-  z.object({
-    email: z
-      .string()
-      .email('Invalid email address'),
-    password: z
-      .string()
-      .min(4, 'Password must be at least 4 characters.')
-  }),
-)
 
 const { handleSubmit } = useForm({
-  validationSchema: formSchema,
+  validationSchema: loginSchema,
   initialValues: {
     email: '',
     password: '',
@@ -66,7 +47,7 @@ const onSubmit = handleSubmit(async (data) => {
 </script>
 
 <template>
-  <Transition v-if="!mounting" name="fade">
+  <Transition name="fade">
     <Alert
       class="z-999 absolute w-1/3 left-1/2 -translate-x-1/2 top-1/2 translate-y-1/2 border-red-badge/50 border-2 "
       v-if="showAlert" variant="destructive">

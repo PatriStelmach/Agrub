@@ -20,7 +20,7 @@ export const useSettingStore = defineStore('setting-store', () => {
       url: systemFullSettings.value.wazuh_url,
       enabled: systemFullSettings.value.wazuh_enabled,
       min_active_level: systemFullSettings.value.wazuh_min_active_level,
-      name: 'Wazuh',
+      name: 'wazuh',
     }
   })
 
@@ -30,7 +30,7 @@ export const useSettingStore = defineStore('setting-store', () => {
       url: systemFullSettings.value.nagios_url,
       enabled: systemFullSettings.value.nagios_enabled,
       user: systemFullSettings.value.nagios_user,
-      name: 'Nagios',
+      name: 'nagios',
     }
   })
 
@@ -39,7 +39,7 @@ export const useSettingStore = defineStore('setting-store', () => {
     return {
       url: systemFullSettings.value.zabbix_url,
       enabled: systemFullSettings.value.zabbix_enabled,
-      name: 'Zabbix',
+      name: 'zabbix',
     }
   })
   const systemsConfig = computed(() => {

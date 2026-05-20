@@ -1,8 +1,8 @@
-import {type Ref, ref, toRaw} from "vue";
+import {type ComputedRef, type Ref, ref, toRaw} from "vue";
 import {toast} from "vue-sonner";
 
 export function useWrapping<T extends object>(
-  data: Ref<T[]>,
+  data: Ref<T[]> | ComputedRef<T[]>,
   key: keyof T = 'id' as keyof T
 ) {
 
