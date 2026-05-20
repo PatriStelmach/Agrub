@@ -43,6 +43,7 @@ public class ZabbixApiService {
         );
 
         try {
+            System.out.println("DIAGNOSTYKA Zaczynamy parsowanie");
             Map<String, Object> response = restClient.post()
                     .uri(apiUrl)
                     .body(request)
@@ -61,7 +62,7 @@ public class ZabbixApiService {
             }
 
             //======================
-            
+
             if (response != null && response.containsKey("result")) {
                 return (List<Map<String, Object>>) response.get("result");
             }
