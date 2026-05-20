@@ -1,0 +1,68 @@
+services:
+  # 1. MySQL
+  mysql-server:
+    image: mysql:8.0
+    container_name: alertwip-main-db
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_DATABASE=alertdb
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+      - MYSQL_ROOT_HOST=%
+    volumes:
+      - mysql_main_data:/var/lib/mysql
+    networks:
+      - alert-network
+
+  # 2. Redis
+  redis-server:
+    image: redis:alpine
+    container_name: alertwip-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_main_data:/data
+    networks:
+      - alert-network
+
+  # 3. Backend
+  backend:
+    build:
+      context: ./backend/scheduler
+      dockerfile: Dockerfile
+    container_name: alertwip-backend
+    restart: always
+    ports:
+      - "10000:10000"
+    environment:
+      - MYSQL_HOST=mysql-server
+      - REDIS_HOST=redis-server
+    volumes:
+      - ./scripts:/app/scripts
+    depends_on:
+      - mysql-server
+      - redis-server
+    networks:
+      - alert-network
+
+  # 4. Frontend
+  frontend:
+    build:
+      context: ./admin-panel
+    container_name: admin-panel
+    restart: always
+    ports:
+      - "5173:10000"
+    depends_on:
+      - backend
+    networks:
+      - alert-network
+
+networks:
+  alert-network:
+    driver: bridge
+
+volumes:
+  mysql_main_data:
+  redis_main_data:

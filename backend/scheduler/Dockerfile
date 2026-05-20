@@ -1,4 +1,3 @@
-
 FROM maven:3.9.6-eclipse-temurin-21-alpine AS builder
 WORKDIR /app
 COPY pom.xml .
@@ -9,7 +8,7 @@ RUN mvn clean package -DskipTests
 
 FROM eclipse-temurin:21-jre-alpine
 
-RUN apk add --no-cache python3 py3-pip
+RUN apk add --no-cache python3 py3-pip bash
 
 RUN pip install --no-cache-dir requests --break-system-packages
 

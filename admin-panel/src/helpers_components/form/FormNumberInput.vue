@@ -13,6 +13,7 @@ const props = defineProps<{
   max?: number
   step?: number
   class?: HTMLAttributes["class"]
+  orientation: "vertical" | "horizontal"
 }>()
 
 const fieldId = props.name
@@ -20,23 +21,26 @@ const fieldId = props.name
 
 <template>
   <VeeField v-slot="{ field, errors }" :name="name">
-    <Field :data-invalid="!!errors.length">
-      <MyFieldLabel :text="label" :for="fieldId" />
-      <NumberField
-        :id="fieldId"
-        :min="min"
-        :max="max"
-        :step="step"
-        :default-value="field.value"
-        :aria-invalid="!!errors.length"
-        @update:model-value="field.onChange"
-      >
-        <NumberFieldContent>
-          <NumberFieldDecrement />
-          <NumberFieldInput :placeholder="placeholder" />
-          <NumberFieldIncrement />
-        </NumberFieldContent>
-      </NumberField>
+    <Field :orientation="props.orientation" :data-invalid="!!errors.length">
+      <MyFieldLabel class="justify-end! " :text="label" :for="fieldId" />
+      <div class="max-md:w-40 md:w-70 lg:w-90 xl:w-120">
+        <NumberField
+          :id="fieldId"
+          :min="min"
+          :max="max"
+          :step="step"
+          :default-value="field.value"
+          :aria-invalid="!!errors.length"
+          @update:model-value="field.onChange"
+        >
+          <NumberFieldContent>
+            <NumberFieldDecrement />
+            <NumberFieldInput :placeholder="placeholder" />
+            <NumberFieldIncrement />
+          </NumberFieldContent>
+        </NumberField>
+      </div>
+
       <FieldError v-if="errors.length" :errors="errors" />
     </Field>
   </VeeField>

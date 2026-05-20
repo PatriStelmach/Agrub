@@ -1,68 +1,149 @@
 services:
-  # 1. MySQL
-  mysql-server:
-    image: mysql:8.0
-    container_name: alertwip-main-db
-    command: --default-authentication-plugin=mysql_native_password
-    ports:
-      - "3306:3306"
-    environment:
-      - MYSQL_DATABASE=alertdb
-      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
-      - MYSQL_ROOT_HOST=%
-    volumes:
-      - mysql_main_data:/var/lib/mysql
-    networks:
-      - alert-network
 
-  # 2. Redis
-  redis-server:
-    image: redis:alpine
-    container_name: alertwip-redis
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_main_data:/data
-    networks:
-      - alert-network
-
-  # 3. Backend
-  backend:
+  # ALERT BACKEND
+  alert-backend:
     build:
       context: ./backend/scheduler
       dockerfile: Dockerfile
-    container_name: alertwip-backend
-    restart: always
+    container_name: alert-backend
+    restart: unless-stopped
     ports:
-      - "10000:10000"
-    environment:
-      - MYSQL_HOST=mysql-server
-      - REDIS_HOST=redis-server
+      - "8080:10000"
     volumes:
       - ./scripts:/app/scripts
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-app:3306/alertwip?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=rootpassword
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_DATA_REDIS_HOST=redis-cache
+      - SPRING_DATA_REDIS_PORT=6379
+      - APP_SCRIPTS_PATH=/app/scripts
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=DEBUG
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB=DEBUG
     depends_on:
-      - mysql-server
-      - redis-server
+      - mysql-app
+      - redis-cache
     networks:
-      - alert-network
+      - monitor_net
 
-  # 4. Frontend
-  frontend:
+  mysql-app:
+    image: mysql:8.0
+    container_name: mysql-app
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_DATABASE=alertwip
+    volumes:
+      - ./mysql-app:/var/lib/mysql
+    networks:
+      - monitor_net
+
+  redis-cache:
+    image: redis:7-alpine
+    container_name: redis-cache
+    restart: unless-stopped
+    volumes:
+      - redis_main_data:/data
+    networks:
+      - monitor_net
+
+
+  # ZABBIX (Server + Web + DB)
+  mysql-zabbix:
+    image: mysql:8.0
+    container_name: mysql-zabbix
+    restart: unless-stopped
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_bin
+      - --log-bin-trust-function-creators=1
+    environment:
+      - MYSQL_ROOT_PASSWORD=zabbixroot
+      - MYSQL_DATABASE=zabbix
+      - MYSQL_USER=zabbix
+      - MYSQL_PASSWORD=zabbixpass
+    volumes:
+      - zabbix-db-data:/var/lib/mysql
+    networks:
+      - monitor_net
+
+  zabbix-server:
+    image: zabbix/zabbix-server-mysql:ubuntu-6.4-latest
+    container_name: zabbix-server
+    restart: unless-stopped
+    environment:
+      - DB_SERVER_HOST=mysql-zabbix
+      - MYSQL_DATABASE=zabbix
+      - MYSQL_USER=zabbix
+      - MYSQL_PASSWORD=zabbixpass
+    ports:
+      - "10051:10051"
+    depends_on:
+      - mysql-zabbix
+    volumes:
+      - ./zabbix-server:/usr/lib/zabbix/alertscripts
+    networks:
+      - monitor_net
+
+  zabbix-web:
+    image: zabbix/zabbix-web-nginx-mysql:ubuntu-6.4-latest
+    container_name: zabbix-web
+    restart: unless-stopped
+    environment:
+      - DB_SERVER_HOST=mysql-zabbix
+      - MYSQL_DATABASE=zabbix
+      - MYSQL_USER=zabbix
+      - MYSQL_PASSWORD=zabbixpass
+      - ZBX_SERVER_HOST=zabbix-server
+      - PHP_TZ=Europe/Warsaw
+    ports:
+      - "8081:8080"
+    depends_on:
+      - mysql-zabbix
+      - zabbix-server
+    networks:
+      - monitor_net
+
+  zabbix-agent:
+    image: zabbix/zabbix-agent:ubuntu-6.4-latest
+    container_name: zabbix-agent
+    restart: unless-stopped
+    environment:
+      - ZBX_SERVER_HOST=zabbix-server
+    networks:
+      - monitor_net
+
+  # NAGIOS
+  nagios:
+    image: jasonrivers/nagios:latest
+    container_name: nagios
+    restart: unless-stopped
+    ports:
+      - "8082:80"
+    environment:
+      - NAGIOSADMIN_USER=nagiosadmin
+      - NAGIOSADMIN_PASS=nagios123
+    networks:
+      - monitor_net
+
+
+  # FRONTEND
+  frontend-nginx:
     build:
       context: ./admin-panel
-    container_name: admin-panel
-    restart: always
+    container_name: alert-frontend
     ports:
-      - "5173:10000"
-    depends_on:
-      - backend
+      - "80:10000"
     networks:
-      - alert-network
+      - monitor_net
+    depends_on:
+      - alert-backend
 
 networks:
-  alert-network:
+  monitor_net:
     driver: bridge
 
 volumes:
-  mysql_main_data:
+  zabbix-db-data:
   redis_main_data:
