@@ -101,7 +101,7 @@ const onCancel = () => {
           <img
             :src="colorMode === 'dark' ? wazuh_logo_white : wazuh_logo_black"
             alt="wazuh_logo"
-            class="-mt-4"
+            class="-mt-2"
           />
         </div>
       </CardHeader>
@@ -135,7 +135,7 @@ const onCancel = () => {
         </div>
         <div>
           <FormNumberInput orientation="vertical" name="wazuh_min_active_level" label="Minimal severity level: ">
-            <IconShieldExclamation class="size-5"/>
+            <IconShieldExclamation class="size-5 text-label"/>
           </FormNumberInput>
         </div>
       </CardDescription>
@@ -157,7 +157,7 @@ const onCancel = () => {
         <img
           :src="colorMode === 'dark' ? wazuh_logo_white : wazuh_logo_black"
           alt="wazuh_logo"
-          class="-mt-4"
+          class="-mt-2"
         />
       </div>
     </CardHeader>

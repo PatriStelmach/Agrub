@@ -88,7 +88,6 @@ const onCancel = () => {
           <img
             :src="zabbix_logo"
             alt="zabbix_logo"
-            class="-mt-4"
           />
         </div>
       </CardHeader>
@@ -134,7 +133,6 @@ const onCancel = () => {
         <img
           :src="zabbix_logo"
           alt="zabbix_logo"
-          class="-mt-4"
         />
       </div>
     </CardHeader>
