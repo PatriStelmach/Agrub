@@ -36,8 +36,7 @@ const navItems = [
   {
     label: 'Systems',
     links: [
-      { label: 'Connected', to: 'my_systems', icon: IconSitemap },
-      { label: 'Available systems', to: 'available_systems', icon: IconDeviceDesktopAnalytics },
+      { label: 'My systems', to: 'my_systems', icon: IconDeviceDesktopAnalytics },
     ]
   },
   {

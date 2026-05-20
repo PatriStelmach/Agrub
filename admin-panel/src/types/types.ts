@@ -201,52 +201,62 @@ export interface LibraryPlugin
   tags: string[],
 }
 
+//tak przychodzi z api
 export interface WazuhConfig {
+  name: string
   wazuh_user: string
-  wazuh_password_SECRET: string
+  wazuh_password_SECRET?: string
   wazuh_url: string
-  wazuh_enabled: string
-  wazuh_min_active_level: string
+  wazuh_enabled: boolean
+  wazuh_min_active_level: number
 }
-
+//tak przychodzi z api
 export interface NagiosConfig {
+  name: string
   nagios_url: string
-  nagios_enabled: string
+  nagios_enabled: boolean
   nagios_user: string
-  nagios_pass_SECRET: string
+  nagios_pass_SECRET?: string
 }
-
+//tak przychodzi z api
 export interface ZabbixConfig {
-  zabbix_enabled: string
+  name: string
+  zabbix_enabled: boolean
   zabbix_url: string
-  zabbix_api_token_SECRET: string
+  zabbix_api_token_SECRET?: string
+}
+//to jest moje po mapowaniu
+export interface MonitoringSystemsConfig  {
+  name: string
+  user?: string
+  passwordOrToken?: string
+  url: string
+  enabled: boolean
+  min_active_level?: number
 }
 
-export interface MonitoringSystemsConfig {
-  system: ZabbixConfig | NagiosConfig | WazuhConfig
-}
-
-export interface SystemConfig {
+//tak przychodzi z api
+export interface systemFullSettings {
   wazuh_user: string
-  wazuh_password_SECRET: string
+  wazuh_password_SECRET?: string
   wazuh_url: string
-  wazuh_enabled: string
-  wazuh_min_active_level: string
+  wazuh_enabled: boolean
+  wazuh_min_active_level: number
 
   nagios_url: string
-  nagios_enabled: string
+  nagios_enabled: boolean
   nagios_user: string
-  nagios_pass_SECRET: string
+  nagios_pass_SECRET?: string
 
-  zabbix_enabled: string
+  zabbix_enabled: boolean
   zabbix_url: string
-  zabbix_api_token_SECRET: string
+  zabbix_api_token_SECRET?: string
 
   smtp_host: string
   smtp_port: string
   smtp_user: string
-  smtp_password_SECRET: string
-  smtp_enabled: string
+  smtp_password_SECRET?: string
+  smtp_enabled: boolean
 
   external_system_sync_timer: string
   scripts_execution_timeout_seconds: string
