@@ -1,36 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:get_it/get_it.dart';
 
 class AuthService {
-  late final Dio _dio;
-  final _storage = const FlutterSecureStorage();
+  final Dio _dio = GetIt.instance<Dio>();
+  final FlutterSecureStorage _storage = GetIt.instance<FlutterSecureStorage>();
 
-  AuthService() {
-    _dio = Dio(
-      BaseOptions(
-        baseUrl: 'http://141.95.41.41',
-        connectTimeout: const Duration(seconds: 15),
-        receiveTimeout: const Duration(seconds: 15),
-        headers: {'Accept': '*/*', 'Content-Type': 'application/json'},
-      ),
-    );
-
-    _dio.interceptors.add(
-      InterceptorsWrapper(
-        onRequest: (options, handler) async {
-          if (options.path != '/api/auth/login') {
-            String? token = await _storage.read(key: 'jwt_token');
-            if (token != null) {
-              options.headers['Authorization'] = 'Bearer $token';
-            }
-          }
-          return handler.next(options);
-        },
-      ),
-    );
-  }
-
-  Dio get dio => _dio;
+  AuthService();
 
   Future<String?> login(String email, String password) async {
     try {

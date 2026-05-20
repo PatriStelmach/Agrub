@@ -35,7 +35,7 @@ Future<void> main() async {
   // Firebase initialization
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  final authService = AuthService();
+  setupLocator();
   //Creation of repositories instances
   final alertRepository = AlertRepository();
   final pluginRepository = PluginsRepository();
@@ -44,8 +44,6 @@ Future<void> main() async {
   final notificationService = PushNotificationService(alertRepository);
 
   await notificationService.initNotificationHandling();
-
-  setupLocator(); // Uruchamia rejestrację GetIt
 
   runApp(
     MultiProvider(
@@ -63,8 +61,8 @@ Future<void> main() async {
 
         ChangeNotifierProxyProvider<UserViewModel, AlertRepository>(
           create: (context) => alertRepository,
-          update: (context, userVM, alertRepo) {
-            if (userVM.isLoggedIn && alertRepo!.alertsCache.isEmpty) {
+          update: (context, userViewModel, alertRepo) {
+            if (userViewModel.isLoggedIn && alertRepo!.alertsCache.isEmpty) {
               alertRepo.updateAllAlerts();
               alertRepo.initSseConnection();
             }
@@ -73,10 +71,14 @@ Future<void> main() async {
         ),
 
         //Creation of view models
-        ChangeNotifierProvider<PluginsViewModel>(
-          create: (context) => PluginsViewModel(
-            pluginsRepository: context.read<PluginsRepository>(),
-          ),
+        ChangeNotifierProxyProvider<UserViewModel, PluginsRepository>(
+          create: (context) => pluginRepository,
+          update: (context, userViewModel, pluginsRepo) {
+            if (userViewModel.isLoggedIn && pluginsRepo!.pluginsCache.isEmpty) {
+              pluginsRepo.updateAllPlugins();
+            }
+            return pluginsRepo!;
+          },
         ),
 
         ChangeNotifierProvider<HomeViewModel>(
@@ -88,6 +90,12 @@ Future<void> main() async {
         ChangeNotifierProvider<AlertsViewModel>(
           create: (context) => AlertsViewModel(
             alertsRepository: context.read<AlertRepository>(),
+          ),
+        ),
+
+        ChangeNotifierProvider<PluginsViewModel>(
+          create: (context) => PluginsViewModel(
+            pluginsRepository: context.read<PluginsRepository>(),
           ),
         ),
       ],

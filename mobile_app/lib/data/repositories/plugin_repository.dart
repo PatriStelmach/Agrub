@@ -7,45 +7,18 @@ class PluginsRepository extends ChangeNotifier {
   final Map<String, Plugin> pluginsCache = {};
 
   final Dio dio = locator<Dio>();
-  //PluginsRepository({required this.dio});
-  //MOCK: getting alerts from local JSON
-  //FINAL: updating full list via REST when opening the app
+
   Future<void> updateAllPlugins() async {
     try {
-      List<Plugin> allPlugins = [];
-      int currentPage = 0;
-      bool hasMorePages = true;
+      final response = await dio.get('/api/local-scripts/list');
 
-      while (hasMorePages) {
-        final response = await dio.get(
-          '/api/plugins/library',
-          queryParameters: {'page': currentPage, 'size': 20},
-        );
+      final List<dynamic> data = response.data as List<dynamic>;
 
-        //mock version:
-        //final String response = await rootBundle.loadString('assets/mocks/plugins.json');
-        //final List<dynamic> decodedData = jsonDecode(response);
+      pluginsCache.clear();
 
-        final Map<String, dynamic> responseData =
-            response.data as Map<String, dynamic>;
-
-        final List<dynamic> data = responseData['content'] ?? [];
-
-        final List<Plugin> pagePlugins = data.map((item) {
-          return Plugin.fromJson(item as Map<String, dynamic>);
-        }).toList();
-
-        allPlugins.addAll(pagePlugins);
-
-        int totalPages = responseData['totalPages'] ?? 0;
-        currentPage++;
-
-        if (currentPage >= totalPages) {
-          hasMorePages = false;
-        } else {
-          hasMorePages = true;
-        }
-      }
+      final List<Plugin> allPlugins = data.map((item) {
+        return Plugin.fromJson(item as Map<String, dynamic>);
+      }).toList();
 
       for (var plugin in allPlugins) {
         pluginsCache[plugin.fileName] = plugin;
@@ -58,12 +31,62 @@ class PluginsRepository extends ChangeNotifier {
     }
   }
 
-  // very simple placehold for sending ack
-  Future<void> startPlugin(String id) async {
-    print("Plugin started");
+  Future<String> forcePlugin(Plugin plugin, {String? arguments}) async {
+    try {
+      final String fileName = plugin.fileName;
+      final String extension = plugin.language.value;
+
+      final String fullFileName = extension.startsWith('.')
+          ? '$fileName$extension'
+          : '$fileName.$extension';
+
+      final Map<String, String> payload = {};
+      if (arguments != null && arguments.isNotEmpty) {
+        payload['arguments'] = arguments;
+      }
+
+      final response = await dio.post(
+        '/api/local-scripts/$fullFileName/run',
+        data: payload,
+      );
+
+      return response.data.toString();
+    } catch (e) {
+      debugPrint("PLUGIN DEBUG: Error while running ${plugin.fileName}: $e");
+      return "Run error: $e";
+    }
   }
 
-  Future<void> stopPlugin(String id) async {
-    print("Plugin stopped");
+  Future<bool> activatePluginWithCron({
+    required String fileName,
+    required String extension,
+    required String cronExpression,
+    required bool active,
+  }) async {
+    try {
+      final String fullFileName = extension.startsWith('.')
+          ? '$fileName$extension'
+          : '$fileName.$extension';
+
+      final response = await dio.put(
+        '/api/local-scripts/$fullFileName/edit',
+        data: {'cronExpression': cronExpression, 'active': active},
+      );
+
+      if (response.statusCode == 200) {
+        if (pluginsCache.containsKey(fileName)) {
+          final oldPlugin = pluginsCache[fileName]!;
+        }
+        notifyListeners();
+        updateAllPlugins();
+        return true;
+      }
+      return false;
+    } catch (e) {
+      debugPrint("PLUGIN DEBUG: Cron save error: $e");
+      return false;
+    }
   }
+
+  Future<void> stopPlugin(String id) async {}
 }
