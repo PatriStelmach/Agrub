@@ -104,6 +104,18 @@ const cronDescription = computed(() => {
   return [cron, true]
 })
 
+const cronWrappedDescription = (cron: string) => {
+  if(cron) {
+    try {
+      cronParser.parse(cron, {strict:true})
+      return [cronstrue.toString(cron), nextUnwrappedCron, true]
+    } catch (e) {
+      return [e, false]
+    }
+  }
+  return [cron, true]
+}
+
 watch(searchFilter, () => {
   emit('update:search-data', searchFilter.value)
 }, {immediate: true})
@@ -295,9 +307,16 @@ const editPlugin = async () => {
               </TransitionGroup>
             </TableCell>
             <TableCell v-if="!isUnwrapped(plugin.fullName)" class="whitespace-break-spaces">
-              {{ plugin.cronExpression ? cronstrue.toString(plugin.cronExpression) : ''}}
-              <br>
-              <span>Next run: {{ nextRun(plugin) }}
+              <span
+                class="grid w-full whitespace-break-spaces "
+                :class="{'text-destructive' : !cronWrappedDescription(plugin.cronExpression)[2]}"
+              >
+                <span>{{cronWrappedDescription(plugin.cronExpression)[0]}}</span>
+                <span  v-if="cronWrappedDescription(plugin.cronExpression)[2]">Next run: {{nextRun(plugin)}}
+                </span>
+                <span class="text-primary truncate" v-else-if="!cronWrappedDescription(plugin.cronExpression)[0]">
+                  Next run: -------------
+                </span>
               </span>
             </TableCell>
             <TableCell v-else class="grid space-y-2">
@@ -308,7 +327,7 @@ const editPlugin = async () => {
                   placeholder="cron expression"
                   v-model="unwrappedItem!.cronExpression"
                 />
-                <InputGroupAddon><IconClockBolt class="absolute left-4 size-4 lg:size-5 xl:size-6 2xl:size-8"/></InputGroupAddon>
+                <InputGroupAddon><IconClockBolt class="absolute left-4 size-4 xl:size-5 2xl:size-6"/></InputGroupAddon>
               </InputGroup>
               <span
                 class="grid gap-y-2 w-full text-center whitespace-break-spaces t"
@@ -367,7 +386,7 @@ const editPlugin = async () => {
                   >
                     <Button
                       @click.stop="getDetails(plugin.fullName)"
-                      class=" m-0 rounded-none bg-transparent! text-severity-3 hover:text-primary"
+                      class="m-0 rounded-none bg-transparent! text-severity-3 hover:text-primary"
                     >
                       Details
                       <IconMessageCode class="size-4 xl:size-5"/>
@@ -375,6 +394,7 @@ const editPlugin = async () => {
                   </PluginDetailsDialog>
                 </Button>
                 <Button
+                  :disabled="!cronDescription[2]"
                   class="border-l-2!"
                   @click.stop="editPlugin"
                   variant="green_outline">

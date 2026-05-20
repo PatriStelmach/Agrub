@@ -22,8 +22,22 @@ onMounted(() => {
       console.log(authStore.accessToken)
     }
   });
+  changeTime()
 })
 
+const date = new Date();
+
+const time = ref<{hour: number; minute: number, second: number}>({hour: date.getHours(), minute: date.getMinutes(), second: date.getSeconds()});
+const weekDay = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+
+const changeTime = () => {
+  setInterval(() => {
+    time.value.hour = new Date().getHours()
+    time.value.minute = new Date().getMinutes()
+    time.value.second = new Date().getSeconds()
+    console.log(time.value)
+  }, 1000)
+}
 
 </script>
 
@@ -47,6 +61,9 @@ onMounted(() => {
     />
     <header class="relative w-full">
       <nav class="absolute top-0 flex w-full h-10 bg-card justify-center items-center">
+        <div class="text-lg p-2 ">
+          {{ `${time.hour}:${time.minute}:${time.second}` }}
+        </div>
         <TopRightButtons/>
       </nav>
     </header>
