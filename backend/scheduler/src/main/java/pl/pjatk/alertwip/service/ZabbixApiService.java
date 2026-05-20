@@ -49,6 +49,19 @@ public class ZabbixApiService {
                     .retrieve()
                     .body(Map.class);
 
+            // ========== LOGOWANIE ===========
+            try {
+                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                mapper.enable(com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT);
+                System.out.println("\n=== [DIAGNOSTYKA] SUROWA ODPOWIEDŹ ZABBIX API (trigger.get) ===");
+                System.out.println(mapper.writeValueAsString(response));
+                System.out.println("===============================================================\n");
+            } catch (Exception printEx) {
+                System.out.println("[DIAGNOSTYKA] Nie udało się sformatować JSON-a. Surowa mapa: " + response);
+            }
+
+            //======================
+            
             if (response != null && response.containsKey("result")) {
                 return (List<Map<String, Object>>) response.get("result");
             }
