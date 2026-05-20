@@ -70,7 +70,7 @@ export const updateAlertRequest = async (action: Actions) => {
       author: action.author,
     })
     if(response.status === 200) {
-      toast.success(`Alert updated \n ${response.data.message}`)
+      return
     }
   }
   catch {

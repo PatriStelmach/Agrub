@@ -21,9 +21,11 @@ const fieldId = props.name
 
 <template>
   <VeeField v-slot="{ field, errors }" :name="name">
-    <Field :orientation="props.orientation" :data-invalid="!!errors.length">
-      <MyFieldLabel class="justify-end! " :text="label" :for="fieldId" />
-      <div class="max-md:w-40 md:w-70 lg:w-90 xl:w-120">
+    <Field class="gap-y-1" :orientation="props.orientation" :class="props.class" :data-invalid="!!errors.length">
+      <div class="flex space-x-2 items-center">
+        <slot/>
+        <MyFieldLabel :text="label" :for="fieldId" />
+      </div>
         <NumberField
           :id="fieldId"
           :min="min"
@@ -39,8 +41,6 @@ const fieldId = props.name
             <NumberFieldIncrement />
           </NumberFieldContent>
         </NumberField>
-      </div>
-
       <FieldError v-if="errors.length" :errors="errors" />
     </Field>
   </VeeField>
