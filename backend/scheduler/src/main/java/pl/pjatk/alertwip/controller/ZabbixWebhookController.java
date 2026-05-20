@@ -35,6 +35,12 @@ public class ZabbixWebhookController {
         String eventName = (String) payload.getOrDefault("name", "Nieznany błąd");
         String host = (String) payload.getOrDefault("host", "Nieznany host");
 
+        String eventId = null;
+        Object eventIdObj = payload.get("eventid");
+        if (eventIdObj != null) {
+            eventId = eventIdObj.toString();
+        }
+
         int severity = 0;
         Object sevObj = payload.get("severity");
         if (sevObj != null) {
@@ -57,6 +63,7 @@ public class ZabbixWebhookController {
                 problem.setStatus("Sent");
                 problem.setSeverity(severity);
                 problem.setCreatedAt(LocalDateTime.now());
+                problem.setExternalEventId(eventId);
 
                 // Procesowanie widoczności przed zapisem
                 routingService.processVisibility(problem);

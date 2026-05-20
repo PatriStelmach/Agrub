@@ -78,7 +78,7 @@ public class ZabbixApiService {
                 System.out.println("=== [DIAGNOSTYKA] DANE Z ZAPYTANIA (problem + event) ===");
                 System.out.println(finalResult);
                 System.out.println("========================================================");
-                
+
                 return finalResult;
             }
 
