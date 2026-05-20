@@ -94,23 +94,33 @@ public class ZabbixSyncService implements SchedulingConfigurer {
 
         // 2. PRZETWARZANIE ALERTÓW Z API
         for (Map<String, Object> problemData : currentProblems) {
-            Object nameObj = problemData.get("name");
+
+            // W triggerach nazwa to 'description'
+            Object nameObj = problemData.get("description");
             String name = (nameObj != null) ? nameObj.toString() : "Nieznany błąd";
 
-            Object eventIdObj = problemData.get("eventid");
-            String zabbixEventId = (eventIdObj != null) ? eventIdObj.toString() : null;
+            String zabbixEventId = null;
+            Object lastEventObj = problemData.get("lastEvent");
+
+            // selectLastEvent zazwyczaj zwraca obiekt lub listę obiektów, sprawdzamy bezpiecznie obie opcje
+            if (lastEventObj instanceof Map<?, ?> eventMap && eventMap.get("eventid") != null) {
+                zabbixEventId = eventMap.get("eventid").toString();
+            } else if (lastEventObj instanceof List<?> eventList && !eventList.isEmpty() && eventList.get(0) instanceof Map<?, ?> eventMap) {
+                if (eventMap.get("eventid") != null) zabbixEventId = eventMap.get("eventid").toString();
+            }
 
             int severity = 0;
-            Object severityObj = problemData.get("severity");
+            Object severityObj = problemData.get("priority");
             if (severityObj != null) {
                 try { severity = Integer.parseInt(severityObj.toString()); } catch (NumberFormatException ignored) {}
             }
 
+            // Wydobycie hosta z zagnieżdżonej tablicy "hosts"
             String hostName = "Nieznany host";
             Object hostsObj = problemData.get("hosts");
             if (hostsObj instanceof List<?> hostList && !hostList.isEmpty()) {
-                if (hostList.get(0) instanceof Map<?, ?> hostMap && hostMap.get("host") != null) {
-                    hostName = hostMap.get("host").toString();
+                if (hostList.get(0) instanceof Map<?, ?> hostMap && hostMap.get("name") != null) {
+                    hostName = hostMap.get("name").toString();
                 }
             }
 
