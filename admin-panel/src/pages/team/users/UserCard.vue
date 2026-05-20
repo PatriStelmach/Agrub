@@ -3,7 +3,7 @@ import type { User } from '@/types/types'
 import { Card, CardDescription, CardHeader } from '@/components/ui/card'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import {gridCard, nameLabel} from '@/assets/cssFunctions'
+import {bigNameLabel, gridCard, smallNameLabel} from '@/assets/cssFunctions'
 import {
   IconUsersGroup, IconEdit, IconKey, IconTool,
 } from "@tabler/icons-vue";
@@ -43,12 +43,12 @@ defineProps<{
     <CardDescription class="px-3">
       <div class="flex space-x-1">
         <component :is="user.role === 'ADMINISTRATOR' ? IconKey : IconTool" stroke="2" />
-        <h1 class="font-bold mb-2 text-lg xl:text-xl 2xl:text-2xl">{{ user.role }}</h1>
+        <h1 :class="bigNameLabel">{{ user.role }}</h1>
       </div>
       <div class="flex flex-2 items-start whitespace-break-spaces">
         <div class="flex space-x-1 items-center mr-2 mt-1">
           <IconUsersGroup stroke="1.5" />
-          <h1 :class="nameLabel">Groups:</h1>
+          <h1 :class="smallNameLabel">Groups:</h1>
         </div>
         <div>
           <Badge

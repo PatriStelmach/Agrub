@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import bash_icon from "@/components/icons/bash_icon.png"
-import python_icon from "@/components/icons/python_icon.png"
-import powershell_icon from "@/components/icons/powershell_icon.png"
+import bash_icon from "../../icons/bash_icon.png"
+import python_icon from "../../icons/python_icon.png"
+import powershell_icon from "../../icons/powershell_icon.png"
 import { isPython, isBash, isPowerShell } from "@/types/types.js"
 
 withDefaults(defineProps<{
