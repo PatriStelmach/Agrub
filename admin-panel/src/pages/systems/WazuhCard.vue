@@ -101,7 +101,7 @@ const onCancel = () => {
           <img
             :src="colorMode === 'dark' ? wazuh_logo_white : wazuh_logo_black"
             alt="wazuh_logo"
-            class="-mt-4"
+            class="-mt-2"
           />
         </div>
       </CardHeader>
@@ -157,7 +157,7 @@ const onCancel = () => {
         <img
           :src="colorMode === 'dark' ? wazuh_logo_white : wazuh_logo_black"
           alt="wazuh_logo"
-          class="-mt-4"
+          class="-mt-2"
         />
       </div>
     </CardHeader>
