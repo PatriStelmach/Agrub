@@ -23,12 +23,30 @@ export const useAlertStore = defineStore('alert-store', () => {
     return currentAlerts.value.findIndex(a => a.id === id)
   }
 
-  const updateAlertActions = (action : ActionResponse)=> {
+  const updateAlertActions = (action: ActionResponse) => {
     const alert = findAlert(action.alertId)
-    if (alert){
-      alert.severity = action.newSeverity ?? alert.severity;
-      alert.acknowledged = action.ack ?? alert.acknowledged
+    if (alert) {
+      const changes: string[] = []
+
+      if (action.ack !== undefined && action.ack !== alert.acknowledged) {
+        const ackText = action.ack ? 'Acknowledged' : 'Unacknowledged'
+        changes.push(ackText)
+        alert.acknowledged = action.ack
+      }
+      if (action.newSeverity !== undefined && action.newSeverity !== alert.severity) {
+        changes.push(`Severity changed to ${action.newSeverity}`)
+        alert.severity = action.newSeverity
+      }
+
+      if (action.message && action.message.trim() !== "") {
+        changes.push(`message: ${action.message}`)
+      }
+
       alert.actions.push(action)
+
+      const changesText = changes.length > 0 ? changes.join(' | ') : 'Updated action'
+
+      toast.success(`${alert.subject} updated by: ${action.author} --> ${changesText} `)
     }
   }
 

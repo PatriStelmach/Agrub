@@ -59,10 +59,10 @@ public class ConfigurationController {
         return ResponseEntity.ok(systemSettings);
     }
 
-    @PostMapping
-    public ResponseEntity<String> saveSettings(@RequestBody Map<String, String> settings) {
+  @PatchMapping
+    public ResponseEntity<Map<String, String>> saveSettings(@RequestBody Map<String, String> settings) {
         settingService.saveSettings(settings);
-        return ResponseEntity.ok("Ustawienia zostały zapisane.");
+        return ResponseEntity.ok(settingService.getMaskedSettings());
     }
 
 

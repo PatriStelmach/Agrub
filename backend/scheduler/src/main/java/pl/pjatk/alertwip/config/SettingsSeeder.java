@@ -34,7 +34,7 @@ public class SettingsSeeder implements CommandLineRunner {
                 Map.entry("zabbix_enabled", "true"),
                 Map.entry("zabbix_url", "http://localhost:10000/api/mock/zabbix"),
                 // to jest klucz api, a nie hasło ,ale potrzebuję mieć tak samo na froncie
-                Map.entry("zabbix_password_SECRET", "asdasd"),
+                Map.entry("zabbix_api_token_SECRET", "asdasd"),
 
                 // Wazuh
                 Map.entry("wazuh_enabled", "false"),

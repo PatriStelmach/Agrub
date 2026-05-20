@@ -12,6 +12,7 @@ const props = defineProps<{
   type?: string
   class?: HTMLAttributes["class"]
   orientation: "horizontal" | "vertical"
+  autocomplete?: string
 }>()
 
 const fieldId = props.name
@@ -19,21 +20,22 @@ const fieldId = props.name
 
 <template>
   <VeeField v-slot="{ field, errors }" :name="name">
-    <Field :orientation="props.orientation" :class="props.class" :data-invalid="!!errors.length">
-        <MyFieldLabel class="justify-end" :text="label" :for="fieldId" />
-      <div>
-        <Input
-          class="max-md:w-40 md:w-70 lg:w-90 xl:w-120"
-          :id="fieldId"
-          :type="type ?? 'text'"
-          :placeholder="placeholder"
-          :aria-invalid="!!errors.length"
-          @update:model-value="field.onChange"
-          :default-value="field.value"
-          v-bind="field"
-        />
-        <FieldError v-if="errors.length" :errors="errors" />
+    <Field class="gap-y-1" :orientation="props.orientation" :class="props.class" :data-invalid="!!errors.length">
+      <div class="flex space-x-2 items-center">
+        <slot/>
+        <MyFieldLabel :text="label" :for="fieldId" />
       </div>
+      <Input
+        :autocomplete="autocomplete"
+        :id="fieldId"
+        :type="type ?? 'text'"
+        :placeholder="placeholder"
+        :aria-invalid="!!errors.length"
+        @update:model-value="field.onChange"
+        :default-value="field.value"
+        v-bind="field"
+      />
+      <FieldError v-if="errors.length" :errors="errors" />
     </Field>
   </VeeField>
 </template>
