@@ -26,44 +26,66 @@ public class ZabbixApiService {
             throw new IllegalStateException("Konfiguracja Zabbixa jest niekompletna. Skonfiguruj API Token w panelu.");
         }
 
-        // Wracamy do problem.get, ale z poprawnym parametrem "name" dla hosta!
-        Map<String, Object> request = Map.of(
-                "jsonrpc", "2.0",
-                "method", "problem.get",
-                "auth", apiToken,
-                "params", Map.of(
-                        "output", List.of("eventid", "name", "severity"),
-                        "selectHosts", List.of("name"),
-                        "recent", false // Zwraca tylko AKTUALNIE trwające problemy na Dashboardzie
-                ),
-                "id", 1
-        );
-
         try {
-            Map<String, Object> response = restClient.post()
-                    .uri(apiUrl)
-                    .body(request)
-                    .retrieve()
-                    .body(Map.class);
-            // ========== LOGOWANIE ===========
-            try {
-                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-                mapper.enable(com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT);
-                System.out.println("\n=== [DIAGNOSTYKA] SUROWA ODPOWIEDŹ ZABBIX API (problem.get) ===");
-                System.out.println(mapper.writeValueAsString(response));
-                System.out.println("===============================================================\n");
-            } catch (Exception printEx) {
-                System.out.println("[DIAGNOSTYKA] Nie udało się sformatować JSON-a. Surowa mapa: " + response);
+            //aktywne alerty
+            Map<String, Object> problemRequest = Map.of(
+                    "jsonrpc", "2.0",
+                    "method", "problem.get",
+                    "auth", apiToken,
+                    "params", Map.of(
+                            "output", List.of("eventid"),
+                            "recent", false
+                    ),
+                    "id", 1
+            );
+
+            Map<String, Object> problemResponse = restClient.post()
+                    .uri(apiUrl).body(problemRequest).retrieve().body(Map.class);
+
+            if (problemResponse == null || !problemResponse.containsKey("result")) {
+                return List.of();
             }
 
-            //======================
-
-            if (response != null && response.containsKey("result")) {
-                return (List<Map<String, Object>>) response.get("result");
+            List<Map<String, Object>> activeProblems = (List<Map<String, Object>>) problemResponse.get("result");
+            if (activeProblems.isEmpty()) {
+                return List.of();
             }
+
+            List<String> eventIds = activeProblems.stream()
+                    .map(p -> p.get("eventid").toString())
+                    .toList();
+
+            //szczegóły + nazwy hostów
+
+            Map<String, Object> eventRequest = Map.of(
+                    "jsonrpc", "2.0",
+                    "method", "event.get",
+                    "auth", apiToken,
+                    "params", Map.of(
+                            "eventids", eventIds,
+                            "output", List.of("eventid", "name", "severity"),
+                            "selectHosts", List.of("name")
+                    ),
+                    "id", 2
+            );
+
+            Map<String, Object> eventResponse = restClient.post()
+                    .uri(apiUrl).body(eventRequest).retrieve().body(Map.class);
+
+            if (eventResponse != null && eventResponse.containsKey("result")) {
+                List<Map<String, Object>> finalResult = (List<Map<String, Object>>) eventResponse.get("result");
+
+                System.out.println("=== [DIAGNOSTYKA] DANE Z ZAPYTANIA (problem + event) ===");
+                System.out.println(finalResult);
+                System.out.println("========================================================");
+                
+                return finalResult;
+            }
+
             return List.of();
+
         } catch (Exception e) {
-            throw new RuntimeException("Błąd pobierania problemów (problem.get): " + e.getMessage());
+            throw new RuntimeException("Błąd pobierania problemów (Dwustopniowe API): " + e.getMessage());
         }
     }
 
