@@ -20,7 +20,7 @@ public class ZabbixApiService {
     @SuppressWarnings("unchecked")
     public List<Map<String, Object>> getActiveProblems() {
         String apiUrl = settingService.getValue("zabbix_url", "");
-        String apiToken = settingService.getValue("zabbix_api_token_SECRET", "");
+        String apiToken = settingService.getValue("zabbix_password_SECRET", "");
 
         if (apiUrl.isBlank() || apiToken.isBlank()) {
             throw new IllegalStateException("Konfiguracja Zabbixa jest niekompletna. Skonfiguruj API Token w panelu.");
@@ -57,7 +57,7 @@ public class ZabbixApiService {
     @SuppressWarnings("unchecked")
     public Map<String, Object> callZabbixApi(String method, Map<String, Object> params) {
         String apiUrl = settingService.getValue("zabbix_url", "");
-        String apiToken = settingService.getValue("zabbix_api_token_SECRET", "");
+        String apiToken = settingService.getValue("zabbix_password_SECRET", "");
 
         if (apiUrl.isBlank() || apiToken.isBlank()) {
             throw new IllegalStateException("Konfiguracja Zabbixa jest niekompletna. Skonfiguruj API Token w panelu.");

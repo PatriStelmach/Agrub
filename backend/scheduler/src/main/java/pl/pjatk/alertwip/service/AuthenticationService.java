@@ -1,7 +1,8 @@
 package pl.pjatk.alertwip.service;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -9,7 +10,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.pjatk.alertwip.dto.AuthenticationRequestDTO;
+import pl.pjatk.alertwip.model.Role;
 import pl.pjatk.alertwip.model.User;
+import pl.pjatk.alertwip.model.UserGroup;
+import pl.pjatk.alertwip.repository.UserGroupRepository;
 import pl.pjatk.alertwip.repository.UserRepository;
 import pl.pjatk.alertwip.security.JwtService;
 
@@ -23,32 +27,38 @@ import java.util.UUID;
 public class AuthenticationService {
 
     private final UserRepository repository;
+    private final UserGroupRepository userGroupRepository;
     private final JwtService jwtService;
-    private final AuthenticationManager authenticationManager;
+    private final AuthenticationProvider localAuthProvider;
+    private final AuthenticationProvider adAuthProvider;
     private final StringRedisTemplate redisTemplate;
     private final SystemSettingService settingService;
     private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
 
     public AuthenticationService(UserRepository repository,
+                                 UserGroupRepository userGroupRepository,
                                  JwtService jwtService,
-                                 AuthenticationManager authenticationManager,
+                                 @Qualifier("localAuthProvider") AuthenticationProvider localAuthProvider,
+                                 @Qualifier("adAuthProvider") AuthenticationProvider adAuthProvider,
                                  StringRedisTemplate redisTemplate,
                                  SystemSettingService settingService,
                                  EmailService emailService,
                                  PasswordEncoder passwordEncoder) {
         this.repository = repository;
+        this.userGroupRepository = userGroupRepository;
         this.jwtService = jwtService;
-        this.authenticationManager = authenticationManager;
+        this.localAuthProvider = localAuthProvider;
+        this.adAuthProvider = adAuthProvider;
         this.redisTemplate = redisTemplate;
         this.settingService = settingService;
         this.emailService = emailService;
         this.passwordEncoder = passwordEncoder;
     }
 
-    public Map<String, String> authenticate(AuthenticationRequestDTO request) {
+    public Map<String, String> authenticateLocal(AuthenticationRequestDTO request) {
         try {
-            authenticationManager.authenticate(
+            localAuthProvider.authenticate(
                     new UsernamePasswordAuthenticationToken(request.email(), request.password())
             );
         } catch (AuthenticationException e) {
@@ -58,22 +68,77 @@ public class AuthenticationService {
         User user = repository.findByEmail(request.email())
                 .orElseThrow(() -> new UsernameNotFoundException("Użytkownik uwierzytelniony, ale nie znaleziony w bazie"));
 
-        if (user.getLastPasswordChangeDate() != null) {
-            long passwordLifetimeDays = Long.parseLong(settingService.getValue("SECURITY_PASSWORD_LIFETIME_DAYS", "90"));
-            if (user.getLastPasswordChangeDate().plusDays(passwordLifetimeDays).isBefore(LocalDateTime.now())) {
-                throw new CredentialsExpiredException("Twoje hasło wygasło. Wymagana zmiana hasła.");
-            }
-        }
+        checkPasswordExpiration(user);
 
         return Map.of(
                 "access_token", jwtService.generateAccessToken(user),
                 "refresh_token", jwtService.generateRefreshToken(user)
         );
     }
-    
+
+    public Map<String, String> authenticateAd(AuthenticationRequestDTO request) {
+        if (adAuthProvider == null) {
+            throw new RuntimeException("Konfiguracja AD jest błędna lub nieaktywna.");
+        }
+
+        try {
+            adAuthProvider.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.email(), request.password())
+            );
+        } catch (AuthenticationException e) {
+            throw new RuntimeException("Nieprawidłowy login lub hasło do Active Directory");
+        }
+
+        User user = repository.findByEmail(request.email()).orElseGet(() -> {
+            User newUser = new User();
+            newUser.setEmail(request.email());
+            newUser.setPassword("EXTERNAL_AD_AUTH");
+
+            String[] parts = request.email().split("@")[0].split("\\.");
+            if (parts.length >= 2) {
+                newUser.setFirstname(capitalize(parts[0]));
+                newUser.setSurname(capitalize(parts[1]));
+            } else {
+                newUser.setFirstname(capitalize(request.email().split("@")[0]));
+                newUser.setSurname("AD");
+            }
+
+            newUser.setRole(Role.TECHNICIAN);
+            newUser.setActive(true);
+
+            UserGroup techGroup = userGroupRepository.findByName("TECH").orElse(null);
+            if (techGroup != null) {
+                newUser.getGroups().add(techGroup);
+            }
+
+            return repository.save(newUser);
+        });
+
+        checkPasswordExpiration(user);
+
+        return Map.of(
+                "access_token", jwtService.generateAccessToken(user),
+                "refresh_token", jwtService.generateRefreshToken(user)
+        );
+    }
+
+    private void checkPasswordExpiration(User user) {
+        if (user.getLastPasswordChangeDate() != null && !"EXTERNAL_AD_AUTH".equals(user.getPassword())) {
+            long passwordLifetimeDays = Long.parseLong(settingService.getValue("SECURITY_PASSWORD_LIFETIME_DAYS", "90"));
+
+            if (user.getLastPasswordChangeDate().plusDays(passwordLifetimeDays).isBefore(LocalDateTime.now())) {
+                throw new CredentialsExpiredException("Twoje hasło wygasło. Wymagana zmiana hasła.");
+            }
+        }
+    }
+
+    private String capitalize(String str) {
+        if (str == null || str.isEmpty()) return str;
+        return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
+    }
+
     public void initiatePasswordReset(String email) {
         User user = repository.findByEmail(email).orElse(null);
-
         if (user == null) {
             return;
         }
@@ -86,24 +151,20 @@ public class AuthenticationService {
 
         String token = UUID.randomUUID().toString();
         redisTemplate.opsForValue().set("reset:" + token, email, 15, TimeUnit.MINUTES);
-
         String resetLink = "http://localhost:5173/reset-password?token=" + token;
         String message = "Cześć " + user.getFirstname() + ",\n\n" +
                 "Link do resetu hasła (ważny 15 minut):\n" + resetLink;
-
         emailService.sendSimpleMessage(email, "Resetowanie hasła - AlertWIP", message);
     }
 
     public void completePasswordReset(String token, String newPassword) {
         String email = redisTemplate.opsForValue().get("reset:" + token);
-
         if (email == null) {
             throw new RuntimeException("Link wygasł lub jest nieprawidłowy.");
         }
 
         User user = repository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Użytkownik nie istnieje"));
-
         user.setPassword(passwordEncoder.encode(newPassword));
         user.setLastPasswordChangeDate(LocalDateTime.now());
 
@@ -128,7 +189,6 @@ public class AuthenticationService {
         String userEmail = jwtService.extractUsername(refreshToken);
         User user = repository.findByEmail(userEmail)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
         if (jwtService.isTokenValid(refreshToken, user)) {
             return jwtService.generateAccessToken(user);
         }

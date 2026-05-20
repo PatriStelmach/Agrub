@@ -41,7 +41,7 @@ Backend AlertWIP integruje się z Nagiosem poprzez `NagiosSyncService`. Wymagane
 | `nagios_enabled` | `true` | Aktywacja modułu Nagios |
 | `nagios_url` | `http://localhost:8080/nagios/cgi-bin/statusjson.cgi` | Adres API Nagiosa |
 | `nagios_user` | `nagiosadmin` | Użytkownik API (Basic Auth) |
-| `nagios_pass_SECRET` | `nagiosadmin` | Hasło API |
+| `nagios_password_SECRET` | `nagiosadmin` | Hasło API |
 
 **Logika mapowania statusów:**
 * Nagios `2 (CRITICAL)` -> AlertWIP `Severity 5`

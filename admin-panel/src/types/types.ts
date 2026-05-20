@@ -216,14 +216,14 @@ export interface NagiosConfig {
   nagios_url: string
   nagios_enabled: boolean
   nagios_user: string
-  nagios_pass_SECRET?: string
+  nagios_password_SECRET?: string
 }
 //tak przychodzi z api
 export interface ZabbixConfig {
   name: string
   zabbix_enabled: boolean
   zabbix_url: string
-  zabbix_api_token_SECRET?: string
+  zabbix_password_SECRET?: string
 }
 //to jest moje po mapowaniu
 export interface MonitoringSystemsConfig  {
@@ -246,11 +246,11 @@ export interface systemFullSettings {
   nagios_url: string
   nagios_enabled: boolean
   nagios_user: string
-  nagios_pass_SECRET?: string
+  nagios_password_SECRET?: string
 
   zabbix_enabled: boolean
   zabbix_url: string
-  zabbix_api_token_SECRET?: string
+  zabbix_password_SECRET?: string
 
   smtp_host: string
   smtp_port: string

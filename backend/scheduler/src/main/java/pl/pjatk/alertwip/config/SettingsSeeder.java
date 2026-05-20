@@ -33,7 +33,8 @@ public class SettingsSeeder implements CommandLineRunner {
                 // Zabbix
                 Map.entry("zabbix_enabled", "true"),
                 Map.entry("zabbix_url", "http://localhost:10000/api/mock/zabbix"),
-                Map.entry("zabbix_api_token_SECRET", "asdasd"),
+                // to jest klucz api, a nie hasło ,ale potrzebuję mieć tak samo na froncie
+                Map.entry("zabbix_password_SECRET", "asdasd"),
 
                 // Wazuh
                 Map.entry("wazuh_enabled", "false"),
@@ -46,7 +47,7 @@ public class SettingsSeeder implements CommandLineRunner {
                 Map.entry("nagios_enabled", "true"),
                 Map.entry("nagios_url", "http://localhost:8080/nagios/cgi-bin/statusjson.cgi"),
                 Map.entry("nagios_user", "nagiosadmin"),
-                Map.entry("nagios_pass_SECRET", "nagiosadmin"),
+                Map.entry("nagios_password_SECRET", "nagiosadmin"),
 
                 // Sync timer
                 Map.entry("external_system_sync_timer", "60"),
