@@ -49,7 +49,7 @@ public class ZabbixApiService {
             try {
                 com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
                 mapper.enable(com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT);
-                System.out.println("\n=== [DIAGNOSTYKA] SUROWA ODPOWIEDŹ ZABBIX API (trigger.get) ===");
+                System.out.println("\n=== [DIAGNOSTYKA] SUROWA ODPOWIEDŹ ZABBIX API (problem.get) ===");
                 System.out.println(mapper.writeValueAsString(response));
                 System.out.println("===============================================================\n");
             } catch (Exception printEx) {
