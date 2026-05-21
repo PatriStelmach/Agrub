@@ -49,7 +49,7 @@ const getActions = async () => {
             <DialogLabel for="alert-subject" text="Subject"/>
             <p id="subject"  class="text-sm"> {{ props.alert.subject}}</p>
           </div>
-          <div class="grid   ">
+          <div class="grid">
             <DialogLabel text="Message" for="alert-message"/>
             <p id="alert-message" class="text-sm"> {{ props.alert.message}}</p>
           </div>
