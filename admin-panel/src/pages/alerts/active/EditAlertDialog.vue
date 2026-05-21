@@ -28,16 +28,16 @@ const props = defineProps<{
 
 const authStore = useAuthStore()
 
-const newAck = ref(props.alert.acknowledged)
+const newAck = ref(props.alert.isAcknowledged)
 const newSeverity = ref(props.alert.severity)
 const newMessage = ref("")
 
 const sentAction = async () => {
-  if(newAck.value !== props.alert.acknowledged || newSeverity.value !== props.alert.severity || newMessage.value) {
+  if(newAck.value !== props.alert.isAcknowledged || newSeverity.value !== props.alert.severity || newMessage.value) {
     await updateAlertRequest({
       id: props.alert.id,
       author: authStore.userEmail!,
-      ack: newAck.value === props.alert.acknowledged ? undefined : newAck.value,
+      ack: newAck.value === props.alert.isAcknowledged ? undefined : newAck.value,
       message: newMessage.value ?? undefined,
       newSeverity: newSeverity.value === props.alert.severity ? undefined : newSeverity.value,
     })
@@ -46,7 +46,7 @@ const sentAction = async () => {
 
 const onClose = () => {
   setTimeout(() => {
-    newAck.value = props.alert.acknowledged
+    newAck.value = props.alert.isAcknowledged
     newSeverity.value = props.alert.severity
     newMessage.value = ""
   }, 500)

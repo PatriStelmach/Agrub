@@ -28,10 +28,10 @@ export const useAlertStore = defineStore('alert-store', () => {
     if (alert) {
       const changes: string[] = []
 
-      if (action.ack !== undefined && action.ack !== alert.acknowledged) {
+      if (action.ack !== undefined && action.ack !== alert.isAcknowledged) {
         const ackText = action.ack ? 'Acknowledged' : 'Unacknowledged'
         changes.push(ackText)
-        alert.acknowledged = action.ack
+        alert.isAcknowledged = action.ack
       }
       if (action.newSeverity !== undefined && action.newSeverity !== alert.severity) {
         changes.push(`Severity changed to ${action.newSeverity}`)

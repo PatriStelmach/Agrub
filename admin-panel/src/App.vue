@@ -38,7 +38,6 @@ const changeTime = () => {
     time.value.hour = dateParser(newDate).hours
     time.value.minute = dateParser(newDate).minutes
     time.value.second = dateParser(newDate).seconds
-    console.log(time.value)
   }, 1000)
 }
 
