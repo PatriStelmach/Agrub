@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button'
-import { IconDeviceFloppy} from "@tabler/icons-vue";
+import { IconCheck} from "@tabler/icons-vue";
 import {
   Dialog,
   DialogClose,
@@ -19,7 +19,7 @@ import BigLoadingBlock from "@/helpers_components/loaders/BigLoadingBlock.vue";
 const props = defineProps<{
   description: string,
   code: string
-  isLoading: boolean
+  isLoading?: boolean
   editable: boolean
 }>()
 
@@ -101,8 +101,8 @@ const emits = defineEmits<{
               type="submit"
               @click="emits('update:save-changes', newCode, newDescription)"
             >
-              Save changes
-              <IconDeviceFloppy />
+              Ok
+              <IconCheck />
             </Button>
           </DialogClose>
 

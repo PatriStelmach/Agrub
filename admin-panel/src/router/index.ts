@@ -13,12 +13,12 @@ import GroupCardDetails from '../pages/team/groups/GroupCardDetails.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    { path: '/my_systems',      name: 'my_systems',      component: MySystems },
+    { path: '/my_systems/:system?',      name: 'my_systems',      component: MySystems },
     { path: '/',                name: 'home',            component: ActiveAlertsPage },
     { path: '/active_alerts',   name: 'active_alerts',   component: ActiveAlertsPage },
     { path: '/alerts_history',  name: 'alerts_history',  component: AlertsHistory },
     { path: '/plugins_library', name: 'plugins_library', component: PluginsLibrary },
-    { path: '/my_plugins',      name: 'my_plugins',      component: MyPlugins },
+    { path: '/my_plugins/:plugin?',      name: 'my_plugins',      component: MyPlugins },
     { path: '/team_members',    name: 'team_members',    component: TeamPage },
     { path: '/groups',          name: 'groups',          component: Groups },
     { path: '/import_plugins',  name: 'import_plugins',  component: ImportPlugin },
@@ -26,5 +26,7 @@ const router = createRouter({
     { path: '/groups/create_group',    name: 'groups/create_group',    component: GroupCardDetails },
   ],
 })
+
+
 
 export default router

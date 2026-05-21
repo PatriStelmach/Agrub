@@ -21,6 +21,7 @@ import {computed, ref, watchEffect} from "vue";
 import SeverityDiv from "@/helpers_components/SeverityDiv.vue";
 import {dateParser} from "@/composables/dateParser.ts";
 import LoadingTable from "@/helpers_components/LoadingTable.vue";
+import {useRouter} from "vue-router";
 
 const props = defineProps<{
   tableData: ActiveAlert[]
@@ -28,7 +29,7 @@ const props = defineProps<{
 }>()
 
 const hoveredAlert = defineModel<AlertDetails | null>('hoveredAlert')
-
+const router = useRouter()
 const hoveredId = ref<number | null>(null);
 
 const computedHoveredAlert = computed(() => {
@@ -43,6 +44,16 @@ watchEffect(() => {
 });
 
 const { sortedData, sortKey, sortOrder, toggleSort } = useSort<ActiveAlert>(() => props.tableData as ActiveAlert[], 'createdAt')
+
+const goToOrigin = (origin :string) => {
+  console.log(origin );
+  if(origin === 'ZABBIX' || origin === 'WAZUH' || origin === 'NAGIOS') {
+    router.push(`/my_systems/${origin}`)
+  }
+  else {
+    router.push(`my_plugins/${origin}`)
+  }
+}
 
 </script>
 
@@ -59,7 +70,7 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<ActiveAlert>(() =
         <SortableHead keyName="message" label="Message" :sort-key="sortKey" class="w-fit md:min-w-1/5" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
         <SortableHead keyName="source" label="Source" :sort-key="sortKey" class="w-fit " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
         <SortableHead keyName="originType" label="Origin" :sort-key="sortKey" class="w-1/10 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-        <SortableHead keyName="acknowledged" label="ACK" :sort-key="sortKey" class="w-6/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+        <SortableHead keyName="isAcknowledged" label="ACK" :sort-key="sortKey" class="w-6/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
         <SortableHead keyName="createdAt" label="Created at" :sort-key="sortKey" class="w-fit md:w-15/100 lg:w-1/9" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
         <TableHead class="max-md:w-9/100 w-6/100 lg:w-5/100 font-bold text-sm lg:text-md xl:text-lg 2xl:text:xl">Actions</TableHead>
       </TableRow>
@@ -69,10 +80,10 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<ActiveAlert>(() =
       <TableBody v-else>
         <TableRow
           :id="`${alert.id}_row`"
-          :class="hoverListRow('relative duration-0')"
+          :class="hoverListRow('relative duration-0 ')"
           v-for="alert in sortedData"
-          :key="alert.id">
-
+          :key="alert.id"
+        >
           <TableCell class="pl-4  whitespace-break-spaces">{{alert.subject}}</TableCell>
           <TableCell>
             <SeverityDiv :severity="alert.severity"/>
@@ -88,13 +99,15 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<ActiveAlert>(() =
             >{{alert.source}}</Badge>
           </TableCell>
           <TableCell >
-            <Badge class="whitespace-break-spaces"
-                   variant="origin"
+            <Badge
+              @click="goToOrigin(alert.originType)"
+              class="whitespace-break-spaces"
+              variant="origin"
             >{{alert.originType}}</Badge>
           </TableCell>
 
           <TableCell class=" gap-x-2 items-center">
-            <IconCircleDashedCheck v-if="alert.acknowledged" class="text-green-badge"/>
+            <IconCircleDashedCheck v-if="alert.isAcknowledged" class="text-green-badge"/>
             <IconCircleDashedX v-else class="text-red-badge"/>
           </TableCell>
           <DateCell   :date="dateParser(alert.createdAt).toDate "></DateCell>
@@ -102,11 +115,10 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<ActiveAlert>(() =
             <EditAlertDialog
               :alert="alert"
             >
-              <Button size="icon-lg" variant="green_outline">
-                <IconEdit class="size-5"/>
+              <Button size="icon-sm" variant="green_outline">
+                <IconEdit class="size-4"/>
               </Button>
             </EditAlertDialog>
-
           </TableCell>
         </TableRow>
       </TableBody>

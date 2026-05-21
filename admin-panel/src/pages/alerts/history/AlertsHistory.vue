@@ -45,12 +45,14 @@ const getAlertsHistory = async () => {
     })
 
     if (response.status === 200) {
-      items.value = response.data.content.map((a: HistoryAlert) => ({
+      items.value = response.data.content.map((a:any) => ({
         ...a,
         createdAt: new Date(a.createdAt),
-        closedAt: new Date(a.closedAt)
+        closedAt: new Date(a.closedAt),
+        isAcknowledged: a.acknowledged
       }))
       totalElements.value = response.data.totalElements
+      console.log(response.data)
     }
   } catch {
     toast.error('Error getting alerts history')
