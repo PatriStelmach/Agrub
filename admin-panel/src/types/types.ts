@@ -23,7 +23,7 @@ export interface ActiveAlert {
   message: string,
   source: string,
   originType: string,
-  acknowledged: boolean,
+  isAcknowledged: boolean,
   createdAt: Date,
   actions: ActionResponse[],
   severity: 0 | 1 | 2 | 3 | 4 | 5,

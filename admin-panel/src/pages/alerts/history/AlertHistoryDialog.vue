@@ -65,10 +65,10 @@ const getActions = async () => {
           </div>
 
           <div class="flex items-end ">
-            <DialogLabel for="ack" class="w-36  mb-0 pb-0" :text="alert.acknowledged ? 'Acknowledged' : 'Unacknowledged' "/>
+            <DialogLabel for="ack" class="w-36  mb-0 pb-0" :text="alert.isAcknowledged ? 'Acknowledged' : 'Unacknowledged' "/>
             <Button variant="outline" class="size-7 cursor-default">
               <IconCheck
-                v-if="alert.acknowledged"
+                v-if="alert.isAcknowledged"
                 class="size-5 text-green-badge "/>
               <IconX
                 v-else

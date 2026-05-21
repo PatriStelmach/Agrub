@@ -58,7 +58,7 @@ watchEffect(() => {
 });
 
 const goToOrigin = (origin :string) => {
-  console.log(origin );
+  console.log(origin);
   if(origin === 'ZABBIX' || origin === 'WAZUH' || origin === 'NAGIOS') {
     router.push(`/my_systems/${origin}`)
   }
@@ -82,7 +82,7 @@ const goToOrigin = (origin :string) => {
             <SortableHead keyName="message" label="Message" :sort-key="sortKey" class="w-fit md:min-w-1 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
             <SortableHead keyName="source" label="Source" :sort-key="sortKey" class="w-fit " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
             <SortableHead keyName="originType" label="Origin" :sort-key="sortKey" class="w-1/10 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-            <SortableHead keyName="acknowledged" label="ACK" :sort-key="sortKey" class="w-6/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="isAcknowledged" label="ACK" :sort-key="sortKey" class="w-6/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
             <SortableHead keyName="createdAt" label="Created at" :sort-key="sortKey" class="w-fit md:w-13/100 lg:w-1/10 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
             <SortableHead keyName="closedAt" label="Closed at" :sort-key="sortKey" class="w-fit md:w-13/100 lg:w-1/10 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
             <TableHead class="max-md:w-9/100 w-6/100 lg:w-5/100 font-bold text-sm lg:text-md xl:text-lg 2xl:text:xl">Actions</TableHead>
@@ -122,7 +122,7 @@ const goToOrigin = (origin :string) => {
               </TableCell>
 
               <TableCell class=" gap-x-2 items-center">
-                <IconCircleDashedCheck v-if="alert.acknowledged" class="text-green-badge"/>
+                <IconCircleDashedCheck v-if="alert.isAcknowledged" class="text-green-badge"/>
                 <IconCircleDashedX v-else class="text-red-badge"/>
               </TableCell>
               <DateCell  :date="alert.createdAt "></DateCell>
