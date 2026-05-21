@@ -130,7 +130,7 @@ services:
     environment:
       - TZ=${SYSTEM_TIMEZONE:-UTC}
       - NAGIOSADMIN_USER=nagiosadmin
-      - NAGIOSADMIN_PASS=nagios123
+      - NAGIOSADMIN_PASS=JebanieKurwa1
     networks:
       - monitor_net
 
@@ -148,7 +148,8 @@ services:
     networks:
       - monitor_net
     depends_on:
-      - alert-backend
+      - alert-backend
+
 
 networks:
   monitor_net:
