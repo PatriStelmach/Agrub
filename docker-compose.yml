@@ -14,7 +14,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-app:3306/alertwip?useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-app:3306/alertwip?useSSL=false&serverTimezone=${SYSTEM_TIMEZONE:-UTC}&allowPublicKeyRetrieval=true
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=rootpassword
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
