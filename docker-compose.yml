@@ -148,8 +148,7 @@ services:
     networks:
       - monitor_net
     depends_on:
-      - alert-backend
-    volumes:
+      - alert-backend
 
 networks:
   monitor_net:
