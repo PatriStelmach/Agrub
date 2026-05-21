@@ -26,6 +26,7 @@ import SeverityDiv from "@/helpers_components/SeverityDiv.vue";
 import {hoverListRow} from "@/assets/cssFunctions.ts";
 import LoadingTable from "@/helpers_components/LoadingTable.vue";
 import AlertHistoryDialog from '@/pages/alerts/history/AlertHistoryDialog.vue'
+import {useRouter} from "vue-router";
 
 const props = defineProps<{
   alerts: HistoryAlert[]
@@ -33,6 +34,7 @@ const props = defineProps<{
   isLoading: boolean
 }>()
 
+const router = useRouter()
 const hoveredAlert = defineModel<AlertDetails | null>('hoveredAlert')
 const sortedHead = defineModel<{ sortKey: string; sortOrder: string }>('sortedHead')
 
@@ -55,6 +57,15 @@ watchEffect(() => {
   sortedHead.value = { sortKey: sortKey.value, sortOrder: sortOrder.value };
 });
 
+const goToOrigin = (origin :string) => {
+  console.log(origin );
+  if(origin === 'ZABBIX' || origin === 'WAZUH' || origin === 'NAGIOS') {
+    router.push(`/my_systems/${origin}`)
+  }
+  else {
+    router.push(`my_plugins/${origin}`)
+  }
+}
 
 </script>
 
@@ -103,8 +114,10 @@ watchEffect(() => {
                 >{{alert.source}}</Badge>
               </TableCell>
               <TableCell >
-                <Badge class="whitespace-break-spaces"
-                       variant="origin"
+                <Badge
+                  @click="goToOrigin(alert.originType)"
+                  class="whitespace-break-spaces"
+                  variant="origin"
                 >{{alert.originType}}</Badge>
               </TableCell>
 
