@@ -11,8 +11,10 @@ services:
       - "8080:10000"
     volumes:
       - ./scripts:/app/scripts
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-app:3306/alertwip?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-app:3306/alertwip?useSSL=false&allowPublicKeyRetrieval=true
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=rootpassword
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
@@ -36,6 +38,8 @@ services:
       - MYSQL_DATABASE=alertwip
     volumes:
       - ./mysql-app:/var/lib/mysql
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     networks:
       - monitor_net
 
@@ -45,6 +49,8 @@ services:
     restart: unless-stopped
     volumes:
       - redis_main_data:/data
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     networks:
       - monitor_net
 
@@ -65,6 +71,8 @@ services:
       - MYSQL_PASSWORD=zabbixpass
     volumes:
       - zabbix-db-data:/var/lib/mysql
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     networks:
       - monitor_net
 
@@ -83,6 +91,8 @@ services:
       - mysql-zabbix
     volumes:
       - ./zabbix-server:/usr/lib/zabbix/alertscripts
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     networks:
       - monitor_net
 
@@ -96,12 +106,15 @@ services:
       - MYSQL_USER=zabbix
       - MYSQL_PASSWORD=zabbixpass
       - ZBX_SERVER_HOST=zabbix-server
-      - PHP_TZ=Europe/Warsaw
+      - PHP_TZ=${SYSTEM_TIMEZONE:-UTC}
     ports:
       - "8081:8080"
     depends_on:
       - mysql-zabbix
       - zabbix-server
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     networks:
       - monitor_net
 
@@ -111,6 +124,9 @@ services:
     restart: unless-stopped
     environment:
       - ZBX_SERVER_HOST=zabbix-server
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     networks:
       - monitor_net
 
@@ -124,6 +140,9 @@ services:
     environment:
       - NAGIOSADMIN_USER=nagiosadmin
       - NAGIOSADMIN_PASS=nagios123
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     networks:
       - monitor_net
 
@@ -133,12 +152,17 @@ services:
     build:
       context: ./admin-panel
     container_name: alert-frontend
+    environment:
+      - TZ=Europe/Warsaw
     ports:
       - "80:10000"
     networks:
       - monitor_net
     depends_on:
       - alert-backend
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
 
 networks:
   monitor_net:
