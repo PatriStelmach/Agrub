@@ -9,6 +9,7 @@ import {useAuthStore} from "@/stores/authStore.ts";
 import LoginPage from "@/pages/login/LoginPage.vue";
 import {onMounted, ref} from "vue";
 import {Skeleton} from "@/components/ui/skeleton";
+import {dateParser} from "@/composables/dateParser.ts";
 
 
 
@@ -27,14 +28,16 @@ onMounted(() => {
 
 const date = new Date();
 
-const time = ref<{hour: number; minute: number, second: number}>({hour: date.getHours(), minute: date.getMinutes(), second: date.getSeconds()});
+const time = ref<{hour: string; minute: string, second: string}>
+({hour: dateParser(date).hours, minute: dateParser(date).minutes, second: dateParser(date).seconds});
 const weekDay = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
 const changeTime = () => {
   setInterval(() => {
-    time.value.hour = new Date().getHours()
-    time.value.minute = new Date().getMinutes()
-    time.value.second = new Date().getSeconds()
+    const newDate = new Date()
+    time.value.hour = dateParser(newDate).hours
+    time.value.minute = dateParser(newDate).minutes
+    time.value.second = dateParser(newDate).seconds
     console.log(time.value)
   }, 1000)
 }

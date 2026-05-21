@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import TopH1Div from "@/helpers_components/TopH1Div.vue";
 import {useSettingStore} from "@/stores/settingStore.js";
-import {computed, onMounted, ref} from "vue";
+import {computed, onMounted, ref, watchEffect} from "vue";
 import BigLoadingBlock from "@/helpers_components/loaders/BigLoadingBlock.vue";
 import type {
   MonitoringSystemsConfig,
@@ -11,9 +11,12 @@ import NagiosCard from "@/pages/systems/NagiosCard.vue";
 import {useWrapping} from "@/composables/unwrapping.ts";
 import WazuhCard from "@/pages/systems/WazuhCard.vue";
 import ZabbixCard from "@/pages/systems/ZabbixCard.vue";
+import {useRoute, useRouter} from "vue-router";
 
 const isPageLoading = ref(true);
 const settingStore = useSettingStore()
+const route = useRoute()
+const router = useRouter()
 const systemsConfig = computed(() => settingStore.systemsConfig)
 onMounted(async () => {
   await settingStore.getSystemFullSettingsRequest()
@@ -24,8 +27,25 @@ onMounted(async () => {
 const {
   isUnwrapped,
   unwrap,
-  wrap
+  unwrappedItem,
 } = useWrapping<MonitoringSystemsConfig>(systemsConfig, 'name')
+
+watchEffect(() => {
+  if(route.params.system) {
+    unwrap(String(route.params.system))
+  }
+  else {
+    unwrappedItem.value = null
+  }
+})
+
+const onCloseAndSave = () => {
+  router.replace({path: '/my_systems'})
+}
+
+const onEdit = (system: string) => {
+  router.replace({path: `/my_systems/${system}`})
+}
 
 </script>
 
@@ -44,24 +64,24 @@ const {
         v-else>
         <NagiosCard
           :system="systemsConfig[2]!"
-          :is-unwrapped="isUnwrapped('nagios')"
-          @edit="unwrap('nagios')"
-          @cancel="wrap"
-          @save="wrap"
+          :is-unwrapped="isUnwrapped('NAGIOS')"
+          @edit="onEdit('NAGIOS')"
+          @cancel="onCloseAndSave"
+          @save="onCloseAndSave"
         />
         <WazuhCard
           :system="systemsConfig[1]!"
-          :is-unwrapped="isUnwrapped('wazuh')"
-          @edit="unwrap('wazuh')"
-          @cancel="wrap"
-          @save="wrap"
+          :is-unwrapped="isUnwrapped('WAZUH')"
+          @edit="onEdit('WAZUH')"
+          @cancel="onCloseAndSave"
+          @save="onCloseAndSave"
         />
         <ZabbixCard
           :system="systemsConfig[0]!"
-          :is-unwrapped="isUnwrapped('zabbix')"
-          @edit="unwrap('zabbix')"
-          @cancel="wrap"
-          @save="wrap"
+          :is-unwrapped="isUnwrapped('ZABBIX')"
+          @edit="onEdit('ZABBIX')"
+          @cancel="onCloseAndSave"
+          @save="onCloseAndSave"
         />
       </div>
     </Transition>
