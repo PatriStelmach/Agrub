@@ -11,9 +11,8 @@ services:
       - "8080:10000"
     volumes:
       - ./scripts:/app/scripts
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
     environment:
+      - TZ=${SYSTEM_TIMEZONE:-UTC}
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-app:3306/alertwip?useSSL=false&serverTimezone=${SYSTEM_TIMEZONE:-UTC}&allowPublicKeyRetrieval=true
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=rootpassword
@@ -34,12 +33,11 @@ services:
     container_name: mysql-app
     restart: unless-stopped
     environment:
+      - TZ=${SYSTEM_TIMEZONE:-UTC}
       - MYSQL_ROOT_PASSWORD=rootpassword
       - MYSQL_DATABASE=alertwip
     volumes:
       - ./mysql-app:/var/lib/mysql
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
     networks:
       - monitor_net
 
@@ -49,8 +47,6 @@ services:
     restart: unless-stopped
     volumes:
       - redis_main_data:/data
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
     networks:
       - monitor_net
 
@@ -65,14 +61,13 @@ services:
       - --collation-server=utf8mb4_bin
       - --log-bin-trust-function-creators=1
     environment:
+      - TZ=${SYSTEM_TIMEZONE:-UTC}
       - MYSQL_ROOT_PASSWORD=zabbixroot
       - MYSQL_DATABASE=zabbix
       - MYSQL_USER=zabbix
       - MYSQL_PASSWORD=zabbixpass
     volumes:
       - zabbix-db-data:/var/lib/mysql
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
     networks:
       - monitor_net
 
@@ -81,6 +76,7 @@ services:
     container_name: zabbix-server
     restart: unless-stopped
     environment:
+      - TZ=${SYSTEM_TIMEZONE:-UTC}
       - DB_SERVER_HOST=mysql-zabbix
       - MYSQL_DATABASE=zabbix
       - MYSQL_USER=zabbix
@@ -91,8 +87,6 @@ services:
       - mysql-zabbix
     volumes:
       - ./zabbix-server:/usr/lib/zabbix/alertscripts
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
     networks:
       - monitor_net
 
@@ -101,6 +95,7 @@ services:
     container_name: zabbix-web
     restart: unless-stopped
     environment:
+      - TZ=${SYSTEM_TIMEZONE:-UTC}
       - DB_SERVER_HOST=mysql-zabbix
       - MYSQL_DATABASE=zabbix
       - MYSQL_USER=zabbix
@@ -112,9 +107,6 @@ services:
     depends_on:
       - mysql-zabbix
       - zabbix-server
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
     networks:
       - monitor_net
 
@@ -123,10 +115,8 @@ services:
     container_name: zabbix-agent
     restart: unless-stopped
     environment:
+      - TZ=${SYSTEM_TIMEZONE:-UTC}
       - ZBX_SERVER_HOST=zabbix-server
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
     networks:
       - monitor_net
 
@@ -138,11 +128,9 @@ services:
     ports:
       - "8082:80"
     environment:
+      - TZ=${SYSTEM_TIMEZONE:-UTC}
       - NAGIOSADMIN_USER=nagiosadmin
       - NAGIOSADMIN_PASS=nagios123
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
     networks:
       - monitor_net
 
@@ -153,6 +141,7 @@ services:
       context: ./admin-panel
     container_name: alert-frontend
     environment:
+      - TZ=${SYSTEM_TIMEZONE:-UTC}
       - TZ=Europe/Warsaw
     ports:
       - "80:10000"
@@ -160,9 +149,7 @@ services:
       - monitor_net
     depends_on:
       - alert-backend
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+    volumes:
 
 networks:
   monitor_net:
