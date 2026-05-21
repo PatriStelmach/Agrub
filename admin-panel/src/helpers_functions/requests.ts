@@ -148,11 +148,11 @@ export const changeGroupNameRequest = async (groupId: number, name: string) => {
   }
 }
 
-export const runScriptRequest = async (fileName: string | undefined) => {
+export const runScriptRequest = async (fileName: string | undefined, args: string) => {
   try {
-    const res = await api.post(`/local-scripts/${fileName}/run`)
+    const res = await api.post(`/local-scripts/${fileName}/run` , {arguments: args})
     if (res.status === 200) {
-      toast.success(`${fileName} TRIGGER: ${res.data}`)
+      return res.data
     }
   } catch (error) {
     throw (error)
