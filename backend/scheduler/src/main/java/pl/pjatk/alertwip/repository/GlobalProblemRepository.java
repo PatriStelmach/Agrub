@@ -32,4 +32,7 @@ public interface GlobalProblemRepository extends JpaRepository<GlobalProblem, Lo
 
     List<GlobalProblem> findByOriginType(String nagios);
     List<GlobalProblem> findAllByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
+
+    @Query("SELECT DISTINCT p.originType FROM GlobalProblem p WHERE p.originType IS NOT NULL")
+    List<String> findDistinctOriginTypes();
 }
