@@ -17,6 +17,8 @@ public class DummyAdapter implements AlertSourceAdapter {
         String lowerOrigin = originType.toLowerCase();
         return lowerOrigin.endsWith(".py") ||
                 lowerOrigin.endsWith(".ps1") ||
+                lowerOrigin.endsWith(".psm1")||
+                lowerOrigin.endsWith(".bash")||
                 lowerOrigin.endsWith(".sh");
     }
 
