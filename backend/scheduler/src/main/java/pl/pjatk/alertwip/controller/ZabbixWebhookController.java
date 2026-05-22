@@ -154,7 +154,7 @@ public class ZabbixWebhookController {
     }
 
 
-    @PostMapping("/wazuh/alert")
+    @PostMapping("/wazuh")
     public ResponseEntity<String> handleWazuhAlert(@RequestBody Map<String, Object> payload) {
         String eventStatus = (String) payload.getOrDefault("status", "PROBLEM");
         String eventName = (String) payload.getOrDefault("name", "Nieznany błąd Wazuh");
@@ -168,7 +168,7 @@ public class ZabbixWebhookController {
         if (sevObj != null) {
             try { rawLevel = Integer.parseInt(sevObj.toString()); } catch (NumberFormatException ignored) {}
         }
-        
+
         int severity = mapWazuhSeverityToLevel(rawLevel);
 
         // Unikalny klucz do deduplikacji
