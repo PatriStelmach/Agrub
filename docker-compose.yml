@@ -12,7 +12,8 @@ services:
     volumes:
       - ./scripts:/app/scripts
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-app:3306/alertwip?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      - TZ=${SYSTEM_TIMEZONE:-UTC}
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-app:3306/alertwip?useSSL=false&serverTimezone=${SYSTEM_TIMEZONE:-UTC}&allowPublicKeyRetrieval=true
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=rootpassword
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
@@ -32,6 +33,7 @@ services:
     container_name: mysql-app
     restart: unless-stopped
     environment:
+      - TZ=${SYSTEM_TIMEZONE:-UTC}
       - MYSQL_ROOT_PASSWORD=rootpassword
       - MYSQL_DATABASE=alertwip
     volumes:
@@ -59,6 +61,7 @@ services:
       - --collation-server=utf8mb4_bin
       - --log-bin-trust-function-creators=1
     environment:
+      - TZ=${SYSTEM_TIMEZONE:-UTC}
       - MYSQL_ROOT_PASSWORD=zabbixroot
       - MYSQL_DATABASE=zabbix
       - MYSQL_USER=zabbix
@@ -73,6 +76,7 @@ services:
     container_name: zabbix-server
     restart: unless-stopped
     environment:
+      - TZ=${SYSTEM_TIMEZONE:-UTC}
       - DB_SERVER_HOST=mysql-zabbix
       - MYSQL_DATABASE=zabbix
       - MYSQL_USER=zabbix
@@ -91,12 +95,13 @@ services:
     container_name: zabbix-web
     restart: unless-stopped
     environment:
+      - TZ=${SYSTEM_TIMEZONE:-UTC}
       - DB_SERVER_HOST=mysql-zabbix
       - MYSQL_DATABASE=zabbix
       - MYSQL_USER=zabbix
       - MYSQL_PASSWORD=zabbixpass
       - ZBX_SERVER_HOST=zabbix-server
-      - PHP_TZ=Europe/Warsaw
+      - PHP_TZ=${SYSTEM_TIMEZONE:-UTC}
     ports:
       - "8081:8080"
     depends_on:
@@ -110,6 +115,7 @@ services:
     container_name: zabbix-agent
     restart: unless-stopped
     environment:
+      - TZ=${SYSTEM_TIMEZONE:-UTC}
       - ZBX_SERVER_HOST=zabbix-server
     networks:
       - monitor_net
@@ -122,8 +128,9 @@ services:
     ports:
       - "8082:80"
     environment:
+      - TZ=${SYSTEM_TIMEZONE:-UTC}
       - NAGIOSADMIN_USER=nagiosadmin
-      - NAGIOSADMIN_PASS=nagios123
+      - NAGIOSADMIN_PASS=JebanieKurwa1
     networks:
       - monitor_net
 
@@ -133,12 +140,16 @@ services:
     build:
       context: ./admin-panel
     container_name: alert-frontend
+    environment:
+      - TZ=${SYSTEM_TIMEZONE:-UTC}
+      - TZ=Europe/Warsaw
     ports:
       - "80:10000"
     networks:
       - monitor_net
     depends_on:
       - alert-backend
+
 
 networks:
   monitor_net:

@@ -120,4 +120,9 @@ public class AlertController {
         System.out.println(history.toString());
         return ResponseEntity.ok(history);
     }
+
+    @GetMapping("/origins")
+    public ResponseEntity<List<String>> getAvailableOrigins() {
+        return ResponseEntity.ok(alertHistoryService.getAllOriginTypes());
+    }
 }

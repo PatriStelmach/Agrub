@@ -25,7 +25,7 @@ public class AuthController {
         this.authenticationService = authenticationService;
     }
 
-    @PostMapping("/login/local")
+    @PostMapping("/login")
     public ResponseEntity<?> loginLocal(@RequestBody AuthenticationRequestDTO request) {
         return processLogin(() -> authenticationService.authenticateLocal(request));
     }
