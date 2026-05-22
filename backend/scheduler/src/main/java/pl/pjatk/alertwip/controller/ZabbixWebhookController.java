@@ -148,6 +148,13 @@ public class ZabbixWebhookController {
         return ResponseEntity.ok("Nagios alert processed");
     }
 
+
+    @PostMapping("/wazuh")
+    public ResponseEntity<String> handleWazuhAlert(@RequestBody Map<java.lang.String, Object> payload) {
+        System.out.println(payload);
+        return ResponseEntity.ok("Wazuh test");
+    }
+
     // TODO: Wyjebać to jakoś do ustawień żeby można było to konfigurować
     private int mapNagiosSeverityToLevel(String severityStr) {
         return switch (severityStr.toUpperCase()) {
