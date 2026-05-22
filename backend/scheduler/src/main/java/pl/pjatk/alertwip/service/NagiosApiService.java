@@ -57,6 +57,16 @@ public class NagiosApiService {
 
         try {
             ResponseEntity<String> response = restTemplate.postForEntity(cgiUrl, request, String.class);
+            String responseBody = response.getBody();
+
+            // Szukamy słów kluczowych błędu w wygenerowanym HTMLu od Nagiosa
+            if (responseBody != null && (responseBody.contains("Sorry,") || responseBody.contains("Error:"))) {
+                System.err.println("======= BŁĄD Z NAGIOS CGI =======");
+                String cleanError = responseBody.replaceAll("<[^>]*>", " ").replaceAll("\\s+", " ").trim();
+                System.err.println(cleanError);
+                System.err.println("=================================");
+                throw new RuntimeException("Odrzucono przez CGI Nagiosa.");
+            }
 
             if (!response.getStatusCode().is2xxSuccessful()) {
                 throw new RuntimeException("Nieoczekiwany kod błędu od Nagiosa (cmd.cgi): " + response.getStatusCode());
