@@ -21,6 +21,8 @@ import {
   IconLabel,
   IconMessageCode,
   IconStatusChange,
+  IconSend2,
+  IconCodeDots,
   IconTrash,
   IconPlayerPlay,
   IconLoader
@@ -32,7 +34,7 @@ import {
   tableCaption,
   dataTable,
   tableHeaders,
-  tableDiv
+  tableDiv, smallNameLabel
 } from "@/assets/cssFunctions.ts";
 import TopH1Div from "@/helpers_components/TopH1Div.vue";
 import {useWrapping} from "@/composables/unwrapping.ts";
@@ -64,12 +66,15 @@ const emit = defineEmits<{
 import PluginDetailsDialog from '@/pages/plugins/PluginDetailsDialog.vue'
 import {toast} from "vue-sonner";
 import {useRoute, useRouter} from "vue-router";
+import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
+import {Input} from "@/components/ui/input";
 const myPluginStore = useMyPluginStore()
 const { sortedData, sortKey, sortOrder, toggleSort } = useSort<MyPlugin>(() => props.data, 'updatedAt')
-const { wrap, isUnwrapped, unwrap, unwrappedItem, save } = useWrapping(sortedData, 'name')
+const { isUnwrapped, unwrap, unwrappedItem, save } = useWrapping(sortedData, 'name')
 const router = useRouter()
 const route = useRoute()
 
+const args = ref<string>('')
 const searchFilter = ref<string>("")
 const checkedPlugins = ref<string[]>([])
 const loadingTrigger = ref<boolean>(false)
@@ -125,18 +130,18 @@ watch(searchFilter, () => {
 
 const checkAll = () => {
   return !allChecked.value ?
-    checkedPlugins.value = props.data.map(plugin => plugin.name) : checkedPlugins.value = []
+    checkedPlugins.value = props.data.map(plugin => plugin.fullName) : checkedPlugins.value = []
 }
 
 const changeStatus = () => {
   if(!unwrappedItem.value) {
-     console.log(myPluginStore.changeStatus(checkedPlugins.value))
+    myPluginStore.changeStatus(checkedPlugins.value)
   }
 }
 
 const deletePlugins = () => {
   if(!unwrappedItem.value) {
-    console.log(myPluginStore.deleteMyPlugins(checkedPlugins.value))
+    myPluginStore.deleteMyPlugins(checkedPlugins.value)
   }
 }
 
@@ -145,8 +150,10 @@ const getDetails = async (fileName: string) => {
     getDetailsLoading.value = true
     await getPluginDetailsRequest(fileName, 'local-scripts')
       .then((res) => {
-        unwrappedItem.value!.code = res?.code
-        unwrappedItem.value!.description = res?.description
+        if(unwrappedItem.value) {
+          unwrappedItem.value.code = res?.code
+          unwrappedItem.value.description = res?.description
+        }
       })
       .catch((err) => toast.error(`Error fetching plugin details: ${err}`))
       .finally(() => getDetailsLoading.value = false)
@@ -164,10 +171,13 @@ const updateDetails = (code: string, description: string) => {
   }
 }
 
-const triggerScript = async () => {
+const triggerScript = async (args: string) => {
   if (checkedPlugins.value.length === 1) {
     loadingTrigger.value = true
-    await runScriptRequest(checkedPlugins.value.pop())
+    await runScriptRequest(checkedPlugins.value.pop(), args)
+      .then((res) => {
+        toast.success(`Script triggered: ${res}`)
+      })
       .catch((error) => toast.error(error))
       .finally(() => loadingTrigger.value = false)
   }
@@ -191,9 +201,12 @@ const savePlugin = async () => {
   }
 }
 
-watchEffect(() => {
+watchEffect(async () => {
   if(route.params.plugin) {
     unwrap(String(route.params.plugin))
+    if(unwrappedItem.value) {
+      await getDetails(unwrappedItem.value.fullName)
+    }
   }
   else {
     unwrappedItem.value = null
@@ -210,24 +223,49 @@ const onEdit = (plugin: MyPlugin) => {
   }
   else {
     router.replace({path: `/my_plugins/${plugin.name}`})
-    getDetails(plugin.fullName)
   }
 }
-
 
 </script>
 
 <template>
 <TopH1Div h1="Your plugins">
   <ButtonGroup >
-    <Button
-      @click="triggerScript"
-      :disabled="blockTrigger"
-      variant="green_outline"
-    >
-     Trigger
-      <IconPlayerPlay/>
-    </Button>
+    <Popover>
+      <PopoverTrigger as-child>
+        <Button
+          :disabled="blockTrigger"
+          variant="green_outline"
+        >
+          Trigger
+          <IconPlayerPlay/>
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent class="w-90">
+        <div class="space-y-2">
+          <div class="flex items-center space-x-2">
+            <IconCodeDots class="text-comment"/>
+            <h1 :class="smallNameLabel">Arguments</h1>
+          </div>
+          <h2 class="text-xs text-comment">Set execute arguments for script</h2>
+          <h2 class="text-xs text-comment">Use space between arguments: "arg1 arg2 arg3"</h2>
+          <div class="flex items-center space-x-2">
+            <Input
+              class="h-8"
+              v-model="args"
+            />
+            <Button
+              @click="triggerScript(args)"
+              class="h-8"
+              variant="green_outline"
+            >
+              <IconSend2 v-if="!loadingTrigger"/>
+              <IconLoader v-else class="animate-spin"/>
+            </Button>
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
     <Button
       class="border-l-2!"
       @click="changeStatus"
@@ -293,13 +331,14 @@ const onEdit = (plugin: MyPlugin) => {
             :class="{'hover:bg-destructive/20': !plugin.active,
              'bg-selected [&_td]:align-top cursor-auto sticky h-40! [&_td]:pt-4! top-9 bottom-22 hover:bg-card z-9 '
                     : isUnwrapped(plugin.name) }">
-            <TableCell class="px-4">
+            <TableCell @click.stop class="px-4">
+
               <input
                 @click.stop
                 :disabled="blockedCheckbox"
                 type="checkbox"
                 :id="cn('my-plugin-no-'+plugin.fullName)" class="size-[1vw] cursor-pointer align-middle"
-                :value="plugin.name"
+                :value="plugin.fullName"
                 v-model="checkedPlugins"
               />
             </TableCell>

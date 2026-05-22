@@ -17,7 +17,7 @@ import { SheetFooter, SheetClose } from '@/components/ui/sheet'
 import MyTagInput from "@/helpers_components/MyTagInput.vue"
 import MyFieldLabel from "@/helpers_components/form/MyFieldLabel.vue"
 import DialogLabel from "@/helpers_components/DialogLabel.vue"
-import { inputText, smallNameLabel } from '@/assets/cssFunctions'
+import {bigNameLabel, inputText, smallNameLabel} from '@/assets/cssFunctions'
 import {toast} from "vue-sonner";
 
 const props = defineProps<{
@@ -89,19 +89,19 @@ const onSubmit = handleSubmit(async () => {
 
       <FieldGroup class="space-x-2">
         <Field :data-invalid="!!firstnameErrors.length" class="w-fit">
-          <MyFieldLabel text="Firstname" :class="smallNameLabel" for="firstname" />
+          <MyFieldLabel text="Firstname" :class="bigNameLabel" for="firstname" />
           <Input v-model="firstname" placeholder="Firstname..." id="firstname" :class="inputText" />
           <FieldError v-if="firstnameErrors.length" :errors="firstnameErrors" />
         </Field>
 
         <Field :data-invalid="!!surnameErrors.length" class="w-fit">
-          <MyFieldLabel text="Surname" :class="smallNameLabel" for="surname" />
+          <MyFieldLabel text="Surname" :class="bigNameLabel" for="surname" />
           <Input v-model="surname" placeholder="Surname..." id="surname" :class="inputText" />
           <FieldError v-if="surnameErrors.length" :errors="surnameErrors" />
         </Field>
 
         <Field :data-invalid="!!emailErrors.length" class="w-fit">
-          <MyFieldLabel text="e-mail" :class="smallNameLabel" for="email" />
+          <MyFieldLabel text="e-mail" :class="bigNameLabel" for="email" />
           <Input v-model="email" placeholder="user@domain.com" id="email" :class="inputText" />
           <FieldError v-if="emailErrors.length" :errors="emailErrors" />
         </Field>

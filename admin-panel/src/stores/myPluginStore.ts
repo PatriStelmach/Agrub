@@ -73,7 +73,7 @@ export const useMyPluginStore = defineStore('my-plugins', () => {
 
   const deleteMyPlugins = async (fileNames: string[]) => {
     try {
-      const response = await api.delete('/local-scripts/delete', { params: { fileNames: fileNames } })
+      const response = await api.delete('/local-scripts/delete', { data: fileNames  })
       if (response.status === 200)
         toast.success('Plugins deleted successfully')
       else

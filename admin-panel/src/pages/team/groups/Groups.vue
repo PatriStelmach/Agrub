@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import {useUserStore} from "@/stores/userStore.ts";
-import {blankUser, type User, type UserGroupStats} from "@/types/types.ts";
+import {type UserGroupStats} from "@/types/types.ts";
 import TopH1Div from "@/helpers_components/TopH1Div.vue";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
 import {ButtonGroup, ButtonGroupSeparator} from "@/components/ui/button-group";
-import EditUser from "@/pages/team/users/EditUser.vue";
 import {IconUsersGroup, IconPlus} from "@tabler/icons-vue";
 import {Search} from "lucide-vue-next";
 import {Button} from "@/components/ui/button";

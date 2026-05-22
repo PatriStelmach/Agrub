@@ -1,5 +1,5 @@
 export const inputText = 'text-sm!  xl:text-xl! 2xl:text-2xl!';
-export const smallNameLabel = 'text-sm lg:text-md xl:text-xl 2xl:text-2xl'
+export const smallNameLabel = 'text-sm lg:text-md  xl:text-lg 2xl:text-2xl'
 export const bigNameLabel = 'font-bold text-label text-lg xl:text-xl 2xl:text-2xl'
 export const dataTable = "w-99/100 text-xs md:text-sm lg:text-md xl:text-lg 2xl:text:xl h-full mx-auto overflow-x-auto table-fixed"
 export const tableCaption = "bg-background border-t-2 text-foreground sticky z-9 bottom-0 py-2 text-md lg:text-lg xl:text-xl 2xl:text:3xl"
