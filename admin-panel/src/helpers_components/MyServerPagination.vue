@@ -65,7 +65,7 @@ watch(pageSize, () => {
       <DropdownMenuContent align="start">
         <DropdownMenuGroup>
           <DropdownMenuItem
-            v-for="size in [1, 5, 10, 20, 30, 50, 100, 200]"
+            v-for="size in [1, 5, 10, 20, 30, 50, 100, 150, 200]"
             :key="size"
             @select="pageSize = size"
           >
