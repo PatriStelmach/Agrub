@@ -193,11 +193,22 @@ public class ZabbixWebhookController {
                 // Procesowanie widoczności przed zapisem
                 routingService.processVisibility(problem);
 
-                GlobalProblem saved = problemRepository.save(problem);
-                alertCache.updateAlert(saved);
-                sseService.sendAlert("NEW_ALERT", saved);
+                boolean infoAsAlerts = Boolean.parseBoolean(settingService.getValue("wazuh_info_as_alerts", "false"));
 
-                System.out.println("[WAZUH WEBHOOK] Zarejestrowano nowy alert: " + eventName + " (Poziom Wazuha: " + rawLevel + " -> Severity: " + severity + ")");
+                if (severity == 1 && !infoAsAlerts) {
+                    // Natychmiastowe zamknięcie: leci do historii bez powiadomień frontendowych
+                    problem.setStatus("Done");
+                    problem.setClosedAt(LocalDateTime.now());
+                    problemRepository.save(problem);
+
+                    System.out.println("[WAZUH WEBHOOK] Alert (Info) dodany bezpośrednio do historii: " + eventName);
+                } else {
+                    GlobalProblem saved = problemRepository.save(problem);
+                    alertCache.updateAlert(saved);
+                    sseService.sendAlert("NEW_ALERT", saved);
+
+                    System.out.println("[WAZUH WEBHOOK] Zarejestrowano nowy alert: " + eventName + " (Poziom Wazuha: " + rawLevel + " -> Severity: " + severity + ")");
+                }
             }
 
         } else if (eventStatus.equalsIgnoreCase("OK") || eventStatus.equalsIgnoreCase("RESOLVED")) {

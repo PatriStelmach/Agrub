@@ -43,6 +43,7 @@ public class SettingsSeeder implements CommandLineRunner {
                 Map.entry("wazuh_password_SECRET", ""),
                 Map.entry("wazuh_min_warning_level", "8"),
                 Map.entry("wazuh_min_critical_level", "14"),
+                Map.entry("wazuh_info_as_alerts", "false"),
 
                 // Nagios
                 Map.entry("nagios_enabled", "true"),
