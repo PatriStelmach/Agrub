@@ -127,11 +127,11 @@ const onClose = () => {
           </DialogClose>
           <DialogClose>
             <Button
-              variant="outline"
+              variant="green_outline"
               type="submit"
               @click="sentAction"
             >
-              Update <IconSend2 class="text-green-badge"/>
+              Update <IconSend2/>
             </Button>
           </DialogClose>
 

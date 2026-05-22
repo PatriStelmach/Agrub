@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { User } from '@/types/types'
+import type {User} from '@/types/types'
 import { Card, CardDescription, CardHeader } from '@/components/ui/card'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
@@ -8,10 +8,27 @@ import {
   IconUsersGroup, IconEdit, IconKey, IconTool,
 } from "@tabler/icons-vue";
 import EditUser from "@/pages/team/users/EditUser.vue";
+import {ref, watch, watchEffect} from "vue";
+import {useRoute} from "vue-router";
+import router from "@/router";
 
-defineProps<{
+const props = defineProps<{
   user: User
 }>()
+const route = useRoute()
+const isDialogOpen = ref(false)
+
+watchEffect( () => {
+  if(route.params.user === props.user.email) {
+    isDialogOpen.value = true
+  }
+})
+
+watch(isDialogOpen, (newValue, oldValue) => {
+  if (newValue === false && oldValue === true) {
+    router.replace({ path: '/team_members' })
+  }
+})
 
 </script>
 
@@ -31,10 +48,12 @@ defineProps<{
         <span class="text-muted-foreground truncate text-xs">{{ user.email }}</span>
       </div>
       <EditUser
+        v-model:open="isDialogOpen"
         action-type="edit"
         :user="user"
       >
         <IconEdit
+          @click="router.replace({ path: `/team_members/${user.email}` })"
           class="absolute -top-2 right-2 text-green-badge hover:scale-105 cursor-pointer" />
       </EditUser>
 
@@ -42,7 +61,9 @@ defineProps<{
 
     <CardDescription class="px-3">
       <div class="flex space-x-1">
-        <component :is="user.role === 'ADMINISTRATOR' ? IconKey : IconTool" stroke="2" />
+        <component
+          :class="{ 'rotate-90' : user.role === 'TECHNICIAN' }"
+          :is="user.role === 'ADMINISTRATOR' ? IconKey : IconTool" stroke="2" />
         <h1 :class="bigNameLabel">{{ user.role }}</h1>
       </div>
       <div class="flex flex-2 items-start whitespace-break-spaces">

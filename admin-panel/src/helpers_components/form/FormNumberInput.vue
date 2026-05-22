@@ -41,7 +41,7 @@ const fieldId = props.name
             <NumberFieldIncrement />
           </NumberFieldContent>
         </NumberField>
-      <FieldError v-if="errors.length" :errors="errors" />
+      <FieldError class="text-center" v-if="errors.length" :errors="errors" />
     </Field>
   </VeeField>
 </template>

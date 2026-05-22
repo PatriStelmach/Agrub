@@ -6,9 +6,9 @@ import { useColorMode } from "@vueuse/core"
 import {
   bigNameLabel,
   gridSystemCard,
-  gridSystemCardUnwrapped
+  gridSystemCardUnwrapped, smallNameLabel
 } from "@/assets/cssFunctions.ts"
-import { IconDeviceFloppy, IconLock, IconPower, IconShieldExclamation, IconUser, IconLink, IconCheck, IconEdit, IconX } from "@tabler/icons-vue"
+import { IconDeviceFloppy, IconLock, IconPower, IconAlertTriangle, IconUser, IconBellExclamation, IconLink, IconCheck, IconEdit, IconX } from "@tabler/icons-vue"
 import { Card, CardDescription, CardFooter, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import FormInput from "@/helpers_components/form/FormInput.vue"
@@ -41,6 +41,8 @@ const { handleSubmit, setValues } = useForm({
     wazuh_url: props.system.url,
     wazuh_user: props.system.user,
     wazuh_password_SECRET: '',
+    wazuh_critical_level: props.system.wazuh_critical_level,
+    wazuh_warning_level: props.system.wazuh_warning_level
   },
 })
 
@@ -54,8 +56,11 @@ const onSubmit = handleSubmit(async (values) => {
   if (values.wazuh_user && values.wazuh_user !== props.system.user) {
     changedValues.wazuh_user = values.wazuh_user
   }
-  if (values.wazuh_min_active_level !== props.system.min_active_level) {
-    changedValues.wazuh_min_active_level = String(values.wazuh_min_active_level)
+  if (values.wazuh_warning_level !== props.system.wazuh_warning_level) {
+    changedValues.wazuh_warning_level = String(values.wazuh_warning_level)
+  }
+  if (values.wazuh_critical_level !== props.system.wazuh_critical_level) {
+    changedValues.wazuh_critical_level = String(values.wazuh_critical_level)
   }
   if (!!values.wazuh_password_SECRET) {
     changedValues.wazuh_password_SECRET = values.wazuh_password_SECRET
@@ -76,7 +81,8 @@ const onEdit = () => {
   setValues({
     wazuh_url: props.system.url,
     wazuh_user: props.system.user,
-    wazuh_min_active_level: props.system.min_active_level,
+    wazuh_warning_level: props.system.wazuh_warning_level,
+    wazuh_critical_level: props.system.wazuh_critical_level,
     wazuh_password_SECRET: '',
   })
   emit('edit', props.system.name)
@@ -109,7 +115,7 @@ const onCancel = () => {
         <div>
           <div class="flex items-center space-x-2 text-label">
             <IconPower class="size-5 text-label"/>
-            <h1 :class="bigNameLabel">Enabled:</h1>
+            <h1 :class="smallNameLabel">Enabled:</h1>
             <component :is="system.enabled ? IconCheck : IconX" :class="system.enabled ? 'text-green-badge' : 'text-red-badge'" />
           </div>
         </div>
@@ -134,8 +140,13 @@ const onCancel = () => {
           </FormInput>
         </div>
         <div>
-          <FormNumberInput orientation="vertical" name="wazuh_min_active_level" label="Minimal severity level: ">
-            <IconShieldExclamation class="size-5"/>
+          <FormNumberInput orientation="vertical" name="wazuh_warning_level" label="Warning level: ">
+            <IconBellExclamation class="size-5"/>
+          </FormNumberInput>
+        </div>
+        <div>
+          <FormNumberInput orientation="vertical" name="wazuh_critical_level" label="Critical level: ">
+            <IconAlertTriangle class="size-5"/>
           </FormNumberInput>
         </div>
       </CardDescription>
@@ -187,15 +198,22 @@ const onCancel = () => {
       </div>
       <div>
         <div class="flex items-center space-x-2 text-label">
-          <IconShieldExclamation class="size-5"/>
-          <h1 :class="bigNameLabel">Minimal sverity level: </h1>
-          <p class="text-lg text-comment">{{ system.min_active_level }}</p>
+          <IconBellExclamation class="size-5"/>
+          <h1 :class="bigNameLabel">Warning level: </h1>
         </div>
+        <p class="text-lg text-comment">{{ system.wazuh_warning_level }}</p>
+      </div>
+      <div>
+        <div class="flex items-center space-x-2 text-label">
+          <IconAlertTriangle class="size-5"/>
+          <h1 :class="bigNameLabel">Critical level: </h1>
+        </div>
+        <p class="text-lg text-comment">{{ system.wazuh_critical_level }}</p>
       </div>
 
     </CardDescription>
     <CardFooter class="bottom-4 absolute w-full">
-      <Button @click="onEdit" variant="green_outline" class="w-full *:size-5!">
+      <Button @click="onEdit" variant="blue_outline" class="w-full *:size-5!">
         Edit configuration <IconEdit />
       </Button>
     </CardFooter>

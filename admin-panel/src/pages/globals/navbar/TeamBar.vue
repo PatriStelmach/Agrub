@@ -73,10 +73,6 @@ const usersData = ref<User[]>([])
               <IconUserCircle />
               Account
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <IconNotification />
-              Notifications
-            </DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>

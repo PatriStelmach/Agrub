@@ -71,7 +71,7 @@ const assignUser = async (user: User) => {
 
               <div class="grid">
                 <span class="text-sm flex space-x-2"><span>{{ userStore.fullName(user) }}</span>
-                  <component :class="{'rotate-270' : user.role === 'ADMINISTRATOR'}" :is="user.role === 'ADMINISTRATOR' ? IconKey : IconTool"/></span>
+                  <component :class="{'rotate-90' : user.role === 'TECHNICIAN'}" :is="user.role === 'ADMINISTRATOR' ? IconKey : IconTool"/></span>
                 <span class="text-xs text-muted-foreground">{{ user.email }}</span>
               </div>
 

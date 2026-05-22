@@ -112,6 +112,9 @@ export interface User {
   firstname: string,
   surname: string,
   password?: string,
+  oldPassword?: string,
+  newPassword?: string,
+  confirmPassword?: string,
   active?: boolean,
   email: string,
   role?: "ADMINISTRATOR" | "TECHNICIAN"
@@ -123,7 +126,10 @@ export const blankUser = {
   surname: '',
   email: '',
   role: "TECHNICIAN",
-  groups: []
+  groups: [],
+  password: '',
+  newPassword: '',
+  confirmPassword: '',
 }
 
 export interface UserGroup {
@@ -208,7 +214,8 @@ export interface WazuhConfig {
   wazuh_password_SECRET?: string
   wazuh_url: string
   wazuh_enabled: boolean
-  wazuh_min_active_level: number
+  wazuh_warning_level: number
+  wazuh_critical_level: number
 }
 //tak przychodzi z api
 export interface NagiosConfig {
@@ -232,7 +239,8 @@ export interface MonitoringSystemsConfig  {
   passwordOrToken?: string
   url: string
   enabled: boolean
-  min_active_level?: number
+  wazuh_warning_level?: number
+  wazuh_critical_level?: number
 }
 
 //tak przychodzi z api
@@ -241,7 +249,8 @@ export interface AlertSystemSettings {
   wazuh_password_SECRET?: string
   wazuh_url: string
   wazuh_enabled: boolean
-  wazuh_min_active_level: number
+  wazuh_warning_level: number
+  wazuh_critical_level: number
 
   nagios_url: string
   nagios_enabled: boolean

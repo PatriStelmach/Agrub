@@ -182,8 +182,8 @@ const getLangStyles = (lang: string) => {
         <SheetClose as-child>
           <Button
             @click.stop="onSubmit"
-            class="text-md" type="button" variant="outline">
-            Submit <IconFilterShare class="text-green-badge size-5" />
+            class="text-md" type="button" variant="green_outline">
+            Submit <IconFilterShare class=" size-5" />
           </Button>
         </SheetClose>
         <SheetClose as-child>

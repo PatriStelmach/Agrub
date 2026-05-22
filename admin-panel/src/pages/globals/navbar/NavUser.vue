@@ -2,7 +2,6 @@
 import {
   IconDotsVertical,
   IconLogout,
-  IconNotification,
   IconUserCircle,
 } from "@tabler/icons-vue"
 
@@ -77,13 +76,9 @@ const authStore = useAuthStore()
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem>
+            <DropdownMenuItem @click="$router.push(`/team_members/${authStore.userEmail}`)">
               <IconUserCircle />
               Account
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <IconNotification />
-              Notifications
             </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />

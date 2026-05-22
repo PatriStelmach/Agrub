@@ -171,6 +171,18 @@ export const downloadPluginRequest = async (plugin: LibraryPlugin) => {
   }
 }
 
+export const createGroupRequest = async (name: string) => {
+  try {
+    const res = await api.post(`/groups`, {name: name} )
+    if (res.status === 200) {
+      return res.data
+    }
+  }
+  catch (error) {
+    throw (error)
+  }
+}
+
 
 
 

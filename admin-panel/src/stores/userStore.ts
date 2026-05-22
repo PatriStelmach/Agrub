@@ -44,9 +44,9 @@ export const useUserStore = defineStore('user-store',() => {
 
   const createUserRequest = async (user: User) => {
     try {
+      console.log(user)
       const res = await api.post('/users', user)
       if (res.status === 200) {
-        toast.success(`User ${user.email} created successfully.`)
         await getAllUsersRequest()
         return res.data.email
       }
