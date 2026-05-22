@@ -93,12 +93,19 @@ public class NagiosSyncService implements SchedulingConfigurer {
                     if (!problemRepository.existsByUniqueKey(uniqueKey)) {
                         GlobalProblem problem = new GlobalProblem();
                         problem.setUniqueKey(uniqueKey);
-                        problem.setSubject("Nagios: " + serviceName);
+                        problem.setSubject(hostName + ": " + serviceName);
                         problem.setSource(hostName);
                         problem.setOriginType("NAGIOS");
                         problem.setMessage(output.length() > 255 ? output.substring(0, 252) + "..." : output);
+                        problem.setExternalEventId(serviceName);
 
-                        problem.setSeverity(status == 2 ? 5 : (status == 1 ? 3 : 2));
+                        //todo ogarnąć to jakoś potem idk
+                        problem.setSeverity(switch (status) {
+                            case 16 -> 5; // CRITICAL
+                            case 4  -> 3; // WARNING
+                            case 8  -> 2; // UNKNOWN
+                            default -> 2; // Fallback
+                        });
                         problem.setStatus("Sent");
                         problem.setCreatedAt(LocalDateTime.now());
 

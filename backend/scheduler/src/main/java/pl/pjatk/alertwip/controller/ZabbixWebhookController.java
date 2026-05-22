@@ -100,11 +100,13 @@ public class ZabbixWebhookController {
         String eventName = (String) payload.getOrDefault("name", "Nieznany błąd Nagios");
         String host = (String) payload.getOrDefault("host", "Nieznany host");
         String eventId = (String) payload.get("externalEventId");
+        String message = (String) payload.getOrDefault("message", "Brak szczegółowego opisu z Nagiosa");
 
         String severityStr = (String) payload.getOrDefault("severity", "UNKNOWN");
         int severity = mapNagiosSeverityToLevel(severityStr);
 
         String uniqueProblemKey = "[NAGIOS] " + host + " - " + (eventId != null ? eventId : eventName);
+
 
         if (eventStatus.equalsIgnoreCase("PROBLEM")) {
             Optional<GlobalProblem> existing = problemRepository.findFirstByUniqueKeyOrderByIdDesc(uniqueProblemKey)
@@ -116,7 +118,7 @@ public class ZabbixWebhookController {
                 problem.setSubject(eventName);
                 problem.setSource(host);
                 problem.setOriginType("NAGIOS");
-                problem.setMessage("Alert odebrany z Nagiosa. Usługa: " + eventName);
+                problem.setMessage(message);
                 problem.setStatus("Sent");
                 problem.setSeverity(severity);
                 problem.setCreatedAt(LocalDateTime.now());
