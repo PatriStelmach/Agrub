@@ -105,7 +105,7 @@ public class ZabbixWebhookController {
         String severityStr = (String) payload.getOrDefault("severity", "UNKNOWN");
         int severity = mapNagiosSeverityToLevel(severityStr);
 
-        String uniqueProblemKey = "[NAGIOS] " + host + " - " + (eventId != null ? eventId : eventName);
+        String uniqueProblemKey = "[NAGIOS] - " + host + " - " + (eventId != null ? eventId : eventName);
 
 
         if (eventStatus.equalsIgnoreCase("PROBLEM")) {
