@@ -47,6 +47,7 @@ const {pageSize, filteredData, updateData, currentPage, searchFilter, tableData 
         :data=hoveredAlert
       />
     <ActiveAlertsTable
+      :alertsAmount="alertStore.currentAlerts.length"
       :isLoading="isLoading"
       :tableData="tableData"
       v-model:activeAlerts="alertStore.currentAlerts"

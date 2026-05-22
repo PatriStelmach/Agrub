@@ -24,7 +24,7 @@ const emit = defineEmits<{
 }>()
 
 const currentPage = defineModel<number>('pageIndex', { default: 1 })
-const pageSize = defineModel<number>('pageSize', { default: 20 })
+const pageSize = defineModel<number>('pageSize', { default: 100 })
 
 const updatedData = computed(() => {
   const start = (currentPage.value -1 ) * pageSize.value

@@ -19,7 +19,8 @@ export const useSettingStore = defineStore('setting-store', () => {
       user: systemFullSettings.value.wazuh_user,
       url: systemFullSettings.value.wazuh_url,
       enabled: systemFullSettings.value.wazuh_enabled,
-      min_active_level: systemFullSettings.value.wazuh_min_active_level,
+      wazuh_warning_level: systemFullSettings.value.wazuh_warning_level,
+      wazuh_critical_level: systemFullSettings.value.wazuh_critical_level,
       name: 'WAZUH',
     }
   })
@@ -61,7 +62,8 @@ export const useSettingStore = defineStore('setting-store', () => {
           nagios_enabled: res.data.nagios_enabled === "true",
           zabbix_enabled: res.data.zabbix_enabled === "true",
           smtp_enabled: res.data.smtp_enabled === "true",
-          wazuh_min_active_level: Number(res.data.wazuh_min_active_level),
+          wazuh_warning_level: Number(res.data.wazuh_warning_level),
+          wazuh_critical_level: Number(res.data.wazuh_critical_level),
         }
         return systemFullSettings.value
       }
@@ -81,7 +83,8 @@ export const useSettingStore = defineStore('setting-store', () => {
           nagios_enabled: res.data.nagios_enabled === "true",
           zabbix_enabled: res.data.zabbix_enabled === "true",
           smtp_enabled: res.data.smtp_enabled === "true",
-          wazuh_min_active_level: Number(res.data.wazuh_min_active_level),
+          wazuh_warning_level: Number(res.data.wazuh_warning_level),
+          wazuh_critical_level: Number(res.data.wazuh_critical_level),
         }
       }
     } catch (error) {

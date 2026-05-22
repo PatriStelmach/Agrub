@@ -26,6 +26,7 @@ import {useRouter} from "vue-router";
 const props = defineProps<{
   tableData: ActiveAlert[]
   isLoading: boolean
+  alertsAmount: number
 }>()
 
 const hoveredAlert = defineModel<AlertDetails | null>('hoveredAlert')
@@ -46,7 +47,6 @@ watchEffect(() => {
 const { sortedData, sortKey, sortOrder, toggleSort } = useSort<ActiveAlert>(() => props.tableData as ActiveAlert[], 'createdAt')
 
 const goToOrigin = (origin :string) => {
-  console.log(origin );
   if(origin === 'ZABBIX' || origin === 'WAZUH' || origin === 'NAGIOS') {
     router.push(`/my_systems/${origin}`)
   }
@@ -61,7 +61,7 @@ const goToOrigin = (origin :string) => {
   <Table id="alert-table" :class="dataTable">
     <TableCaption :class="tableCaption">
       <slot/>
-      <span>Active Alerts: <span class="font-extrabold">{{ sortedData.length}}</span></span>
+      <span>Active Alerts: <span class="font-extrabold">{{ alertsAmount }}</span></span>
     </TableCaption>
     <TableHeader class="h-10">
       <TableRow :class="tableHeaders">

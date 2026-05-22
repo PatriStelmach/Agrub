@@ -11,5 +11,5 @@ const props = defineProps<{
 </script>
 
 <template>
-  <FieldLabel :class="`text-lg  font-bold text-label ${props.class}`" :for="props.for">{{ text }}</FieldLabel>
+  <FieldLabel :class="`text-md  font-bold text-label ${props.class}`" :for="props.for">{{ text }}</FieldLabel>
 </template>

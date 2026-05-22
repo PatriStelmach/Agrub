@@ -6,7 +6,16 @@ import {useUserStore} from "@/stores/userStore.ts";
 import {type GroupDetails, initialGroupDetails, type Rule, type User} from "@/types/types.ts";
 import BigLoadingBlock from "@/helpers_components/loaders/BigLoadingBlock.vue";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar";
-import {IconX, IconEdit, IconLoader, IconFilterPlus, IconTrash, IconUserPlus, IconCheck} from "@tabler/icons-vue";
+import {
+  IconX,
+  IconEdit,
+  IconLoader,
+  IconFilterPlus,
+  IconTrash,
+  IconUserPlus,
+  IconCheck,
+  IconKey, IconTool
+} from "@tabler/icons-vue";
 import {Button} from "@/components/ui/button";
 import NewRuleDialog from './NewRuleDialog.vue';
 import {
@@ -193,7 +202,10 @@ const changeName = async () => {
                   </div>
                 </li>
                 <li v-else :class="hoverListRow('px-2')" v-for="user in groupUsers" :key="user.id">
-                  <div class="space-x-2 flex items-center py-2 px-2 pr-6 relative">
+                  <div
+                    @click="$router.push(`/team_members/${user.email}`)"
+                    v-if="user.id"
+                    class="space-x-2 cursor-pointer flex items-center py-2 px-2 pr-6 relative">
                     <Avatar class="size-9 rounded-lg">
                       <AvatarFallback class="text-sm rounded-full grayscale">
                         {{ userStore.avFallback(user)}}
@@ -203,8 +215,12 @@ const changeName = async () => {
                       <span class="whitespace-break-spaces">{{ userStore.fullName(user) }}</span>
                       <span class="text-comment text-sm whitespace-break-spaces">{{ user.email }}</span>
                     </div>
+                    <component
+                      :is="user.role === 'ADMINISTRATOR' ? IconKey : IconTool" stroke="2"
+                      :class="{ 'rotate-90' : user.role === 'TECHNICIAN' }"
+                    />
                     <Button
-                      @click="deleteUser(user.id!)"
+                      @click="deleteUser(user.id)"
                       variant="red_outline" class="absolute right-2 top-1/2 -translate-y-1/2" size="icon-sm">
                       <IconLoader v-if="loadingUserDelete.some(i => i === user.id)" class="animate-spin "/>
                       <IconTrash v-else />
