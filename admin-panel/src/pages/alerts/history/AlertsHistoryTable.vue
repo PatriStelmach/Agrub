@@ -26,6 +26,7 @@ import SeverityDiv from "@/helpers_components/SeverityDiv.vue";
 import {hoverListRow} from "@/assets/cssFunctions.ts";
 import LoadingTable from "@/helpers_components/LoadingTable.vue";
 import AlertHistoryDialog from '@/pages/alerts/history/AlertHistoryDialog.vue'
+import {useRouter} from "vue-router";
 
 const props = defineProps<{
   alerts: HistoryAlert[]
@@ -33,6 +34,7 @@ const props = defineProps<{
   isLoading: boolean
 }>()
 
+const router = useRouter()
 const hoveredAlert = defineModel<AlertDetails | null>('hoveredAlert')
 const sortedHead = defineModel<{ sortKey: string; sortOrder: string }>('sortedHead')
 
@@ -55,6 +57,15 @@ watchEffect(() => {
   sortedHead.value = { sortKey: sortKey.value, sortOrder: sortOrder.value };
 });
 
+const goToOrigin = (origin :string) => {
+  console.log(origin);
+  if(origin === 'ZABBIX' || origin === 'WAZUH' || origin === 'NAGIOS') {
+    router.push(`/my_systems/${origin}`)
+  }
+  else {
+    router.push(`my_plugins/${origin}`)
+  }
+}
 
 </script>
 
@@ -71,7 +82,7 @@ watchEffect(() => {
             <SortableHead keyName="message" label="Message" :sort-key="sortKey" class="w-fit md:min-w-1 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
             <SortableHead keyName="source" label="Source" :sort-key="sortKey" class="w-fit " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
             <SortableHead keyName="originType" label="Origin" :sort-key="sortKey" class="w-1/10 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-            <SortableHead keyName="acknowledged" label="ACK" :sort-key="sortKey" class="w-6/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="isAcknowledged" label="ACK" :sort-key="sortKey" class="w-6/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
             <SortableHead keyName="createdAt" label="Created at" :sort-key="sortKey" class="w-fit md:w-13/100 lg:w-1/10 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
             <SortableHead keyName="closedAt" label="Closed at" :sort-key="sortKey" class="w-fit md:w-13/100 lg:w-1/10 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
             <TableHead class="max-md:w-9/100 w-6/100 lg:w-5/100 font-bold text-sm lg:text-md xl:text-lg 2xl:text:xl">Actions</TableHead>
@@ -103,13 +114,15 @@ watchEffect(() => {
                 >{{alert.source}}</Badge>
               </TableCell>
               <TableCell >
-                <Badge class="whitespace-break-spaces"
-                       variant="origin"
+                <Badge
+                  @click="goToOrigin(alert.originType)"
+                  class="whitespace-break-spaces"
+                  variant="origin"
                 >{{alert.originType}}</Badge>
               </TableCell>
 
               <TableCell class=" gap-x-2 items-center">
-                <IconCircleDashedCheck v-if="alert.acknowledged" class="text-green-badge"/>
+                <IconCircleDashedCheck v-if="alert.isAcknowledged" class="text-green-badge"/>
                 <IconCircleDashedX v-else class="text-red-badge"/>
               </TableCell>
               <DateCell  :date="alert.createdAt "></DateCell>

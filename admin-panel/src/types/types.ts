@@ -1,4 +1,4 @@
-export const api_url = 'http://localhost:10000/api'
+export const api_url = '/api'
 
 export enum Language {
   PYTHON = ".py",
@@ -23,7 +23,7 @@ export interface ActiveAlert {
   message: string,
   source: string,
   originType: string,
-  acknowledged: boolean,
+  isAcknowledged: boolean,
   createdAt: Date,
   actions: ActionResponse[],
   severity: 0 | 1 | 2 | 3 | 4 | 5,
@@ -212,7 +212,7 @@ export interface WazuhConfig {
 }
 //tak przychodzi z api
 export interface NagiosConfig {
-  name: string
+  name?: string
   nagios_url: string
   nagios_enabled: boolean
   nagios_user: string
@@ -223,7 +223,7 @@ export interface ZabbixConfig {
   name: string
   zabbix_enabled: boolean
   zabbix_url: string
-  zabbix_password_SECRET?: string
+  zabbix_api_token_SECRET?: string
 }
 //to jest moje po mapowaniu
 export interface MonitoringSystemsConfig  {
@@ -236,7 +236,7 @@ export interface MonitoringSystemsConfig  {
 }
 
 //tak przychodzi z api
-export interface systemFullSettings {
+export interface AlertSystemSettings {
   wazuh_user: string
   wazuh_password_SECRET?: string
   wazuh_url: string
@@ -250,7 +250,7 @@ export interface systemFullSettings {
 
   zabbix_enabled: boolean
   zabbix_url: string
-  zabbix_password_SECRET?: string
+  zabbix_api_token_SECRET?: string
 
   smtp_host: string
   smtp_port: string

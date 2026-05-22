@@ -11,6 +11,8 @@ const props = defineProps<{
   placeholder?: string
   type?: string
   class?: HTMLAttributes["class"]
+  orientation: "horizontal" | "vertical"
+  autocomplete?: string
 }>()
 
 const fieldId = props.name
@@ -18,9 +20,13 @@ const fieldId = props.name
 
 <template>
   <VeeField v-slot="{ field, errors }" :name="name">
-    <Field :class="props.class" :data-invalid="!!errors.length">
-      <MyFieldLabel :text="label" :for="fieldId" />
+    <Field class="gap-y-1" :orientation="props.orientation" :class="props.class" :data-invalid="!!errors.length">
+      <div class="flex space-x-2 items-center">
+        <slot/>
+        <MyFieldLabel :text="label" :for="fieldId" />
+      </div>
       <Input
+        :autocomplete="autocomplete"
         :id="fieldId"
         :type="type ?? 'text'"
         :placeholder="placeholder"

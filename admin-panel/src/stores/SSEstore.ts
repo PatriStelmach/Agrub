@@ -13,7 +13,6 @@ export const useSSEstore = defineStore('SSE', () => {
   const isConnected = ref(false)
 
   const handleSSEMessage = (event: any) => {
-    console.log("handleSSEMessage", event)
     if (!event) return;
 
     if (event.status === 'loading') {
@@ -27,7 +26,8 @@ export const useSSEstore = defineStore('SSE', () => {
     if (event.status === 'success') {
       switch (event.eventType) {
         case 'NEW_ALERT': {
-          toast.error(`New alert: ${event.message.subject}`, { icon: h(IconAlertTriangle, { class: 'animate-pulse duration-100' }) });
+          toast.error(`New alert: ${event.message.subject}`,
+            { icon: h(IconAlertTriangle, { class: 'animate-pulse duration-100' }) });
           alertStore.addCurrentAlert(event.message);
           break;
         }
@@ -37,7 +37,6 @@ export const useSSEstore = defineStore('SSE', () => {
           break;
         }
         case 'ALERT_UPDATE_ONLY': {
-          toast.success(`Alert updated: ${event.message.subject}`);
           alertStore.updateAlertActions(event.message);
           break;
         }

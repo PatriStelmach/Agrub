@@ -11,6 +11,8 @@ import pl.pjatk.alertwip.model.GlobalProblem;
 import pl.pjatk.alertwip.repository.GlobalProblemRepository;
 import pl.pjatk.alertwip.repository.GlobalProblemSpecifications;
 
+import java.util.List;
+
 @Service
 public class AlertHistoryService {
 
@@ -36,5 +38,9 @@ public class AlertHistoryService {
         Pageable pageable = PageRequest.of(page, pageSize, finalSort);
 
         return repository.findAll(spec, pageable);
+    }
+
+    public List<String> getAllOriginTypes() {
+        return repository.findDistinctOriginTypes();
     }
 }

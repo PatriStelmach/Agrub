@@ -26,9 +26,18 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody AuthenticationRequestDTO request) {
+    public ResponseEntity<?> loginLocal(@RequestBody AuthenticationRequestDTO request) {
+        return processLogin(() -> authenticationService.authenticateLocal(request));
+    }
+
+    @PostMapping("/login/ad")
+    public ResponseEntity<?> loginAd(@RequestBody AuthenticationRequestDTO request) {
+        return processLogin(() -> authenticationService.authenticateAd(request));
+    }
+
+    private ResponseEntity<?> processLogin(java.util.function.Supplier<Map<String, String>> authSupplier) {
         try {
-            Map<String, String> tokens = authenticationService.authenticate(request);
+            Map<String, String> tokens = authSupplier.get();
 
             ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", tokens.get("refresh_token"))
                     .httpOnly(true)
@@ -47,7 +56,7 @@ public class AuthController {
                     .body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("error", "Nieprawidłowy login lub hasło"));
+                    .body(Map.of("error", e.getMessage()));
         }
     }
 
@@ -92,6 +101,7 @@ public class AuthController {
                 .header(HttpHeaders.SET_COOKIE, deleteCookie.toString())
                 .body(Map.of("message", "Wylogowano pomyślnie. Tokeny zablokowane."));
     }
+
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestParam String email) {
         authenticationService.initiatePasswordReset(email);

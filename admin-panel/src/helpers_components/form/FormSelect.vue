@@ -15,6 +15,7 @@ const props = defineProps<{
   label: string
   options: string[]
   placeholder?: string
+  orientation: "horizontal" | "vertical"
 }>()
 
 const fieldId = props.name
@@ -22,7 +23,7 @@ const fieldId = props.name
 
 <template>
   <VeeField v-slot="{ field, errors }" :name="name">
-    <Field :data-invalid="!!errors.length">
+    <Field :orientation="props.orientation" :data-invalid="!!errors.length">
       <MyFieldLabel :text="label" :for="fieldId" />
       <Select v-bind="field" :default-value="field.value" @update:model-value="field.onChange">
         <SelectTrigger :id="fieldId" :aria-invalid="!!errors.length">

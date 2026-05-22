@@ -9,6 +9,7 @@ import {useAuthStore} from "@/stores/authStore.ts";
 import LoginPage from "@/pages/login/LoginPage.vue";
 import {onMounted, ref} from "vue";
 import {Skeleton} from "@/components/ui/skeleton";
+import {dateParser} from "@/composables/dateParser.ts";
 
 
 
@@ -22,8 +23,23 @@ onMounted(() => {
       console.log(authStore.accessToken)
     }
   });
+  changeTime()
 })
 
+const date = new Date();
+
+const time = ref<{hour: string; minute: string, second: string}>
+({hour: dateParser(date).hours, minute: dateParser(date).minutes, second: dateParser(date).seconds});
+const weekDay = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+
+const changeTime = () => {
+  setInterval(() => {
+    const newDate = new Date()
+    time.value.hour = dateParser(newDate).hours
+    time.value.minute = dateParser(newDate).minutes
+    time.value.second = dateParser(newDate).seconds
+  }, 1000)
+}
 
 </script>
 
@@ -47,6 +63,9 @@ onMounted(() => {
     />
     <header class="relative w-full">
       <nav class="absolute top-0 flex w-full h-10 bg-card justify-center items-center">
+        <div class="text-lg p-2 ">
+          {{ `${time.hour}:${time.minute}:${time.second}` }}
+        </div>
         <TopRightButtons/>
       </nav>
     </header>

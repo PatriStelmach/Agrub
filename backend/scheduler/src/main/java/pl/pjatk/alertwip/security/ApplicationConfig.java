@@ -2,16 +2,12 @@ package pl.pjatk.alertwip.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAuthenticationProvider;
 import pl.pjatk.alertwip.repository.UserRepository;
 import pl.pjatk.alertwip.service.SystemSettingService;
 
@@ -37,19 +33,15 @@ public class ApplicationConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public AuthenticationProvider daoAuthenticationProvider() {
+    @Bean("localAuthProvider")
+    public AuthenticationProvider localAuthenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService());
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
 
-    @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-        AuthenticationManagerBuilder authBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
-
-        authBuilder.authenticationProvider(daoAuthenticationProvider());
-
+    @Bean("adAuthProvider")
+    public AuthenticationProvider adAuthenticationProvider() {
         try {
             String adUrl = settingService.getValue("SECURITY_AD_URL", "ldap://ldap.forumsys.com:389");
             String baseDn = settingService.getValue("SECURITY_LDAP_BASE_DN", "dc=example,dc=com");
@@ -63,14 +55,10 @@ public class ApplicationConfig {
                     new org.springframework.security.ldap.authentication.BindAuthenticator(contextSource);
             authenticator.setUserDnPatterns(new String[]{userPattern + "," + baseDn});
 
-            org.springframework.security.ldap.authentication.LdapAuthenticationProvider ldapProvider =
-                    new org.springframework.security.ldap.authentication.LdapAuthenticationProvider(authenticator);
-
-            authBuilder.authenticationProvider(ldapProvider);
+            return new org.springframework.security.ldap.authentication.LdapAuthenticationProvider(authenticator);
         } catch (Exception e) {
             System.err.println("[SECURITY] Błąd konfiguracji LDAP: " + e.getMessage());
+            return null;
         }
-
-        return authBuilder.build();
     }
 }

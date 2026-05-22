@@ -2,17 +2,17 @@ import {defineStore} from "pinia";
 import type {
   MonitoringSystemsConfig,
   NagiosConfig,
-  systemFullSettings,
+  AlertSystemSettings,
   WazuhConfig,
   ZabbixConfig
 } from "@/types/types.ts";
-import {computed, ref, watchEffect} from "vue";
+import {computed, ref} from "vue";
 import api from "@/lib/axios.ts";
 import {toast} from "vue-sonner";
 
 export const useSettingStore = defineStore('setting-store', () => {
 
-  const systemFullSettings = ref<systemFullSettings | null>(null)
+  const systemFullSettings = ref<AlertSystemSettings | null>(null)
   const wazuhConfig = computed((): MonitoringSystemsConfig | null => {
     if (!systemFullSettings.value) return null
     return {
@@ -20,7 +20,7 @@ export const useSettingStore = defineStore('setting-store', () => {
       url: systemFullSettings.value.wazuh_url,
       enabled: systemFullSettings.value.wazuh_enabled,
       min_active_level: systemFullSettings.value.wazuh_min_active_level,
-      name: 'Wazuh',
+      name: 'WAZUH',
     }
   })
 
@@ -30,7 +30,7 @@ export const useSettingStore = defineStore('setting-store', () => {
       url: systemFullSettings.value.nagios_url,
       enabled: systemFullSettings.value.nagios_enabled,
       user: systemFullSettings.value.nagios_user,
-      name: 'Nagios',
+      name: 'NAGIOS',
     }
   })
 
@@ -39,7 +39,7 @@ export const useSettingStore = defineStore('setting-store', () => {
     return {
       url: systemFullSettings.value.zabbix_url,
       enabled: systemFullSettings.value.zabbix_enabled,
-      name: 'Zabbix',
+      name: 'ZABBIX',
     }
   })
   const systemsConfig = computed(() => {
@@ -66,19 +66,26 @@ export const useSettingStore = defineStore('setting-store', () => {
         return systemFullSettings.value
       }
     } catch (error) {
-      toast.error(`Error retrieving system config: ${error}`)
+      toast.error(`Error retrieving system configuration: ${error}`)
     }
   }
 
-  const updatesystemFullSettingsRequest = async (config: WazuhConfig | NagiosConfig | ZabbixConfig) => {
+  const updateSystemFullSettingsRequest = async (config: Record<string,string>) => {
     try {
-      const res = await api.put('/settings', config)
+      const res = await api.patch('/settings', config)
       if (res.status === 200) {
-        toast.success('System config updated')
-        return res.data
+        toast.success('System configuration updated')
+        systemFullSettings.value = {
+          ...res.data,
+          wazuh_enabled: res.data.wazuh_enabled === "true",
+          nagios_enabled: res.data.nagios_enabled === "true",
+          zabbix_enabled: res.data.zabbix_enabled === "true",
+          smtp_enabled: res.data.smtp_enabled === "true",
+          wazuh_min_active_level: Number(res.data.wazuh_min_active_level),
+        }
       }
     } catch (error) {
-      toast.error(`Error updating system config: ${error}`)
+      throw error
     }
   }
 
@@ -91,6 +98,6 @@ export const useSettingStore = defineStore('setting-store', () => {
     nagiosConfig,
     zabbixConfig,
     getSystemFullSettingsRequest,
-    updatesystemFullSettingsRequest,
+    updateSystemFullSettingsRequest,
   }
 })
