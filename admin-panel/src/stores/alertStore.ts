@@ -61,8 +61,10 @@ export const useAlertStore = defineStore('alert-store', () => {
     try {
       const response = await api.get<ActiveAlert[]>('/alerts/active')
       if(response.status === 200) {
-        currentAlerts.value = response.data
-        console.log(currentAlerts.value)
+        currentAlerts.value = response.data.map((a :any) => ({
+          ...a,
+          isAcknowledged: a.acknowledged
+        }))
       }
       else {
         toast.error('Error while fetching current alerts')
