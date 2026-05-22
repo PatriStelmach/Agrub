@@ -45,7 +45,7 @@ public class NagiosApiService {
     public void sendCgiCommand(MultiValueMap<String, String> body) {
         if (!settingService.getBoolean("nagios_enabled", false)) return;
 
-        String cgiUrl = settingService.getValue("nagios_cgi_url", "") + "/cmd.cgi";
+        String cgiUrl = settingService.getValue("nagios_url", "") + "/cmd.cgi";
         String user = settingService.getValue("nagios_user", "");
         String pass = settingService.getValue("nagios_password_SECRET", "");
 
