@@ -118,4 +118,24 @@ public class UserController {
 
         return ResponseEntity.ok(Map.of("message", "Zaktualizowano czas wylogowania"));
     }
+
+    @PatchMapping("/me/password")
+    public ResponseEntity<?> changePassword(@RequestBody pl.pjatk.alertwip.dto.ChangePasswordRequestDTO request, org.springframework.security.core.Authentication authentication) {
+        User user = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new RuntimeException("Nie znaleziono użytkownika"));
+
+        if ("EXTERNAL_AD_AUTH".equals(user.getPassword())) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Konta AD nie mogą zmieniać hasła z poziomu aplikacji."));
+        }
+
+        if (!passwordEncoder.matches(request.oldPassword(), user.getPassword())) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Stare hasło jest nieprawidłowe."));
+        }
+
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
+        user.setLastPasswordChangeDate(java.time.LocalDateTime.now());
+        userRepository.save(user);
+
+        return ResponseEntity.ok(Map.of("message", "Hasło zostało pomyślnie zmienione."));
+    }
 }
