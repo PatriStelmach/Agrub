@@ -5,13 +5,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.pjatk.alertwip.model.GlobalProblem;
 import pl.pjatk.alertwip.repository.GlobalProblemRepository;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class NagiosSyncService implements SchedulingConfigurer {
@@ -23,6 +25,8 @@ public class NagiosSyncService implements SchedulingConfigurer {
     private final ActiveAlertCache alertCache;
     private final SseNotifService sseService;
     private final SystemSettingService settingService;
+
+    private static final String API_ERROR_UNIQUE_KEY = "[SYSTEM] - NAGIOS_API_OFFLINE";
 
     public NagiosSyncService(NagiosApiService nagiosApi,
                              GlobalProblemRepository problemRepository,
@@ -58,21 +62,35 @@ public class NagiosSyncService implements SchedulingConfigurer {
         );
     }
 
+    @Transactional
     public void sync() {
         if (!settingService.getBoolean("nagios_enabled", false)) return;
 
         System.out.println("[NAGIOS SYNC] Pobieranie zdarzeń...");
 
+        String rawJson;
         try {
-            String rawJson = nagiosApi.fetchAlerts();
-            if (rawJson == null) return;
+            rawJson = nagiosApi.fetchAlerts();
+            if (rawJson == null) throw new RuntimeException("API zwróciło pustą odpowiedź");
+        } catch (Exception e) {
+            System.err.println("[NAGIOS SYNC] Błąd połączenia API. Generuję alert systemowy...");
+            generateSystemAlert(API_ERROR_UNIQUE_KEY, "Awaria komunikacji z Nagios API: " + e.getMessage());
+            return;
+        }
 
-            resolveSystemAlert("[SYSTEM] - NAGIOS_API_OFFLINE");
+        resolveSystemAlert(API_ERROR_UNIQUE_KEY);
 
+        try {
             JsonNode servicelist = mapper.readTree(rawJson).path("data").path("servicelist");
             if (!servicelist.isObject()) return;
 
+            List<GlobalProblem> activeDbNagiosProblems = problemRepository.findByOriginTypeAndStatusNot("NAGIOS", "Done");
+            Map<String, GlobalProblem> existingProblemsMap = activeDbNagiosProblems.stream()
+                    .collect(Collectors.toMap(GlobalProblem::getUniqueKey, Function.identity(), (existing, replacement) -> existing));
+
+            Set<String> activeNagiosProblemKeys = new HashSet<>();
             int added = 0;
+            int updatedCount = 0;
 
             for (Map.Entry<String, JsonNode> hostEntry : servicelist.properties()) {
                 String hostName = hostEntry.getKey();
@@ -82,30 +100,35 @@ public class NagiosSyncService implements SchedulingConfigurer {
                     String serviceName = serviceEntry.getKey();
                     JsonNode details = serviceEntry.getValue();
 
-                    int status = details.path("status").asInt(0);
-                    String output = details.path("plugin_output").asText("Brak opisu awarii");
                     boolean acknowledged = details.path("has_been_acknowledged").asBoolean(false);
+                    // if (acknowledged) continue; // TODO: dodać opcje znikania ackowanych z nagiosa
 
-                    if (acknowledged) continue;
+                    int status = details.path("status").asInt(0);
+                    int severity = switch (status) {
+                        case 16 -> 5; // CRITICAL
+                        case 4  -> 3; // WARNING
+                        case 8  -> 2; // UNKNOWN
+                        default -> 2;
+                    };
 
+                    String output = details.path("plugin_output").asText("Brak opisu awarii");
                     String uniqueKey = "[NAGIOS] - " + hostName + " - " + serviceName;
 
-                    if (!problemRepository.existsByUniqueKey(uniqueKey)) {
+                    activeNagiosProblemKeys.add(uniqueKey);
+
+                    // Sprawdzamy w mapie w pamięci RAM
+                    GlobalProblem existingProblem = existingProblemsMap.get(uniqueKey);
+
+                    if (existingProblem == null) {
+                        // TWORZENIE NOWEGO
                         GlobalProblem problem = new GlobalProblem();
                         problem.setUniqueKey(uniqueKey);
                         problem.setSubject(hostName + ": " + serviceName);
                         problem.setSource(hostName);
                         problem.setOriginType("NAGIOS");
                         problem.setMessage(output.length() > 255 ? output.substring(0, 252) + "..." : output);
-                        problem.setExternalEventId(serviceName);
-
-                        //todo ogarnąć to jakoś potem idk
-                        problem.setSeverity(switch (status) {
-                            case 16 -> 5; // CRITICAL
-                            case 4  -> 3; // WARNING
-                            case 8  -> 2; // UNKNOWN
-                            default -> 2; // Fallback
-                        });
+                        problem.setExternalEventId(serviceName); // Ważne do CGI ACK
+                        problem.setSeverity(severity);
                         problem.setStatus("Sent");
                         problem.setCreatedAt(LocalDateTime.now());
 
@@ -115,22 +138,50 @@ public class NagiosSyncService implements SchedulingConfigurer {
                         alertCache.updateAlert(saved);
                         sseService.sendAlert("NEW_ALERT", saved);
                         added++;
+                    } else {
+                        // AKTUALIZACJA SEVERITY
+                        if (existingProblem.getSeverity() != severity) {
+                            System.out.println("[NAGIOS SYNC] Zmiana severity dla " + uniqueKey + " (" + existingProblem.getSeverity() + " -> " + severity + ")");
+                            existingProblem.setSeverity(severity);
+                            GlobalProblem updated = problemRepository.save(existingProblem);
+
+                            alertCache.updateAlert(updated);
+                            sseService.sendAlert("ALERT_UPDATE", updated);
+                            updatedCount++;
+                        }
                     }
                 }
             }
 
-            if (added > 0) {
-                System.out.println("[NAGIOS SYNC] Zapisano " + added + " nowych alertów z Nagiosa do bazy!");
+            // ZAMYKANIE STARYCH
+            int resolved = 0;
+            for (GlobalProblem dbProblem : activeDbNagiosProblems) {
+                if (API_ERROR_UNIQUE_KEY.equals(dbProblem.getUniqueKey())) continue;
+
+                if (!activeNagiosProblemKeys.contains(dbProblem.getUniqueKey())) {
+                    dbProblem.setStatus("Done");
+                    dbProblem.setClosedAt(LocalDateTime.now());
+                    problemRepository.save(dbProblem);
+                    alertCache.removeAlert(dbProblem.getId());
+                    sseService.sendAlert("ALERT_RESOLVED", dbProblem);
+                    resolved++;
+                }
+            }
+
+            if (added > 0 || resolved > 0 || updatedCount > 0) {
+                System.out.println(String.format("[NAGIOS SYNC] Synchronizacja zakończona: Dodano %d, Zaktualizowano %d, Zamknięto %d", added, updatedCount, resolved));
             }
 
         } catch (Exception e) {
-            System.err.println("[NAGIOS SYNC] Błąd pobierania alertów: " + e.getMessage());
-            generateSystemAlert("[SYSTEM] - NAGIOS_API_OFFLINE", "[NAGIOS SYNC] Awaria połączenia z API. Generuję alert systemowy...");
+            System.err.println("[NAGIOS SYNC] Błąd mapowania danych API: " + e.getMessage());
         }
     }
 
     private void generateSystemAlert(String uniqueKey, String message) {
-        if (!problemRepository.existsByUniqueKey(uniqueKey)) {
+        Optional<GlobalProblem> existingProblem = problemRepository.findFirstByUniqueKeyOrderByIdDesc(uniqueKey)
+                .filter(p -> !"Done".equals(p.getStatus()));
+
+        if (existingProblem.isEmpty()) {
             System.out.println(message);
             GlobalProblem problem = new GlobalProblem();
             problem.setUniqueKey(uniqueKey);
