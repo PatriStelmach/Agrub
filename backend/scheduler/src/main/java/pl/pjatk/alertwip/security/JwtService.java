@@ -12,6 +12,7 @@ import pl.pjatk.alertwip.service.SystemSettingService;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.Map;
 import java.util.function.Function;
 
 @Service
@@ -43,6 +44,14 @@ public class JwtService {
                 .claim("firstname", user.getFirstname())
                 .claim("surname", user.getSurname())
                 .claim("role", user.getRole().name())
+                .claim("id", user.getId())
+                .claim("groups", user
+                        .getGroups()
+                        .stream()
+                        .map(g-> Map.of("id", g.getId(), "name", g.getName()))
+                        .toList())
+                .claim("autoLogoutMinutes", user.getAutoLogoutMinutes())
+                .claim("lastPasswordChangeDate", user.getLastPasswordChangeDate().toString())
                 .subject(user.getEmail())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
