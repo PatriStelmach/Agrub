@@ -42,6 +42,10 @@ public class WazuhSyncService implements SchedulingConfigurer {
         this.settingService = settingService;
     }
 
+
+    // WYŁĄCZONE
+    // Idk czy chcemy to zrobić, lepiej chyba żeby tylko na bieżąco przychodziło?
+    /*
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
         taskRegistrar.addTriggerTask(
@@ -61,6 +65,7 @@ public class WazuhSyncService implements SchedulingConfigurer {
                 }
         );
     }
+    */
 
     @Transactional
     public void sync() {
