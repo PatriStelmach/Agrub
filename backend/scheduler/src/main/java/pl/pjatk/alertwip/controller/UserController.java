@@ -54,7 +54,7 @@ public class UserController {
         return ResponseEntity.ok(mapToDTO(savedUser));
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMINISTRATOR')")
     public ResponseEntity<UserResponseDTO> editUser(@PathVariable Long id, @RequestBody User userDetails) {
         User user = userRepository.findById(id)
@@ -65,6 +65,7 @@ public class UserController {
         user.setRole(userDetails.getRole());
         user.setActive(userDetails.isActive());
         user.setGroups(userDetails.getGroups());
+        user.setAutoLogoutMinutes(userDetails.getAutoLogoutMinutes());
 
         User updatedUser = userRepository.save(user);
         return ResponseEntity.ok(mapToDTO(updatedUser));
