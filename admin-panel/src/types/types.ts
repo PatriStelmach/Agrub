@@ -1,4 +1,4 @@
-export const api_url = '/api'
+export const api_url = 'http://localhost:10000/api'
 
 export enum Language {
   PYTHON = ".py",
@@ -60,6 +60,10 @@ export interface MyJWTPayload {
   role: "ADMINISTRATOR" | "TECHNICIAN";
   firstname: string,
   surname: string,
+  id: number,
+  groups: UserGroup[],
+  autoLogoutMinutes: number,
+  lastPasswordChangeDate: string
   sub: string;
   iat: number;
   exp: number;
@@ -119,6 +123,18 @@ export interface User {
   email: string,
   role?: "ADMINISTRATOR" | "TECHNICIAN"
   groups?: UserGroup[],
+  autoLogoutMinutes?: number
+  lastPasswordChangeDate?: string,
+}
+
+export interface EditCurrentUser {
+  id: number,
+  firstname: string,
+  surname: string,
+  email: string,
+  role: "ADMINISTRATOR" | "TECHNICIAN"
+  groups: UserGroup[],
+  autoLogoutMinutes?: number
 }
 
 export const blankUser = {

@@ -1,5 +1,5 @@
 import {defineStore} from "pinia";
-import type {User, UserGroup} from "@/types/types.ts";
+import type {EditCurrentUser, User, UserGroup} from "@/types/types.ts";
 import {ref} from "vue";
 import api from "@/lib/axios.ts";
 import {toast} from "vue-sonner";
@@ -19,9 +19,9 @@ export const useUserStore = defineStore('user-store',() => {
       toast.error(`Error retrieving users: ${error}`)
     }
   }
-  const editUserRequest = async (user: User) => {
+  const editUserRequest = async (user: User | EditCurrentUser) => {
     try {
-      const res = await api.put(`/users/${user.id}`, user )
+      const res = await api.patch(`/users/${user.id}`, user )
       if (res.status === 200){
         await getAllUsersRequest()
         return res.data.email

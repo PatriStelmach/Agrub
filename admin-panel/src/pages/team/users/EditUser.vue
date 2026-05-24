@@ -11,7 +11,6 @@ import { IconLoader } from '@tabler/icons-vue'
 import type { User } from "@/types/types"
 import EditUserForm from './EditUserForm.vue'
 import {useAuthStore} from "@/stores/authStore.ts";
-import {useRoute} from "vue-router";
 import {computed} from "vue";
 
 const props = defineProps<{
@@ -19,9 +18,7 @@ const props = defineProps<{
   actionType: "create" | "edit"
 }>()
 const authStore = useAuthStore()
-const route = useRoute()
-const isMe = computed(() => route.params.user === authStore.userEmail)
-
+const isMe = computed(() => (`${props.user.firstname} ${props.user.surname}`) === authStore.fullName)
 const isOpen = defineModel<boolean>('open', { default: false })
 
 </script>
