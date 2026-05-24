@@ -64,7 +64,7 @@ const {filters, items, pageSize, currentPage, totalElements, sortedHead, updateF
     <TopH1Div h1="Plugins library">
       <ButtonGroup>
         <PluginFilters @update:filters="updateFilters">
-          <Button variant="outline">
+          <Button variant="blue_outline">
             Filters <IconFilterCog />
           </Button>
         </PluginFilters>
@@ -74,8 +74,7 @@ const {filters, items, pageSize, currentPage, totalElements, sortedHead, updateF
     <PluginsLibraryTable
       :isLoading="isLoading"
       v-model:sorted-head="sortedHead"
-      :plugins="items"
-      :totalElements="totalElements">
+      :plugins="items">
       <MyServerPagination
         :total="totalElements"
         v-model:page-index="currentPage"

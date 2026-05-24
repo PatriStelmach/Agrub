@@ -174,7 +174,7 @@ const updateDetails = (code: string, description: string) => {
 const triggerScript = async (args: string) => {
   if (checkedPlugins.value.length === 1) {
     loadingTrigger.value = true
-    await runScriptRequest(checkedPlugins.value.pop(), args)
+    await runScriptRequest(checkedPlugins.value.find(v => v), args)
       .then((res) => {
         toast.success(`Script triggered: ${res}`)
       })
@@ -298,7 +298,6 @@ const onEdit = (plugin: MyPlugin) => {
     <Table id="my-plugin-table" :class="dataTable">
       <TableCaption :class="tableCaption">
         <slot/>
-        <span>My Plugins:<span class="font-extrabold">{{ sortedData.length}}</span></span>
       </TableCaption>
       <TableHeader class="h-10">
         <TableRow :class="tableHeaders">

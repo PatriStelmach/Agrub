@@ -47,11 +47,22 @@ export const zabbixSchema = toTypedSchema(
   })
 )
 
-export const loginSchema = toTypedSchema(
+export const alertLoginSchema = toTypedSchema(
   z.object({
     email: z
       .string()
       .email('Invalid email address'),
+    password: z
+      .string()
+      .min(4, 'Password must be at least 4 characters.')
+  }),
+)
+
+export const ADLoginSchema = toTypedSchema(
+  z.object({
+    email: z
+      .string()
+      .min(1,'Username is required'),
     password: z
       .string()
       .min(4, 'Password must be at least 4 characters.')
@@ -98,20 +109,31 @@ export const editUserSchema = toTypedSchema(
   })
 )
 
-export const editCurrentUser = toTypedSchema(
+export const editCurrentUserSchema = toTypedSchema(
   z.object({
+    id: z.number(),
     email: z.string().email('Invalid email address'),
     firstname: z.string().min(2, 'Firstname must be at least 2 characters.'),
     surname: z.string().min(2, 'Surname must be at least 2 characters.'),
+    autoLogoutMinutes: z.number().min(1, "Cannot be lower than 1 minute"),
+    role: z.enum(['TECHNICIAN', 'ADMINISTRATOR']),
+    groups: z.array(z.object({
+      name: z.string(),
+      id: z.number(),
+    }))
+  }))
+
+export const changePasswordSchema = toTypedSchema(
+  z.object({
     oldPassword: z
       .string()
-      .min(4, 'Password must be at least 4 characters.'),
+      .min(8, 'Password must be at least 8 characters.'),
     newPassword: z
       .string()
-      .min(4, 'Password must be at least 4 characters.'),
+      .min(8, 'Password must be at least 8 characters.'),
     confirmPassword: z
       .string()
-      .min(4, 'Password must be at least 4 characters.')
+      .min(8, 'Password must be at least 8 characters.'),
   }).superRefine((data,ctx) => {
     if(data.newPassword !== data.confirmPassword) {
       ctx.addIssue({
@@ -127,4 +149,5 @@ export const editCurrentUser = toTypedSchema(
         path: ["newPassword"]
       })
     }
-  }))
+  })
+)

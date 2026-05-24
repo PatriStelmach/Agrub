@@ -31,7 +31,7 @@ const fieldId = props.name
           :min="min"
           :max="max"
           :step="step"
-          :default-value="field.value"
+          :model-value="field.value"
           :aria-invalid="!!errors.length"
           @update:model-value="field.onChange"
         >

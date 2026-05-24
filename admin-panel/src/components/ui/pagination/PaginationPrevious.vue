@@ -27,7 +27,6 @@ const forwarded = useForwardProps(delegatedProps)
   >
     <slot>
       <ChevronLeftIcon class="size-[2vh]" />
-      <span class="hidden sm:block">Previous</span>
     </slot>
   </PaginationPrev>
 </template>

@@ -45,7 +45,7 @@ const authStore = useAuthStore()
                 {{ authStore.fullName }}
               </span>
               <span class="text-muted-foreground truncate text-xs">
-                {{ authStore.userEmail }}
+                {{ authStore.currentUser?.email }}
               </span>
             </div>
             <IconDotsVertical class="ml-auto size-4" />
@@ -69,17 +69,19 @@ const authStore = useAuthStore()
                   {{ authStore.fullName }}
                 </span>
                 <span class="text-muted-foreground truncate text-xs">
-                  {{ authStore.userEmail }}
+                  {{ authStore.currentUser?.email }}
                 </span>
               </div>
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem @click="$router.push(`/team_members/${authStore.userEmail}`)">
-              <IconUserCircle />
-              Account
-            </DropdownMenuItem>
+            <RouterLink to="/team_members/my_account">
+              <DropdownMenuItem>
+                <IconUserCircle />
+                Account
+              </DropdownMenuItem>
+            </RouterLink>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem

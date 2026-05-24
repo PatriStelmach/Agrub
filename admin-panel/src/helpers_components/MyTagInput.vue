@@ -100,7 +100,3 @@ onMounted(() => {
     </Transition>
   </div>
 </template>
-
-<style scoped>
-
-</style>

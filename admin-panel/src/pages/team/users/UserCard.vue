@@ -11,15 +11,16 @@ import EditUser from "@/pages/team/users/EditUser.vue";
 import {ref, watch, watchEffect} from "vue";
 import {useRoute} from "vue-router";
 import router from "@/router";
+import {useAuthStore} from "@/stores/authStore.ts";
 
 const props = defineProps<{
   user: User
 }>()
 const route = useRoute()
 const isDialogOpen = ref(false)
-
+const authStore = useAuthStore()
 watchEffect( () => {
-  if(route.params.user === props.user.email) {
+  if(route.params.user === `${props.user.firstname} ${props.user.surname}`) {
     isDialogOpen.value = true
   }
 })
@@ -52,9 +53,10 @@ watch(isDialogOpen, (newValue, oldValue) => {
         action-type="edit"
         :user="user"
       >
-        <IconEdit
-          @click="router.replace({ path: `/team_members/${user.email}` })"
-          class="absolute -top-2 right-2 text-green-badge hover:scale-105 cursor-pointer" />
+        <RouterLink :to=" authStore.currentUser?.id === user.id ? '/team_members/my_account' : `/team_members/${user.firstname} ${user.surname}`">
+          <IconEdit
+            class="absolute -top-2 right-2 text-green-badge hover:scale-105 cursor-pointer" />
+        </RouterLink>
       </EditUser>
 
     </CardHeader>
@@ -72,13 +74,13 @@ watch(isDialogOpen, (newValue, oldValue) => {
           <h1 :class="smallNameLabel">Groups:</h1>
         </div>
         <div>
-          <Badge
-            @click="$router.push(`/groups/edit_group/${group.id}/${group.name}`)"
-            variant="tags"
-            v-for="(group, index) in user.groups"
-            :key="index">
-            {{ group.name }}
-          </Badge>
+          <RouterLink :to="`/groups/edit_group/${group.id}/${group.name}`" v-for="group in user.groups" :key="group.id">
+            <Badge
+              variant="tags">
+              {{ group.name }}
+            </Badge>
+
+          </RouterLink>
         </div>
       </div>
     </CardDescription>

@@ -26,7 +26,6 @@ import {useRouter} from "vue-router";
 const props = defineProps<{
   tableData: ActiveAlert[]
   isLoading: boolean
-  alertsAmount: number
 }>()
 
 const hoveredAlert = defineModel<AlertDetails | null>('hoveredAlert')
@@ -46,14 +45,7 @@ watchEffect(() => {
 
 const { sortedData, sortKey, sortOrder, toggleSort } = useSort<ActiveAlert>(() => props.tableData as ActiveAlert[], 'createdAt')
 
-const goToOrigin = (origin :string) => {
-  if(origin === 'ZABBIX' || origin === 'WAZUH' || origin === 'NAGIOS') {
-    router.push(`/my_systems/${origin}`)
-  }
-  else {
-    router.push(`my_plugins/${origin}`)
-  }
-}
+
 
 </script>
 
@@ -61,7 +53,6 @@ const goToOrigin = (origin :string) => {
   <Table id="alert-table" :class="dataTable">
     <TableCaption :class="tableCaption">
       <slot/>
-      <span>Active Alerts: <span class="font-extrabold">{{ alertsAmount }}</span></span>
     </TableCaption>
     <TableHeader class="h-10">
       <TableRow :class="tableHeaders">
@@ -99,11 +90,15 @@ const goToOrigin = (origin :string) => {
             >{{alert.source}}</Badge>
           </TableCell>
           <TableCell >
-            <Badge
-              @click="goToOrigin(alert.originType)"
-              class="whitespace-break-spaces"
-              variant="origin"
-            >{{alert.originType}}</Badge>
+            <RouterLink
+              :to="(alert.originType === 'ZABBIX' || alert.originType === 'WAZUH' || alert.originType === 'NAGIOS') ?
+               `/my_systems/${alert.originType}` :
+                `/my_plugins/${alert.originType}`">
+              <Badge
+                class="whitespace-break-spaces"
+                variant="origin"
+              >{{alert.originType}}</Badge>
+            </RouterLink>
           </TableCell>
 
           <TableCell class=" gap-x-2 items-center">

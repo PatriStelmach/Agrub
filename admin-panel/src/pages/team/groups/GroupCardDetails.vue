@@ -30,6 +30,7 @@ import UsersCombobox from "@/helpers_components/UsersCombobox.vue";
 import {toast} from "vue-sonner";
 import {Input} from "@/components/ui/input";
 import RulesList from "@/pages/team/groups/RulesList.vue";
+import {useAuthStore} from "@/stores/authStore.ts";
 
 const route = useRoute();
 const userStore = useUserStore();
@@ -42,8 +43,7 @@ const loadingGroupsDelete = ref<number[]>([])
 const editNameOpen = ref(false)
 const newName = ref<string>()
 const newNameLoading = ref(false)
-
-
+const authStore = useAuthStore();
 
 const groupUsers = computed({
   get() { return groupDetails.value?.users ?? [] },
@@ -202,31 +202,32 @@ const changeName = async () => {
                   </div>
                 </li>
                 <li v-else :class="hoverListRow('px-2')" v-for="user in groupUsers" :key="user.id">
-                  <div
-                    @click="$router.push(`/team_members/${user.email}`)"
-                    v-if="user.id"
-                    class="space-x-2 cursor-pointer flex items-center py-2 px-2 pr-6 relative">
-                    <Avatar class="size-9 rounded-lg">
-                      <AvatarFallback class="text-sm rounded-full grayscale">
-                        {{ userStore.avFallback(user)}}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div class="grid mr-5">
-                      <span class="whitespace-break-spaces">{{ userStore.fullName(user) }}</span>
-                      <span class="text-comment text-sm whitespace-break-spaces">{{ user.email }}</span>
-                    </div>
-                    <component
-                      :is="user.role === 'ADMINISTRATOR' ? IconKey : IconTool" stroke="2"
-                      :class="{ 'rotate-90' : user.role === 'TECHNICIAN' }"
-                    />
-                    <Button
-                      @click="deleteUser(user.id)"
-                      variant="red_outline" class="absolute right-2 top-1/2 -translate-y-1/2" size="icon-sm">
-                      <IconLoader v-if="loadingUserDelete.some(i => i === user.id)" class="animate-spin "/>
-                      <IconTrash v-else />
-                    </Button>
+                  <RouterLink :to=" authStore.currentUser?.id === user.id ? '/team_members/my_account' : `/team_members/${user.firstname} ${user.surname}`">
+                    <div
+                      v-if="user.id"
+                      class="space-x-2 cursor-pointer flex items-center py-2 px-2 pr-6 relative">
+                      <Avatar class="size-9 rounded-lg">
+                        <AvatarFallback class="text-sm rounded-full grayscale">
+                          {{ userStore.avFallback(user)}}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div class="grid mr-5">
+                        <span class="whitespace-break-spaces">{{ userStore.fullName(user) }}</span>
+                        <span class="text-comment text-sm whitespace-break-spaces">{{ user.email }}</span>
+                      </div>
+                      <component
+                        :is="user.role === 'ADMINISTRATOR' ? IconKey : IconTool" stroke="2"
+                        :class="{ 'rotate-90' : user.role === 'TECHNICIAN' }"
+                      />
+                      <Button
+                        @click.stop.prevent="deleteUser(user.id)"
+                        variant="red_outline" class="absolute right-2 top-1/2 -translate-y-1/2" size="icon-sm">
+                        <IconLoader v-if="loadingUserDelete.some(i => i === user.id)" class="animate-spin "/>
+                        <IconTrash v-else />
+                      </Button>
 
-                  </div>
+                    </div>
+                  </RouterLink>
                   </li>
               </ul>
             </div>

@@ -47,13 +47,13 @@ const {pageSize, filteredData, updateData, currentPage, searchFilter, tableData 
         :data=hoveredAlert
       />
     <ActiveAlertsTable
-      :alertsAmount="alertStore.currentAlerts.length"
       :isLoading="isLoading"
       :tableData="tableData"
       v-model:activeAlerts="alertStore.currentAlerts"
       v-model:hoveredAlert="hoveredAlert"
     >
       <MyClientPagination
+        :total="alertStore.currentAlerts.length"
         :data="filteredData"
         v-model:page-index="currentPage"
         v-model:page-size="pageSize"
