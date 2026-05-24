@@ -135,4 +135,10 @@ public class AlertActionService {
 
         return savedAction;
     }
+
+    // pobranie wszystkich akcji dla usera
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public List<ProblemAction> getActionsByAuthor(String author) {
+        return actionRepository.findByAuthorOrderByCreatedAtDesc(author);
+    }
 }
