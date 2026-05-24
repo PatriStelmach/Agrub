@@ -35,6 +35,7 @@ const {filteredData, tableData, updateData, updateSearchData, currentPage, pageS
       @update:searchData="updateSearchData"
     >
       <MyClientPagination
+        :total="myPluginStore.allMyPlugins.length"
         :data="filteredData"
         v-model:page-index="currentPage"
         v-model:page-size="pageSize"

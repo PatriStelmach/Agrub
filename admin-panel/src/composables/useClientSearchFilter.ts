@@ -6,7 +6,7 @@ export function useClientSearchFilter<T>(data: () => T[], filter: (item: T) => s
   const debounceFilter = ref<string>('')
   const currentPage = ref(1)
   const tableData = ref<T[]>(data())
-  const pageSize = ref<number>(20)
+  const pageSize = ref<number>(100)
 
   const filteredData = computed(() => {
     if(!debounceFilter.value) {

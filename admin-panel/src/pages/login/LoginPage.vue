@@ -1,49 +1,16 @@
 <script setup lang="ts">
-import { useForm, Field as VeeField } from 'vee-validate'
 
-import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
-import {useAuthStore} from "@/stores/authStore.ts";
 import {ref} from "vue";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
-import { IconAlertCircle, IconX, IconLoader} from "@tabler/icons-vue";
-import {loginSchema} from "@/helpers_functions/formSchemas.ts";
+import { IconAlertCircle, IconX} from "@tabler/icons-vue";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
+import AdLogin from "@/pages/login/AdLogin.vue";
+import AlertLogin from "@/pages/login/AlertLogin.vue";
 
-const authStore = useAuthStore()
 const showAlert = ref(false)
 const isLoading = ref(false)
 
-const { handleSubmit } = useForm({
-  validationSchema: loginSchema,
-  initialValues: {
-    email: '',
-    password: '',
-  },
-})
 
-const onSubmit = handleSubmit(async (data) => {
-  isLoading.value = true
-  try {
-    if(!await authStore.login(data))
-      showAlert.value = true
-  }
-  catch { showAlert.value = true }
-  finally { isLoading.value = false }
-})
 </script>
 
 <template>
@@ -53,75 +20,46 @@ const onSubmit = handleSubmit(async (data) => {
       v-if="showAlert" variant="destructive">
       <IconX @click="showAlert = false" class="size-5! absolute top-2 right-2 hover:border cursor-pointer"></IconX>
       <IconAlertCircle />
-      <AlertTitle>Unable to log in</AlertTitle>
+      <AlertTitle>Unable to log in!</AlertTitle>
       <AlertDescription>
 
-        <p>Please verify your credentials</p>
+        <p>Please verify your credentials:</p>
         <ul class="mt-2 list-inside list-disc space-y-1">
-          <li>Check your login</li>
-          <li>Check your password</li>
-          <li>Verify account status with administration</li>
+          <li>Check your login.</li>
+          <li>Check your password.</li>
+          <li>Verify account status with administration.</li>
         </ul>
       </AlertDescription>
     </Alert>
   </Transition>
 
+  <div class="left-1/2 absolute -translate-x-1/2 top-1/2 translate-y-1/2">
+    <Tabs default-value="ALERT">
+      <TabsList class="mx-auto *:cursor-pointer">
+        <TabsTrigger value="ALERT">
+          Alert credentials
+        </TabsTrigger>
+        <TabsTrigger value="AD">
+          Active Directory credentials
+        </TabsTrigger>
+      </TabsList>
+      <TabsContent value="ALERT">
+        <AlertLogin
+          v-model:isLoading="isLoading"
+          v-model:showAlert="showAlert"
+        >
 
-  <Card class="border-blue-badge w-1/3 border-2 shadow-blue-badge/50 shadow-[0_5px_50px_1px] duration-500 mx-auto top-1/2 translate-y-1/2"
-        :class="{'blur-xl' : showAlert}">
-    <CardHeader>
-      <CardTitle class="text-xl text-center">Log in</CardTitle>
-      <CardDescription class="text-center">
-        Log in to Alert
-      </CardDescription>
-    </CardHeader>
-    <CardContent>
+        </AlertLogin>
+      </TabsContent>
+      <TabsContent  value="AD">
+        <AdLogin
+          v-model:isLoading="isLoading"
+          v-model:showAlert="showAlert"
+        >
 
-      <form class="p-2"  id="login-form" @submit="onSubmit">
-        <FieldGroup>
-          <VeeField v-slot="{ field, errors }" name="email">
-            <Field :data-invalid="!!errors.length">
-              <FieldLabel for="email">
-                E-mail address
-              </FieldLabel>
-              <Input
-                id="email"
-                type="email"
-                v-bind="field"
-                placeholder="user@domain.com"
-                :aria-invalid="!!errors.length"
-                autocomplete="email"
-              />
-              <FieldError v-if="errors.length" :errors="errors" />
-            </Field>
-          </VeeField>
+        </AdLogin>
+      </TabsContent>
+    </Tabs>
+  </div>
 
-          <VeeField v-slot="{ field, errors }" name="password">
-            <Field :data-invalid="!!errors.length">
-              <FieldLabel for="password">
-                Password
-              </FieldLabel>
-                <Input
-                  id="password"
-                  v-bind="field"
-                  type="password"
-                  placeholder="Password"
-                  :aria-invalid="!!errors.length"
-                  autocomplete="current-password"
-                />
-              <FieldError v-if="errors.length" :errors="errors" />
-            </Field>
-          </VeeField>
-        </FieldGroup>
-      </form>
-    </CardContent>
-    <CardFooter>
-      <Field orientation="horizontal">
-        <Button  type="submit" class="w-full" form="login-form">
-          <span v-if="!isLoading">Log in</span>
-          <IconLoader v-else class="animate-spin duration-75"/>
-        </Button>
-      </Field>
-    </CardFooter>
-  </Card>
 </template>

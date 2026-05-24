@@ -36,7 +36,7 @@ const sentAction = async () => {
   if(newAck.value !== props.alert.isAcknowledged || newSeverity.value !== props.alert.severity || newMessage.value) {
     await updateAlertRequest({
       id: props.alert.id,
-      author: authStore.userEmail!,
+      author: authStore.currentUser!.email!,
       ack: newAck.value === props.alert.isAcknowledged ? undefined : newAck.value,
       message: newMessage.value ?? undefined,
       newSeverity: newSeverity.value === props.alert.severity ? undefined : newSeverity.value,
@@ -127,11 +127,11 @@ const onClose = () => {
           </DialogClose>
           <DialogClose>
             <Button
-              variant="outline"
+              variant="green_outline"
               type="submit"
               @click="sentAction"
             >
-              Update <IconSend2 class="text-green-badge"/>
+              Update <IconSend2/>
             </Button>
           </DialogClose>
 

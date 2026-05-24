@@ -1,32 +1,38 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from "vue"
-import { type MyJWTPayload} from "@/types/types.ts"
+import {ref, computed, watch, watchEffect} from "vue"
+import {type MyJWTPayload, type User} from "@/types/types.ts"
 import { jwtDecode } from "jwt-decode"
 import api from "@/lib/axios"
+import {toast} from "vue-sonner";
 
 export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = ref<boolean>(false)
   const accessToken = ref<string | null>(null)
-  const fullName = computed(() => `${userFirstname.value} ${userSurname.value}`)
-  const avFallback = computed(() =>  `${userFirstname.value?.slice(0,1)}${userSurname.value?.slice(0,1)}`)
-  const userEmail = computed(() => userPayload.value?.sub)
-  const userFirstname = computed(() => userPayload.value?.firstname)
-  const userSurname = computed(() => userPayload.value?.surname)
-  const userRole = computed(() => userPayload.value?.role)
-  const userPayload = computed(() => {
+  const fullName = computed(() => `${currentUser.value?.firstname} ${currentUser.value?.surname}`)
+  const avFallback = computed(() =>  `${currentUser.value?.firstname.slice(0,1)}${currentUser.value?.surname.slice(0,1)}`)
+  const currentUser = computed(() => {
     if (!accessToken.value) return null
     try {
-      return jwtDecode<MyJWTPayload>(accessToken.value)
+      const payload = jwtDecode<MyJWTPayload>(accessToken.value)
+      return {
+        id: payload.id,
+        firstname: payload.firstname,
+        surname: payload.surname,
+        groups: payload.groups,
+        autoLogoutMinutes: payload.autoLogoutMinutes,
+        lastPasswordChangeDate: payload.lastPasswordChangeDate,
+        email: payload.sub,
+        role: payload.role,
+      } as User
     } catch {
       return null
     }
   })
 
 
-  async function login(credentials: { email: string; password: string }) {
+  async function alertLogin(credentials: { email: string; password: string }) {
     try {
       const response = await api.post('/auth/login', credentials)
-
       if (response.status === 200 && response.data.access_token) {
         accessToken.value = response.data.access_token
         isAuthenticated.value = true
@@ -34,8 +40,22 @@ export const useAuthStore = defineStore('auth', () => {
         return true
       }
 
-    } catch (error) {
-      console.error('Login error:', error)
+    } catch {
+      return false
+    }
+  }
+
+  async function ADLogin(credentials: { email: string; password: string }) {
+    try {
+      const response = await api.post('/auth/login/ad', credentials)
+      if (response.status === 200 && response.data.access_token) {
+        accessToken.value = response.data.access_token
+        isAuthenticated.value = true
+        console.log(response.data.access_token)
+        return true
+      }
+
+    } catch {
       return false
     }
   }
@@ -44,7 +64,7 @@ export const useAuthStore = defineStore('auth', () => {
     try {
        await api.post(`/auth/logout`,  { withCredentials: true });
     } catch (error) {
-      console.error('Logout error context:', error)
+      toast.error(`Error during logout: ${error}`)
     } finally {
       isAuthenticated.value = false
       accessToken.value = null
@@ -64,17 +84,15 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+
   return {
-    userPayload,
-    userRole,
+    currentUser,
     fullName,
-    userEmail,
-    userFirstname,
-    userSurname,
     accessToken,
     isAuthenticated,
     avFallback,
-    login,
+    alertLogin,
+    ADLogin,
     logout,
     refreshToken
   }

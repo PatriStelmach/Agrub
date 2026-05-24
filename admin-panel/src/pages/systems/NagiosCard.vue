@@ -175,7 +175,7 @@ const onCancel = () => {
 
     </CardDescription>
     <CardFooter class="bottom-4 absolute w-full">
-      <Button @click="onEdit" variant="green_outline" class="w-full *:size-5!">
+      <Button @click="onEdit" variant="blue_outline" class="w-full *:size-5!">
         Edit configuration <IconEdit />
       </Button>
     </CardFooter>

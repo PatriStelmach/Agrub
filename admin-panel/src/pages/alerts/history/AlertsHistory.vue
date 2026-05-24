@@ -89,7 +89,7 @@ const hoveredAlert = ref<AlertDetails | null>(null)
     <TopH1Div h1="Alerts history">
       <ButtonGroup>
         <AlertsFilters @update:filters="updateFilters">
-          <Button variant="outline">
+          <Button variant="blue_outline">
             Filters <IconFilterCog />
           </Button>
         </AlertsFilters>
@@ -105,7 +105,6 @@ const hoveredAlert = ref<AlertDetails | null>(null)
         v-model:hovered-alert="hoveredAlert"
         v-model:sorted-head="sortedHead"
         :alerts="items"
-        :totalElements="totalElements"
       >
         <MyServerPagination
           :total="totalElements"

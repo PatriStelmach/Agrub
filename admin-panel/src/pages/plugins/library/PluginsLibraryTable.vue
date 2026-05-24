@@ -26,7 +26,6 @@ import PluginDetailsDialog from "@/pages/plugins/PluginDetailsDialog.vue";
 
 const props = defineProps<{
   plugins: LibraryPlugin[]
-  totalElements: number
   isLoading: boolean;
 }>()
 
@@ -60,7 +59,6 @@ const getDetails = async (plugin: LibraryPlugin) => {
     <Table id="plugins-library-table" :class="dataTable">
       <TableCaption :class="tableCaption">
         <slot/>
-        <span >Matched plugins: <span class="font-extrabold">{{ totalElements}}</span></span>
       </TableCaption>
       <TableHeader class="h-10">
         <TableRow :class="tableHeaders">

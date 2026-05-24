@@ -9,6 +9,7 @@ import TeamPage from '../pages/team/users/TeamPage.vue'
 import Groups from '../pages/team/groups/Groups.vue'
 import ImportPlugin from '../pages/plugins/my/ImportPlugin.vue'
 import GroupCardDetails from '../pages/team/groups/GroupCardDetails.vue'
+import MyAccount from "@/pages/team/users/MyAccount.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -19,14 +20,13 @@ const router = createRouter({
     { path: '/alerts_history',  name: 'alerts_history',  component: AlertsHistory },
     { path: '/plugins_library', name: 'plugins_library', component: PluginsLibrary },
     { path: '/my_plugins/:plugin?',      name: 'my_plugins',      component: MyPlugins },
-    { path: '/team_members',    name: 'team_members',    component: TeamPage },
+    { path: '/team_members/:user?',    name: 'team_members',    component: TeamPage },
+    { path: '/team_members/my_account', name: 'my_account', component: MyAccount},
     { path: '/groups',          name: 'groups',          component: Groups },
     { path: '/import_plugins',  name: 'import_plugins',  component: ImportPlugin },
     { path: '/groups/edit_group/:id/:name',  name: 'groups/edit_group',      component: GroupCardDetails },
     { path: '/groups/create_group',    name: 'groups/create_group',    component: GroupCardDetails },
   ],
 })
-
-
 
 export default router
