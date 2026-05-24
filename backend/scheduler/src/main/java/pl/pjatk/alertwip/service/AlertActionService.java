@@ -57,6 +57,12 @@ public class AlertActionService {
             //czas pierwszego acka dla audytu
             if(request.acknowledge() && problem.getAcknowledgedAt() == null){
                 problem.setAcknowledgedAt(LocalDateTime.now());
+
+                //jeśli to wazuh to zamykamy od razy
+                if(problem.getOriginType() == "WAZUH"){
+                    problem.setStatus("Done");
+                    problem.setClosedAt(LocalDateTime.now());
+                }
             }
 
             action.setAckUpdate(request.acknowledge());
