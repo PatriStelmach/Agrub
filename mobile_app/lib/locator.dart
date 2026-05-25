@@ -14,7 +14,7 @@ void setupLocator() {
   locator.registerLazySingleton<Dio>(() {
     final dio = Dio(
       BaseOptions(
-        baseUrl: 'http://10.0.2.2:10000',
+        baseUrl: 'http://141.95.41.41/',
         connectTimeout: const Duration(seconds: 15),
         receiveTimeout: const Duration(seconds: 15),
         headers: {'Accept': '*/*', 'Content-Type': 'application/json'},
