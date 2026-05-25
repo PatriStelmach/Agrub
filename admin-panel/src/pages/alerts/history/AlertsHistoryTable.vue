@@ -18,7 +18,7 @@ import SortableHead from "@/helpers_components/SortableHead.vue";
 import {computed, ref, watchEffect} from "vue";
 import {type AlertDetails, type HistoryAlert} from "@/types/types.ts";
 import {Badge} from "@/components/ui/badge";
-import {IconCircleDashedCheck, IconCircleDashedX, IconHistory} from "@tabler/icons-vue";
+import {IconCircleCheck, IconCircleX, IconHistory} from "@tabler/icons-vue";
 import {Button} from "@/components/ui/button";
 import DateCell from "@/helpers_components/DateCell.vue";
 import {useSortRequests} from "@/composables/useSortRequests.ts";
@@ -115,8 +115,8 @@ watchEffect(() => {
               </TableCell>
 
               <TableCell class=" gap-x-2 items-center">
-                <IconCircleDashedCheck v-if="alert.isAcknowledged" class="text-green-badge"/>
-                <IconCircleDashedX v-else class="text-red-badge"/>
+                <IconCircleCheck v-if="alert.isAcknowledged" class="text-green-badge"/>
+                <IconCircleX v-else class="text-red-badge"/>
               </TableCell>
               <DateCell  :date="alert.createdAt "></DateCell>
               <DateCell  :date="alert.closedAt "></DateCell>

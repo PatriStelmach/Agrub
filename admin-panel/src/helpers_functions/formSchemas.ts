@@ -116,7 +116,6 @@ export const editCurrentUserSchema = toTypedSchema(
     firstname: z.string().min(2, 'Firstname must be at least 2 characters.'),
     surname: z.string().min(2, 'Surname must be at least 2 characters.'),
     autoLogoutMinutes: z.number().min(1, "Cannot be lower than 1 minute"),
-    role: z.enum(['TECHNICIAN', 'ADMINISTRATOR']),
     groups: z.array(z.object({
       name: z.string(),
       id: z.number(),

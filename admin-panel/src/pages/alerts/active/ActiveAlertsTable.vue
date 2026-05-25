@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table";
-import {IconCircleDashedCheck, IconCircleDashedX, IconEdit} from "@tabler/icons-vue";
+import {IconCircleCheck, IconCircleX, IconEdit} from "@tabler/icons-vue";
 import SortableHead from "@/helpers_components/SortableHead.vue";
 import EditAlertDialog from "@/pages/alerts/active/EditAlertDialog.vue";
 import {Button} from "@/components/ui/button";
@@ -102,8 +102,8 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<ActiveAlert>(() =
           </TableCell>
 
           <TableCell class=" gap-x-2 items-center">
-            <IconCircleDashedCheck v-if="alert.isAcknowledged" class="text-green-badge"/>
-            <IconCircleDashedX v-else class="text-red-badge"/>
+            <IconCircleCheck v-if="alert.isAcknowledged" class="text-green-badge"/>
+            <IconCircleX v-else class="text-red-badge"/>
           </TableCell>
           <DateCell   :date="dateParser(alert.createdAt).toDate "></DateCell>
           <TableCell>

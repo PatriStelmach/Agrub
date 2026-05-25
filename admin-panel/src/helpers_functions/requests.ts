@@ -219,6 +219,18 @@ export const changeUserPasswordRequest = async (oldPassword: string, newPassword
     }
   }
 
+export const getUserActions = async (id: number) => {
+  try {
+    const res = await api.get(`/users/${id}/actions`)
+    if (res.status === 200) {
+      return res.data ?? []
+    }
+  }
+  catch (error) {
+    toast.error( `Error retrieving user actions: ${error}`)
+  }
+}
+
 
 
 
