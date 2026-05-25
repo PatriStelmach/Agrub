@@ -27,18 +27,30 @@ class Alert {
     required this.acknowledged,
   });
 
-  Color get severityColor {
+  Color severityColor(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     switch (severity) {
+      //oklch(0.632 0.254 21.972)
       case AlertSeverity.extreme:
-        return Colors.redAccent;
+        return const Color(0xFFFC2E41);
+      //  oklch(70.5% 0.213 47.604)
       case AlertSeverity.high:
-        return Colors.orange;
+        return const Color(0xFFFF7B2E);
+      //  oklch(76.9% 0.290 70.08)
       case AlertSeverity.medium:
-        return Colors.yellow;
+        return const Color(0xFFFFB400);
+      //  oklch(90.5% 0.182 98.111)
       case AlertSeverity.low:
-        return Colors.green;
+        return const Color(0xFFE5FA31);
+      // oklch(0.731 0.255 137.694)
+      case AlertSeverity.lowest:
+        return const Color(0xFF00FA54);
+
+      case AlertSeverity.info:
       default:
-        return Colors.grey;
+        // Tryb ciemny oklch(0.70 0.14 242) Jasny oklch(0.79 0.14 242)
+        return isDark ? const Color(0xFF4DB0FF) : const Color(0xFF8AD2FF);
     }
   }
 

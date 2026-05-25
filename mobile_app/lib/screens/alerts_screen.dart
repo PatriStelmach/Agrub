@@ -24,14 +24,13 @@ class _AlertsScreenState extends State<AlertsScreen>
 
   @override
   void dispose() {
-    // Pamiętaj o wyrejestrowaniu!
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // Gdy użytkownik wraca do aplikacji (np. po kliknięciu w powiadomienie push)
+    // user wraca pushem do aplikacji
     if (state == AppLifecycleState.resumed) {
       debugPrint("Ekran: Aplikacja wybudzona! Synchronizuję dane...");
       _syncData();
@@ -69,39 +68,46 @@ class _AlertsScreenState extends State<AlertsScreen>
         Row(
           children: [
             Text("Sort by - ", style: TextStyle(fontSize: 30)),
-            DropdownButton<String>(
-              padding: EdgeInsets.all(6),
-              borderRadius: BorderRadius.all(Radius.circular(16)),
-              value: currentSort,
-              icon: const Icon(Icons.menu),
-              style: const TextStyle(color: Colors.black),
-              onChanged: (String? newValue) {
-                if (newValue != null) {
-                  alertsViewModel.sortAlertsBy(newValue);
-                }
-              },
-              items: const [
-                DropdownMenuItem<String>(
-                  value: 'id',
-                  child: Text('ID', style: TextStyle(fontSize: 30)),
+            Expanded(
+              child: DropdownButton<String>(
+                isExpanded: true,
+                padding: EdgeInsets.all(6),
+                borderRadius: BorderRadius.all(Radius.circular(16)),
+                value: currentSort,
+                icon: const Icon(Icons.menu),
+                style: TextStyle(
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
+                  fontSize: 18,
+                  fontFamily: 'JetBrainsMono',
                 ),
-                DropdownMenuItem<String>(
-                  value: 'title',
-                  child: Text('Title', style: TextStyle(fontSize: 30)),
-                ),
-                DropdownMenuItem<String>(
-                  value: 'createdAt',
-                  child: Text('CreatedAt', style: TextStyle(fontSize: 30)),
-                ),
-                DropdownMenuItem<String>(
-                  value: 'acknowledged',
-                  child: Text('Acknowledged', style: TextStyle(fontSize: 30)),
-                ),
-                DropdownMenuItem<String>(
-                  value: 'severity',
-                  child: Text('Severity', style: TextStyle(fontSize: 30)),
-                ),
-              ],
+                onChanged: (String? newValue) {
+                  if (newValue != null) {
+                    alertsViewModel.sortAlertsBy(newValue);
+                  }
+                },
+                items: const [
+                  DropdownMenuItem<String>(
+                    value: 'id',
+                    child: Text('ID', style: TextStyle(fontSize: 30)),
+                  ),
+                  DropdownMenuItem<String>(
+                    value: 'title',
+                    child: Text('Title', style: TextStyle(fontSize: 30)),
+                  ),
+                  DropdownMenuItem<String>(
+                    value: 'createdAt',
+                    child: Text('CreatedAt', style: TextStyle(fontSize: 30)),
+                  ),
+                  DropdownMenuItem<String>(
+                    value: 'acknowledged',
+                    child: Text('Acknowledged', style: TextStyle(fontSize: 30)),
+                  ),
+                  DropdownMenuItem<String>(
+                    value: 'severity',
+                    child: Text('Severity', style: TextStyle(fontSize: 30)),
+                  ),
+                ],
+              ),
             ),
             IconButton(
               icon: Icon(isAsc ? Icons.arrow_upward : Icons.arrow_downward),
@@ -118,51 +124,110 @@ class _AlertsScreenState extends State<AlertsScreen>
             itemBuilder: (context, index) {
               final alert = alertsViewModel.sortedAlerts[index];
 
-              return Card(
-                color: alert?.severityColor,
-                child: ExpansionTile(
-                  title: Text(alert?.subject ?? 'No Title'),
-                  subtitle: Text(
-                    alert.acknowledged ? 'ACKNOWLEDGED' : 'NOT ACKNOWLEDGED',
+              final cardBackgroundColor = alert.severityColor(context);
+
+              final cardBrightness = ThemeData.estimateBrightnessForColor(
+                cardBackgroundColor,
+              );
+
+              final textColor = cardBrightness == Brightness.dark
+                  ? Colors.white
+                  : const Color(0xFF1E1E1E);
+
+              return Theme(
+                data: Theme.of(context).copyWith(
+                  brightness: cardBrightness,
+                  iconTheme: IconThemeData(color: textColor),
+                  textTheme: TextTheme(
+                    titleLarge: TextStyle(
+                      color: textColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    bodyLarge: TextStyle(color: textColor),
+                    bodyMedium: TextStyle(color: textColor),
+                    bodySmall: TextStyle(color: textColor),
                   ),
-                  leading: Icon(Icons.warning, color: Colors.black),
-                  children: [
-                    Column(
-                      children: [
-                        Row(
+                ),
+                child: Card(
+                  color: cardBackgroundColor,
+                  child: ExpansionTile(
+                    iconColor: textColor,
+                    collapsedIconColor: textColor,
+                    leading: Icon(Icons.warning, color: textColor),
+
+                    title: Text(
+                      alert?.subject ?? 'No Title',
+                      style: TextStyle(
+                        color: textColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    subtitle: Text(
+                      alert.acknowledged ? 'ACKNOWLEDGED' : 'NOT ACKNOWLEDGED',
+                      style: TextStyle(color: textColor.withOpacity(0.8)),
+                    ),
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Column(
                           children: [
-                            Text(alert?.source ?? 'Unknown Host'),
-                            Spacer(),
-                            Text(alert?.createdAt.toString() ?? 'Unknown Time'),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Text(alert?.status.toString() ?? 'Unknown Status'),
-                            Spacer(),
-                            Text(
-                              alert?.severity.toString() ?? 'Unknown Severity',
+                            Row(
+                              children: [
+                                Text(
+                                  alert?.source ?? 'Unknown Host',
+                                  style: TextStyle(color: textColor),
+                                ),
+                                const Spacer(),
+                                Text(
+                                  alert?.createdAt.toString() ?? 'Unknown Time',
+                                  style: TextStyle(color: textColor),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                Text(
+                                  alert?.status.toString() ?? 'Unknown Status',
+                                  style: TextStyle(color: textColor),
+                                ),
+                                const Spacer(),
+                                Text(
+                                  alert?.severity.toString() ??
+                                      'Unknown Severity',
+                                  style: TextStyle(
+                                    color: textColor,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      cardBrightness == Brightness.dark
+                                      ? Colors.white24
+                                      : Colors.black12,
+                                  foregroundColor: textColor,
+                                  elevation: 0,
+                                ),
+                                onPressed: () {
+                                  _openAckDialog(context, alert.id);
+                                },
+                                child: const Text('Actions'),
+                              ),
                             ),
                           ],
                         ),
-
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              _openAckDialog(context, alert.id);
-                            },
-                            child: Text('Actions'),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
               );
             },
-            padding: const EdgeInsets.all(10),
-            scrollDirection: Axis.vertical,
           ),
         ),
       ],

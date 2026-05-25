@@ -4,6 +4,7 @@ import 'package:alert_app/data/repositories/user_repository.dart';
 import 'package:alert_app/firebase_options.dart';
 import 'package:alert_app/locator.dart';
 import 'package:alert_app/logic/general_layout_view_model.dart';
+import 'package:alert_app/logic/settings_view_model.dart';
 import 'package:alert_app/screens/login_screen.dart';
 import 'package:alert_app/services/auth_service.dart';
 import 'package:alert_app/services/navigation_service.dart';
@@ -44,8 +45,7 @@ Future<void> main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => GeneralLayoutViewModel()),
-        //ChangeNotifierProvider.value(value: alertRepository),
-        //ChangeNotifierProvider.value(value: pluginRepository),
+        ChangeNotifierProvider(create: (_) => SettingsViewModel()),
         ChangeNotifierProvider.value(value: notificationService),
         ChangeNotifierProvider.value(value: userRepository),
 
@@ -106,29 +106,29 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final settingsViewModel = context.watch<SettingsViewModel>();
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.light,
+      themeMode: settingsViewModel.themeMode,
       navigatorKey: navigationService.navigatorKey,
 
-      // Home staje się dynamiczny
       home: Consumer<UserViewModel>(
         builder: (context, userViewModel, child) {
-          // 1. Ekran ładowania (podczas sprawdzania SecureStorage przy starcie)
+          // Sprawdzanie secure storage
           if (userViewModel.isLoading) {
             return const Scaffold(
               body: Center(child: CircularProgressIndicator()),
             );
           }
 
-          // 2. Jeśli zalogowany - pokazujemy główny layout
+          // \zalogowany -  główny layout
           if (userViewModel.isLoggedIn) {
             return const GeneralLayout();
           }
 
-          // 3. Jeśli niezalogowany - pokazujemy ekran logowania
+          // niezalogowany - ekran logowania
           return const LoginScreen();
         },
       ),
@@ -140,13 +140,9 @@ class MainApp extends StatelessWidget {
 
 
 T0D0:
-- pobieranie i korzystanie z poprawnych danych zalogowanego usera
-- upewnić się, że user otrzymuje własciwe dane zgodne z grupą
+
 - severity change
 - najnowszy wpis z historii alertu ( co najmniej )
-- retencja pamięci, żeby już otrzymane alerty się nie odpalały przy odpalaniu apki
-- sortowanie w Pluginach( powtórzyc rozwiązanie z alertów)
-- FCM!!!!!!!!!
 - komentarze porządne
 - refactoring, uporządkowanie tego co robią servicy/repo/view models zgodnie z MVVM, uporządkowanie rzeczy zgodnie z DRY itd.
 

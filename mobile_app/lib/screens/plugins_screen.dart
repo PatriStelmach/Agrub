@@ -12,11 +12,22 @@ class PluginsScreen extends StatefulWidget {
 }
 
 class _PluginsScreenState extends State<PluginsScreen> {
-  String dropDownValue = 'fileName';
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        final vm = context.read<PluginsViewModel>();
+        vm.sortPluginsBy(vm.currentSortProperty);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final pluginsViewModel = context.watch<PluginsViewModel>();
+    final currentSort = pluginsViewModel.currentSortProperty;
+    final isAsc = pluginsViewModel.isAscending;
 
     if (pluginsViewModel.pluginList.isEmpty) {
       return const Scaffold(
@@ -26,9 +37,9 @@ class _PluginsScreenState extends State<PluginsScreen> {
           ),
         ),
       );
-    } else {
-      pluginsViewModel.sortPluginsBy(dropDownValue);
     }
+
+    final sortedList = pluginsViewModel.sortedPlugins;
 
     return Column(
       children: [
@@ -38,14 +49,19 @@ class _PluginsScreenState extends State<PluginsScreen> {
             DropdownButton<String>(
               padding: EdgeInsets.all(6),
               borderRadius: BorderRadius.all(Radius.circular(16)),
-              value: dropDownValue,
+              value: currentSort,
               icon: const Icon(Icons.menu),
-              style: const TextStyle(color: Colors.black),
+              style: TextStyle(
+                color: Theme.of(context).textTheme.bodyLarge?.color,
+                fontSize: 18,
+                fontFamily: 'JetBrainsMono',
+              ),
               onChanged: (String? newValue) {
-                setState(() {
-                  dropDownValue = newValue!;
-                });
+                if (newValue != null) {
+                  pluginsViewModel.sortPluginsBy(newValue);
+                }
               },
+
               items: const [
                 DropdownMenuItem<String>(
                   value: 'fileName',
@@ -61,14 +77,20 @@ class _PluginsScreenState extends State<PluginsScreen> {
                 ),
               ],
             ),
+            IconButton(
+              icon: Icon(isAsc ? Icons.arrow_upward : Icons.arrow_downward),
+              onPressed: () {
+                pluginsViewModel.sortPluginsBy(currentSort, ascending: !isAsc);
+              },
+            ),
           ],
         ),
 
         Expanded(
           child: ListView.builder(
-            itemCount: pluginsViewModel.sortedPlugins.length,
+            itemCount: sortedList.length,
             itemBuilder: (context, index) {
-              final plugin = pluginsViewModel.sortedPlugins[index];
+              final plugin = sortedList[index];
 
               return Card(
                 color: plugin.activeColor,

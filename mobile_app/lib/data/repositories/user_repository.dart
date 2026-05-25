@@ -23,7 +23,7 @@ class UserRepository extends ChangeNotifier {
     // 3. Jeśli nie ma tokena, logowanie się nie udało
     return false;
   }
- 
+
   Future<String?> getToken() async => await _storage.read(key: 'jwt_token');
 
   Future<void> logout() async => await _storage.delete(key: 'jwt_token');
@@ -33,7 +33,23 @@ class UserRepository extends ChangeNotifier {
 
     // Decoding token to get user data
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+    //Debug do sprawdzenia czy mam info dobre
+    debugPrint("JWT DECODED: $decodedToken");
 
     return UserModel.fromJwt(decodedToken);
+  }
+
+  Future<String> getCurrentUserGroup() async {
+    final token = await getToken();
+    if (token == null || token.isEmpty) return 'None';
+
+    final user = getUserFromToken(token);
+    return user?.group ?? 'None';
+  }
+
+  Future<UserModel?> getCurrentUser() async {
+    final token = await getToken();
+    if (token == null || token.isEmpty) return null;
+    return getUserFromToken(token);
   }
 }

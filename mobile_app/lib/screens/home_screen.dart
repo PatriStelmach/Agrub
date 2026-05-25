@@ -57,7 +57,7 @@ class HomeScreen extends StatelessWidget {
             if (latestCritical != null)
               Card(
                 elevation: 4,
-                color: latestCritical.severityColor.withOpacity(0.9),
+                color: latestCritical.severityColor(context).withOpacity(0.9),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),

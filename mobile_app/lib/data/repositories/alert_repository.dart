@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:alert_app/data/models/alert_model.dart';
+import 'package:alert_app/data/repositories/user_repository.dart';
 import 'package:alert_app/locator.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -58,8 +59,10 @@ class AlertRepository extends ChangeNotifier {
   }
 
   Future<void> initSseConnection() async {
+    final userRepo = locator<UserRepository>();
+    final String userGroup = await userRepo.getCurrentUserGroup();
     final String sseUrl =
-        '${dio.options.baseUrl}/api/alerts/stream?groups=ADMIN';
+        '${dio.options.baseUrl}/api/alerts/stream?groups=$userGroup';
     _sseSubscription?.cancel();
 
     String? token = await _storage.read(key: 'jwt_token');
@@ -191,7 +194,7 @@ class AlertRepository extends ChangeNotifier {
     // Inicjalizujemy SharedPreferences na początku metody
     final prefs = await SharedPreferences.getInstance();
 
-    // Pobieramy z pamięci telefonu listę ID, które już BYŁY wykrzyczane
+    // pobieranie alertów które już były
     List<String> persistentNotifiedIds =
         prefs.getStringList('notified_alert_ids') ?? [];
     // Pobieramy aktualny cache offline alertów
@@ -224,7 +227,6 @@ class AlertRepository extends ChangeNotifier {
       if (alert.severity == AlertSeverity.extreme && !alreadyNotified) {
         debugPrint("DEBUG: Alert is new");
 
-        // Dodajemy do lokalnej listy w RAM (jeśli nadal jej używasz w tej klasie)
         if (!notifiedAlertIds.contains(alert.id)) {
           notifiedAlertIds.add(alert.id);
         }
@@ -260,6 +262,11 @@ class AlertRepository extends ChangeNotifier {
     final String actionType = isAck ? "ACK" : "COMMENT";
     final String commentText = comment ?? "";
 
+    final userRepo = locator<UserRepository>();
+    final currentUser = await userRepo.getCurrentUser();
+    //jakby sesja wygasła
+    final String authorName = currentUser?.login ?? 'Unknown Mobile';
+
     final originalAlert = alertsCache[alertId];
 
     final int currentSeverityInt = originalAlert != null
@@ -279,7 +286,7 @@ class AlertRepository extends ChangeNotifier {
     }
 
     final Map<String, dynamic> requestBody = {
-      "author": "Mobile User",
+      "author": authorName,
       "message": commentText,
       "newSeverity": finalSeverityInt,
       "ack": isAck,
