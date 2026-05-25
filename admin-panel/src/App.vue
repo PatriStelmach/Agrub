@@ -7,13 +7,15 @@ import {useSSEstore} from "@/stores/SSEstore.ts";
 import {SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
 import {useAuthStore} from "@/stores/authStore.ts";
 import LoginPage from "@/pages/login/LoginPage.vue";
-import {onMounted, ref} from "vue";
+import {computed, onMounted, ref, watchEffect} from "vue";
 import {Skeleton} from "@/components/ui/skeleton";
 import {dateParser} from "@/composables/dateParser.ts";
+import {globals} from "@/composables/globals.ts";
 
 
 
 const authStore = useAuthStore()
+const logoutTimeout = computed(() => authStore.currentUser?.autoLogoutMinutes)
 const isLoading = ref(true);
 onMounted(() => {
   authStore.refreshToken().finally(() => {
@@ -25,21 +27,15 @@ onMounted(() => {
   });
   changeTime()
 })
+const { time, changeTime } = globals(
+  () => Number(logoutTimeout.value),
+  () => {
+    if (authStore.isAuthenticated) {
+      authStore.logout()
+    }
+  }
+)
 
-const date = new Date();
-
-const time = ref<{hour: string; minute: string, second: string}>
-({hour: dateParser(date).hours, minute: dateParser(date).minutes, second: dateParser(date).seconds});
-const weekDay = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
-
-const changeTime = () => {
-  setInterval(() => {
-    const newDate = new Date()
-    time.value.hour = dateParser(newDate).hours
-    time.value.minute = dateParser(newDate).minutes
-    time.value.second = dateParser(newDate).seconds
-  }, 1000)
-}
 
 </script>
 

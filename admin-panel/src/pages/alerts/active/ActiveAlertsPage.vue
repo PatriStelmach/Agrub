@@ -53,6 +53,7 @@ const {pageSize, filteredData, updateData, currentPage, searchFilter, tableData 
       v-model:hoveredAlert="hoveredAlert"
     >
       <MyClientPagination
+        :total="alertStore.currentAlerts.length"
         :data="filteredData"
         v-model:page-index="currentPage"
         v-model:page-size="pageSize"

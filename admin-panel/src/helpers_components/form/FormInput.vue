@@ -35,7 +35,7 @@ const fieldId = props.name
         :default-value="field.value"
         v-bind="field"
       />
-      <FieldError v-if="errors.length" :errors="errors" />
+      <FieldError class="text-center" v-if="errors.length" :errors="errors" />
     </Field>
   </VeeField>
 </template>

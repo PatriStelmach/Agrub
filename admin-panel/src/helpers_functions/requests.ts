@@ -171,6 +171,54 @@ export const downloadPluginRequest = async (plugin: LibraryPlugin) => {
   }
 }
 
+export const createGroupRequest = async (name: string) => {
+  try {
+    const res = await api.post(`/groups`, {name: name} )
+    if (res.status === 200) {
+      return res.data
+    }
+  }
+  catch (error) {
+    throw (error)
+  }
+}
+
+export const getUserDetailsRequest = async () => {
+  try {
+    const res = await api.get('users/me/settings')
+    if (res.status === 200) {
+      return res.data
+    }
+  }
+  catch (error) {
+    throw (error)
+  }
+}
+
+export const autoLogoutRequest = async (minutes: number | null) => {
+  if(minutes) {
+    try {
+      const res = await api.patch('users/me/auto-logout', {minutes: minutes})
+      if (res.status === 200) {
+        return true
+      }
+    } catch (error) {
+      throw (error)
+    }
+  }}
+
+export const changeUserPasswordRequest = async (oldPassword: string, newPassword: string) => {
+    try {
+      const res = await api.patch('users/me/password', { oldPassword: oldPassword, newPassword: newPassword })
+      if (res.status === 200) {
+        toast.success('Password changed successfully!')
+        return true
+      }
+    } catch (error) {
+      throw (error)
+    }
+  }
+
 
 
 

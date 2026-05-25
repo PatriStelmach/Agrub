@@ -168,8 +168,8 @@ public class ScriptExecutionService {
                     GlobalProblem problem = new GlobalProblem();
                     problem.setUniqueKey(uniqueKey);
                     problem.setSubject(task.getTaskName());
-                    problem.setSource("Local Script");
-                    problem.setOriginType(task.getTaskName());
+                    problem.setSource(task.getTaskName());
+                    problem.setOriginType("Local Script");
                     problem.setStatus("Sent");
                     problem.setCreatedAt(LocalDateTime.now());
                     problem.setMessage(newMessage);

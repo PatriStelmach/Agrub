@@ -1,25 +1,23 @@
 <script setup lang="ts">
-import {computed, ref, watch, watchEffect} from "vue"
-import { useForm, useField } from 'vee-validate'
-import { toTypedSchema } from "@vee-validate/zod"
-import z from "zod"
+import {onMounted, ref, watch, watchEffect} from "vue"
+import {useForm, useSetFieldValue} from 'vee-validate'
 import { useUserStore } from "@/stores/userStore.js"
-import type { User } from "@/types/types"
+import { type User} from "@/types/types"
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Button } from '@/components/ui/button'
-import { IconKey, IconTool, IconDeviceFloppy, IconLoader } from '@tabler/icons-vue'
-import { Field, FieldError, FieldGroup } from "@/components/ui/field"
+import { IconKey, IconTool, IconDeviceFloppy, IconLabel, IconLock, IconMail, IconX, IconLoader } from '@tabler/icons-vue'
 import { SheetFooter, SheetClose } from '@/components/ui/sheet'
 import MyTagInput from "@/helpers_components/MyTagInput.vue"
-import MyFieldLabel from "@/helpers_components/form/MyFieldLabel.vue"
 import DialogLabel from "@/helpers_components/DialogLabel.vue"
-import {bigNameLabel, inputText, smallNameLabel} from '@/assets/cssFunctions'
 import {toast} from "vue-sonner";
-
+import FormInput from "@/helpers_components/form/FormInput.vue";
+import {
+  createUserSchema,
+  editUserSchema
+} from "@/helpers_functions/formSchemas.ts";
 const props = defineProps<{
   user: User
   actionType: "create" | "edit"
@@ -28,84 +26,66 @@ const props = defineProps<{
 const userStore = useUserStore()
 const updatedUser = ref<User>({ ...props.user })
 const isLoading = ref(false)
+
 const tagsForEdit = ref<string[]>(
   updatedUser.value.groups?.map(g => g.name) ?? []
 )
 
-watch(tagsForEdit, (val) => {
-  updatedUser.value.groups = userStore.allGroups.filter(g => val.includes(g.name))
-  console.log(updatedUser.value)
-}, { deep: true })
-
-
-const formSchema = toTypedSchema(
-  z.object({
-    email: z.string().email('Invalid email address'),
-    firstname: z.string().min(2, 'Firstname must be at least 2 characters.'),
-    surname: z.string().min(2, 'Surname must be at least 2 characters.'),
-    //password: z.string().op
-  })
-)
-
-const { handleSubmit } = useForm({ validationSchema: formSchema })
-
-const { value: firstname, errors: firstnameErrors } = useField<string>('firstname', undefined,
-  { initialValue: updatedUser.value.firstname })
-const { value: surname, errors: surnameErrors } = useField<string>('surname', undefined,
-  { initialValue: updatedUser.value.surname })
-const { value: email, errors: emailErrors } = useField<string>('email', undefined,
-  { initialValue: updatedUser.value.email })
+const { handleSubmit, values } = useForm({
+  validationSchema: props.actionType === 'create' ? createUserSchema : editUserSchema,
+  initialValues: updatedUser.value
+})
 
 const onSubmit = handleSubmit(async () => {
   isLoading.value = true
-  updatedUser.value.firstname = firstname.value
-  updatedUser.value.surname = surname.value
-  updatedUser.value.email = email.value
   if(props.actionType === "edit") {
     await userStore.editUserRequest(updatedUser.value)
       .then((res) => toast.success(`User ${res} updated successfully.`))
-      .catch((err) => toast.error(`${err.message}`))
-      .finally(() => isLoading.value = false)
+      .catch((error) => toast.error(`Error updating ${updatedUser.value.email}: ${error}`))
   }
   else {
-    //updatedUser.value.password = password.value
     await userStore.createUserRequest(updatedUser.value)
       .then((res) => toast.success(`User ${res} created successfully.`))
-      .catch((err) => toast.error(`${err.message}`))
+      .catch((error) => toast.error(`Error updating ${updatedUser.value.email}: ${error}`))
       .finally(() => isLoading.value = false)
   }
-
 })
+
+watch(tagsForEdit, (val) => {
+  updatedUser.value.groups = userStore.allGroups.filter(g => val.includes(g.name))
+}, { deep: true })
+
+watch(values, (newValues) => {
+  Object.assign(updatedUser.value, newValues)
+}, { deep: true })
+
+
+
 </script>
 
 <template>
-  <form id="edit-user-form" @submit="onSubmit" class="px-4 space-y-4">
-    <div class="grid space-y-2 w-3/4">
-      <Avatar class="size-12 rounded-lg">
-        <AvatarFallback class="rounded-full text-xl grayscale">
-          {{ userStore.avFallback(updatedUser)}}
+  <form id="edit-user-form" @submit="onSubmit" class="px-4 space-y-4 max-h-[75vh] overflow-auto">
+    <div class="grid space-y-3 w-3/4">
+      <Avatar class="size-9 rounded-lg">
+        <AvatarFallback class="rounded-full text-md grayscale">
+          {{ userStore.avFallback(values as User)}}
         </AvatarFallback>
       </Avatar>
-
-      <FieldGroup class="space-x-2">
-        <Field :data-invalid="!!firstnameErrors.length" class="w-fit">
-          <MyFieldLabel text="Firstname" :class="bigNameLabel" for="firstname" />
-          <Input v-model="firstname" placeholder="Firstname..." id="firstname" :class="inputText" />
-          <FieldError v-if="firstnameErrors.length" :errors="firstnameErrors" />
-        </Field>
-
-        <Field :data-invalid="!!surnameErrors.length" class="w-fit">
-          <MyFieldLabel text="Surname" :class="bigNameLabel" for="surname" />
-          <Input v-model="surname" placeholder="Surname..." id="surname" :class="inputText" />
-          <FieldError v-if="surnameErrors.length" :errors="surnameErrors" />
-        </Field>
-
-        <Field :data-invalid="!!emailErrors.length" class="w-fit">
-          <MyFieldLabel text="e-mail" :class="bigNameLabel" for="email" />
-          <Input v-model="email" placeholder="user@domain.com" id="email" :class="inputText" />
-          <FieldError v-if="emailErrors.length" :errors="emailErrors" />
-        </Field>
-      </FieldGroup>
+      <FormInput autocomplete="name" name="firstname" label="Firstname" orientation="vertical">
+        <IconLabel class="size-4"/>
+      </FormInput>
+      <FormInput name="surname" label="Surname" orientation="vertical">
+        <IconLabel class="size-4"/>
+      </FormInput>
+      <FormInput autocomplete="email" type="email" name="email" label="e-mail" orientation="vertical">
+        <IconMail class="size-4"/>
+      </FormInput>
+      <FormInput v-if="actionType === 'create'" autocomplete="password" type="password" name="password" label="Password" orientation="vertical">
+        <IconLock class="size-4"/>
+      </FormInput>
+      <FormInput v-if="actionType === 'create'" autocomplete="new-password" type="password" name="confirmPassword" label="Confirm password" orientation="vertical">
+        <IconLock class="size-4"/>
+      </FormInput>
 
       <div class="grid mt-4 space-y-6">
         <div>
@@ -131,13 +111,13 @@ const onSubmit = handleSubmit(async () => {
     </div>
   </form>
 
-  <SheetFooter class="mt-6">
+  <SheetFooter>
       <Button  type="submit" form="edit-user-form" variant="green_outline" class="flex items-center">
         Save <IconDeviceFloppy v-if="!isLoading" />
         <IconLoader v-else class="animate-spin" />
       </Button>
     <SheetClose as-child>
-      <Button variant="red_outline">Cancel</Button>
+      <Button class="flex items-center" variant="red_outline">Cancel<IconX/></Button>
     </SheetClose>
   </SheetFooter>
 </template>

@@ -63,21 +63,24 @@ const onEdit = (system: string) => {
         class=" px-6 py-2 pr-3 grid sm:grid-cols-2 md:grid-cols-3 gap-6 max-h-[85vh] overflow-y-auto"
         v-else>
         <NagiosCard
-          :system="systemsConfig[2]!"
+          v-if="systemsConfig[2]"
+          :system="systemsConfig[2]"
           :is-unwrapped="isUnwrapped('NAGIOS')"
           @edit="onEdit('NAGIOS')"
           @cancel="onCloseAndSave"
           @save="onCloseAndSave"
         />
         <WazuhCard
-          :system="systemsConfig[1]!"
+          v-if="systemsConfig[1]"
+          :system="systemsConfig[1]"
           :is-unwrapped="isUnwrapped('WAZUH')"
           @edit="onEdit('WAZUH')"
           @cancel="onCloseAndSave"
           @save="onCloseAndSave"
         />
         <ZabbixCard
-          :system="systemsConfig[0]!"
+          v-if="systemsConfig[0]"
+          :system="systemsConfig[0]"
           :is-unwrapped="isUnwrapped('ZABBIX')"
           @edit="onEdit('ZABBIX')"
           @cancel="onCloseAndSave"

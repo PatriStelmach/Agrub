@@ -11,26 +11,27 @@ defineProps<{
 
 </script>
 <template>
-  <Card
-    @click="$router.push(`/groups/edit_group/${group.id}/${group.name}`)"
-    class="cursor-pointer"
-    :class="gridCard"
-  >
-    <CardHeader class="font-bold mx-8 text-center border-b-2 border-blue-badge/50 italic">
-      {{ group.name }}
-    </CardHeader>
-    <CardDescription class="*:flex *:gap-x-2 *:items-center *:justify-center space-y-2 px-3">
+  <RouterLink :to="`/groups/edit_group/${group.id}/${group.name}`">
+    <Card
+      class="cursor-pointer"
+      :class="gridCard"
+    >
+      <CardHeader class="font-bold mx-8 text-center border-b-2 border-blue-badge/50 italic">
+        {{ group.name }}
+      </CardHeader>
+      <CardDescription class="*:flex *:gap-x-2 *:items-center *:justify-center space-y-2 px-3">
       <span>
         <IconFilterCog />
         <span class="max-lg:text-md lg:text-lg 2xl:text-xl">Rules configurations:</span>
         <Badge variant="number">{{ group.ruleCount}}</Badge>
       </span>
-      <span>
+        <span>
         <IconUserCog />
         <span class="max-lg:text-md lg:text-lg 2xl:text-xl">Assigned users:</span>
         <Badge variant="number">{{ group.userCount}}</Badge>
       </span>
-    </CardDescription>
-  </Card>
+      </CardDescription>
+    </Card>
+  </RouterLink>
 </template>
 

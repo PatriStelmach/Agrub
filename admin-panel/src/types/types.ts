@@ -60,6 +60,10 @@ export interface MyJWTPayload {
   role: "ADMINISTRATOR" | "TECHNICIAN";
   firstname: string,
   surname: string,
+  id: number,
+  groups: UserGroup[],
+  autoLogoutMinutes: number,
+  lastPasswordChangeDate: string
   sub: string;
   iat: number;
   exp: number;
@@ -112,10 +116,25 @@ export interface User {
   firstname: string,
   surname: string,
   password?: string,
+  oldPassword?: string,
+  newPassword?: string,
+  confirmPassword?: string,
   active?: boolean,
   email: string,
   role?: "ADMINISTRATOR" | "TECHNICIAN"
   groups?: UserGroup[],
+  autoLogoutMinutes?: number
+  lastPasswordChangeDate?: string,
+}
+
+export interface EditCurrentUser {
+  id: number,
+  firstname: string,
+  surname: string,
+  email: string,
+  role: "ADMINISTRATOR" | "TECHNICIAN"
+  groups: UserGroup[],
+  autoLogoutMinutes?: number
 }
 
 export const blankUser = {
@@ -123,7 +142,10 @@ export const blankUser = {
   surname: '',
   email: '',
   role: "TECHNICIAN",
-  groups: []
+  groups: [],
+  password: '',
+  newPassword: '',
+  confirmPassword: '',
 }
 
 export interface UserGroup {
@@ -208,7 +230,8 @@ export interface WazuhConfig {
   wazuh_password_SECRET?: string
   wazuh_url: string
   wazuh_enabled: boolean
-  wazuh_min_active_level: number
+  wazuh_warning_level: number
+  wazuh_critical_level: number
 }
 //tak przychodzi z api
 export interface NagiosConfig {
@@ -232,7 +255,8 @@ export interface MonitoringSystemsConfig  {
   passwordOrToken?: string
   url: string
   enabled: boolean
-  min_active_level?: number
+  wazuh_warning_level?: number
+  wazuh_critical_level?: number
 }
 
 //tak przychodzi z api
@@ -241,7 +265,8 @@ export interface AlertSystemSettings {
   wazuh_password_SECRET?: string
   wazuh_url: string
   wazuh_enabled: boolean
-  wazuh_min_active_level: number
+  wazuh_warning_level: number
+  wazuh_critical_level: number
 
   nagios_url: string
   nagios_enabled: boolean

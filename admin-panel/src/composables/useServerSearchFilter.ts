@@ -4,7 +4,7 @@ export function useServerSearchFilter<T, F>
 (getItemsRequest: () => Promise<void>, emptyFilters: F, sortKey: string, sortOrder: string) {
   const items = ref<T[]>([])
   const searchFilter = ref<string | null>(null);
-  const pageSize = ref<number>(50);
+  const pageSize = ref<number>(100);
   const currentPage = ref<number>(1);
   const totalElements = ref<number>(0);
   const isLoading = ref(true);
