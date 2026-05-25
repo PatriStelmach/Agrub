@@ -45,7 +45,9 @@ public class WazuhSyncService implements SchedulingConfigurer {
 
     // WYŁĄCZONE
     // Idk czy chcemy to zrobić, lepiej chyba żeby tylko na bieżąco przychodziło?
-    /*
+    // w wazuhu nie ma jako tako aktywnych alertów tylko po prostu logi więc trzeba by porównywać stan bazy aktualny całej
+    // ze stanem całego wazuha a to będzie duża operacja
+    // może dać to ale tego synca raz na godzinę?
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
         taskRegistrar.addTriggerTask(
@@ -65,11 +67,11 @@ public class WazuhSyncService implements SchedulingConfigurer {
                 }
         );
     }
-    */
 
+    // WYŁĄCZONE TUTAJ
     @Transactional
     public void sync() {
-        if (!settingService.getBoolean("wazuh_enabled", false)) {
+        if (!settingService.getBoolean("wazuh_enabled", false) && false) {
             return;
         }
 
