@@ -1,3 +1,4 @@
+import 'package:alert_app/services/push_notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:alert_app/logic/user_view_model.dart';
@@ -16,10 +17,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _handleLogin() async {
     final userVM = context.read<UserViewModel>();
-    
+    final pushService = context.read<PushNotificationService>();
     bool success = await userVM.signIn(
       _emailController.text.trim(),
       _passwordController.text,
+      pushService,
     );
 
     if (!success && mounted) {
@@ -50,7 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 40),
-              
+
               // Pole Email
               TextField(
                 controller: _emailController,
@@ -62,7 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 20),
-              
+
               // Pole Hasło
               TextField(
                 controller: _passwordController,
@@ -72,24 +74,31 @@ class _LoginScreenState extends State<LoginScreen> {
                   prefixIcon: const Icon(Icons.lock),
                   border: const OutlineInputBorder(),
                   suffixIcon: IconButton(
-                    icon: Icon(_obscurePassword ? Icons.visibility : Icons.visibility_off),
-                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                    icon: Icon(
+                      _obscurePassword
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                    ),
+                    onPressed: () =>
+                        setState(() => _obscurePassword = !_obscurePassword),
                   ),
                 ),
               ),
               const SizedBox(height: 30),
-              
+
               SizedBox(
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
                   onPressed: isLoading ? null : _handleLogin,
                   style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
-                  child: isLoading 
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text("LOG IN", style: TextStyle(fontSize: 18)),
+                  child: isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text("LOG IN", style: TextStyle(fontSize: 18)),
                 ),
               ),
             ],

@@ -8,10 +8,10 @@ import 'package:alert_app/services/navigation_service.dart';
 import 'package:flutter_client_sse/constants/sse_request_type_enum.dart';
 import 'package:flutter_client_sse/flutter_client_sse.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AlertRepository extends ChangeNotifier {
   final Dio dio = locator<Dio>();
-  //A//lertRepository({required this.dio});
   final Map<int, Alert> alertsCache = {};
   //remembering extreme alerts that triggered alert screen
   final Set<int> notifiedAlertIds = {};
@@ -20,6 +20,23 @@ class AlertRepository extends ChangeNotifier {
   StreamSubscription? _sseSubscription;
 
   DateTime lastPing = DateTime.now();
+
+  int _mapSeverityToInt(AlertSeverity severity) {
+    switch (severity) {
+      case AlertSeverity.extreme:
+        return 5;
+      case AlertSeverity.high:
+        return 4;
+      case AlertSeverity.medium:
+        return 3;
+      case AlertSeverity.low:
+        return 2;
+      case AlertSeverity.lowest:
+        return 1;
+      case AlertSeverity.info:
+        return 0;
+    }
+  }
 
   AlertSeverity _mapIntToSeverity(int value) {
     switch (value) {
@@ -31,6 +48,10 @@ class AlertRepository extends ChangeNotifier {
         return AlertSeverity.medium;
       case 2:
         return AlertSeverity.low;
+      case 1:
+        return AlertSeverity.lowest;
+      case 0:
+        return AlertSeverity.info;
       default:
         return AlertSeverity.info;
     }
@@ -101,19 +122,32 @@ class AlertRepository extends ChangeNotifier {
       return Alert.fromJson(item as Map<String, dynamic>);
     }).toList();
 
+    alertsCache.clear();
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('offline_alerts_cache');
+
     _processAlerts(parsedAlerts);
   }
 
-  void handleSingleAlertUpdate(dynamic message) {
+  Future<void> handleSingleAlertUpdate(dynamic message) async {
     debugPrint("SSE Message: $message");
     if (message is! Map<String, dynamic>) return;
 
-    final int? id = message['alertId'];
+    //FCM miał problem, niżej bezpieczne parsowanie tego przyszło przez FCM
+    int? id;
+    if (message['alertId'] != null) {
+      if (message['alertId'] is int) {
+        id = message['alertId'] as int;
+      } else {
+        id = int.tryParse(message['alertId'].toString());
+      }
+    }
 
     // Jeśli to pełny obiekt Alert (ma pole subject)
     if (message.containsKey('subject')) {
       final alert = Alert.fromJson(message);
-      _processAlerts([alert]);
+      await _processAlerts([alert]);
       return;
     }
 
@@ -127,6 +161,8 @@ class AlertRepository extends ChangeNotifier {
         updated = updated.copyWith(
           severity: _mapIntToSeverity(message['newSeverity']),
         );
+      } else {
+        updated = updated.copyWith(severity: existing.severity);
       }
 
       // Update ACK status
@@ -149,35 +185,66 @@ class AlertRepository extends ChangeNotifier {
     }
   }
 
-  void _processAlerts(List<Alert> incomingAlerts) {
+  Future<void> _processAlerts(List<Alert> incomingAlerts) async {
     debugPrint("Repo: Procesuję ${incomingAlerts.length} alertów");
+
+    // Inicjalizujemy SharedPreferences na początku metody
+    final prefs = await SharedPreferences.getInstance();
+
+    // Pobieramy z pamięci telefonu listę ID, które już BYŁY wykrzyczane
+    List<String> persistentNotifiedIds =
+        prefs.getStringList('notified_alert_ids') ?? [];
+    // Pobieramy aktualny cache offline alertów
+    List<String> offlineAlertsCache =
+        prefs.getStringList('offline_alerts_cache') ?? [];
 
     bool alarmOverlayTrigger = false;
 
     for (var alert in incomingAlerts) {
       alertsCache[alert.id] = alert;
 
+      String alertJson = jsonEncode(alert.toJson());
+
+      offlineAlertsCache.removeWhere((item) {
+        final Map<String, dynamic> m = jsonDecode(item);
+        return m['id'] == alert.id;
+      });
+      offlineAlertsCache.add(alertJson);
+
       debugPrint("DEBUG: Analysis of Alert ID: ${alert.id}");
-      debugPrint(" DEBUG: Show severity: ${alert.severity}");
+      debugPrint("  DEBUG: Show severity: ${alert.severity}");
+
+      bool alreadyNotified = persistentNotifiedIds.contains(
+        alert.id.toString(),
+      );
       debugPrint(
-        " DEBUG: Is ID already in notifedAlertIds list>? ${notifiedAlertIds.contains(alert.id)}",
+        "  DEBUG: Is ID already in persistent notified list? $alreadyNotified",
       );
 
-      if (alert.severity == AlertSeverity.extreme &&
-          !notifiedAlertIds.contains(alert.id)) {
+      if (alert.severity == AlertSeverity.extreme && !alreadyNotified) {
         debugPrint("DEBUG: Alert is new");
-        notifiedAlertIds.add(alert.id);
+
+        // Dodajemy do lokalnej listy w RAM (jeśli nadal jej używasz w tej klasie)
+        if (!notifiedAlertIds.contains(alert.id)) {
+          notifiedAlertIds.add(alert.id);
+        }
+
+        persistentNotifiedIds.add(alert.id.toString());
+
         alarmOverlayTrigger = true;
       } else {
-        debugPrint("DEBUG: Alert is not new");
+        debugPrint("DEBUG: Alert is not new (lub nie jest extreme)");
       }
     }
 
+    await prefs.setStringList('notified_alert_ids', persistentNotifiedIds);
+    await prefs.setStringList('offline_alerts_cache', offlineAlertsCache);
+
     if (alarmOverlayTrigger) {
-      debugPrint(" DEBUG: Calling showEmergencyOverlay() method");
+      debugPrint("  DEBUG: Calling showEmergencyOverlay() method");
       navigationService.showEmergencyOverlay();
     } else {
-      debugPrint(" DEBUG: No new extreme alerts.");
+      debugPrint("  DEBUG: No new extreme alerts.");
     }
 
     notifyListeners();
@@ -188,14 +255,24 @@ class AlertRepository extends ChangeNotifier {
     int alertId, {
     String? comment,
     bool isAck = true,
+    int? newSeverity,
   }) async {
     final String actionType = isAck ? "ACK" : "COMMENT";
     final String commentText = comment ?? "";
 
     final originalAlert = alertsCache[alertId];
+
+    final int currentSeverityInt = originalAlert != null
+        ? _mapSeverityToInt(originalAlert.severity)
+        : 0;
+    final int finalSeverityInt = newSeverity ?? currentSeverityInt;
+    final AlertSeverity finalEnumSeverity = AlertSeverity
+        .values[finalSeverityInt.clamp(0, AlertSeverity.values.length - 1)];
+
     if (originalAlert != null) {
       alertsCache[alertId] = originalAlert.copyWith(
         acknowledged: isAck,
+        severity: finalEnumSeverity,
         message: commentText.isNotEmpty ? commentText : originalAlert.message,
       );
       notifyListeners();
@@ -204,6 +281,7 @@ class AlertRepository extends ChangeNotifier {
     final Map<String, dynamic> requestBody = {
       "author": "Mobile User",
       "message": commentText,
+      "newSeverity": finalSeverityInt,
       "ack": isAck,
     };
 
@@ -215,6 +293,7 @@ class AlertRepository extends ChangeNotifier {
 
       if (response.statusCode == 200) {
         debugPrint('ACK SUCCESS: Alert $alertId acknowledged.');
+        await updateAllAlerts();
       }
     } on DioException catch (e) {
       debugPrint('--- [Detailed Error Log] ---');
@@ -224,5 +303,61 @@ class AlertRepository extends ChangeNotifier {
     } catch (e) {
       debugPrint('ACK UNKNOWN ERROR: $e');
     }
+  }
+
+  Future<void> markAlertAsNotified(int alertId) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // Pobieramy listę już wykrzyczanych ID (jako Stringi)
+    List<String> notifiedIds = prefs.getStringList('notified_alert_ids') ?? [];
+
+    // Jeśli tego ID jeszcze nie ma na liście, dodajemy go
+    if (!notifiedIds.contains(alertId.toString())) {
+      notifiedIds.add(alertId.toString());
+      await prefs.setStringList('notified_alert_ids', notifiedIds);
+      debugPrint("Zapisano ID $alertId jako alarmowany.");
+    }
+  }
+
+  Future<bool> isAlertAlreadyNotified(int alertId) async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> notifiedIds = prefs.getStringList('notified_alert_ids') ?? [];
+    return notifiedIds.contains(alertId.toString());
+  }
+
+  Future<void> syncCacheWithSharedPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> cachedAlertsRaw =
+        prefs.getStringList('offline_alerts_cache') ?? [];
+
+    debugPrint(
+      "Repo:  Znaleziono ${cachedAlertsRaw.length} alertów w pamięci offline.",
+    );
+
+    if (cachedAlertsRaw.isEmpty) {
+      alertsCache.clear();
+      notifyListeners();
+      return;
+    }
+
+    // Czyścimy stary RAM, aby idealnie odzwierciedlić stan, który przed chwilą zapisał proces w tle
+    alertsCache.clear();
+
+    for (String rawJson in cachedAlertsRaw) {
+      try {
+        Map<String, dynamic> alertMap = jsonDecode(rawJson);
+        Alert alert = Alert.fromJson(alertMap);
+
+        // Wpychamy bezpośrednio do cache w RAM
+        alertsCache[alert.id] = alert;
+      } catch (e) {
+        debugPrint(
+          "Repo ERROR: Błąd dekodowania alertu podczas synchronizacji: $e",
+        );
+      }
+    }
+
+    debugPrint("Repo: Pamięć RAM zaktualizowana stanem z dysku.");
+    notifyListeners();
   }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum AlertSeverity { info, low, medium, high, extreme }
+enum AlertSeverity { info, lowest, low, medium, high, extreme }
 
 enum AlertStatus { sent, inProgress, done }
 
@@ -108,7 +108,23 @@ class Alert {
           DateTime.now(),
       status: stat,
       message: json['message']?.toString() ?? '',
-      acknowledged: json['acknowledged'] ?? false,
+      acknowledged: json['acknowledged'] is bool
+          ? json['acknowledged']
+          : json['acknowledged']?.toString().toLowerCase() == 'true',
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'subject': subject,
+      'source': source,
+      'severity': AlertSeverity.values.indexOf(severity),
+      'status': status.toString().split('.').last,
+      'createdAt': createdAt.toIso8601String(),
+      'message': message,
+      'author': author,
+      'acknowledged': acknowledged,
+    };
   }
 }

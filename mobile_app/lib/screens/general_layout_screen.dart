@@ -1,4 +1,6 @@
+import 'package:alert_app/data/repositories/alert_repository.dart';
 import 'package:alert_app/logic/general_layout_view_model.dart';
+import 'package:alert_app/logic/home_view_model.dart';
 import 'package:alert_app/screens/debug_screen.dart';
 import 'package:alert_app/screens/plugins_screen.dart';
 import 'package:alert_app/screens/home_screen.dart';
@@ -8,29 +10,67 @@ import 'package:alert_app/screens/user_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-
-
-class GeneralLayout extends StatelessWidget {
+class GeneralLayout extends StatefulWidget {
   const GeneralLayout({super.key});
 
-  
+  @override
+  State<GeneralLayout> createState() => _GeneralLayoutState();
+}
 
-@override
+class _GeneralLayoutState extends State<GeneralLayout>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    // Rejestrujemy nasłuchiwanie powrotu z tła dla całej aplikacji
+    WidgetsBinding.instance.addObserver(this);
+
+    // Opcjonalnie: synchronizujemy przy starcie aplikacji od zera
+    _syncAllData();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    debugPrint("GeneralLayout: Zmiana stanu aplikacji na: $state");
+
+    if (state == AppLifecycleState.resumed) {
+      debugPrint(
+        "GeneralLayout: Aplikacja wybudzona! Synchronizuję cache z dyskiem i API...",
+      );
+      _syncAllData();
+    }
+  }
+
+  void _syncAllData() async {
+    final alertRepo = context.read<AlertRepository>();
+    await alertRepo.syncCacheWithSharedPreferences();
+    await alertRepo.updateAllAlerts();
+    if (mounted) {
+      context.read<HomeViewModel>().refresh();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final layoutViewModel = context.watch<GeneralLayoutViewModel>();
 
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(layoutViewModel.activeScreenName.toUpperCase()), // Dynamiczny tytuł
+        title: Text(
+          layoutViewModel.activeScreenName.toUpperCase(),
+        ), // Dynamiczny tytuł
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(4.0),
           child: Container(color: Colors.black, height: 4.0),
         ),
-
       ),
 
- 
       drawer: Drawer(
         child: Column(
           children: [
@@ -51,7 +91,7 @@ class GeneralLayout extends StatelessWidget {
                 Navigator.pop(context);
               },
             ),
-               ListTile(
+            ListTile(
               leading: const Icon(Icons.computer_rounded),
               title: const Text("Plugins"),
               onTap: () {
@@ -59,7 +99,7 @@ class GeneralLayout extends StatelessWidget {
                 Navigator.pop(context);
               },
             ),
-               ListTile(
+            ListTile(
               leading: const Icon(Icons.settings),
               title: const Text("Settings"),
               onTap: () {
@@ -67,7 +107,7 @@ class GeneralLayout extends StatelessWidget {
                 Navigator.pop(context);
               },
             ),
-                          ListTile(
+            ListTile(
               leading: const Icon(Icons.person_3_outlined),
               title: const Text("User"),
               onTap: () {
@@ -75,7 +115,7 @@ class GeneralLayout extends StatelessWidget {
                 Navigator.pop(context);
               },
             ),
-               ListTile(
+            ListTile(
               leading: const Icon(Icons.warning),
               title: const Text("Debug"),
               onTap: () {
@@ -91,15 +131,20 @@ class GeneralLayout extends StatelessWidget {
     );
   }
 
-Widget _buildBody(String screenName) {
+  Widget _buildBody(String screenName) {
     switch (screenName) {
-      case 'Alerts': return const AlertsScreen();
-      case 'Plugins': return const PluginsScreen();
-      case 'Settings': return const SettingsScreen();
-      case 'Debug': return const DebugScreen();
-      case 'User': return const UserScreen();
-      default: return const HomeScreen();
+      case 'Alerts':
+        return const AlertsScreen();
+      case 'Plugins':
+        return const PluginsScreen();
+      case 'Settings':
+        return const SettingsScreen();
+      case 'Debug':
+        return const DebugScreen();
+      case 'User':
+        return const UserScreen();
+      default:
+        return const HomeScreen();
     }
   }
 }
-

@@ -1,3 +1,4 @@
+import 'package:alert_app/data/repositories/alert_repository.dart';
 import 'package:alert_app/logic/alerts_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -9,76 +10,121 @@ class AlertsScreen extends StatefulWidget {
   State<AlertsScreen> createState() => _AlertsScreenState();
 }
 
-class _AlertsScreenState extends State<AlertsScreen> {
-
-  
+class _AlertsScreenState extends State<AlertsScreen>
+    with WidgetsBindingObserver {
   String dropDownValue = 'id';
-  
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+
+    _syncData();
+  }
+
+  @override
+  void dispose() {
+    // Pamiętaj o wyrejestrowaniu!
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Gdy użytkownik wraca do aplikacji (np. po kliknięciu w powiadomienie push)
+    if (state == AppLifecycleState.resumed) {
+      debugPrint("Ekran: Aplikacja wybudzona! Synchronizuję dane...");
+      _syncData();
+    }
+  }
+
+  void _syncData() async {
+    final repo = context.read<AlertRepository>();
+    await repo.syncCacheWithSharedPreferences();
+    await repo.updateAllAlerts();
+  }
+
   @override
   Widget build(BuildContext context) {
-
     debugPrint("--- REBUILD ---");
     final alertsViewModel = context.watch<AlertsViewModel>();
 
     final currentSort = alertsViewModel.currentSortProperty;
     final isAsc = alertsViewModel.isAscending;
-    
+
     if (alertsViewModel.alertsList.isEmpty) {
-    return const Scaffold( 
-      body: Center(
-        child: Text("No alerts found. Consider checking the button in Debug Screen!"),
-      ),
-    );
-}
+      return const Scaffold(
+        body: Center(
+          child: Text(
+            "No alerts found. Consider checking the button in Debug Screen!",
+          ),
+        ),
+      );
+    }
 
-final sortedList = alertsViewModel.sortedAlerts;
-    
+    final sortedList = alertsViewModel.sortedAlerts;
+
     return Column(
-      
+      children: [
+        Row(
           children: [
-
-            Row(
-              children: [
-                Text("Sort by - ", style: TextStyle(fontSize: 30)),
-                DropdownButton<String>(
-                            padding: EdgeInsets.all(6),
-                            borderRadius: BorderRadius.all(Radius.circular(16)),
-                            value: currentSort, 
-                            icon: const Icon(Icons.menu),
-                            style: const TextStyle(color: Colors.black), 
-                            onChanged: (String? newValue) {
-                              if (newValue != null) {
-                alertsViewModel.sortAlertsBy(newValue);
-              }
-                            },
-                            items:const[
-                            DropdownMenuItem<String>(value: 'id', child: Text('ID',style:TextStyle(fontSize: 30))),
-                            DropdownMenuItem<String>(value: 'title', child: Text('Title',style:TextStyle(fontSize: 30))),
-                            DropdownMenuItem<String>(value: 'createdAt', child: Text('CreatedAt',style:TextStyle(fontSize: 30))),
-                            DropdownMenuItem<String>(value: 'acknowledged', child: Text('Acknowledged',style:TextStyle(fontSize: 30))),
-                            DropdownMenuItem<String>(value: 'severity', child: Text('Severity',style:TextStyle(fontSize: 30))),
-                            ]
-                            ),
-                              IconButton(icon: Icon(isAsc ? Icons.arrow_upward : Icons.arrow_downward),
-            onPressed: () {
-              alertsViewModel.sortAlertsBy(currentSort, ascending: !isAsc);
-            },
+            Text("Sort by - ", style: TextStyle(fontSize: 30)),
+            DropdownButton<String>(
+              padding: EdgeInsets.all(6),
+              borderRadius: BorderRadius.all(Radius.circular(16)),
+              value: currentSort,
+              icon: const Icon(Icons.menu),
+              style: const TextStyle(color: Colors.black),
+              onChanged: (String? newValue) {
+                if (newValue != null) {
+                  alertsViewModel.sortAlertsBy(newValue);
+                }
+              },
+              items: const [
+                DropdownMenuItem<String>(
+                  value: 'id',
+                  child: Text('ID', style: TextStyle(fontSize: 30)),
+                ),
+                DropdownMenuItem<String>(
+                  value: 'title',
+                  child: Text('Title', style: TextStyle(fontSize: 30)),
+                ),
+                DropdownMenuItem<String>(
+                  value: 'createdAt',
+                  child: Text('CreatedAt', style: TextStyle(fontSize: 30)),
+                ),
+                DropdownMenuItem<String>(
+                  value: 'acknowledged',
+                  child: Text('Acknowledged', style: TextStyle(fontSize: 30)),
+                ),
+                DropdownMenuItem<String>(
+                  value: 'severity',
+                  child: Text('Severity', style: TextStyle(fontSize: 30)),
+                ),
+              ],
             ),
-              ]
+            IconButton(
+              icon: Icon(isAsc ? Icons.arrow_upward : Icons.arrow_downward),
+              onPressed: () {
+                alertsViewModel.sortAlertsBy(currentSort, ascending: !isAsc);
+              },
             ),
+          ],
+        ),
 
+        Expanded(
+          child: ListView.builder(
+            itemCount: sortedList.length,
+            itemBuilder: (context, index) {
+              final alert = alertsViewModel.sortedAlerts[index];
 
-            Expanded(
-              child: ListView.builder(
-              itemCount: sortedList.length,
-              itemBuilder: (context, index) {
-                final alert = alertsViewModel.sortedAlerts[index];
-              
-                return Card (
-                  color: alert?.severityColor,
-                   child: ExpansionTile(
-                   title: Text(alert?.subject ?? 'No Title'),
-                  subtitle: Text(alert.acknowledged ? 'ACKNOWLEDGED' : 'NOT ACKNOWLEDGED'),
+              return Card(
+                color: alert?.severityColor,
+                child: ExpansionTile(
+                  title: Text(alert?.subject ?? 'No Title'),
+                  subtitle: Text(
+                    alert.acknowledged ? 'ACKNOWLEDGED' : 'NOT ACKNOWLEDGED',
+                  ),
                   leading: Icon(Icons.warning, color: Colors.black),
                   children: [
                     Column(
@@ -88,44 +134,41 @@ final sortedList = alertsViewModel.sortedAlerts;
                             Text(alert?.source ?? 'Unknown Host'),
                             Spacer(),
                             Text(alert?.createdAt.toString() ?? 'Unknown Time'),
-                          ],),
-                          Row(
-                            children: [
-                              Text(alert?.status.toString()?? 'Unknown Status'),
-                              Spacer(),
-                              Text(alert?.severity.toString() ?? 'Unknown Severity'),
-                            ],),
-                     
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Text(alert?.status.toString() ?? 'Unknown Status'),
+                            Spacer(),
+                            Text(
+                              alert?.severity.toString() ?? 'Unknown Severity',
+                            ),
+                          ],
+                        ),
+
                         SizedBox(
                           width: double.infinity,
-                          child:ElevatedButton(onPressed:() { _openAckDialog(context, alert.id);}, child: Text('Actions')) 
-                          )
-                        
-                      ]
-                      
-                    
-                    )
-              
-                  ],
-                  )
-                   );
-                            
+                          child: ElevatedButton(
+                            onPressed: () {
+                              _openAckDialog(context, alert.id);
                             },
-              padding: const EdgeInsets.all(10),
-              scrollDirection: Axis.vertical,
-              ),
-              ),
-              ],
+                            child: Text('Actions'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            },
+            padding: const EdgeInsets.all(10),
+            scrollDirection: Axis.vertical,
+          ),
+        ),
+      ],
     );
-        
-  
-
   }
-
-
-  
 }
-
 
 class AckDialog extends StatefulWidget {
   final int alertId;
@@ -139,23 +182,33 @@ class _AckDialogState extends State<AckDialog> {
   late TextEditingController _controller;
 
   bool isAck = true;
+  int selectedSeverity = 0;
 
   @override
   void initState() {
     super.initState();
     _controller = TextEditingController();
+
+    //TEMPORARY! Need to change cache to View Model!
+    final alertRepo = context.read<AlertRepository>();
+    final currentAlert = alertRepo.alertsCache[widget.alertId];
+
+    if (currentAlert != null) {
+      selectedSeverity = currentAlert.severity.index;
+      isAck = currentAlert.acknowledged;
+    }
   }
 
   @override
   void dispose() {
-    _controller.dispose(); 
+    _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-title: Text('Actions for Alert ${widget.alertId}'),
+      title: Text('Actions for Alert ${widget.alertId}'),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -165,6 +218,36 @@ title: Text('Actions for Alert ${widget.alertId}'),
               decoration: const InputDecoration(labelText: 'Your comment'),
             ),
             const SizedBox(height: 15),
+
+            const Text(
+              "Change Severity:",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 5),
+
+            DropdownButtonFormField<int>(
+              initialValue: selectedSeverity,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
+                ),
+              ),
+              items: const [
+                DropdownMenuItem(value: 0, child: Text('0 - Info')),
+                DropdownMenuItem(value: 1, child: Text('1 - Low')),
+                DropdownMenuItem(value: 2, child: Text('2 - Low')),
+                DropdownMenuItem(value: 3, child: Text('3 - Medium')),
+                DropdownMenuItem(value: 4, child: Text('4 - High')),
+                DropdownMenuItem(value: 5, child: Text('5 - Extreme')),
+              ],
+              onChanged: (int? newValue) {
+                setState(() {
+                  selectedSeverity = newValue ?? 0;
+                });
+              },
+            ),
             CheckboxListTile(
               title: const Text("Acknowledge alert"),
               value: isAck,
@@ -179,12 +262,19 @@ title: Text('Actions for Alert ${widget.alertId}'),
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
 
         ElevatedButton(
           onPressed: () {
             final String commentValue = _controller.text;
-            context.read<AlertsViewModel>().acknowledgeAlert(widget.alertId, comment: commentValue, isAck: this.isAck );
+            context.read<AlertsViewModel>().acknowledgeAlert(
+              widget.alertId,
+              comment: commentValue,
+              isAck: this.isAck,
+            );
             Navigator.pop(context);
           },
           child: const Text('Update'),
@@ -194,9 +284,7 @@ title: Text('Actions for Alert ${widget.alertId}'),
   }
 }
 
-
 void _openAckDialog(BuildContext context, int alertId) {
-
   showDialog(
     context: context,
     builder: (context) => AckDialog(alertId: alertId),

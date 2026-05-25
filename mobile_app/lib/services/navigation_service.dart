@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:alert_app/screens/alarm_overlay_screen.dart';
 import 'package:alert_app/services/alarm_service.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class NavigationService {
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -35,8 +36,12 @@ class NavigationService {
   }
 
   void stopAlarmAndDismiss() {
-    alarmService.stopAlarm(); // Wyłącza dźwięk
-    navigatorKey.currentState?.pop(); // Zamyka overlay
+    // Wyłącza dźwięk
+    alarmService.stopAlarm();
+    // Zamyka overlay
+    navigatorKey.currentState?.pop();
+    // Kończy pętlę alarmową androida
+    FlutterLocalNotificationsPlugin().cancelAll();
   }
 }
 

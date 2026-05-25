@@ -1,8 +1,10 @@
 import 'package:alert_app/data/repositories/alert_repository.dart';
+import 'package:alert_app/locator.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:get_it/get_it.dart';
 
 //mock imports
 //import 'dart:convert';
@@ -10,6 +12,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 
 class PushNotificationService extends ChangeNotifier {
   final AlertRepository alertRepository;
+  final Dio dio = locator<Dio>();
 
   PushNotificationService(this.alertRepository);
 
@@ -44,25 +47,56 @@ class PushNotificationService extends ChangeNotifier {
     }
   }
 
-  Future<void> registerDevice() async {
-    //FCM token registration
+  Future<void> registerDevice(String jwtToken) async {
+    try {
+      NotificationSettings settings = await fcm.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+
+      if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+        String? fcmToken = await fcm.getToken();
+        debugPrint("FCM Token: $fcmToken");
+
+        if (fcmToken != null) {
+          final response = await dio.post(
+            '/api/devices/token',
+            options: Options(headers: {'Authorization': 'Bearer $jwtToken'}),
+          );
+
+          if (response.statusCode == 200 || response.statusCode == 201) {
+            debugPrint("FCM: Token pomyślnie zarejestrowany na backendzie.");
+          }
+        }
+      } else {
+        debugPrint("FCM: Użytkownik odmówił uprawnień do powiadomień.");
+      }
+    } catch (e) {
+      debugPrint("FCM ERROR: Błąd podczas rejestracji tokenu: $e");
+    }
   }
 
   Future<void> pingBackend() async {
     // 10.0.2.2 emulator Androida
     // localhost/127.0.0.1 Windows(Chrome)
-    final url = Uri.parse('http://10.0.2.2:10000/api/health');
 
     try {
-      final response = await http.get(url);
+      final response = await dio.post('');
 
       if (response.statusCode == 200) {
-        print('Backend working: ${response.body}');
+        print('Backend working:');
       } else {
         print('Backend working, but error: ${response.statusCode}');
       }
     } catch (e) {
       print('No connection: $e');
     }
+  }
+
+  // Dodatkowa metoda wywoływana z poziomu main.dart w tle
+  void handleBackgroundMessage(RemoteMessage message) {
+    debugPrint("FCM [BACKGROUND]: Serwis przechwycił wiadomość wybudzającą.");
+    _handleMessage(message);
   }
 }

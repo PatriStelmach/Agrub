@@ -4,26 +4,22 @@ import '../data/models/alert_model.dart';
 import 'package:alert_app/data/repositories/alert_repository.dart';
 
 class AlertsViewModel extends ChangeNotifier {
-
-final AlertRepository alertsRepository;
-String _currentSortProperty = 'id';
+  final AlertRepository alertsRepository;
+  String _currentSortProperty = 'id';
   bool _isAscending = true;
 
+  AlertsViewModel({required this.alertsRepository}) {
+    alertsRepository.addListener(handleRepoChange);
+  }
 
-AlertsViewModel({required this.alertsRepository}) {
-  alertsRepository.addListener(handleRepoChange);
-
-}
-
-String get currentSortProperty => _currentSortProperty;
+  String get currentSortProperty => _currentSortProperty;
   bool get isAscending => _isAscending;
 
-List<Alert> get alertsList => alertsRepository.alertsCache.values.toList();
+  List<Alert> get alertsList => alertsRepository.alertsCache.values.toList();
 
-
-List<Alert> get sortedAlerts {
+  List<Alert> get sortedAlerts {
     final list = List<Alert>.from(alertsList);
-    
+
     final Map<String, Comparable Function(Alert)> getters = {
       'id': (alert) => alert.id,
       'title': (alert) => alert.subject,
@@ -32,59 +28,54 @@ List<Alert> get sortedAlerts {
       'status': (alert) => alert.status.index,
       'createdAt': (alert) => alert.createdAt,
       'description': (alert) => alert.message,
-      'source': (alert) => alert.source
+      'source': (alert) => alert.source,
     };
 
     final getter = getters[_currentSortProperty] ?? (alert) => alert.id;
-      
-      list.sort((a, b) {
+
+    list.sort((a, b) {
       final aValue = getter(a);
       final bValue = getter(b);
-      
-      return _isAscending 
-          ? aValue.compareTo(bValue) 
-          : bValue.compareTo(aValue); 
+
+      return _isAscending ? aValue.compareTo(bValue) : bValue.compareTo(aValue);
     });
 
     return list;
   }
 
-
-
-void sortAlertsBy(String property, {bool? ascending}) {
+  void sortAlertsBy(String property, {bool? ascending}) {
     _currentSortProperty = property;
-    
+
     if (ascending != null) {
       _isAscending = ascending;
     }
-    
+
     debugPrint("Sorting by $property, Ascending: $_isAscending");
-    notifyListeners(); 
+    notifyListeners();
   }
 
   void handleRepoChange() {
     debugPrint("ViewModel: Repo wysłało sygnał, odświeżam widok.");
-    notifyListeners(); 
+    notifyListeners();
   }
 
-
-
-
-
-
-Future<void> acknowledgeAlert(int alertId, {String? comment, bool isAck = true}) async {
-
-// VERY simple function for sending ack via repository function. rudimentary error hadling
-  try {
-    await alertsRepository.sendAcknowledge(alertId, comment: comment, isAck: isAck);
-    
-  } catch (e) {
+  Future<void> acknowledgeAlert(
+    int alertId, {
+    String? comment,
+    bool isAck = true,
+  }) async {
+    try {
+      await alertsRepository.sendAcknowledge(
+        alertId,
+        comment: comment,
+        isAck: isAck,
+      );
+    } catch (e) {
       debugPrint('Placeholder error: $e');
-
+    }
   }
-}
 
-@override
+  @override
   void dispose() {
     alertsRepository.removeListener(handleRepoChange);
     super.dispose();

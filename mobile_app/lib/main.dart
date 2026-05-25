@@ -17,27 +17,22 @@ import 'package:alert_app/themes/app_theme_default.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
-
-//This process is responsible for handling notifications coming when app is not running.
-//Must be top-level, out of main
-@pragma('vm:entry-point')
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
-
-  debugPrint("Handling a background message: ${message.messageId}");
-}
+import 'package:alert_app/services/fcm_background_handler.dart';
 
 Future<void> main() async {
   //checking if flutter engine is ready
   WidgetsFlutterBinding.ensureInitialized();
 
   // Firebase initialization
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await Firebase.initializeApp();
 
   setupLocator();
+
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   //Creation of repositories instances
-  final alertRepository = AlertRepository();
+  final alertRepository = locator<AlertRepository>();
   final pluginRepository = PluginsRepository();
   final userRepository = UserRepository();
 
@@ -49,8 +44,8 @@ Future<void> main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => GeneralLayoutViewModel()),
-        ChangeNotifierProvider.value(value: alertRepository),
-        ChangeNotifierProvider.value(value: pluginRepository),
+        //ChangeNotifierProvider.value(value: alertRepository),
+        //ChangeNotifierProvider.value(value: pluginRepository),
         ChangeNotifierProvider.value(value: notificationService),
         ChangeNotifierProvider.value(value: userRepository),
 
@@ -61,6 +56,7 @@ Future<void> main() async {
 
         ChangeNotifierProxyProvider<UserViewModel, AlertRepository>(
           create: (context) => alertRepository,
+          lazy: false,
           update: (context, userViewModel, alertRepo) {
             if (userViewModel.isLoggedIn && alertRepo!.alertsCache.isEmpty) {
               alertRepo.updateAllAlerts();
@@ -82,6 +78,7 @@ Future<void> main() async {
         ),
 
         ChangeNotifierProvider<HomeViewModel>(
+          lazy: false,
           create: (context) =>
               HomeViewModel(repository: context.read<AlertRepository>())
                 ..getMyToken(),
@@ -118,16 +115,16 @@ class MainApp extends StatelessWidget {
 
       // Home staje się dynamiczny
       home: Consumer<UserViewModel>(
-        builder: (context, userVM, child) {
+        builder: (context, userViewModel, child) {
           // 1. Ekran ładowania (podczas sprawdzania SecureStorage przy starcie)
-          if (userVM.isLoading) {
+          if (userViewModel.isLoading) {
             return const Scaffold(
               body: Center(child: CircularProgressIndicator()),
             );
           }
 
           // 2. Jeśli zalogowany - pokazujemy główny layout
-          if (userVM.isLoggedIn) {
+          if (userViewModel.isLoggedIn) {
             return const GeneralLayout();
           }
 
@@ -145,10 +142,10 @@ class MainApp extends StatelessWidget {
 T0D0:
 - pobieranie i korzystanie z poprawnych danych zalogowanego usera
 - upewnić się, że user otrzymuje własciwe dane zgodne z grupą
-- naprawić pobieranie pluginów
-- oprogramowanie start/stop/force pluginów
-- pluginy z library plus my plugins?
+- severity change
+- najnowszy wpis z historii alertu ( co najmniej )
 - retencja pamięci, żeby już otrzymane alerty się nie odpalały przy odpalaniu apki
+- sortowanie w Pluginach( powtórzyc rozwiązanie z alertów)
 - FCM!!!!!!!!!
 - komentarze porządne
 - refactoring, uporządkowanie tego co robią servicy/repo/view models zgodnie z MVVM, uporządkowanie rzeczy zgodnie z DRY itd.

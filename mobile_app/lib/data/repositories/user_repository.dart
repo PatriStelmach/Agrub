@@ -23,7 +23,7 @@ class UserRepository extends ChangeNotifier {
     // 3. Jeśli nie ma tokena, logowanie się nie udało
     return false;
   }
-
+ 
   Future<String?> getToken() async => await _storage.read(key: 'jwt_token');
 
   Future<void> logout() async => await _storage.delete(key: 'jwt_token');

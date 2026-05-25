@@ -7,11 +7,9 @@ class UserScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // context.watch sprawia, że widget przebuduje się, gdy wywołasz notifyListeners()
     final userViewModel = context.watch<UserViewModel>();
     final user = userViewModel.user;
 
-    // 1. Zabezpieczenie na wypadek, gdyby dane jeszcze nie dotarły
     if (user == null) {
       return const Center(
         child: Column(
@@ -25,34 +23,34 @@ class UserScreen extends StatelessWidget {
       );
     }
 
-    // 2. Jeśli dane są dostępne, renderujemy UI
     return Padding(
       padding: const EdgeInsets.all(18.0),
-      child: SingleChildScrollView( // Dodane na wypadek mniejszych ekranów
+      child: SingleChildScrollView(
         child: Column(
           children: [
             const Icon(Icons.account_circle_rounded, size: 100),
             const SizedBox(height: 20),
-            
+
             _buildDataRow('Username', user.login),
             _buildDataRow('E-mail', user.email),
             _buildDataRow('Role', user.role),
             _buildDataRow('Group', user.group),
-            
+
             const SizedBox(height: 30),
-            
-            // Przycisk wylogowania (opcjonalnie, ale przydatne do testów)
+
             ElevatedButton(
-              onPressed: () {context.read<UserViewModel>().signOut();},
-              child: const Text("Wyloguj się"),
-            )
+              onPressed: () {
+                context.read<UserViewModel>().signOut();
+              },
+              child: const Text("Logout"),
+            ),
           ],
         ),
       ),
     );
   }
 
-  // Helper do budowania wierszy, żeby kod nie był powtarzalny
+  // Helper for building rows
   Widget _buildDataRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -60,7 +58,10 @@ class UserScreen extends StatelessWidget {
         children: [
           Text(label, style: const TextStyle(fontSize: 24, color: Colors.grey)),
           const Spacer(),
-          Text(value, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
         ],
       ),
     );

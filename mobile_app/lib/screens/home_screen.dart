@@ -9,18 +9,21 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final homeViewModel = context.watch<HomeViewModel>();
-    
+
     final DateTime lastPingTime = homeViewModel.repository.lastPing;
-    final String shortPingTime = 
+    final String shortPingTime =
         "${lastPingTime.hour}:${lastPingTime.minute.toString().padLeft(2, '0')}:${lastPingTime.second.toString().padLeft(2, '0')}";
-    
-    final int activeAlertsCount = homeViewModel.repository.alertsCache.length;
-    
+
+    //current Alert count
+    final int activeAlertsCount = homeViewModel.activeAlertsCount;
+
     final criticalAlerts = homeViewModel.latestCriticalAlerts();
-    final latestCritical = criticalAlerts.isNotEmpty ? criticalAlerts.first : null;
+    final latestCritical = criticalAlerts.isNotEmpty
+        ? criticalAlerts.first
+        : null;
 
     return Scaffold(
-      body: SingleChildScrollView( 
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,23 +49,34 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            const Text('Latest Critical Incident', 
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            const Text(
+              'Latest Critical Incident',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 8),
             if (latestCritical != null)
               Card(
                 elevation: 4,
                 color: latestCritical.severityColor.withOpacity(0.9),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 child: ListTile(
                   contentPadding: const EdgeInsets.all(16),
                   leading: const CircleAvatar(
                     backgroundColor: Colors.white,
                     child: Icon(Icons.priority_high, color: Colors.red),
                   ),
-                  title: Text(latestCritical.subject, 
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                  subtitle: Text("Acknowledged? ${latestCritical.acknowledged}\nTime: ${latestCritical.createdAt}"),
+                  title: Text(
+                    latestCritical.subject,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                  subtitle: Text(
+                    "Acknowledged? ${latestCritical.acknowledged}\nTime: ${latestCritical.createdAt}",
+                  ),
                   isThreeLine: true,
                 ),
               )
@@ -73,11 +87,13 @@ class HomeScreen extends StatelessWidget {
                   leading: Icon(Icons.check_circle, color: Colors.green),
                 ),
               ),
-            
+
             const SizedBox(height: 24),
 
-            const Text('Quick Navigation', 
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            const Text(
+              'Quick Navigation',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 12),
             Row(
               children: [
@@ -97,7 +113,9 @@ class HomeScreen extends StatelessWidget {
                   icon: Icons.extension,
                   color: Colors.teal,
                   onTap: () {
-                    context.read<GeneralLayoutViewModel>().changePage('Plugins');
+                    context.read<GeneralLayoutViewModel>().changePage(
+                      'Plugins',
+                    );
                   },
                 ),
               ],
@@ -108,8 +126,13 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStatCard(BuildContext context, 
-      {required String title, required String value, required IconData icon, required Color color}) {
+  Widget _buildStatCard(
+    BuildContext context, {
+    required String title,
+    required String value,
+    required IconData icon,
+    required Color color,
+  }) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -123,16 +146,27 @@ class HomeScreen extends StatelessWidget {
           children: [
             Icon(icon, color: color),
             const SizedBox(height: 8),
-            Text(title, style: TextStyle(color: color, fontWeight: FontWeight.w600)),
-            Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            Text(
+              title,
+              style: TextStyle(color: color, fontWeight: FontWeight.w600),
+            ),
+            Text(
+              value,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildNavTile(BuildContext context, 
-      {required String label, required IconData icon, required Color color, required VoidCallback onTap}) {
+  Widget _buildNavTile(
+    BuildContext context, {
+    required String label,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
     return Expanded(
       child: InkWell(
         onTap: onTap,
@@ -142,14 +176,27 @@ class HomeScreen extends StatelessWidget {
           decoration: BoxDecoration(
             color: color,
             borderRadius: BorderRadius.circular(16),
-            boxShadow: [BoxShadow(color: color.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))],
+            boxShadow: [
+              BoxShadow(
+                color: color.withOpacity(0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(icon, color: Colors.white, size: 40),
               const SizedBox(height: 8),
-              Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
             ],
           ),
         ),

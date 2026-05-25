@@ -1,5 +1,6 @@
 import 'package:alert_app/data/models/user_model.dart';
 import 'package:alert_app/data/repositories/user_repository.dart';
+import 'package:alert_app/services/push_notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
@@ -34,7 +35,11 @@ class UserViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> signIn(String email, String password) async {
+  Future<bool> signIn(
+    String email,
+    String password,
+    PushNotificationService pushService,
+  ) async {
     _isLoading = true;
     notifyListeners();
 
@@ -44,6 +49,17 @@ class UserViewModel extends ChangeNotifier {
       if (token != null) {
         _user = repository.getUserFromToken(token);
         _isLoggedIn = true;
+
+        try {
+          // Wywołujemy asynchronicznie, żeby nie opóźniać wejścia na główny ekran
+          pushService.registerDevice(token);
+          print(
+            "LOGIN DEBUG: Pomyślnie przekazano token JWT do rejestracji FCM.",
+          );
+        } catch (e) {
+          print("LOGIN DEBUG: Błąd podczas uruchamiania registerDevice: $e");
+        }
+        // ========================================================
       }
     }
 
@@ -52,5 +68,20 @@ class UserViewModel extends ChangeNotifier {
     return success;
   }
 
-  void signOut() {}
+  Future<void> signOut() async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await repository.logout();
+    } catch (e) {
+      print("Błąd podczas operacji logout w repozytorium: $e");
+    } finally {
+      _user = null;
+      _isLoggedIn = false;
+      _isLoading = false;
+
+      notifyListeners();
+    }
+  }
 }
