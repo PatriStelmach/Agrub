@@ -157,8 +157,6 @@
 }
 
 
-
-
 @theme
 {
   --breakpoint-sm: 720px;
@@ -176,9 +174,6 @@
     @apply bg-background text-foreground;
   }
 }
-
-
-
 
 
 
@@ -362,7 +357,4 @@ input[type=number] {
   border-color: var(--red-badge);
   box-shadow: 0 0 10px 2px var(--red-badge);
 }
-
-
-
 

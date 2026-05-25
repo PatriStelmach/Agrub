@@ -4,7 +4,7 @@ export const bigNameLabel = 'font-bold text-label text-md xl:text-xl 2xl:text-2x
 export const dataTable = "w-99/100 text-xs md:text-sm lg:text-md xl:text-lg 2xl:text:xl h-full mx-auto overflow-x-auto table-fixed"
 export const tableCaption = "bg-background border-t-2 text-foreground sticky z-9 bottom-0 py-2 text-md lg:text-lg xl:text-xl 2xl:text:3xl"
 export const tableHeaders = "hover:bg-background bg-background border-b-2! gap-0 space-0 "
-export const tableDiv = " mt-[2vh] mx-[1%] w-98/100 relative overflow-auto max-md:max-h-[80vh]  max-h-[85vh]   "
+export const tableDiv = " mt-[2vh] mx-[1%] w-98/100 relative overflow-auto max-md:max-h-[80vh] max-h-[85vh]"
 export const topDiv = "relative max-h-[10vh] items-center align-middle"
 export const topH1 = "text-center my-[2vh]  text-xl xl:text-2xl 2xl:text-4xl border-b pb-[2vh]"
 export const topButtonGroup = "absolute left-4 top-0 flex max-w-2/5 "
@@ -17,4 +17,4 @@ export const gridSystemCardUnwrapped =
 export const gridSystemCard =
   "shadow-[5px_5px_10px_1px] shadow-secondary border-2 my-2 cursor-auto relative h-90 lg:h-100 xl:h-120 flex  hover:border-blue-badge/50 hover:shadow-blue-badge/50 transition-all "
 
-export const hoverListRow = (extra = '') => `odd:bg-accent/30 hover:bg-blue-badge/10 ${extra}`.trim()
+export const hoverListRow = (extra = '') => `odd:bg-accent/30 hover:bg-blue-badge/10 duration-0 ${extra}`.trim()

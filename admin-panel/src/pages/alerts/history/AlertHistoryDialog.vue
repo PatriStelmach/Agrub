@@ -11,7 +11,7 @@ import {Badge} from "@/components/ui/badge";
 import DialogLabel from "@/helpers_components/DialogLabel.vue";
 
 
-import ActionsTable from "@/pages/alerts/ActionsTable.vue";
+import ActionsList from "@/pages/alerts/ActionsList.vue";
 import {Button} from "@/components/ui/button";
 import {IconCheck, IconX} from "@tabler/icons-vue";
 import type {ActionResponse, HistoryAlert} from "@/types/types.ts";
@@ -85,12 +85,13 @@ const getActions = async () => {
         </div>
       </div>
       <!-- zmienić na tabs z shadcn dla actions -->
-      <ActionsTable
+      <ActionsList
+        :max-h="20"
         :actions="actions"
         :isLoading="isLoading"
       >
         <DialogLabel text="Actions" for="actions-history" />
-      </ActionsTable>
+      </ActionsList>
       <DialogFooter class=" items-center">
         <DialogClose as-child>
           <Button variant="red_outline">

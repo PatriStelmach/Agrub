@@ -132,7 +132,6 @@ export interface EditCurrentUser {
   firstname: string,
   surname: string,
   email: string,
-  role: "ADMINISTRATOR" | "TECHNICIAN"
   groups: UserGroup[],
   autoLogoutMinutes?: number
 }

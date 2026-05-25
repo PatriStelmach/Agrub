@@ -17,7 +17,7 @@ import {IconX, IconCheck, IconSend2} from "@tabler/icons-vue";
 import DialogLabel from "@/helpers_components/DialogLabel.vue";
 import type { ActiveAlert} from "@/types/types.js";
 import {Badge} from "@/components/ui/badge";
-import ActionsTable from "@/pages/alerts/ActionsTable.vue";
+import ActionsList from "@/pages/alerts/ActionsList.vue";
 import {useAuthStore} from "@/stores/authStore.ts";
 import SeveritySelect from "@/helpers_components/SeveritySelect.vue";
 import {updateAlertRequest} from "@/helpers_functions/requests.ts";
@@ -113,11 +113,12 @@ const onClose = () => {
           </div>
         </div>
         <!-- zmienić na tabs z shadcn dla actions -->
-        <ActionsTable
+        <ActionsList
+          :max-h="20"
           :actions="alert.actions"
           >
           <DialogLabel text="Actions" for="actions-history" />
-        </ActionsTable>
+        </ActionsList>
         <DialogFooter class=" items-center">
           <DialogClose as-child>
             <Button variant="red_outline"
