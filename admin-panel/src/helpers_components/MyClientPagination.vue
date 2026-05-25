@@ -99,7 +99,7 @@ watchEffect(() => {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <span>Results: <span class="font-extrabold">{{ total}}</span></span>
+      <span class="text-md" >Results: <span class="font-extrabold text-md">{{ total}}</span></span>
     </div>
   </Pagination>
 </template>
