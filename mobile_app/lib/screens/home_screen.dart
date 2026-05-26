@@ -75,7 +75,9 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                   subtitle: Text(
-                    "Acknowledged? ${latestCritical.acknowledged}\nTime: ${latestCritical.createdAt}",
+                    latestCritical == true
+                        ? "ACKNOWLEDGED"
+                        : "NOT ACKNOWLEDGED",
                   ),
                   isThreeLine: true,
                 ),

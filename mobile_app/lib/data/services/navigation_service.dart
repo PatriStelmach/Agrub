@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:alert_app/screens/alarm_overlay_screen.dart';
-import 'package:alert_app/services/alarm_service.dart';
+import 'package:alert_app/data/services/alarm_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class NavigationService {

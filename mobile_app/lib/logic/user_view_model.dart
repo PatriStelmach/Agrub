@@ -1,6 +1,6 @@
 import 'package:alert_app/data/models/user_model.dart';
 import 'package:alert_app/data/repositories/user_repository.dart';
-import 'package:alert_app/services/push_notification_service.dart';
+import 'package:alert_app/data/services/push_notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 

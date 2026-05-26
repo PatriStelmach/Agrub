@@ -1,6 +1,17 @@
 import 'package:flutter/material.dart';
 
-enum AlertSeverity { info, lowest, low, medium, high, extreme }
+// Using Enhanced enums to easily print normal strings in views
+enum AlertSeverity {
+  info('Info'),
+  lowest('Lowest'),
+  low('Low'),
+  medium('Medium'),
+  high('High'),
+  extreme('Extreme');
+
+  final String label;
+  const AlertSeverity(this.label);
+}
 
 enum AlertStatus { sent, inProgress, done }
 

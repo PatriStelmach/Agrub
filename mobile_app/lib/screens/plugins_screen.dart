@@ -12,13 +12,19 @@ class PluginsScreen extends StatefulWidget {
 }
 
 class _PluginsScreenState extends State<PluginsScreen> {
+  bool _isLoading = true;
+
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (mounted) {
-        final vm = context.read<PluginsViewModel>();
-        vm.sortPluginsBy(vm.currentSortProperty);
+        await context.read<PluginsViewModel>().loadPlugins();
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       }
     });
   }
@@ -26,8 +32,10 @@ class _PluginsScreenState extends State<PluginsScreen> {
   @override
   Widget build(BuildContext context) {
     final pluginsViewModel = context.watch<PluginsViewModel>();
-    final currentSort = pluginsViewModel.currentSortProperty;
-    final isAsc = pluginsViewModel.isAscending;
+
+    if (_isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
 
     if (pluginsViewModel.pluginList.isEmpty) {
       return const Scaffold(
@@ -40,6 +48,8 @@ class _PluginsScreenState extends State<PluginsScreen> {
     }
 
     final sortedList = pluginsViewModel.sortedPlugins;
+    final currentSort = pluginsViewModel.currentSortProperty;
+    final isAsc = pluginsViewModel.isAscending;
 
     return Column(
       children: [
@@ -93,7 +103,7 @@ class _PluginsScreenState extends State<PluginsScreen> {
               final plugin = sortedList[index];
 
               return Card(
-                color: plugin.activeColor,
+                color: plugin.activeColor(context),
                 child: ExpansionTile(
                   title: Text(plugin?.fileName ?? 'No name'),
                   subtitle: Text(plugin?.creator ?? 'Unknown creator'),
@@ -136,7 +146,11 @@ class _PluginsScreenState extends State<PluginsScreen> {
                           width: double.infinity,
                           child: ElevatedButton(
                             onPressed: () {
-                              pluginsViewModel.startPlugin(plugin);
+                              showRunArgsDialog(
+                                context,
+                                plugin,
+                                pluginsViewModel,
+                              );
                             },
 
                             child: Text('Run plugin'),
@@ -159,7 +173,9 @@ class _PluginsScreenState extends State<PluginsScreen> {
 
 void showCronDialog(BuildContext context, Plugin plugin) {
   final cronController = TextEditingController(text: plugin.cronExpression);
+  final argsController = TextEditingController(text: '');
   bool isActive = plugin.active;
+  final theme = Theme.of(context);
 
   showDialog(
     context: context,
@@ -169,28 +185,37 @@ void showCronDialog(BuildContext context, Plugin plugin) {
         builder: (context, setState) {
           return AlertDialog(
             title: Text('Plugin schedule: ${plugin.fileName}'),
-            content: Column(
-              mainAxisSize:
-                  MainAxisSize.min, // Okienko dopasuje się do zawartości
-              children: [
-                TextField(
-                  controller: cronController,
-                  decoration: const InputDecoration(
-                    labelText: 'CRON expression',
-                    hintText: '*/5 * * * *',
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: cronController,
+                    decoration: const InputDecoration(
+                      labelText: 'CRON expression',
+                      hintText: '*/5 * * * *',
+                    ),
                   ),
-                ),
-                const SizedBox(height: 16),
-                SwitchListTile(
-                  title: const Text('Active?'),
-                  value: isActive,
-                  onChanged: (value) {
-                    setState(() {
-                      isActive = value;
-                    });
-                  },
-                ),
-              ],
+                  TextField(
+                    controller: argsController,
+                    style: theme.textTheme.bodyLarge,
+                    decoration: const InputDecoration(
+                      labelText: 'Default Arguments (Optional)',
+                      hintText: '--verbose --save-logs',
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  SwitchListTile(
+                    title: const Text('Active?'),
+                    value: isActive,
+                    onChanged: (value) {
+                      setState(() {
+                        isActive = value;
+                      });
+                    },
+                  ),
+                ],
+              ),
             ),
             actions: [
               TextButton(
@@ -209,8 +234,8 @@ void showCronDialog(BuildContext context, Plugin plugin) {
                       );
 
                   if (context.mounted) {
-                    Navigator.pop(context); // Zamykamy overlay
-                    // Opcjonalnie: pokaż mały SnackBar z informacją o sukcesie
+                    Navigator.pop(context);
+                    // snackbar z informacja zwrotna
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text(success ? 'Saved' : 'Error')),
                     );
@@ -221,6 +246,55 @@ void showCronDialog(BuildContext context, Plugin plugin) {
             ],
           );
         },
+      );
+    },
+  );
+}
+
+void showRunArgsDialog(
+  BuildContext context,
+  Plugin plugin,
+  PluginsViewModel viewModel,
+) {
+  final argsController = TextEditingController();
+
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text(
+          'Run plugin: ${plugin.fileName}',
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+        content: TextField(
+          controller: argsController,
+          decoration: const InputDecoration(
+            labelText: 'Arguments (Optional)',
+            hintText: '--verbose --mode=production',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final String? enteredArgs = argsController.text.trim().isNotEmpty
+                  ? argsController.text.trim()
+                  : null;
+
+              viewModel.startPlugin(plugin, arguments: enteredArgs);
+
+              Navigator.pop(context);
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Plugin ${plugin.fileName} triggered')),
+              );
+            },
+            child: const Text('Run'),
+          ),
+        ],
       );
     },
   );

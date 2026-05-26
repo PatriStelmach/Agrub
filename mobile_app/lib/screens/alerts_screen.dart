@@ -1,7 +1,9 @@
+import 'package:alert_app/data/models/problem_action_model.dart';
 import 'package:alert_app/data/repositories/alert_repository.dart';
 import 'package:alert_app/logic/alerts_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 class AlertsScreen extends StatefulWidget {
   const AlertsScreen({super.key});
@@ -179,7 +181,11 @@ class _AlertsScreenState extends State<AlertsScreen>
                                 ),
                                 const Spacer(),
                                 Text(
-                                  alert?.createdAt.toString() ?? 'Unknown Time',
+                                  alert?.createdAt != null
+                                      ? DateFormat(
+                                          'dd.MM.yyyy HH:mm:ss',
+                                        ).format(alert!.createdAt)
+                                      : 'Unknown Time',
                                   style: TextStyle(color: textColor),
                                 ),
                               ],
@@ -187,14 +193,9 @@ class _AlertsScreenState extends State<AlertsScreen>
                             const SizedBox(height: 8),
                             Row(
                               children: [
-                                Text(
-                                  alert?.status.toString() ?? 'Unknown Status',
-                                  style: TextStyle(color: textColor),
-                                ),
                                 const Spacer(),
                                 Text(
-                                  alert?.severity.toString() ??
-                                      'Unknown Severity',
+                                  "Severity: ${alert!.severity.label}",
                                   style: TextStyle(
                                     color: textColor,
                                     fontWeight: FontWeight.w500,
@@ -219,6 +220,60 @@ class _AlertsScreenState extends State<AlertsScreen>
                                 },
                                 child: const Text('Actions'),
                               ),
+                            ),
+                            FutureBuilder<ProblemAction?>(
+                              future: context
+                                  .read<AlertRepository>()
+                                  .getLatestActionForAlert(alert.id),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: LinearProgressIndicator(),
+                                  );
+                                }
+                                final theme = Theme.of(context);
+
+                                final latestAction = snapshot.data;
+                                if (latestAction == null) {
+                                  return ListTile(
+                                    title: Text(
+                                      "Brak historii alertu",
+                                      style: theme.textTheme.bodyLarge
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                    ),
+                                  );
+                                }
+
+                                return ListTile(
+                                  leading: Icon(
+                                    Icons.history,
+                                    color:
+                                        theme.iconTheme.color?.withOpacity(
+                                          0.7,
+                                        ) ??
+                                        Colors.grey,
+                                  ),
+                                  title: Text(
+                                    latestAction.message.isNotEmpty
+                                        ? latestAction.message
+                                        : 'Brak komentarza',
+                                    style: theme.textTheme.bodyLarge?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  subtitle: Text(
+                                    "Autor: ${latestAction.author} | Status ACK: ${latestAction.ack ? 'Tak' : 'Nie'}",
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: theme.textTheme.bodyMedium?.color
+                                          ?.withOpacity(0.7),
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
                           ],
                         ),

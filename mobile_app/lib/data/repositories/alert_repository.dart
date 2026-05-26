@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:alert_app/data/models/alert_model.dart';
+import 'package:alert_app/data/models/problem_action_model.dart';
 import 'package:alert_app/data/repositories/user_repository.dart';
 import 'package:alert_app/locator.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:alert_app/services/navigation_service.dart';
+import 'package:alert_app/data/services/navigation_service.dart';
 import 'package:flutter_client_sse/constants/sse_request_type_enum.dart';
 import 'package:flutter_client_sse/flutter_client_sse.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -366,5 +367,28 @@ class AlertRepository extends ChangeNotifier {
 
     debugPrint("Repo: Pamięć RAM zaktualizowana stanem z dysku.");
     notifyListeners();
+  }
+
+  Future<ProblemAction?> getLatestActionForAlert(int alertId) async {
+    try {
+      final response = await dio.get('/api/alerts/$alertId/actions');
+
+      if (response.data is List) {
+        final List<dynamic> data = response.data as List<dynamic>;
+
+        if (data.isNotEmpty) {
+          return ProblemAction.fromJson(data.first as Map<String, dynamic>);
+        }
+      }
+      return null;
+    } on DioException catch (e) {
+      debugPrint(
+        "ALERT DEBUG: Issue when getting history for $alertId: ${e.message}",
+      );
+      return null;
+    } catch (e) {
+      debugPrint("ALERT DEBUG UNKNOWN ERROR: $e");
+      return null;
+    }
   }
 }

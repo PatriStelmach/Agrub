@@ -11,7 +11,7 @@ class PluginsViewModel extends ChangeNotifier {
   String get currentSortProperty => _currentSortProperty;
   bool get isAscending => _isAscending;
 
-  List<Plugin> sortedPlugins = [];
+  //List<Plugin> sortedPlugins = [];
 
   PluginsViewModel({required PluginsRepository pluginsRepository})
     : _repository = pluginsRepository {
@@ -20,17 +20,8 @@ class PluginsViewModel extends ChangeNotifier {
 
   List<Plugin> get pluginList => _repository.pluginsCache.values.toList();
 
-  void sortPluginsBy(String property, {bool? ascending}) {
-    _currentSortProperty = property;
-    if (ascending != null) {
-      _isAscending = ascending;
-    }
-
-    if (pluginList.isEmpty) {
-      sortedPlugins = [];
-      notifyListeners();
-      return;
-    }
+  List<Plugin> get sortedPlugins {
+    if (pluginList.isEmpty) return [];
 
     final Map<String, Comparable Function(Plugin)> pluginGetters = {
       'id': (plugin) => plugin.id,
@@ -61,15 +52,27 @@ class PluginsViewModel extends ChangeNotifier {
         return valB.compareTo(valA);
       }
     });
-    sortedPlugins = newList;
+    return newList;
 
+    //notifyListeners();
+  }
+
+  void sortPluginsBy(String property, {bool? ascending}) {
+    _currentSortProperty = property;
+    if (ascending != null) {
+      _isAscending = ascending;
+    }
     notifyListeners();
+  }
+
+  Future<void> loadPlugins() async {
+    await _repository.updateAllPlugins();
   }
 
   Future<void> startPlugin(Plugin plugin, {String? arguments}) async {
     // Simple forcing of plugin execution. rudimentary error hadling
     try {
-      await _repository.forcePlugin(plugin);
+      await _repository.forcePlugin(plugin, arguments: arguments);
 
       notifyListeners();
     } catch (e) {

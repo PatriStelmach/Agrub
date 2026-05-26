@@ -6,21 +6,21 @@ import 'package:alert_app/locator.dart';
 import 'package:alert_app/logic/general_layout_view_model.dart';
 import 'package:alert_app/logic/settings_view_model.dart';
 import 'package:alert_app/screens/login_screen.dart';
-import 'package:alert_app/services/auth_service.dart';
-import 'package:alert_app/services/navigation_service.dart';
+import 'package:alert_app/data/services/auth_service.dart';
+import 'package:alert_app/data/services/navigation_service.dart';
 import 'package:alert_app/logic/plugins_view_model.dart';
 import 'package:alert_app/logic/alerts_view_model.dart';
 import 'package:alert_app/logic/home_view_model.dart';
 import 'package:alert_app/logic/user_view_model.dart';
 import 'package:alert_app/screens/general_layout_screen.dart';
-import 'package:alert_app/services/push_notification_service.dart';
+import 'package:alert_app/data/services/push_notification_service.dart';
 import 'package:alert_app/themes/app_theme_default.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
-import 'package:alert_app/services/fcm_background_handler.dart';
+import 'package:alert_app/data/services/fcm_background_handler.dart';
 
 Future<void> main() async {
   //checking if flutter engine is ready
@@ -142,8 +142,8 @@ class MainApp extends StatelessWidget {
 T0D0:
 
 - severity change
-- najnowszy wpis z historii alertu ( co najmniej )
 - komentarze porządne
+- testy
 - refactoring, uporządkowanie tego co robią servicy/repo/view models zgodnie z MVVM, uporządkowanie rzeczy zgodnie z DRY itd.
 
 

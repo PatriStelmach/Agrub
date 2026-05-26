@@ -7,6 +7,6 @@ class GeneralLayoutViewModel extends ChangeNotifier {
 
   void changePage(String newPage) {
     _activeScreenName = newPage;
-    notifyListeners(); 
+    notifyListeners();
   }
 }
