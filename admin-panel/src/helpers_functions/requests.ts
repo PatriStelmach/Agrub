@@ -73,8 +73,8 @@ export const updateAlertRequest = async (action: Actions) => {
       return
     }
   }
-  catch {
-    toast.error('Failed to send ack!')
+  catch (error) {
+    throw error
   }
 }
 
@@ -227,7 +227,7 @@ export const getUserActions = async (id: number) => {
     }
   }
   catch (error) {
-    toast.error( `Error retrieving user actions: ${error}`)
+    throw (error)
   }
 }
 

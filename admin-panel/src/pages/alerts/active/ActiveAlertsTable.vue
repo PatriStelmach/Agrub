@@ -21,15 +21,14 @@ import {computed, ref, watchEffect} from "vue";
 import SeverityDiv from "@/helpers_components/SeverityDiv.vue";
 import {dateParser} from "@/composables/dateParser.ts";
 import LoadingTable from "@/helpers_components/LoadingTable.vue";
-import {useRouter} from "vue-router";
 
 const props = defineProps<{
   tableData: ActiveAlert[]
   isLoading: boolean
 }>()
 
+const isDialogOpen = ref(false)
 const hoveredAlert = defineModel<AlertDetails | null>('hoveredAlert')
-const router = useRouter()
 const hoveredId = ref<number | null>(null);
 
 const computedHoveredAlert = computed(() => {
@@ -93,7 +92,7 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<ActiveAlert>(() =
             <RouterLink
               :to="(alert.originType === 'ZABBIX' || alert.originType === 'WAZUH' || alert.originType === 'NAGIOS') ?
                `/my_systems/${alert.originType}` :
-                `/my_plugins/${alert.originType}`">
+                `/my_plugins/${alert.source}`">
               <Badge
                 class="whitespace-break-spaces"
                 variant="origin"
@@ -107,13 +106,17 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<ActiveAlert>(() =
           </TableCell>
           <DateCell   :date="dateParser(alert.createdAt).toDate "></DateCell>
           <TableCell>
-            <EditAlertDialog
-              :alert="alert"
-            >
-              <Button size="icon-sm" variant="green_outline">
-                <IconEdit class="size-4"/>
-              </Button>
-            </EditAlertDialog>
+            <!-- dialog link -->
+            <RouterLink :to="`/active_alerts/${alert.id}`">
+              <EditAlertDialog
+                v-model:isDialogOpen="isDialogOpen"
+                :alert="alert"
+              >
+                <Button size="icon-sm" variant="green_outline">
+                  <IconEdit class="size-4"/>
+                </Button>
+              </EditAlertDialog>
+            </RouterLink>
           </TableCell>
         </TableRow>
       </TableBody>

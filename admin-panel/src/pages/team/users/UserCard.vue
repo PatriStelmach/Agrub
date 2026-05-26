@@ -19,6 +19,7 @@ const props = defineProps<{
 const route = useRoute()
 const isDialogOpen = ref(false)
 const authStore = useAuthStore()
+
 watchEffect( () => {
   if(route.params.user === `${props.user.firstname} ${props.user.surname}`) {
     isDialogOpen.value = true

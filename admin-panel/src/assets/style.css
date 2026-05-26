@@ -358,3 +358,32 @@ input[type=number] {
   box-shadow: 0 0 10px 2px var(--red-badge);
 }
 
+.fade-delayed-enter-active {
+  transition-delay: 0.3s;
+  transition: scale 0.3s ease, opacity 0.15s;
+}
+
+
+.fade-delayed-leave-active {
+  position: absolute;
+  transition: scale 0.3s ease, opacity 0.15s;
+
+}
+.fade-delayed-enter-from, .fade-delayed-leave-to {
+  opacity: 0;
+  scale: 25%;
+}
+
+.fade-100-enter-active,
+.fade-100-leave-active {
+  transition-delay: 0.1s;
+  transition: 0.1s;
+  position: absolute;
+}
+
+.fade-100-leave-to,
+.fade-100-enter-from {
+  scale: 50%;
+  opacity: 0;
+}
+

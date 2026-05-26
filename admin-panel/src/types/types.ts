@@ -1,4 +1,4 @@
-export const api_url = '/api'
+export const api_url = 'http://localhost:10000/api'
 
 export enum Language {
   PYTHON = ".py",
@@ -23,7 +23,7 @@ export interface ActiveAlert {
   message: string,
   source: string,
   originType: string,
-  isAcknowledged: boolean,
+  isAcknowledged: boolean | null,
   createdAt: Date,
   actions: ActionResponse[],
   severity: 0 | 1 | 2 | 3 | 4 | 5,
@@ -38,16 +38,18 @@ export interface Actions {
   id: number
   alertId?: number
   author: string,
-  ack?: boolean,
+  ack?: boolean | null,
   message?: string,
   newSeverity?: 0 | 1 | 2 | 3 | 4 | 5,
+  previousSeverity?: 0 | 1 | 2 | 3 | 4 | 5,
+  createdAt?: Date
+  closedAt?: Date
 }
 
 export interface ActionResponse extends Actions {
-  ackUpdate: boolean,
-  previousSeverity: 0 | 1 | 2 | 3 | 4 | 5,
+  ackUpdate: boolean | null,
   problemId: number,
-  createdAt: Date,
+  subject?: string
 }
 
 export interface AlertDetails {
