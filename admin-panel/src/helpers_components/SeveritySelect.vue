@@ -21,7 +21,7 @@ const severity = defineModel<0 | 1 | 2 | 3 | 4 | 5 | undefined>('severity');
     <SelectContent>
       <SelectItem
         :class='`tabelar-nums  font-extrabold cursor-pointer hover:bg-severity-${value}/50! `'
-        v-for="value in [0,1,2,3,4,5]" :key="value" :value="value">{{value}}</SelectItem>
+        v-for="value in [1,2,3,4,5]" :key="value" :value="value">{{value}}</SelectItem>
     </SelectContent>
   </Select>
 </template>

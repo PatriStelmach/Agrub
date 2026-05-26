@@ -17,18 +17,15 @@ import {
   editCurrentUserSchema,
 } from "@/helpers_functions/formSchemas.ts";
 import FormNumberInput from "@/helpers_components/form/FormNumberInput.vue";
-import {bigNameLabel, hoverListRow} from "@/assets/cssFunctions.ts";
+import {bigNameLabel} from "@/assets/cssFunctions.ts";
 import {dateParser} from "@/composables/dateParser.ts";
 import ChangePasswordDialog from "@/pages/team/users/ChangePasswordDialog.vue";
 import {useAuthStore} from "@/stores/authStore.ts";
 import {ButtonGroup} from "@/components/ui/button-group";
 import TopH1Div from "@/helpers_components/TopH1Div.vue";
 import {Badge} from "@/components/ui/badge";
-import ShowRuleDiv from "@/pages/team/groups/ShowRuleDiv.vue";
-import EditRuleDiv from "@/pages/team/groups/EditRuleDiv.vue";
-import {getUserActions} from "@/helpers_functions/requests.ts";
-import type {ActionResponse, Actions} from "@/types/types.ts";
-import ActionsList from "@/pages/alerts/ActionsList.vue";
+import type {ActionResponse} from "@/types/types.ts";
+import ActionsList from "@/helpers_components/ActionsList.vue";
 
 const authStore = useAuthStore();
 const user = computed(() => authStore.currentUser!)
@@ -36,8 +33,8 @@ const userStore = useUserStore()
 
 onMounted(async () => {
   try {
+    if (userStore.allGroups.length === 0)
     await userStore.getAllGroupsRequest()
-    actions.value = await getUserActions(user.value.id!)
   }
   catch (error) {
     toast.error(`${error}`)
@@ -70,7 +67,7 @@ const { handleSubmit, resetForm, setFieldValue } = useForm({
 
 const onSubmit = handleSubmit(async (data) => {
   isSubmitLoading.value = true
-  await userStore.editUserRequest(data)
+  await userStore.editUserRequest({...data, role: user.value.role})
     .then((res) => toast.success(`User ${res} updated successfully.`))
     .catch((error) => toast.error(`Error updating ${data.email}: ${error}`))
   await authStore.refreshToken()
@@ -243,7 +240,11 @@ watch(tagsForEdit, (val) => {
         <h1 class="pb-1 mb-2 border-b-4  text-center">User interactions with alerts: {{ actions.length }}</h1>
         <div class=" pb-2 border-b-4 ">
           <ul>
-            <ActionsList :max-h="70" :actions="actions" />
+            <ActionsList
+              :userId="user.id"
+              :userView="true"
+              max-w="65vw"
+              max-h="72vh"/>
           </ul>
         </div>
       </div>

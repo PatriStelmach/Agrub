@@ -16,8 +16,8 @@ const router = createRouter({
   routes: [
     { path: '/my_systems/:system?',      name: 'my_systems',      component: MySystems },
     { path: '/',                name: 'home',            component: ActiveAlertsPage },
-    { path: '/active_alerts',   name: 'active_alerts',   component: ActiveAlertsPage },
-    { path: '/alerts_history',  name: 'alerts_history',  component: AlertsHistory },
+    { path: '/active_alerts/:alert?',   name: 'active_alerts',   component: ActiveAlertsPage },
+    { path: '/alerts_history/:alert?',  name: 'alerts_history',  component: AlertsHistory },
     { path: '/plugins_library', name: 'plugins_library', component: PluginsLibrary },
     { path: '/my_plugins/:plugin?',      name: 'my_plugins',      component: MyPlugins },
     { path: '/team_members/:user?',    name: 'team_members',    component: TeamPage },
