@@ -1,10 +1,8 @@
 <script setup lang="ts">
-
 import {
   dataTable,
   tableCaption,
   tableHeaders,
-
 } from "@/assets/cssFunctions.ts";
 import {
   Table, TableBody,
@@ -26,17 +24,15 @@ import SeverityDiv from "@/helpers_components/SeverityDiv.vue";
 import {hoverListRow} from "@/assets/cssFunctions.ts";
 import LoadingTable from "@/helpers_components/LoadingTable.vue";
 import AlertHistoryDialog from '@/pages/alerts/history/AlertHistoryDialog.vue'
-import {useRouter} from "vue-router";
 
 const props = defineProps<{
   alerts: HistoryAlert[]
   isLoading: boolean
 }>()
 
-const router = useRouter()
 const hoveredAlert = defineModel<AlertDetails | null>('hoveredAlert')
 const sortedHead = defineModel<{ sortKey: string; sortOrder: string }>('sortedHead')
-
+const isDialogOpen = ref(false)
 const { sortKey, sortOrder, toggleSort } = useSortRequests<HistoryAlert>(() => props.alerts, 'createdAt')
 
 const hoveredId = ref<number | null>(null);
@@ -106,7 +102,7 @@ watchEffect(() => {
                 <RouterLink
                   :to="(alert.originType === 'ZABBIX' || alert.originType === 'WAZUH' || alert.originType === 'NAGIOS') ?
                `/my_systems/${alert.originType}` :
-                `/my_plugins/${alert.originType}`">
+                `/my_plugins/${alert.source}`">
                   <Badge
                     class="whitespace-break-spaces"
                     variant="origin"
@@ -121,14 +117,18 @@ watchEffect(() => {
               <DateCell  :date="alert.createdAt "></DateCell>
               <DateCell  :date="alert.closedAt "></DateCell>
               <TableCell>
-                <AlertHistoryDialog
-                  :alert="alert"
-                >
-                  <Button size="icon-lg" variant="green_outline">
-                    <IconHistory class="size-5"/>
-                  </Button>
-                </AlertHistoryDialog>
 
+                <!-- dialog link -->
+                <RouterLink :to="`/alerts_history/${alert.id}`">
+                  <AlertHistoryDialog
+                    :isDialogOpen="isDialogOpen"
+                    :alert="alert"
+                  >
+                    <Button size="icon-lg" variant="green_outline">
+                      <IconHistory class="size-5"/>
+                    </Button>
+                  </AlertHistoryDialog>
+                </RouterLink>
               </TableCell>
             </TableRow>
           </TableBody>

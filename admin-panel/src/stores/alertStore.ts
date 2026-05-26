@@ -1,7 +1,7 @@
 import {defineStore} from "pinia";
 import { ref} from "vue";
 import {
-  type ActionResponse,
+  type ActionResponse, type Actions,
   type ActiveAlert
 } from "@/types/types.ts";
 import api from "@/lib/axios";
@@ -23,12 +23,13 @@ export const useAlertStore = defineStore('alert-store', () => {
     return currentAlerts.value.findIndex(a => a.id === id)
   }
 
-  const updateAlertActions = (action: ActionResponse) => {
+  const updateAlertActions = (action: Actions) => {
     const alert = findAlert(action.alertId)
+    console.log(action)
     if (alert) {
       const changes: string[] = []
 
-      if (action.ack !== undefined && action.ack !== alert.isAcknowledged) {
+      if (action.ack !== null && action.ack !== undefined) {
         const ackText = action.ack ? 'Acknowledged' : 'Unacknowledged'
         changes.push(ackText)
         alert.isAcknowledged = action.ack
@@ -42,7 +43,17 @@ export const useAlertStore = defineStore('alert-store', () => {
         changes.push(`message: ${action.message}`)
       }
 
-      alert.actions.push(action)
+      alert.actions.push({
+        id: action.id,
+        author: action.author,
+        ackUpdate: action.ack,
+        newSeverity: action.newSeverity,
+        previousSeverity: action.previousSeverity,
+        message: action.message,
+        alertId: action.alertId,
+        createdAt: action.createdAt
+      } as ActionResponse)
+      console.log(alert)
 
       const changesText = changes.length > 0 ? changes.join(' | ') : 'Updated action'
 
