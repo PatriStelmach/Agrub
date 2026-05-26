@@ -2,12 +2,14 @@ import 'package:alert_app/logic/general_layout_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:alert_app/logic/home_view_model.dart';
 import 'package:provider/provider.dart';
+import 'package:alert_app/l10n/app_localizations.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     final homeViewModel = context.watch<HomeViewModel>();
 
     final DateTime lastPingTime = homeViewModel.repository.lastPing;
@@ -32,7 +34,7 @@ class HomeScreen extends StatelessWidget {
               children: [
                 _buildStatCard(
                   context,
-                  title: "Last Ping",
+                  title: t.statLastPing,
                   value: shortPingTime,
                   icon: Icons.sync,
                   color: Colors.blueGrey,
@@ -40,7 +42,7 @@ class HomeScreen extends StatelessWidget {
                 const SizedBox(width: 12),
                 _buildStatCard(
                   context,
-                  title: "Active Alerts",
+                  title: t.statActiveAlerts,
                   value: activeAlertsCount.toString(),
                   icon: Icons.notifications_active,
                   color: activeAlertsCount > 0 ? Colors.orange : Colors.green,
@@ -49,9 +51,9 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            const Text(
-              'Latest Critical Incident',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            Text(
+              t.latestCriticalSection,
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             if (latestCritical != null)
@@ -76,32 +78,32 @@ class HomeScreen extends StatelessWidget {
                   ),
                   subtitle: Text(
                     latestCritical == true
-                        ? "ACKNOWLEDGED"
-                        : "NOT ACKNOWLEDGED",
+                        ? t.alertStatusAcknowledged
+                        : t.alertStatusNotAcknowledged,
                   ),
                   isThreeLine: true,
                 ),
               )
             else
-              const Card(
+              Card(
                 child: ListTile(
-                  title: Text("No critical alerts"),
-                  leading: Icon(Icons.check_circle, color: Colors.green),
+                  title: Text(t.noCriticalAlerts),
+                  leading: const Icon(Icons.check_circle, color: Colors.green),
                 ),
               ),
 
             const SizedBox(height: 24),
 
-            const Text(
-              'Quick Navigation',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            Text(
+              t.quickNavigationSection,
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
             Row(
               children: [
                 _buildNavTile(
                   context,
-                  label: "ALL ALERTS",
+                  label: t.navAllAlerts,
                   icon: Icons.list_alt,
                   color: Colors.indigo,
                   onTap: () {
@@ -111,7 +113,7 @@ class HomeScreen extends StatelessWidget {
                 const SizedBox(width: 12),
                 _buildNavTile(
                   context,
-                  label: "PLUGINS",
+                  label: t.navPlugins,
                   icon: Icons.extension,
                   color: Colors.teal,
                   onTap: () {

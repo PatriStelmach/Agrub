@@ -1,3 +1,4 @@
+import 'package:alert_app/l10n/app_localizations.dart';
 import 'package:alert_app/logic/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -9,15 +10,16 @@ class UserScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final userViewModel = context.watch<UserViewModel>();
     final user = userViewModel.user;
+    final t = AppLocalizations.of(context)!;
 
     if (user == null) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CircularProgressIndicator(),
             SizedBox(height: 10),
-            Text("Ładowanie danych użytkownika..."),
+            Text(t.user_loading_data),
           ],
         ),
       );
@@ -31,10 +33,10 @@ class UserScreen extends StatelessWidget {
             const Icon(Icons.account_circle_rounded, size: 100),
             const SizedBox(height: 20),
 
-            _buildDataRow('Username', user.login),
-            _buildDataRow('E-mail', user.email),
-            _buildDataRow('Role', user.role),
-            _buildDataRow('Group', user.group),
+            _buildDataRow(t.user_label_username, user.login),
+            _buildDataRow(t.user_label_email, user.email),
+            _buildDataRow(t.user_label_role, user.role),
+            _buildDataRow(t.user_label_group, user.group),
 
             const SizedBox(height: 30),
 
@@ -42,7 +44,7 @@ class UserScreen extends StatelessWidget {
               onPressed: () {
                 context.read<UserViewModel>().signOut();
               },
-              child: const Text("Logout"),
+              child: Text(t.user_button_logout),
             ),
           ],
         ),

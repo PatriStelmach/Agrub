@@ -4,6 +4,7 @@ import 'package:alert_app/logic/alerts_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:alert_app/l10n/app_localizations.dart';
 
 class AlertsScreen extends StatefulWidget {
   const AlertsScreen({super.key});
@@ -49,18 +50,13 @@ class _AlertsScreenState extends State<AlertsScreen>
   Widget build(BuildContext context) {
     debugPrint("--- REBUILD ---");
     final alertsViewModel = context.watch<AlertsViewModel>();
+    final t = AppLocalizations.of(context)!;
 
     final currentSort = alertsViewModel.currentSortProperty;
     final isAsc = alertsViewModel.isAscending;
 
     if (alertsViewModel.alertsList.isEmpty) {
-      return const Scaffold(
-        body: Center(
-          child: Text(
-            "No alerts found. Consider checking the button in Debug Screen!",
-          ),
-        ),
-      );
+      return Scaffold(body: Center(child: Text(t.alerts_no_alerts_found)));
     }
 
     final sortedList = alertsViewModel.sortedAlerts;
@@ -69,7 +65,7 @@ class _AlertsScreenState extends State<AlertsScreen>
       children: [
         Row(
           children: [
-            Text("Sort by - ", style: TextStyle(fontSize: 30)),
+            Text(t.alerts_sort_by, style: TextStyle(fontSize: 30)),
             Expanded(
               child: DropdownButton<String>(
                 isExpanded: true,
@@ -87,26 +83,41 @@ class _AlertsScreenState extends State<AlertsScreen>
                     alertsViewModel.sortAlertsBy(newValue);
                   }
                 },
-                items: const [
+                items: [
                   DropdownMenuItem<String>(
                     value: 'id',
-                    child: Text('ID', style: TextStyle(fontSize: 30)),
+                    child: Text(
+                      t.alerts_sort_id,
+                      style: TextStyle(fontSize: 30),
+                    ),
                   ),
                   DropdownMenuItem<String>(
                     value: 'title',
-                    child: Text('Title', style: TextStyle(fontSize: 30)),
+                    child: Text(
+                      t.alerts_sort_title,
+                      style: TextStyle(fontSize: 30),
+                    ),
                   ),
                   DropdownMenuItem<String>(
                     value: 'createdAt',
-                    child: Text('CreatedAt', style: TextStyle(fontSize: 30)),
+                    child: Text(
+                      t.alerts_sort_created_at,
+                      style: TextStyle(fontSize: 30),
+                    ),
                   ),
                   DropdownMenuItem<String>(
                     value: 'acknowledged',
-                    child: Text('Acknowledged', style: TextStyle(fontSize: 30)),
+                    child: Text(
+                      t.alerts_sort_acknowledged,
+                      style: TextStyle(fontSize: 30),
+                    ),
                   ),
                   DropdownMenuItem<String>(
                     value: 'severity',
-                    child: Text('Severity', style: TextStyle(fontSize: 30)),
+                    child: Text(
+                      t.alerts_sort_severity,
+                      style: TextStyle(fontSize: 30),
+                    ),
                   ),
                 ],
               ),
@@ -158,14 +169,16 @@ class _AlertsScreenState extends State<AlertsScreen>
                     leading: Icon(Icons.warning, color: textColor),
 
                     title: Text(
-                      alert?.subject ?? 'No Title',
+                      alert?.subject ?? t.alerts_tile_no_title,
                       style: TextStyle(
                         color: textColor,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     subtitle: Text(
-                      alert.acknowledged ? 'ACKNOWLEDGED' : 'NOT ACKNOWLEDGED',
+                      alert.acknowledged
+                          ? t.alerts_status_acknowledged
+                          : t.alerts_status_not_acknowledged,
                       style: TextStyle(color: textColor.withOpacity(0.8)),
                     ),
                     children: [
@@ -176,7 +189,7 @@ class _AlertsScreenState extends State<AlertsScreen>
                             Row(
                               children: [
                                 Text(
-                                  alert?.source ?? 'Unknown Host',
+                                  alert?.source ?? t.alerts_tile_unknown_host,
                                   style: TextStyle(color: textColor),
                                 ),
                                 const Spacer(),
@@ -185,7 +198,7 @@ class _AlertsScreenState extends State<AlertsScreen>
                                       ? DateFormat(
                                           'dd.MM.yyyy HH:mm:ss',
                                         ).format(alert!.createdAt)
-                                      : 'Unknown Time',
+                                      : t.alerts_tile_unknown_time,
                                   style: TextStyle(color: textColor),
                                 ),
                               ],
@@ -195,7 +208,9 @@ class _AlertsScreenState extends State<AlertsScreen>
                               children: [
                                 const Spacer(),
                                 Text(
-                                  "Severity: ${alert!.severity.label}",
+                                  t.alerts_tile_severity_prefix(
+                                    alert!.severity.label,
+                                  ),
                                   style: TextStyle(
                                     color: textColor,
                                     fontWeight: FontWeight.w500,
@@ -216,9 +231,9 @@ class _AlertsScreenState extends State<AlertsScreen>
                                   elevation: 0,
                                 ),
                                 onPressed: () {
-                                  _openAckDialog(context, alert.id);
+                                  _openAckDialog(context, alert.id, t);
                                 },
-                                child: const Text('Actions'),
+                                child: Text(t.alerts_button_actions),
                               ),
                             ),
                             FutureBuilder<ProblemAction?>(
@@ -239,7 +254,7 @@ class _AlertsScreenState extends State<AlertsScreen>
                                 if (latestAction == null) {
                                   return ListTile(
                                     title: Text(
-                                      "Brak historii alertu",
+                                      t.alerts_history_empty,
                                       style: theme.textTheme.bodyLarge
                                           ?.copyWith(
                                             fontWeight: FontWeight.w600,
@@ -260,13 +275,16 @@ class _AlertsScreenState extends State<AlertsScreen>
                                   title: Text(
                                     latestAction.message.isNotEmpty
                                         ? latestAction.message
-                                        : 'Brak komentarza',
+                                        : t.alerts_history_no_comment,
                                     style: theme.textTheme.bodyLarge?.copyWith(
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                   subtitle: Text(
-                                    "Autor: ${latestAction.author} | Status ACK: ${latestAction.ack ? 'Tak' : 'Nie'}",
+                                    t.alerts_history_subtitle(
+                                      latestAction.author,
+                                      latestAction.ack ? t.yes : t.no,
+                                    ),
                                     style: theme.textTheme.bodyMedium?.copyWith(
                                       color: theme.textTheme.bodyMedium?.color
                                           ?.withOpacity(0.7),
@@ -292,7 +310,8 @@ class _AlertsScreenState extends State<AlertsScreen>
 
 class AckDialog extends StatefulWidget {
   final int alertId;
-  const AckDialog({super.key, required this.alertId});
+  final AppLocalizations t;
+  const AckDialog({super.key, required this.alertId, required this.t});
 
   @override
   State<AckDialog> createState() => _AckDialogState();
@@ -327,20 +346,23 @@ class _AckDialogState extends State<AckDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final t = widget.t;
     return AlertDialog(
-      title: Text('Actions for Alert ${widget.alertId}'),
+      title: Text(t.alerts_dialog_title(widget.alertId.toString())),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: _controller,
-              decoration: const InputDecoration(labelText: 'Your comment'),
+              decoration: InputDecoration(
+                labelText: t.alerts_dialog_field_comment,
+              ),
             ),
             const SizedBox(height: 15),
 
-            const Text(
-              "Change Severity:",
+            Text(
+              t.alerts_dialog_section_severity,
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 5),
@@ -354,13 +376,31 @@ class _AckDialogState extends State<AckDialog> {
                   vertical: 5,
                 ),
               ),
-              items: const [
-                DropdownMenuItem(value: 0, child: Text('0 - Info')),
-                DropdownMenuItem(value: 1, child: Text('1 - Low')),
-                DropdownMenuItem(value: 2, child: Text('2 - Low')),
-                DropdownMenuItem(value: 3, child: Text('3 - Medium')),
-                DropdownMenuItem(value: 4, child: Text('4 - High')),
-                DropdownMenuItem(value: 5, child: Text('5 - Extreme')),
+              items: [
+                DropdownMenuItem(
+                  value: 0,
+                  child: Text(t.alerts_dialog_severity_info),
+                ),
+                DropdownMenuItem(
+                  value: 1,
+                  child: Text(t.alerts_dialog_severity_low),
+                ),
+                DropdownMenuItem(
+                  value: 2,
+                  child: Text(t.alerts_dialog_severity_low),
+                ),
+                DropdownMenuItem(
+                  value: 3,
+                  child: Text(t.alerts_dialog_severity_medium),
+                ),
+                DropdownMenuItem(
+                  value: 4,
+                  child: Text(t.alerts_dialog_severity_high),
+                ),
+                DropdownMenuItem(
+                  value: 5,
+                  child: Text(t.alerts_dialog_severity_extreme),
+                ),
               ],
               onChanged: (int? newValue) {
                 setState(() {
@@ -369,7 +409,7 @@ class _AckDialogState extends State<AckDialog> {
               },
             ),
             CheckboxListTile(
-              title: const Text("Acknowledge alert"),
+              title: Text(t.alerts_dialog_check_ack),
               value: isAck,
               contentPadding: EdgeInsets.zero,
               onChanged: (bool? value) {
@@ -384,7 +424,7 @@ class _AckDialogState extends State<AckDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: Text(t.alerts_dialog_button_cancel),
         ),
 
         ElevatedButton(
@@ -393,20 +433,20 @@ class _AckDialogState extends State<AckDialog> {
             context.read<AlertsViewModel>().acknowledgeAlert(
               widget.alertId,
               comment: commentValue,
-              isAck: this.isAck,
+              isAck: isAck,
             );
             Navigator.pop(context);
           },
-          child: const Text('Update'),
+          child: Text(t.alerts_dialog_button_update),
         ),
       ],
     );
   }
 }
 
-void _openAckDialog(BuildContext context, int alertId) {
+void _openAckDialog(BuildContext context, int alertId, AppLocalizations t) {
   showDialog(
     context: context,
-    builder: (context) => AckDialog(alertId: alertId),
+    builder: (context) => AckDialog(alertId: alertId, t: t),
   );
 }

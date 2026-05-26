@@ -2,6 +2,7 @@ import 'package:alert_app/data/services/push_notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:alert_app/logic/user_view_model.dart';
+import 'package:alert_app/l10n/app_localizations.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -16,9 +17,10 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscurePassword = true;
 
   void _handleLogin() async {
-    final userVM = context.read<UserViewModel>();
+    final userViewModel = context.read<UserViewModel>();
     final pushService = context.read<PushNotificationService>();
-    bool success = await userVM.signIn(
+    final t = AppLocalizations.of(context)!;
+    bool success = await userViewModel.signIn(
       _emailController.text.trim(),
       _passwordController.text,
       pushService,
@@ -26,8 +28,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (!success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Loggin error. Check connection and try again"),
+        SnackBar(
+          content: Text(t.login_error_message),
           backgroundColor: Colors.red,
         ),
       );
@@ -36,6 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     final isLoading = context.watch<UserViewModel>().isLoading;
 
     return Scaffold(
@@ -47,17 +50,20 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               const Icon(Icons.lock_outline, size: 80, color: Colors.blue),
               const SizedBox(height: 20),
-              const Text(
-                "ALERT APP",
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              Text(
+                t.login_app_title,
+                style: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 40),
 
               // Pole Email
               TextField(
                 controller: _emailController,
-                decoration: const InputDecoration(
-                  labelText: "E-mail",
+                decoration: InputDecoration(
+                  labelText: t.login_field_email,
                   prefixIcon: Icon(Icons.email),
                   border: OutlineInputBorder(),
                 ),
@@ -70,7 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 controller: _passwordController,
                 obscureText: _obscurePassword,
                 decoration: InputDecoration(
-                  labelText: "Hasło",
+                  labelText: t.login_field_password,
                   prefixIcon: const Icon(Icons.lock),
                   border: const OutlineInputBorder(),
                   suffixIcon: IconButton(
@@ -98,7 +104,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   child: isLoading
                       ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text("LOG IN", style: TextStyle(fontSize: 18)),
+                      : Text(
+                          t.login_field_password,
+                          style: TextStyle(fontSize: 18),
+                        ),
                 ),
               ),
             ],

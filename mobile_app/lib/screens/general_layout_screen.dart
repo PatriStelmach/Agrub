@@ -9,6 +9,7 @@ import 'package:alert_app/screens/settings_screen.dart';
 import 'package:alert_app/screens/user_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:alert_app/l10n/app_localizations.dart';
 
 class GeneralLayout extends StatefulWidget {
   const GeneralLayout({super.key});
@@ -25,7 +26,6 @@ class _GeneralLayoutState extends State<GeneralLayout>
     // Rejestrujemy nasłuchiwanie powrotu z tła dla całej aplikacji
     WidgetsBinding.instance.addObserver(this);
 
-    // Opcjonalnie: synchronizujemy przy starcie aplikacji od zera
     _syncAllData();
   }
 
@@ -56,15 +56,33 @@ class _GeneralLayoutState extends State<GeneralLayout>
     }
   }
 
+  String _getScreenTitle(String screenName, AppLocalizations t) {
+    switch (screenName) {
+      case 'Alerts':
+        return t.layout_menu_alerts;
+      case 'Plugins':
+        return t.layout_menu_plugins;
+      case 'Settings':
+        return t.layout_menu_settings;
+      case 'Debug':
+        return t.layout_menu_debug;
+      case 'User':
+        return t.layout_menu_user;
+      default:
+        return t.layout_menu_home;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final layoutViewModel = context.watch<GeneralLayoutViewModel>();
+    final t = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          layoutViewModel.activeScreenName.toUpperCase(),
-        ), // Dynamiczny tytuł
+          _getScreenTitle(layoutViewModel.activeScreenName, t).toUpperCase(),
+        ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(4.0),
           child: Container(color: Colors.black, height: 4.0),
@@ -74,10 +92,10 @@ class _GeneralLayoutState extends State<GeneralLayout>
       drawer: Drawer(
         child: Column(
           children: [
-            const DrawerHeader(child: Center(child: Text("ALERT MENU"))),
+            DrawerHeader(child: Center(child: Text(t.layout_menu_header))),
             ListTile(
               leading: const Icon(Icons.home),
-              title: const Text("Home"),
+              title: Text(t.layout_menu_home),
               onTap: () {
                 layoutViewModel.changePage('Home');
                 Navigator.pop(context);
@@ -85,7 +103,7 @@ class _GeneralLayoutState extends State<GeneralLayout>
             ),
             ListTile(
               leading: const Icon(Icons.warning),
-              title: const Text("Alerts"),
+              title: Text(t.layout_menu_alerts),
               onTap: () {
                 layoutViewModel.changePage('Alerts');
                 Navigator.pop(context);
@@ -93,7 +111,7 @@ class _GeneralLayoutState extends State<GeneralLayout>
             ),
             ListTile(
               leading: const Icon(Icons.computer_rounded),
-              title: const Text("Plugins"),
+              title: Text(t.layout_menu_plugins),
               onTap: () {
                 layoutViewModel.changePage('Plugins');
                 Navigator.pop(context);
@@ -101,7 +119,7 @@ class _GeneralLayoutState extends State<GeneralLayout>
             ),
             ListTile(
               leading: const Icon(Icons.settings),
-              title: const Text("Settings"),
+              title: Text(t.layout_menu_settings),
               onTap: () {
                 layoutViewModel.changePage('Settings');
                 Navigator.pop(context);
@@ -109,20 +127,21 @@ class _GeneralLayoutState extends State<GeneralLayout>
             ),
             ListTile(
               leading: const Icon(Icons.person_3_outlined),
-              title: const Text("User"),
+              title: Text(t.layout_menu_user),
               onTap: () {
                 layoutViewModel.changePage('User');
                 Navigator.pop(context);
               },
             ),
-            ListTile(
-              leading: const Icon(Icons.warning),
-              title: const Text("Debug"),
-              onTap: () {
-                layoutViewModel.changePage('Debug');
-                Navigator.pop(context);
-              },
-            ),
+            // Commenting way to debug screen for now
+            // ListTile(
+            //   leading: const Icon(Icons.warning),
+            //   title: const Text(t.layout_menu_debug),
+            //   onTap: () {
+            //     layoutViewModel.changePage('Debug');
+            //     Navigator.pop(context);
+            //   },
+            // ),
           ],
         ),
       ),
