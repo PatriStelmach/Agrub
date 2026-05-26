@@ -8,6 +8,7 @@ import pl.pjatk.alertwip.dto.GroupResponseDTO;
 import pl.pjatk.alertwip.dto.UserResponseDTO;
 import pl.pjatk.alertwip.model.User;
 import pl.pjatk.alertwip.repository.UserRepository;
+import pl.pjatk.alertwip.service.AlertActionService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,10 +21,14 @@ public class UserController {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AlertActionService alertActionService;
 
-    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserController(UserRepository userRepository,
+                          PasswordEncoder passwordEncoder,
+                          AlertActionService alertActionService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.alertActionService = alertActionService;
     }
 
     @GetMapping
@@ -54,7 +59,7 @@ public class UserController {
         return ResponseEntity.ok(mapToDTO(savedUser));
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMINISTRATOR')")
     public ResponseEntity<UserResponseDTO> editUser(@PathVariable Long id, @RequestBody User userDetails) {
         User user = userRepository.findById(id)
@@ -65,6 +70,7 @@ public class UserController {
         user.setRole(userDetails.getRole());
         user.setActive(userDetails.isActive());
         user.setGroups(userDetails.getGroups());
+        user.setAutoLogoutMinutes(userDetails.getAutoLogoutMinutes());
 
         User updatedUser = userRepository.save(user);
         return ResponseEntity.ok(mapToDTO(updatedUser));
@@ -137,5 +143,15 @@ public class UserController {
         userRepository.save(user);
 
         return ResponseEntity.ok(Map.of("message", "Hasło zostało pomyślnie zmienione."));
+    }
+
+    @GetMapping("/{id}/actions")
+    public ResponseEntity<?> getAllActionsByUsers(@PathVariable Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Nie znaleziono użytkownika o ID: " + id));
+
+        String authorIdentifier = user.getUsername();
+        List<?> userActions = alertActionService.getActionsByAuthor(authorIdentifier);
+        return ResponseEntity.ok(userActions);
     }
 }
