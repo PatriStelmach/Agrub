@@ -16,7 +16,7 @@ import {tableCaption, dataTable, tableHeaders, hoverListRow} from "@/assets/cssF
 import {useSort} from "@/composables/sorting.js";
 import {ButtonGroup} from "@/components/ui/button-group";
 import {Button} from "@/components/ui/button";
-import { IconDownload, IconSourceCode} from "@tabler/icons-vue";
+import { IconDownload, IconCode} from "@tabler/icons-vue";
 import {ref, watchEffect} from "vue";
 import {dateParser} from "@/composables/dateParser.js";
 import LoadingTable from "@/helpers_components/LoadingTable.vue";
@@ -91,8 +91,7 @@ const getDetails = async (plugin: LibraryPlugin) => {
             </TableCell>
             <DateCell  :date="dateParser(plugin.createdAt).toDate"></DateCell>
             <TableCell >{{plugin.weight}} Kb</TableCell>
-            <TableCell>
-              <ButtonGroup>
+            <TableCell class="flex space-x-2 ">
                 <PluginDetailsDialog
                   :editable="false"
                   :code="plugin.code ?? ''"
@@ -101,9 +100,9 @@ const getDetails = async (plugin: LibraryPlugin) => {
                 >
                   <Button
                     @click="getDetails(plugin)"
-                    variant="orange_outline"
+                    variant="blue_outline"
                   >
-                    <IconSourceCode/>
+                    <IconCode/>
                   </Button>
                 </PluginDetailsDialog>
 
@@ -114,7 +113,6 @@ const getDetails = async (plugin: LibraryPlugin) => {
                 >
                   <IconDownload/>
                 </Button>
-              </ButtonGroup>
             </TableCell>
           </TableRow>
         </TableBody>

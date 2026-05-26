@@ -233,6 +233,7 @@ export interface WazuhConfig {
   wazuh_enabled: boolean
   wazuh_warning_level: number
   wazuh_critical_level: number
+  wazuh_info_as_alerts: boolean
 }
 //tak przychodzi z api
 export interface NagiosConfig {
@@ -258,6 +259,7 @@ export interface MonitoringSystemsConfig  {
   enabled: boolean
   wazuh_warning_level?: number
   wazuh_critical_level?: number
+  wazuh_info_as_alerts?: boolean
 }
 
 //tak przychodzi z api
@@ -268,6 +270,7 @@ export interface AlertSystemSettings {
   wazuh_enabled: boolean
   wazuh_warning_level: number
   wazuh_critical_level: number
+  wazuh_info_as_alerts: boolean
 
   nagios_url: string
   nagios_enabled: boolean

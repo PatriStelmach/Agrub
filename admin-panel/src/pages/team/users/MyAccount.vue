@@ -98,7 +98,7 @@ watch(tagsForEdit, (val) => {
         <ChangePasswordDialog>
           <Button
             type="button"
-            variant="orange_outline"
+            :variant="isEditMode ? 'blue_outline' : 'green_outline'"
           >
             Change password
             <IconLock class="size-4"/>
@@ -129,19 +129,20 @@ watch(tagsForEdit, (val) => {
             </Avatar>
 
             <FormInput autocomplete="name" name="firstname" label="Firstname" orientation="vertical">
-              <IconLabel class="size-4"/>
+              <IconLabel class="size-4 mb-1"/>
             </FormInput>
             <FormInput name="surname" label="Surname" orientation="vertical">
-              <IconLabel class="size-4"/>
+              <IconLabel class="size-4 mb-1"/>
             </FormInput>
             <FormInput autocomplete="email" type="email" name="email" label="E-mail" orientation="vertical">
-              <IconMail class="size-4"/>
+              <IconMail class="size-4 mb-1"/>
             </FormInput>
             <FormNumberInput :min="0"  name="autoLogoutMinutes" label="Auto logout (in minutes)" orientation="vertical" autocomplete="auto-logout">
-              <IconLogout class="size-4"/>
+              <IconLogout class="size-4 mb-1"/>
             </FormNumberInput>
 
             <div class="space-x-2 flex items-center" >
+              <IconCalendarEvent class="size-4 mb-1" />
               <h1 :class="bigNameLabel">Last password change:</h1>
               <div class="text-sm text-comment  space-x-2">{{user.lastPasswordChangeDate ? dateParser(user.lastPasswordChangeDate).fullDate : '--------' }}</div>
             </div>

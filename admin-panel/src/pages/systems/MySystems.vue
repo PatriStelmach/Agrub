@@ -40,11 +40,11 @@ watchEffect(() => {
 })
 
 const onCloseAndSave = () => {
-  router.replace({path: '/my_systems'})
+  router.replace({path: '/settings/systems'})
 }
 
 const onEdit = (system: string) => {
-  router.replace({path: `/my_systems/${system}`})
+  router.replace({path: `/settings/systems/${system}`})
 }
 
 </script>

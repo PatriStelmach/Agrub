@@ -9,7 +9,7 @@ const props = defineProps<{
 
 <template>
   <div
-    :class="`flex justify-center items-center tabular-nums min-w-10 max-w-20  h-6 text-center font-extrabold text-md border-3 shadow-[0px_2px_10px_2px] light:shadow-md
+    :class="`flex justify-center items-center tabular-nums min-w-10 max-w-20  h-6 text-center font-extrabold text-md! border-3 shadow-[0px_2px_10px_2px] light:shadow-md
                  shadow-severity-${severity}/70 border-severity-${severity}  bg-severity-${severity}/30 rounded-sm  ${props.class}`">
     <span :class="`text-severity-${severity}`" >{{severity}}</span>
   </div>

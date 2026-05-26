@@ -75,14 +75,14 @@ const link = (action: ActionResponse) => {
     :class="`mx-auto overflow-auto ${props.class} `">
     <Table :class="`${dataTable}  overflow-x-scroll max-w-[${maxW}] `">
       <TableHeader class="h-8">
-        <TableRow v-if="!sortedData.length">
+        <TableRow v-if="!sortedData.length || areActionsLoading">
           <TableHead colspan="6" class="px-4 py-8 text-center text-slate-400 italic">
             No actions recorded yet.
           </TableHead>
         </TableRow>
         <TableRow v-else :class="tableHeaders">
           <SortableHead keyName="ackUpdate" label="ACK" class="w-7/100" :sort-key="sortKey as string" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-          <TableHead class="px-0 max-md:w-18/100 w-14/100">
+          <TableHead class="px-2 max-md:w-18/100 w-14/100">
           <span
             class=" items-center h-full truncate mx-0  font-bold text-sm lg:text-md xl:text-lg 2xl:text:xl">
             Severity
@@ -110,7 +110,7 @@ const link = (action: ActionResponse) => {
               </p>
             </TableCell>
             <TableCell >
-              <div class="flex space-x-2 items-center" v-if="action.newSeverity">
+              <div class="flex space-x-1 items-center" v-if="action.newSeverity">
                 <SeverityDiv :severity="action.previousSeverity"/>
                 <span :class="`bg-linear-to-r from-severity-${action.previousSeverity} to-severity-${action.newSeverity} bg-clip-text text-md text-transparent font-extrabold `">
                   ➠

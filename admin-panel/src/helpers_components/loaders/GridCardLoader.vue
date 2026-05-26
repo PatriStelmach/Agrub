@@ -5,6 +5,6 @@ import {Skeleton} from "@/components/ui/skeleton";
 <template>
   <div
     :class="gridSkeletons">
-    <Skeleton v-for="(_, i) in Array.from({ length: 21})" :key="i" class="w-full h-44"/>
+    <Skeleton v-for="(_, i) in Array.from({ length: 30})" :key="i" class="w-full h-44"/>
   </div>
 </template>

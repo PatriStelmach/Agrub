@@ -96,12 +96,12 @@ watch(isDialogOpen, (newValue, oldValue) => {
                 <DialogDescription>Review and add new actions</DialogDescription>
               </DialogHeader>
               <div class="flex flex-col ">
-                <div class="grid gap-y-6 *:flex *:space-x-2 *:items-start [&_p]:text-md! [&_p]:text-comment border-b-2 pb-2">
+                <div class="grid gap-y-6 *:flex *:space-x-2 *:items-center [&_p]:text-lg [&_p]:text-comment border-b-2 pb-2">
                   <div >
                     <h1 :class="bigNameLabel">Subject: </h1>
                     <p id="subject"  > {{ props.alert.subject}}</p>
                   </div>
-                  <div >
+                  <div class="items-start!" >
                     <h1 :class="bigNameLabel">Message: </h1>
                     <p id="alert-message" > {{ props.alert.message}}</p>
                   </div>

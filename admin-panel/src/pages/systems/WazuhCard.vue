@@ -42,7 +42,8 @@ const { handleSubmit, setValues } = useForm({
     wazuh_user: props.system.user,
     wazuh_password_SECRET: '',
     wazuh_critical_level: props.system.wazuh_critical_level,
-    wazuh_warning_level: props.system.wazuh_warning_level
+    wazuh_warning_level: props.system.wazuh_warning_level,
+    wazuh_info_as_alerts: props.system.wazuh_info_as_alerts,
   },
 })
 
@@ -65,6 +66,9 @@ const onSubmit = handleSubmit(async (values) => {
   if (!!values.wazuh_password_SECRET) {
     changedValues.wazuh_password_SECRET = values.wazuh_password_SECRET
   }
+  if (values.wazuh_info_as_alerts !== props.system.wazuh_info_as_alerts) {
+    changedValues.wazuh_info_as_alerts = String(values.wazuh_info_as_alerts)
+  }
   if (Object.keys(changedValues).length === 0) {
     toast.info("No changes detected.")
     isLoading.value = false
@@ -84,6 +88,7 @@ const onEdit = () => {
     wazuh_warning_level: props.system.wazuh_warning_level,
     wazuh_critical_level: props.system.wazuh_critical_level,
     wazuh_password_SECRET: '',
+    wazuh_info_as_alerts: props.system.wazuh_info_as_alerts,
   })
   emit('edit', props.system.name)
 }
@@ -99,7 +104,7 @@ const onCancel = () => {
   <!-- EDIT CARD -->
   <Card
     v-if="props.isUnwrapped"
-    :class="gridSystemCardUnwrapped"
+    :class="`${gridSystemCardUnwrapped} h-164 xl:h-200 `"
   >
     <form id="wazuh-form" @submit.prevent="onSubmit">
       <CardHeader class="left-1/2 -translate-x-1/2 items-center relative">
@@ -111,7 +116,7 @@ const onCancel = () => {
           />
         </div>
       </CardHeader>
-      <CardDescription class="px-3 space-y-3 *:flex *:items-center *:mr-2 -mt-4 max-h-50 lg:max-h-60 xl:max-h-70 overflow-auto">
+      <CardDescription class="px-3 space-y-3 *:flex *:items-center *:mr-2 -mt-4 max-h-120 overflow-auto">
         <div>
           <div class="flex items-center space-x-2 text-label">
             <IconPower class="size-5 text-label"/>
@@ -201,7 +206,7 @@ const onCancel = () => {
           <IconBellExclamation class="size-5"/>
           <h1 :class="bigNameLabel">Warning level: </h1>
         </div>
-        <p class="text-lg text-comment">{{ system.wazuh_warning_level }}</p>
+        <p class="text-md text-comment">{{ system.wazuh_warning_level }}</p>
       </div>
       <div>
         <div class="flex items-center space-x-2 text-label">

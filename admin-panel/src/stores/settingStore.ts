@@ -21,6 +21,7 @@ export const useSettingStore = defineStore('setting-store', () => {
       enabled: systemFullSettings.value.wazuh_enabled,
       wazuh_warning_level: systemFullSettings.value.wazuh_warning_level,
       wazuh_critical_level: systemFullSettings.value.wazuh_critical_level,
+      wazuh_info_as_alerts: systemFullSettings.value.wazuh_info_as_alerts,
       name: 'WAZUH',
     }
   })
@@ -62,6 +63,7 @@ export const useSettingStore = defineStore('setting-store', () => {
           nagios_enabled: res.data.nagios_enabled === "true",
           zabbix_enabled: res.data.zabbix_enabled === "true",
           smtp_enabled: res.data.smtp_enabled === "true",
+          wazuh_info_as_alerts: res.data.wazuh_info_as_alerts === "true",
           wazuh_warning_level: Number(res.data.wazuh_warning_level),
           wazuh_critical_level: Number(res.data.wazuh_critical_level),
         }
