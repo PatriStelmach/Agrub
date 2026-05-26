@@ -22,6 +22,7 @@ export const wazuhSchema = toTypedSchema(
     wazuh_warning_level: z.number()
       .min(0, '0 is minimal warning level')
       .max(16, '16 is maximal warning level'),
+    wazuh_info_as_alerts: z.boolean(),
   })
     .superRefine((data, ctx) => {
       if(data.wazuh_warning_level > data.wazuh_critical_level) {

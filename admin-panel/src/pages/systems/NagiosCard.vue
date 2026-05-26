@@ -85,7 +85,7 @@ const onCancel = () => {
   <!-- EDIT CARD -->
   <Card
     v-if="props.isUnwrapped"
-    :class="gridSystemCardUnwrapped"
+    :class="`${gridSystemCardUnwrapped} h-120 xl:h-160`"
   >
     <form id="nagios-form" @submit.prevent="onSubmit">
       <CardHeader class="left-1/2 -translate-x-1/2 items-center relative">
@@ -97,7 +97,7 @@ const onCancel = () => {
           />
         </div>
       </CardHeader>
-      <CardDescription class="px-3 space-y-3 *:flex *:items-center *:mr-2 -mt-4 max-h-50 lg:max-h-60 xl:max-h-70 overflow-auto">
+      <CardDescription class="px-3 space-y-3 *:flex *:items-center *:mr-2 -mt-4 max-h-76 overflow-auto">
         <div>
           <div class="flex items-center space-x-2 text-label">
             <IconPower class="size-5 text-label"/>

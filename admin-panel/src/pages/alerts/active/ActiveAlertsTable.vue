@@ -91,7 +91,7 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<ActiveAlert>(() =
           <TableCell >
             <RouterLink
               :to="(alert.originType === 'ZABBIX' || alert.originType === 'WAZUH' || alert.originType === 'NAGIOS') ?
-               `/my_systems/${alert.originType}` :
+               `/settings/systems/${alert.originType}` :
                 `/my_plugins/${alert.source}`">
               <Badge
                 class="whitespace-break-spaces"

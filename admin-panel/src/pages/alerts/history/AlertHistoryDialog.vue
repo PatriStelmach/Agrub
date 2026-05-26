@@ -53,7 +53,7 @@ watch(isDialogOpen, (newValue, oldValue) => {
     </DialogTrigger>
     <DialogContent
       :show-close-button="false"
-      :class=" 'max-w-280! h-180!' +
+      :class=" 'max-w-280! h-140!' +
         ` border-2 shadow-[0_0_1rem_2px] shadow-severity-${alert.severity}/70 border-severity-${alert.severity}/70 duration-500`">
       <Tabs>
         <TabsList class="absolute  right-4">
@@ -71,12 +71,12 @@ watch(isDialogOpen, (newValue, oldValue) => {
               Review alert details
             </DialogDescription>
           </DialogHeader>
-            <div class="grid gap-y-6 *:flex *:space-x-2 *:items-start [&_p]:text-md! [&_p]:text-comment  pb-2">
+            <div class="grid gap-y-4  *:flex *:space-x-2 *:items-center [&_p]:text-lg! [&_p]:text-comment  pb-2">
               <div >
                 <h1 :class="bigNameLabel">Subject: </h1>
                 <p id="subject"  > {{ props.alert.subject}}</p>
               </div>
-              <div >
+              <div class="items-start!" >
                 <h1 :class="bigNameLabel">Message: </h1>
                 <p id="alert-message" > {{ props.alert.message}}</p>
               </div>
@@ -88,7 +88,7 @@ watch(isDialogOpen, (newValue, oldValue) => {
                 <h1 :class="bigNameLabel">Origin: </h1>
                 <Badge variant="origin">{{ props.alert.originType}}</Badge>
               </div>
-              <div class="flex items-end!">
+              <div class="flex items-end">
                 <h1 :class="bigNameLabel">ACK: </h1>
                 <div class="flex items-end space-x-2">
                   <Button variant="outline" class="size-7 cursor-default">
@@ -99,7 +99,7 @@ watch(isDialogOpen, (newValue, oldValue) => {
                       v-else
                       class="size-5  text-red-badge "/>
                   </Button>
-                  <span class="text-comment">{{ alert.isAcknowledged ? 'Acknowledged' : 'Unacknowledged'  }}</span>
+                  <span class="text-comment text-lg">{{ alert.isAcknowledged ? 'Acknowledged' : 'Unacknowledged'  }}</span>
                 </div>
 
               </div>
@@ -119,7 +119,7 @@ watch(isDialogOpen, (newValue, oldValue) => {
           </DialogHeader>
           <ActionsList
             :userView="false"
-            max-h="32rem"
+            max-h="24rem"
             max-w="65rem"
             :actions="alert.actions"
           />

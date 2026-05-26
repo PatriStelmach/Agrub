@@ -270,7 +270,7 @@ const onEdit = (plugin: MyPlugin) => {
       class="border-l-2!"
       @click="changeStatus"
       :disabled="blockDeleteAndChangeStatus"
-      variant="orange_outline">
+      variant="blue_outline">
       On/Off
       <IconStatusChange/>
     </Button>
