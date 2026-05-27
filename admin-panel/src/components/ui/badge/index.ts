@@ -19,7 +19,7 @@ export const badgeVariants = cva(
         null:
           "border-red-badge/50 border-2  text-red-badge  bg-red-badge/20  text-xs",
         tags:
-          "border-blue-badge  border-2 text-blue-badge bg-blue-badge/20 hover:bg-blue-badge/10 cursor-pointer  " +
+          "border-blue-badge hover:-translate-y-[1px] border-2 text-blue-badge bg-blue-badge/20 hover:bg-blue-badge/10 cursor-pointer  " +
           " hover:scale-102 hover:shadow-blue-badge  mr-1 my-1 ",
         source:
           "border-transparent  border text-primary bg-input  " +
@@ -29,7 +29,7 @@ export const badgeVariants = cva(
           " hover:shadow-blue-badge  text-blue-badge hover:scale-102",
         ack_type:"border-green-badge/50 border-2  text-green-badge  bg-green-badge/20  text-xs",
         number:
-        " items-baseline bg-green-badge/60 h-5 min-w-5 rounded-full lg:h-6 lg:min-w-6 2xl:h-8 2xl:min-w-8 px-1  font-bold tabular-nums text-primary"
+        " items-start  bg-green-badge/70 h-5 min-w-5 px-1 rounded-full lg:text-xs! f tabular-nums text-primary"
       },
     },
     defaultVariants: {

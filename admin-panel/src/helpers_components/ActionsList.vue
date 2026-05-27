@@ -50,9 +50,9 @@ onMounted(async () => {
   }
 })
 
-const givenUser = (author: string) => {
+const givenUser = (author: string, withId: boolean) => {
   const user = userStore.allUsers.find(u => u.email === author)
-  return `${user?.firstname} ${user?.surname}`
+  return withId ? `${user?.id}/${user?.firstname} ${user?.surname}` : `${user?.firstname} ${user?.surname}`
 }
 
 const link = (action: ActionResponse) => {
@@ -63,7 +63,7 @@ const link = (action: ActionResponse) => {
     if (authStore.currentUser?.email === action.author)
       return '/team_members/my_account'
     else
-      return `/team_members/${givenUser(action.author)}`
+      return `/team_members/${givenUser(action.author, true)}`
   }
 
 }
@@ -129,7 +129,7 @@ const link = (action: ActionResponse) => {
                 :to="link(action)">
                 <span
                   class="hover:border-b font-semibold text-blue-badge/80 hover:border-b-blue-600 hover:text-blue-600 text-xs whitespace-break-spaces"
-                >{{ userView ? action.subject : `${givenUser(action.author)}` }}</span>
+                >{{ userView ? action.subject : `${givenUser(action.author, false)}` }}</span>
               </RouterLink>
             </TableCell>
             <TableCell class=" pr-2 tabular-nums text-comment whitespace-break-spaces">

@@ -101,7 +101,7 @@ watch(tagsForEdit, (val) => {
             :variant="isEditMode ? 'blue_outline' : 'green_outline'"
           >
             Change password
-            <IconLock class="size-4"/>
+            <IconLock class="size-5"/>
           </Button>
         </ChangePasswordDialog>
         <Button
@@ -118,8 +118,8 @@ watch(tagsForEdit, (val) => {
         </Button>
       </ButtonGroup>
     </TopH1Div>
-    <div class="w-full flex space-x-20 max-h-[80vh]  overflow-y-auto">
-      <div class="w-3/10 ml-4">
+    <div class="w-full flex space-x-10 max-h-[90vh]  overflow-y-auto">
+      <div class="w-3/10 ml-6">
         <form v-if="isEditMode" id="edit-user-form" @submit="onSubmit" class=" space-y-4 max-h-[70vh]  w-full overflow-auto">
           <div class="grid space-y-3 w-9/10">
             <Avatar class="size-14 rounded-full">
@@ -129,20 +129,20 @@ watch(tagsForEdit, (val) => {
             </Avatar>
 
             <FormInput autocomplete="name" name="firstname" label="Firstname" orientation="vertical">
-              <IconLabel class="size-4 mb-1"/>
+              <IconLabel class="size-5 mb-1"/>
             </FormInput>
             <FormInput name="surname" label="Surname" orientation="vertical">
-              <IconLabel class="size-4 mb-1"/>
+              <IconLabel class="size-5 mb-1"/>
             </FormInput>
             <FormInput autocomplete="email" type="email" name="email" label="E-mail" orientation="vertical">
-              <IconMail class="size-4 mb-1"/>
+              <IconMail class="size-5 mb-1"/>
             </FormInput>
             <FormNumberInput :min="0"  name="autoLogoutMinutes" label="Auto logout (in minutes)" orientation="vertical" autocomplete="auto-logout">
-              <IconLogout class="size-4 mb-1"/>
+              <IconLogout class="size-5 mb-1"/>
             </FormNumberInput>
 
             <div class="space-x-2 flex items-center" >
-              <IconCalendarEvent class="size-4 mb-1" />
+              <IconCalendarEvent class="size-5 mb-1" />
               <h1 :class="bigNameLabel">Last password change:</h1>
               <div class="text-sm text-comment  space-x-2">{{user.lastPasswordChangeDate ? dateParser(user.lastPasswordChangeDate).fullDate : '--------' }}</div>
             </div>
@@ -177,63 +177,70 @@ watch(tagsForEdit, (val) => {
           </Avatar>
 
 
-          <div class="grid space-y-3 **:flex **:items-center **:gap-2">
+          <div class="grid space-y-2 **:flex *:items-center **:gap-2">
             <div>
-              <div class="flex items-center">
-                <IconLabel class="size-4" />
+              <IconLabel class="size-5" />
+              <div class="flex items-baseline">
                 <h1 :class="bigNameLabel">Firstname: </h1>
+                <span class="text-comment">{{ user.firstname }}</span>
               </div>
-              <span class="text-comment">{{ user.firstname }}</span>
             </div>
+
             <div>
-              <div class="flex items-center">
-                <IconLabel class="size-4" />
+              <IconLabel class="size-5" />
+              <div class="flex items-baseline">
                 <h1 :class="bigNameLabel">Surname: </h1>
+                <span class="text-comment">{{ user.surname }}</span>
               </div>
-              <span class="text-comment">{{ user.surname }}</span>
             </div>
+
             <div>
-              <div>
-                <IconMail class="size-4" />
+              <IconMail class="size-5" />
+              <div class="flex items-baseline">
                 <h1 :class="bigNameLabel">Email: </h1>
+                <span class="text-comment">{{ user.email }}</span>
               </div>
-              <span class="text-comment">{{ user.email }}</span>
             </div>
+
             <div>
-              <div>
-                <IconLogout class="size-4" />
+              <IconLogout class="size-5" />
+              <div class="flex items-baseline">
                 <h1 :class="bigNameLabel">Auto logout: </h1>
+                <span class="text-comment">{{ user.autoLogoutMinutes ?? '—' }} min</span>
               </div>
-              <span class="text-comment">{{ user.autoLogoutMinutes ?? '—' }} min</span>
             </div>
+
             <div>
-              <div>
-                <IconUserKey class="size-4"/>
+              <IconUserKey class="size-5"/>
+              <div class="flex items-center gap-2">
                 <h1 :class="bigNameLabel">User role: </h1>
+                <span class="text-comment flex items-center gap-1">
+        <component :is="user.role === 'ADMINISTRATOR' ? IconKey : IconTool" class="size-5" :class="{'rotate-90' : user.role === 'TECHNICIAN'}" />
+        <span>{{ user.role }}</span>
+      </span>
               </div>
-              <span class="text-comment">
-            <component :is="user.role === 'ADMINISTRATOR' ? IconKey : IconTool" class="size-5" :class="{'rotate-90' : user.role === 'TECHNICIAN'}" />
-            <span>{{ user.role }}</span>
-          </span>
             </div>
+
             <div>
-              <div>
-                <IconCalendarEvent class="size-4" />
-                <h1 :class="bigNameLabel"> Last password change: </h1>
+              <IconCalendarEvent class="size-5" />
+              <div class="flex items-baseline">
+                <h1 :class="bigNameLabel">Last password change: </h1>
+                <span class="text-comment">{{ user.lastPasswordChangeDate ? dateParser(user.lastPasswordChangeDate).fullDate : '--------' }}</span>
               </div>
-              <span class="text-comment">{{ user.lastPasswordChangeDate ? dateParser(user.lastPasswordChangeDate).fullDate : '--------' }}</span>
             </div>
+
             <div>
-              <div>
-                <IconUsersGroup class="size-4" />
+              <IconUsersGroup class="size-5" />
+              <div class="flex items-base gap-2 flex-wrap">
                 <h1 :class="bigNameLabel">User groups:</h1>
+                <RouterLink v-for="g in user.groups" :key="g.id" :to="`/groups/edit_group/${g.id}/${g.name}`">
+                  <Badge class="mt-0!" variant="tags">
+                    {{ g.name }}
+                  </Badge>
+                </RouterLink>
               </div>
-              <RouterLink v-for="g in user.groups" :key="g.id" :to="`/groups/edit_group/${g.id}/${g.name}`">
-                <Badge class="mt-0!" variant="tags" >
-                  {{ g.name }}
-                </Badge>
-              </RouterLink>
             </div>
+
           </div>
         </div>
       </div>
@@ -245,7 +252,7 @@ watch(tagsForEdit, (val) => {
               :userId="user.id"
               :userView="true"
               max-w="65vw"
-              max-h="72vh"/>
+              max-h="80vh"/>
           </ul>
         </div>
       </div>

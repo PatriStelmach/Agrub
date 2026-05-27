@@ -9,7 +9,7 @@ const props = defineProps<{
   <TransitionGroup
     :class="props.class"
     tag="div"
-    name="slide-fade-card"
+    name="fade"
   >
     <slot/>
   </TransitionGroup>

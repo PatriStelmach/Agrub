@@ -149,7 +149,7 @@ const changeName = async () => {
         </UsersCombobox>
       </ButtonGroup>
     </TopH1Div>
-    <span class="font-bold italic mb-8 items-center border-b-3 h-12 border-blue-badge/70 w-fit mx-6 flex space-x-2 text-xl">
+    <span class="font-bold italic mb-8 items-center border-b-3 h-12 border-blue-badge/50 w-fit mx-6 flex space-x-2 text-xl">
       <span class=" tems-baseline w-fit">Group name:</span>
       <span v-if="editNameOpen" class="flex justify-center relative w-fit">
         <Input
@@ -202,7 +202,7 @@ const changeName = async () => {
                   </div>
                 </li>
                 <li v-else :class="hoverListRow('px-2')" v-for="user in groupUsers" :key="user.id">
-                  <RouterLink :to=" authStore.currentUser?.id === user.id ? '/team_members/my_account' : `/team_members/${user.firstname} ${user.surname}`">
+                  <RouterLink :to=" authStore.currentUser?.id === user.id ? '/team_members/my_account' : `/team_members/${user.id}/${user.firstname} ${user.surname}`">
                     <div
                       v-if="user.id"
                       class="space-x-2 cursor-pointer flex items-center py-2 px-2 pr-6 relative">

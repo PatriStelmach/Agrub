@@ -24,10 +24,13 @@ const { filteredData,  searchFilter } =
   useClientSearchFilter<User>(() => userStore.allUsers,(user) => `${user.firstname} ${user.surname}` )
 
 onMounted(async () => {
-  await Promise.all([
-    userStore.getAllUsersRequest(),
-    userStore.getAllGroupsRequest()
-  ]).finally(() => isLoading.value = false)
+  if(userStore.allUsers.length === 0 || userStore.allGroups.length === 0) {
+    await Promise.all([
+      userStore.getAllUsersRequest(),
+      userStore.getAllGroupsRequest()
+    ]).finally(() => isLoading.value = false)
+  }
+  else isLoading.value = false;
 })
 
 
