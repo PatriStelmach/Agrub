@@ -1,9 +1,23 @@
 <script setup lang="ts">
 import {
-  IconAlertTriangle, IconDatabase,
-  IconHistory, IconPhoneRinging,
-  IconScript, IconSitemap, IconDeviceDesktopAnalytics,
-  IconUpload, IconUsers, IconUsersGroup, IconSettings, IconKey, IconPassword, IconLockCode
+  IconAlertTriangle,
+  IconDatabase,
+  IconHistory,
+  IconPhoneRinging,
+  IconScript,
+  IconSitemap,
+  IconDeviceDesktopAnalytics,
+  IconUpload,
+  IconClock,
+  IconCalendar,
+  IconUsers,
+  IconUsersGroup,
+  IconSettings,
+  IconKey,
+  IconPassword,
+  IconLockCode,
+  IconCode,
+  IconHelp
 } from "@tabler/icons-vue";
 import {
   Sidebar, SidebarContent,
@@ -14,9 +28,12 @@ import {
 
 import NavUser from "@/pages/globals/navbar/NavUser.vue";
 import {useRoute} from "vue-router";
+import {globals} from "@/composables/globals.ts";
+import {onMounted} from "vue";
 
+const { time, dayMonthYear, weekday, changeTime } = globals()
 const route = useRoute()
-
+onMounted(() => changeTime())
 
 const navItems = [
   {
@@ -29,7 +46,7 @@ const navItems = [
   {
     label: 'Plugins',
     links: [
-      { label: 'My plugins', to: 'my_plugins', icon: IconScript },
+      { label: 'My plugins', to: 'my_plugins', icon: IconCode },
       { label: 'Library', to: 'plugins_library', icon: IconDatabase },
     ]
   },
@@ -37,15 +54,21 @@ const navItems = [
     label: 'Team',
     links: [
       { label: 'Team members', to: 'team_members', icon: IconUsers },
-      { label: 'Groups', to: 'groups', icon: IconUsersGroup },
+      { label: 'User groups', to: 'groups', icon: IconUsersGroup },
     ],
   },
   {
     label: 'Settings',
     links: [
-      { label: 'Systems', to: 'settings/systems', icon: IconDeviceDesktopAnalytics },
+      { label: 'External systems', to: 'settings/systems', icon: IconDeviceDesktopAnalytics },
       { label: 'Configuration', to: 'settings/configuration', icon: IconSettings },
       { label: 'API keys', to:  'settings/api_keys', icon: IconLockCode}
+    ]
+  },
+  {
+    label: 'Help',
+    links: [
+      { label: 'Tutorial', to: 'help', icon: IconHelp },
     ]
   }
 
@@ -59,6 +82,7 @@ const navItems = [
       <div class="text-xl space-x-2 flex pt-4"><IconPhoneRinging/>
         <span>Alert</span>
       </div>
+
     </SidebarHeader>
     <SidebarContent>
       <SidebarGroup>
@@ -71,11 +95,10 @@ const navItems = [
                 </SidebarGroupLabel>
                   <RouterLink
                     :class="{'bg-blue-badge/50 border-blue-badge' : route.name?.toString().includes(link.to.toString())}"
-                    class="flex xl:text-lg ml-3 border-l-4 w-full hover:bg-input rounded-[0_0.5rem_0.5rem_0]"
+                    class="flex text-sm items-center xl:text-lg ml-3 border-l-4 w-full gap-x-2 p-2 hover:bg-input rounded-[0_0.5rem_0.5rem_0]"
                     v-for="link in item.links" :key="link.to" :to="{ name: link.to}">
-                    <div class="flex items-center gap-x-2 p-2 ml-1 ">
-                      <component class="size-5  xl:size-6" :is="link.icon"/> {{link.label}}
-                    </div>
+                      <component class="size-5  xl:size-6" :is="link.icon"/>
+                    <span>{{link.label}}</span>
                   </RouterLink>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -84,8 +107,24 @@ const navItems = [
       </SidebarGroup>
     </SidebarContent>
     <SidebarFooter>
+      <div class="grid space-y-2 **:text-comment justify-between *:items-center border-b-3 py-2">
+        <div class="flex space-x-1 ">
+          <IconClock class="size-4"/>
+          <span class="text-xs mt-1 ">
+        {{ time }}
+        </span>
+        </div>
+        <div class="flex space-x-1">
+          <IconCalendar class="size-4"/>
+          <span class="text-xs mt-1">
+            {{ dayMonthYear }}
+          </span>
+          <span class="text-xs mt-1">
+            {{ weekday }}
+          </span>
+        </div>
+      </div>
       <NavUser/>
     </SidebarFooter>
-    <SidebarRail/>
   </Sidebar>
 </template>

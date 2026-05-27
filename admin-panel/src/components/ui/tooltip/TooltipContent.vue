@@ -6,7 +6,7 @@ import { TooltipArrow, TooltipContent, TooltipPortal, useForwardPropsEmits } fro
 import { cn } from "@/lib/utils"
 
 defineOptions({
-  inheritAttrs: false,
+  inheritAttrs: true,
 })
 
 const props = withDefaults(defineProps<TooltipContentProps & { class?: HTMLAttributes["class"] }>(), {

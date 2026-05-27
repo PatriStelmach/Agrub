@@ -7,17 +7,20 @@ import {
   bigNameLabel,
   gridSystemCard,
   gridSystemCardUnwrapped, smallNameLabel
-} from "@/assets/cssFunctions.ts"
-import { IconDeviceFloppy, IconLock, IconPower, IconAlertTriangle, IconUser, IconBellExclamation, IconLink, IconCheck, IconEdit, IconX } from "@tabler/icons-vue"
+} from "@/assets/cssFunctions.js"
+import { IconDeviceFloppy, IconLogs, IconLock, IconPower, IconAlertTriangle, IconUser, IconBellExclamation, IconLink, IconCheck, IconEdit, IconX } from "@tabler/icons-vue"
 import { Card, CardDescription, CardFooter, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import FormInput from "@/helpers_components/form/FormInput.vue"
-import type { MonitoringSystemsConfig} from "@/types/types.ts";
+import type { MonitoringSystemsConfig} from "@/types/types.js";
 import {useForm} from "vee-validate";
-import {wazuhSchema} from "@/helpers_functions/formSchemas.ts";
-import {useSettingStore} from "@/stores/settingStore.ts";
+import {wazuhSchema} from "@/helpers_functions/formSchemas.js";
+import {useSettingStore} from "@/stores/settingStore.js";
 import {toast} from "vue-sonner";
 import FormNumberInput from "@/helpers_components/form/FormNumberInput.vue";
+import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
+import {Label} from "@/components/ui/label";
+import MyFieldLabel from "@/helpers_components/form/MyFieldLabel.vue";
 
 const props = defineProps<{
   system: MonitoringSystemsConfig
@@ -35,7 +38,7 @@ const settingStore = useSettingStore()
 const isLoading = ref(false)
 const colorMode = useColorMode()
 
-const { handleSubmit, setValues } = useForm({
+const { handleSubmit, setValues, setFieldValue, values } = useForm({
   validationSchema: wazuhSchema,
   initialValues: {
     wazuh_url: props.system.url,
@@ -76,7 +79,10 @@ const onSubmit = handleSubmit(async (values) => {
   }
 
   await settingStore.updateSystemFullSettingsRequest(changedValues)
-    .then(() => emit('save'))
+    .then(() => {
+      toast.success('Wazuh configuration updated')
+      emit('save')
+    })
     .catch((error) => toast.error(`Error updating system configuration: ${error.message}`))
     .finally(() => isLoading.value = false)
 })
@@ -104,7 +110,7 @@ const onCancel = () => {
   <!-- EDIT CARD -->
   <Card
     v-if="props.isUnwrapped"
-    :class="`${gridSystemCardUnwrapped} h-164 xl:h-200 `"
+    :class="`${gridSystemCardUnwrapped} h-160 xl:h-200 `"
   >
     <form id="wazuh-form" @submit.prevent="onSubmit">
       <CardHeader class="left-1/2 -translate-x-1/2 items-center relative">
@@ -116,7 +122,7 @@ const onCancel = () => {
           />
         </div>
       </CardHeader>
-      <CardDescription class="px-3 space-y-3 *:flex *:items-center *:mr-2 -mt-4 max-h-120 overflow-auto">
+      <CardDescription class="px-3 space-y-3 *:flex *:items-center *:mr-2 py-4 -mt-4 max-h-115 border-y-3 overflow-auto">
         <div>
           <div class="flex items-center space-x-2 text-label">
             <IconPower class="size-5 text-label"/>
@@ -153,6 +159,23 @@ const onCancel = () => {
           <FormNumberInput orientation="vertical" name="wazuh_critical_level" label="Critical level: ">
             <IconAlertTriangle class="size-5"/>
           </FormNumberInput>
+        </div>
+        <div>
+          <MyFieldLabel class="mr-2" for="wazuh_info_as_alerts" text="Info as alerts:"/>
+          <RadioGroup
+            @update:model-value="(val) => setFieldValue('wazuh_info_as_alerts', val === 'true')"
+            :model-value="values.wazuh_info_as_alerts ? 'true' : 'false'"
+            :default-value="system.wazuh_info_as_alerts ? 'true' : 'false'"
+            class="flex space-x-2">
+            <div class="flex items-center space-x-2">
+              <RadioGroupItem class="size-4 lg:size-5 xl:size-6 2xl:size-8" id="radio-true" value="true" />
+              <Label class="cursor-pointer text-green-badge"  for="radio-true">True</Label>
+            </div>
+            <div class="flex items-center space-x-2">
+              <RadioGroupItem class="size-4 lg:size-5 xl:size-6 2xl:size-8" id="radio-false" value="false" />
+              <Label class="cursor-pointer text-destructive" for="radio-false">False</Label>
+            </div>
+          </RadioGroup>
         </div>
       </CardDescription>
       <CardFooter class="bottom-4 absolute justify-between w-full">
@@ -206,7 +229,7 @@ const onCancel = () => {
           <IconBellExclamation class="size-5"/>
           <h1 :class="bigNameLabel">Warning level: </h1>
         </div>
-        <p class="text-md text-comment">{{ system.wazuh_warning_level }}</p>
+        <p class="text-lg text-comment">{{ system.wazuh_warning_level }}</p>
       </div>
       <div>
         <div class="flex items-center space-x-2 text-label">
@@ -214,6 +237,13 @@ const onCancel = () => {
           <h1 :class="bigNameLabel">Critical level: </h1>
         </div>
         <p class="text-lg text-comment">{{ system.wazuh_critical_level }}</p>
+      </div>
+      <div>
+        <div class="flex items-center space-x-2 text-label">
+          <IconLogs class="size-5"/>
+          <h1 :class="bigNameLabel">Info as alerts: </h1>
+        </div>
+        <component :is="system.wazuh_info_as_alerts ? IconCheck : IconX" :class="system.wazuh_info_as_alerts ? 'text-green-badge' : 'text-red-badge'" />
       </div>
 
     </CardDescription>

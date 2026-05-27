@@ -165,8 +165,7 @@ export const downloadPluginRequest = async (plugin: LibraryPlugin) => {
     if (res.status === 200) {
       toast.success(`Successfully downloaded "${plugin.fileName}"`);
     }
-  }
-  catch (error) {
+  } catch (error) {
     toast.error(`Error downloading plugin: ${error}`);
   }
 }
@@ -177,8 +176,7 @@ export const createGroupRequest = async (name: string) => {
     if (res.status === 200) {
       return res.data
     }
-  }
-  catch (error) {
+  } catch (error) {
     throw (error)
   }
 }
@@ -189,8 +187,7 @@ export const getUserDetailsRequest = async () => {
     if (res.status === 200) {
       return res.data
     }
-  }
-  catch (error) {
+  } catch (error) {
     throw (error)
   }
 }
@@ -225,8 +222,7 @@ export const getUserActions = async (id: number) => {
     if (res.status === 200) {
       return res.data ?? []
     }
-  }
-  catch (error) {
+  } catch (error) {
     throw (error)
   }
 }

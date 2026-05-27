@@ -195,21 +195,6 @@ export interface PluginDetails
   code: string,
 }
 
-export interface SystemsStatus {
-  wazuh_enabled: boolean
-  nagios_enabled: boolean
-  zabbix_enabled: boolean
-}
-
-export interface ImportPlugin {
-  name: string,
-  creator: string,
-  language: Language,
-  code: string,
-  description: string,
-  tags: string[],
-  log: boolean
-}
 
 export interface LibraryPlugin
 {
@@ -287,35 +272,25 @@ export interface AlertSystemSettings {
   smtp_password_SECRET?: string
   smtp_enabled: boolean
 
-  external_system_sync_timer: string
-  scripts_execution_timeout_seconds: string
+  external_system_sync_timer: number
+  scripts_execution_timeout_seconds: number
 
-  SECURITY_PASSWORD_LIFETIME_DAYS: string
-  SECURITY_ACCESS_TOKEN_EXP_MINUTES: string
-  SECURITY_REFRESH_TOKEN_EXP_HOURS: string
+  SECURITY_PASSWORD_LIFETIME_DAYS: number
+  SECURITY_ACCESS_TOKEN_EXP_MINUTES: number
+  SECURITY_REFRESH_TOKEN_EXP_HOURS: number
   SECURITY_AD_DOMAIN: string
   SECURITY_AD_URL: string
   SECURITY_LDAP_BASE_DN: string
   SECURITY_LDAP_USER_DN_PATTERN: string
 }
 
-export interface System
-{
+export interface ApiKey {
+  active: boolean,
   id: number,
-  name: string,
-  img: string,
-  openSource: boolean,
-  description: string
+  description: string,
+  createdAt: Date,
+  token: string | null,
 }
-
-export interface fileType
-{
-  id:number,
-  file:File,
-  progress:number
-}
-
-
 
 export interface GroupDetails {
   id?: number,
@@ -323,8 +298,6 @@ export interface GroupDetails {
   rules: Rule[],
   users: User[]
 }
-
-
 
 export interface Rule {
   id?: number
