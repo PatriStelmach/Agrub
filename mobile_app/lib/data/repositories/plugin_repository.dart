@@ -3,10 +3,12 @@ import 'package:alert_app/locator.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 
-class PluginsRepository extends ChangeNotifier {
+class PluginRepository extends ChangeNotifier {
   final Map<String, Plugin> pluginsCache = {};
 
   final Dio dio = locator<Dio>();
+
+  PluginRepository(Dio dio);
 
   Future<void> updateAllPlugins() async {
     try {

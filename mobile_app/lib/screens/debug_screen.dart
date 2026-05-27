@@ -56,7 +56,7 @@ class DebugScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: ElevatedButton(
                   onPressed: () {
-                    Provider.of<PluginsRepository>(
+                    Provider.of<PluginRepository>(
                       context,
                       listen: false,
                     ).updateAllPlugins();
@@ -77,7 +77,7 @@ class DebugScreen extends StatelessWidget {
                     Provider.of<AlertRepository>(
                       context,
                       listen: false,
-                    ).updateAllAlerts();
+                    ).fetchAllAlerts();
                   },
                   child: Text('Push - new alerts(with extreme)'),
                 ),

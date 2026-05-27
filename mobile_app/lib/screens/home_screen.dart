@@ -11,8 +11,8 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context)!;
     final homeViewModel = context.watch<HomeViewModel>();
-
-    final DateTime lastPingTime = homeViewModel.repository.lastPing;
+    //T0D0: implement pinging in alertviewmodel or somewhere
+    final DateTime lastPingTime = DateTime.now();
     final String shortPingTime =
         "${lastPingTime.hour}:${lastPingTime.minute.toString().padLeft(2, '0')}:${lastPingTime.second.toString().padLeft(2, '0')}";
 

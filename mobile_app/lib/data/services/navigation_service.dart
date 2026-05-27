@@ -44,5 +44,3 @@ class NavigationService {
     FlutterLocalNotificationsPlugin().cancelAll();
   }
 }
-
-final navigationService = NavigationService();

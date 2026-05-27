@@ -1,4 +1,3 @@
-import 'package:alert_app/data/repositories/alert_repository.dart';
 import 'package:alert_app/logic/general_layout_view_model.dart';
 import 'package:alert_app/logic/home_view_model.dart';
 import 'package:alert_app/screens/debug_screen.dart';
@@ -26,7 +25,11 @@ class _GeneralLayoutState extends State<GeneralLayout>
     // Rejestrujemy nasłuchiwanie powrotu z tła dla całej aplikacji
     WidgetsBinding.instance.addObserver(this);
 
-    _syncAllData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<HomeViewModel>().refresh();
+      }
+    });
   }
 
   @override
@@ -43,16 +46,9 @@ class _GeneralLayoutState extends State<GeneralLayout>
       debugPrint(
         "GeneralLayout: Aplikacja wybudzona! Synchronizuję cache z dyskiem i API...",
       );
-      _syncAllData();
-    }
-  }
-
-  void _syncAllData() async {
-    final alertRepo = context.read<AlertRepository>();
-    await alertRepo.syncCacheWithSharedPreferences();
-    await alertRepo.updateAllAlerts();
-    if (mounted) {
-      context.read<HomeViewModel>().refresh();
+      if (mounted) {
+        context.read<HomeViewModel>().refresh();
+      }
     }
   }
 

@@ -1,104 +1,105 @@
+import 'package:alert_app/firebase_options.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+
+// Internal imports
+import 'package:alert_app/locator.dart';
+import 'package:alert_app/l10n/app_localizations.dart';
+import 'package:alert_app/themes/app_theme_default.dart';
+import 'package:alert_app/screens/login_screen.dart';
+import 'package:alert_app/screens/general_layout_screen.dart';
+
+// Services & Repositories
+import 'package:alert_app/data/services/language_service.dart';
+import 'package:alert_app/data/services/navigation_service.dart';
+import 'package:alert_app/data/services/push_notification_service.dart';
+import 'package:alert_app/data/services/fcm_background_handler.dart';
 import 'package:alert_app/data/repositories/alert_repository.dart';
 import 'package:alert_app/data/repositories/plugin_repository.dart';
 import 'package:alert_app/data/repositories/user_repository.dart';
-import 'package:alert_app/data/services/language_service.dart';
-import 'package:alert_app/l10n/app_localizations.dart';
-import 'package:alert_app/locator.dart';
+
+// ViewModels
 import 'package:alert_app/logic/general_layout_view_model.dart';
 import 'package:alert_app/logic/settings_view_model.dart';
-import 'package:alert_app/screens/login_screen.dart';
-import 'package:alert_app/data/services/navigation_service.dart';
 import 'package:alert_app/logic/plugins_view_model.dart';
 import 'package:alert_app/logic/alerts_view_model.dart';
 import 'package:alert_app/logic/home_view_model.dart';
 import 'package:alert_app/logic/user_view_model.dart';
-import 'package:alert_app/screens/general_layout_screen.dart';
-import 'package:alert_app/data/services/push_notification_service.dart';
-import 'package:alert_app/themes/app_theme_default.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:alert_app/data/services/fcm_background_handler.dart';
 
 Future<void> main() async {
   //checking if flutter engine is ready
   WidgetsFlutterBinding.ensureInitialized();
 
   // Firebase initialization
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  setupLocator();
+  await setupLocator();
 
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
-  //Creation of repositories instances
-  final alertRepository = locator<AlertRepository>();
-  final pluginRepository = PluginsRepository();
-  final userRepository = UserRepository();
 
-  final notificationService = PushNotificationService(alertRepository);
+  runApp(const AppStateProvider());
+}
 
-  await notificationService.initNotificationHandling();
+class AppStateProvider extends StatelessWidget {
+  const AppStateProvider({super.key});
 
-  runApp(
-    MultiProvider(
+  @override
+  Widget build(BuildContext context) {
+    return MultiProvider(
       providers: [
+        // Serwisy globalne
         ChangeNotifierProvider(create: (_) => LanguageService()),
-        ChangeNotifierProvider(create: (_) => GeneralLayoutViewModel()),
         ChangeNotifierProvider(create: (_) => SettingsViewModel()),
-        ChangeNotifierProvider.value(value: notificationService),
-        ChangeNotifierProvider.value(value: userRepository),
-
-        ChangeNotifierProvider<UserViewModel>(
-          create: (context) =>
-              UserViewModel(repository: context.read<UserRepository>()),
-        ),
-
-        ChangeNotifierProxyProvider<UserViewModel, AlertRepository>(
-          create: (context) => alertRepository,
-          lazy: false,
-          update: (context, userViewModel, alertRepo) {
-            if (userViewModel.isLoggedIn && alertRepo!.alertsCache.isEmpty) {
-              alertRepo.updateAllAlerts();
-              alertRepo.initSseConnection();
-            }
-            return alertRepo!;
-          },
-        ),
-
-        //Creation of view models
-        ChangeNotifierProxyProvider<UserViewModel, PluginsRepository>(
-          create: (context) => pluginRepository,
-          update: (context, userViewModel, pluginsRepo) {
-            if (userViewModel.isLoggedIn && pluginsRepo!.pluginsCache.isEmpty) {
-              pluginsRepo.updateAllPlugins();
-            }
-            return pluginsRepo!;
-          },
-        ),
-
-        ChangeNotifierProvider<HomeViewModel>(
-          lazy: false,
-          create: (context) =>
-              HomeViewModel(repository: context.read<AlertRepository>())
-                ..getMyToken(),
-        ),
-
-        ChangeNotifierProvider<AlertsViewModel>(
-          create: (context) => AlertsViewModel(
-            alertsRepository: context.read<AlertRepository>(),
-          ),
-        ),
-
-        ChangeNotifierProvider<PluginsViewModel>(
-          create: (context) => PluginsViewModel(
-            pluginsRepository: context.read<PluginsRepository>(),
-          ),
+        ChangeNotifierProvider(create: (_) => GeneralLayoutViewModel()),
+        Provider<PushNotificationService>(
+          create: (_) => PushNotificationService()..initNotificationHandling(),
         ),
       ],
-      child: MainApp(),
-    ),
-  );
+      child: Builder(
+        builder: (contextAfterServices) {
+          return MultiProvider(
+            providers: [
+              ChangeNotifierProvider(
+                create: (_) =>
+                    UserViewModel(repository: locator<UserRepository>()),
+              ),
+              ChangeNotifierProvider(
+                lazy: false,
+                create: (_) => AlertsViewModel(
+                  alertsRepository: locator<AlertRepository>(),
+                  pushNotificationService: contextAfterServices
+                      .read<PushNotificationService>(),
+                ),
+              ),
+              ChangeNotifierProvider(
+                create: (_) => PluginsViewModel(
+                  pluginsRepository: locator<PluginRepository>(),
+                ),
+              ),
+            ],
+            child: Builder(
+              builder: (contextAfterAlerts) {
+                return MultiProvider(
+                  providers: [
+                    ChangeNotifierProvider(
+                      lazy: false,
+                      create: (_) => HomeViewModel(
+                        alertsViewModel: contextAfterAlerts
+                            .read<AlertsViewModel>(),
+                      )..getMyToken(),
+                    ),
+                  ],
+                  child: const MainApp(),
+                );
+              },
+            ),
+          );
+        },
+      ),
+    );
+  }
 }
 
 class MainApp extends StatelessWidget {
@@ -117,7 +118,7 @@ class MainApp extends StatelessWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: settingsViewModel.themeMode,
-      navigatorKey: navigationService.navigatorKey,
+      navigatorKey: locator<NavigationService>().navigatorKey,
 
       home: Consumer<UserViewModel>(
         builder: (context, userViewModel, child) {
@@ -128,12 +129,12 @@ class MainApp extends StatelessWidget {
             );
           }
 
-          // \zalogowany -  główny layout
+          // For logged in user, show main layout
           if (userViewModel.isLoggedIn) {
             return const GeneralLayout();
           }
 
-          // niezalogowany - ekran logowania
+          // For not logged in user - show login screen
           return const LoginScreen();
         },
       ),
@@ -143,14 +144,12 @@ class MainApp extends StatelessWidget {
 
   /*
 
-
 T0D0:
 
 - severity change
 - komentarze porządne
 - testy
-- refactoring, uporządkowanie tego co robią servicy/repo/view models zgodnie z MVVM, uporządkowanie rzeczy zgodnie z DRY itd.
-
-
+- AlertRemoteDataSourceTest - There is no SSE test here - T0D0 as integration test for alert repository
+- refactoring, (pluginy, FCM, pozostałe drobiazgi)
 
   */

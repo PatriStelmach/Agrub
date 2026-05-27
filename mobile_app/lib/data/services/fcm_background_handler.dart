@@ -2,6 +2,7 @@ import 'package:alert_app/locator.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get_it/get_it.dart';
 
@@ -11,6 +12,7 @@ import 'package:alert_app/data/repositories/alert_repository.dart';
 //Global function, so it can be called in Isolate
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
   // Inicjalizacja DI (GetIt) dla procesu w tle
@@ -28,8 +30,16 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
       final Alert alert = Alert.fromJson(rawData);
 
       final alertRepo = GetIt.instance<AlertRepository>();
-      await alertRepo.handleSingleAlertUpdate(rawData);
+      final offlineAlerts = await alertRepo.getOfflineAlerts();
 
+      final existingIndex = offlineAlerts.indexWhere((a) => a.id == alert.id);
+      if (existingIndex != -1) {
+        offlineAlerts[existingIndex] = alert;
+      } else {
+        offlineAlerts.add(alert);
+      }
+
+      await alertRepo.saveAlertsToOfflineCache(offlineAlerts);
       await _showNotificationBasedOnSeverity(alert);
 
       debugPrint("!!! BACKGROUND SYSTEM ALARM PROCESSED SUCCESSFULLY !!!");

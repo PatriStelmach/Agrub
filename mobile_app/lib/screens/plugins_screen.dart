@@ -239,7 +239,7 @@ void showCronDialog(BuildContext context, Plugin plugin, AppLocalizations t) {
               ElevatedButton(
                 onPressed: () async {
                   final success = await context
-                      .read<PluginsRepository>()
+                      .read<PluginRepository>()
                       .activatePluginWithCron(
                         fileName: plugin.fileName,
                         extension: plugin.language.value,

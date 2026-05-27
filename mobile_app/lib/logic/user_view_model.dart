@@ -1,6 +1,7 @@
 import 'package:alert_app/data/models/user_model.dart';
 import 'package:alert_app/data/repositories/user_repository.dart';
 import 'package:alert_app/data/services/push_notification_service.dart';
+import 'package:alert_app/logic/alerts_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
@@ -15,11 +16,9 @@ class UserViewModel extends ChangeNotifier {
   bool get isLoggedIn => _isLoggedIn;
   bool get isLoading => _isLoading;
 
-  UserViewModel({required this.repository}) {
-    checkAuthStatus();
-  }
+  UserViewModel({required this.repository}) {}
 
-  Future<void> checkAuthStatus() async {
+  Future<void> checkAuthStatus(AlertsViewModel alertsViewModel) async {
     _isLoading = true;
     notifyListeners();
 
@@ -27,6 +26,15 @@ class UserViewModel extends ChangeNotifier {
     if (token != null && !JwtDecoder.isExpired(token)) {
       _user = repository.getUserFromToken(token);
       _isLoggedIn = (_user != null);
+
+      if (_isLoggedIn && _user != null) {
+        alertsViewModel.initSseConnection(
+          userGroup: _user!.group,
+          token: token,
+        );
+
+        alertsViewModel.fetchInitialAlerts();
+      }
     } else {
       _isLoggedIn = false;
     }
@@ -39,6 +47,7 @@ class UserViewModel extends ChangeNotifier {
     String email,
     String password,
     PushNotificationService pushService,
+    AlertsViewModel alertsViewModel,
   ) async {
     _isLoading = true;
     notifyListeners();
@@ -49,6 +58,12 @@ class UserViewModel extends ChangeNotifier {
       if (token != null) {
         _user = repository.getUserFromToken(token);
         _isLoggedIn = true;
+
+        alertsViewModel.initSseConnection(
+          userGroup: _user!.group,
+          token: token,
+        );
+        alertsViewModel.fetchInitialAlerts();
 
         try {
           // Wywołujemy asynchronicznie, żeby nie opóźniać wejścia na główny ekran

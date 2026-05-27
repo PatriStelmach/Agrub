@@ -1,17 +1,19 @@
+import 'package:alert_app/data/datasources/alert_local_data_source.dart';
+import 'package:alert_app/data/datasources/alert_remote_data_source.dart';
 import 'package:alert_app/data/repositories/alert_repository.dart';
+import 'package:alert_app/data/repositories/plugin_repository.dart';
 import 'package:alert_app/data/repositories/user_repository.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:alert_app/data/services/navigation_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final locator = GetIt.instance;
 
-void setupLocator() {
-  locator.registerLazySingleton<FlutterSecureStorage>(
-    () => const FlutterSecureStorage(),
-  );
-  locator.registerLazySingleton<AlertRepository>(() => AlertRepository());
-  locator.registerLazySingleton<UserRepository>(() => UserRepository());
+Future<void> setupLocator() async {
+  final sharedPreferences = await SharedPreferences.getInstance();
+  locator.registerSingleton<SharedPreferences>(sharedPreferences);
 
   locator.registerLazySingleton<Dio>(() {
     final dio = Dio(
@@ -41,4 +43,34 @@ void setupLocator() {
 
     return dio;
   });
+
+  locator.registerLazySingleton<AlertLocalDataSource>(
+    () => AlertLocalDataSourceImpl(
+      sharedPreferences: locator<SharedPreferences>(),
+    ),
+  );
+
+  locator.registerLazySingleton<AlertRemoteDataSource>(
+    () => AlertRemoteDataSourceImpl(dio: locator<Dio>()),
+  );
+
+  locator.registerLazySingleton<FlutterSecureStorage>(
+    () => const FlutterSecureStorage(),
+  );
+
+  locator.registerLazySingleton<AlertRepository>(
+    () => AlertRepository(
+      remoteDataSource: locator<AlertRemoteDataSource>(),
+      localDataSource: locator<AlertLocalDataSource>(),
+    ),
+  );
+
+  locator.registerLazySingleton<NavigationService>(() => NavigationService());
+
+  locator.registerLazySingleton<UserRepository>(
+    () => UserRepository(locator<Dio>()),
+  );
+  locator.registerLazySingleton<PluginRepository>(
+    () => PluginRepository(locator<Dio>()),
+  );
 }

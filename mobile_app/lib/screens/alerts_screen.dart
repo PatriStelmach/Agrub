@@ -1,10 +1,11 @@
 import 'package:alert_app/data/models/problem_action_model.dart';
-import 'package:alert_app/data/repositories/alert_repository.dart';
 import 'package:alert_app/logic/alerts_view_model.dart';
+import 'package:alert_app/logic/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:alert_app/l10n/app_localizations.dart';
+import 'package:alert_app/data/models/alert_model.dart';
 
 class AlertsScreen extends StatefulWidget {
   const AlertsScreen({super.key});
@@ -22,7 +23,9 @@ class _AlertsScreenState extends State<AlertsScreen>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
 
-    _syncData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<AlertsViewModel>().fetchInitialAlerts();
+    });
   }
 
   @override
@@ -36,14 +39,8 @@ class _AlertsScreenState extends State<AlertsScreen>
     // user wraca pushem do aplikacji
     if (state == AppLifecycleState.resumed) {
       debugPrint("Ekran: Aplikacja wybudzona! Synchronizuję dane...");
-      _syncData();
+      context.read<AlertsViewModel>().fetchInitialAlerts();
     }
-  }
-
-  void _syncData() async {
-    final repo = context.read<AlertRepository>();
-    await repo.syncCacheWithSharedPreferences();
-    await repo.updateAllAlerts();
   }
 
   @override
@@ -52,6 +49,9 @@ class _AlertsScreenState extends State<AlertsScreen>
     final alertsViewModel = context.watch<AlertsViewModel>();
     final t = AppLocalizations.of(context)!;
 
+    if (alertsViewModel.isLoading && alertsViewModel.alertsList.isEmpty) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
     final currentSort = alertsViewModel.currentSortProperty;
     final isAsc = alertsViewModel.isAscending;
 
@@ -238,7 +238,7 @@ class _AlertsScreenState extends State<AlertsScreen>
                             ),
                             FutureBuilder<ProblemAction?>(
                               future: context
-                                  .read<AlertRepository>()
+                                  .read<AlertsViewModel>()
                                   .getLatestActionForAlert(alert.id),
                               builder: (context, snapshot) {
                                 if (snapshot.connectionState ==
@@ -328,14 +328,23 @@ class _AckDialogState extends State<AckDialog> {
     super.initState();
     _controller = TextEditingController();
 
-    //TEMPORARY! Need to change cache to View Model!
-    final alertRepo = context.read<AlertRepository>();
-    final currentAlert = alertRepo.alertsCache[widget.alertId];
+    final alertsViewModel = context.read<AlertsViewModel>();
+    final currentAlert = alertsViewModel.alertsList.firstWhere(
+      (a) => a.id == widget.alertId,
+      // Fallback if alert disappear in the meantime
+      orElse: () => Alert(
+        id: widget.alertId,
+        subject: '',
+        source: '',
+        severity: AlertSeverity.info,
+        status: AlertStatus.sent,
+        createdAt: DateTime.now(),
+        acknowledged: false,
+      ),
+    );
 
-    if (currentAlert != null) {
-      selectedSeverity = currentAlert.severity.index;
-      isAck = currentAlert.acknowledged;
-    }
+    selectedSeverity = currentAlert.severity.index;
+    isAck = currentAlert.acknowledged;
   }
 
   @override
@@ -430,8 +439,15 @@ class _AckDialogState extends State<AckDialog> {
         ElevatedButton(
           onPressed: () {
             final String commentValue = _controller.text;
+            final userViewModel = context.read<UserViewModel>();
+            final currentUser = userViewModel.user;
+
+            final String currentAuthor = currentUser != null
+                ? currentUser.login
+                : "Mobile User";
             context.read<AlertsViewModel>().acknowledgeAlert(
               widget.alertId,
+              author: currentAuthor,
               comment: commentValue,
               isAck: isAck,
             );

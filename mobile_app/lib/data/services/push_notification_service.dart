@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:alert_app/data/repositories/alert_repository.dart';
 import 'package:alert_app/locator.dart';
 import 'package:flutter/material.dart';
@@ -10,13 +12,14 @@ import 'package:get_it/get_it.dart';
 //import 'dart:convert';
 //import 'package:flutter/services.dart';
 
-class PushNotificationService extends ChangeNotifier {
-  final AlertRepository alertRepository;
+class PushNotificationService {
   final Dio dio = locator<Dio>();
-
-  PushNotificationService(this.alertRepository);
-
   final FirebaseMessaging fcm = FirebaseMessaging.instance;
+  final _messageController = StreamController<Map<String, dynamic>>.broadcast();
+  Stream<Map<String, dynamic>> get fcmPayloadStream =>
+      _messageController.stream;
+
+  PushNotificationService();
 
   Future<void> initNotificationHandling() async {
     //Aplication not running at all
@@ -43,7 +46,7 @@ class PushNotificationService extends ChangeNotifier {
     if (rawData.isNotEmpty) {
       debugPrint("FCM: Przekazywanie surowych danych do AlertRepository...");
 
-      alertRepository.handleSingleAlertUpdate(rawData);
+      _messageController.add(rawData);
     }
   }
 

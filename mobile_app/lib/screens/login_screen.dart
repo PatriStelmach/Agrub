@@ -1,4 +1,5 @@
 import 'package:alert_app/data/services/push_notification_service.dart';
+import 'package:alert_app/logic/alerts_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:alert_app/logic/user_view_model.dart';
@@ -16,14 +17,30 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
+  @override
+  void initState() {
+    super.initState();
+    //Checking the token before loading the screen
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        final alertsVM = context.read<AlertsViewModel>();
+
+        //can skip login
+        context.read<UserViewModel>().checkAuthStatus(alertsVM);
+      }
+    });
+  }
+
   void _handleLogin() async {
     final userViewModel = context.read<UserViewModel>();
     final pushService = context.read<PushNotificationService>();
+    final alertsViewModel = context.read<AlertsViewModel>();
     final t = AppLocalizations.of(context)!;
     bool success = await userViewModel.signIn(
       _emailController.text.trim(),
       _passwordController.text,
       pushService,
+      alertsViewModel,
     );
 
     if (!success && mounted) {
@@ -105,7 +122,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: isLoading
                       ? const CircularProgressIndicator(color: Colors.white)
                       : Text(
-                          t.login_field_password,
+                          t.login_button_submit,
                           style: TextStyle(fontSize: 18),
                         ),
                 ),

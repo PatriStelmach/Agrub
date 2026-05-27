@@ -1,3 +1,4 @@
+import 'package:alert_app/locator.dart';
 import 'package:flutter/material.dart';
 import 'package:alert_app/data/services/navigation_service.dart';
 import 'package:alert_app/l10n/app_localizations.dart';
@@ -26,9 +27,9 @@ class AlarmOverlayScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: () {
-                    navigationService.stopAlarmAndDismiss();
-                  },
+                  onPressed: () =>
+                      locator<NavigationService>().stopAlarmAndDismiss(),
+
                   child: Text(t.overlay_button_stop),
                 ),
               ],

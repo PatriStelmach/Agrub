@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:alert_app/data/repositories/plugin_repository.dart';
 
 class PluginsViewModel extends ChangeNotifier {
-  final PluginsRepository _repository;
+  final PluginRepository _repository;
 
   String _currentSortProperty = 'fileName';
   bool _isAscending = true;
@@ -13,7 +13,7 @@ class PluginsViewModel extends ChangeNotifier {
 
   //List<Plugin> sortedPlugins = [];
 
-  PluginsViewModel({required PluginsRepository pluginsRepository})
+  PluginsViewModel({required PluginRepository pluginsRepository})
     : _repository = pluginsRepository {
     _repository.addListener(notifyListeners);
   }

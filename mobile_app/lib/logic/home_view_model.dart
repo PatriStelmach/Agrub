@@ -1,32 +1,33 @@
-import 'package:alert_app/data/repositories/alert_repository.dart';
+import 'package:alert_app/logic/alerts_view_model.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 import '../data/models/alert_model.dart';
 
 class HomeViewModel extends ChangeNotifier {
+  final AlertsViewModel alertsViewModel;
   void getMyToken() async {
     String? token = await FirebaseMessaging.instance.getToken();
     //
     debugPrint("Mój FCM Token: $token");
   }
 
-  final AlertRepository repository;
-  HomeViewModel({required this.repository}) {
-    repository.addListener(notifyListeners);
+  HomeViewModel({required this.alertsViewModel}) {
+    alertsViewModel.addListener(notifyListeners);
   }
 
-  int get activeAlertsCount => repository.alertsCache.length;
-  DateTime? get lastPing => repository.lastPing;
+  int get activeAlertsCount => alertsViewModel.alertsList.length;
+  //T0D0: Null tymczasowo, co zrobić z tym last ping>?
+  DateTime? get lastPing => null;
 
   List<Alert> latestAlerts() {
-    List<Alert> allAlerts = repository.alertsCache.values.toList();
+    List<Alert> allAlerts = List<Alert>.from(alertsViewModel.alertsList);
     allAlerts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     return allAlerts.take(3).toList();
   }
 
   List<Alert> latestCriticalAlerts() {
-    return repository.alertsCache.values
+    return alertsViewModel.alertsList
         .where((alert) => alert.severity == AlertSeverity.extreme)
         .toList();
   }

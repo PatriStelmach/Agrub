@@ -21,5 +21,8 @@ class AlarmService {
 
   Future<void> stopAlarm() async {
     await player.stop();
+    if (await Vibration.hasVibrator()) {
+      Vibration.cancel();
+    }
   }
 }
