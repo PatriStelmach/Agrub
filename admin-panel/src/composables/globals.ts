@@ -1,10 +1,8 @@
-import {onMounted, onUnmounted, ref, watchEffect} from "vue";
+import {onUnmounted, ref} from "vue";
 import {dateParser} from "@/composables/dateParser.ts";
-import {toast} from "vue-sonner";
 
-export function globals(timeout: () => number, onTimeout: () => void) {
-  const date = new Date();
-  const weekDay = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+export function globals(timeout?: () => number, onTimeout?: () => void) {
+  const date = ref<Date>(new Date())
   const activityEvents = [
     'mousedown',
     'mousemove',
@@ -14,47 +12,52 @@ export function globals(timeout: () => number, onTimeout: () => void) {
   ]
   let timer: ReturnType<typeof setTimeout> | null = null
 
-  watchEffect(() => console.log(timeout()))
-  const time = ref<{hour: string; minute: string, second: string}>
-  ({hour: dateParser(date).hours, minute: dateParser(date).minutes, second: dateParser(date).seconds});
+  const time = ref<string>(dateParser(date.value).fullTime);
+  const dayMonthYear  = ref<string>(dateParser(date.value).dayMonthYear)
+  const weekday = ref<string | undefined>(dateParser(date.value).weekday())
 
   const changeTime = () => {
     setInterval(() => {
       const newDate = new Date()
-      time.value.hour = dateParser(newDate).hours
-      time.value.minute = dateParser(newDate).minutes
-      time.value.second = dateParser(newDate).seconds
+      time.value = dateParser(newDate).fullTime
+      if(time.value === '00:00:00') {
+        dayMonthYear.value = dateParser(newDate).dayMonthYear
+        weekday.value = dateParser(newDate).weekday()
+      }
     }, 1000)
   }
 
-  const resetTimer = () => {
+  const resetLogoutTimer = () => {
     if(timer) clearTimeout(timer)
 
-    const timeoutMinutes = timeout() || 5
+    if (timeout && onTimeout) {
+      const timeoutMinutes = timeout() || 5
 
-    timer = setTimeout(() => {
-      onTimeout()
-      toast.info('You were logged out because of inactivity, please log in again.')
-      console.log('You were logged out because of inactivity, please log in again.')
-    }, timeoutMinutes * 60 * 1000)
+      timer = setTimeout(() => {
+        onTimeout()
+      }, timeoutMinutes * 60 * 1000)
+    }
   }
 
-  onMounted(() => {
+  const startLogoutTimer = () => {
     activityEvents.forEach((event) => {
-      window.addEventListener(event, resetTimer, { passive: true })
+      window.addEventListener(event, resetLogoutTimer, { passive: true })
     })
-    resetTimer()
-  })
+    resetLogoutTimer()
+  }
 
   onUnmounted(() => {
     if(timer) clearTimeout(timer)
     activityEvents.forEach((event) => {
-      window.removeEventListener(event, resetTimer)
+      window.removeEventListener(event, resetLogoutTimer)
     })
   })
 
   return {
     time,
-    changeTime
+    weekday,
+    changeTime,
+    dayMonthYear,
+    startLogoutTimer,
   }
 }
