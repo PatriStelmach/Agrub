@@ -1,10 +1,8 @@
 <script setup lang="ts">
-
 import {
   dataTable,
   tableCaption,
   tableHeaders,
-
 } from "@/assets/cssFunctions.ts";
 import {
   Table, TableBody,
@@ -18,7 +16,7 @@ import SortableHead from "@/helpers_components/SortableHead.vue";
 import {computed, ref, watchEffect} from "vue";
 import {type AlertDetails, type HistoryAlert} from "@/types/types.ts";
 import {Badge} from "@/components/ui/badge";
-import {IconCircleDashedCheck, IconCircleDashedX, IconHistory} from "@tabler/icons-vue";
+import {IconCircleCheck, IconCircleX, IconHistory} from "@tabler/icons-vue";
 import {Button} from "@/components/ui/button";
 import DateCell from "@/helpers_components/DateCell.vue";
 import {useSortRequests} from "@/composables/useSortRequests.ts";
@@ -26,17 +24,15 @@ import SeverityDiv from "@/helpers_components/SeverityDiv.vue";
 import {hoverListRow} from "@/assets/cssFunctions.ts";
 import LoadingTable from "@/helpers_components/LoadingTable.vue";
 import AlertHistoryDialog from '@/pages/alerts/history/AlertHistoryDialog.vue'
-import {useRouter} from "vue-router";
 
 const props = defineProps<{
   alerts: HistoryAlert[]
   isLoading: boolean
 }>()
 
-const router = useRouter()
 const hoveredAlert = defineModel<AlertDetails | null>('hoveredAlert')
 const sortedHead = defineModel<{ sortKey: string; sortOrder: string }>('sortedHead')
-
+const isDialogOpen = ref(false)
 const { sortKey, sortOrder, toggleSort } = useSortRequests<HistoryAlert>(() => props.alerts, 'createdAt')
 
 const hoveredId = ref<number | null>(null);
@@ -105,8 +101,8 @@ watchEffect(() => {
               <TableCell >
                 <RouterLink
                   :to="(alert.originType === 'ZABBIX' || alert.originType === 'WAZUH' || alert.originType === 'NAGIOS') ?
-               `/my_systems/${alert.originType}` :
-                `/my_plugins/${alert.originType}`">
+               `/settings/systems/${alert.originType}` :
+                `/my_plugins/${alert.source}`">
                   <Badge
                     class="whitespace-break-spaces"
                     variant="origin"
@@ -115,20 +111,24 @@ watchEffect(() => {
               </TableCell>
 
               <TableCell class=" gap-x-2 items-center">
-                <IconCircleDashedCheck v-if="alert.isAcknowledged" class="text-green-badge"/>
-                <IconCircleDashedX v-else class="text-red-badge"/>
+                <IconCircleCheck v-if="alert.isAcknowledged" class="text-green-badge"/>
+                <IconCircleX v-else class="text-red-badge"/>
               </TableCell>
               <DateCell  :date="alert.createdAt "></DateCell>
               <DateCell  :date="alert.closedAt "></DateCell>
               <TableCell>
-                <AlertHistoryDialog
-                  :alert="alert"
-                >
-                  <Button size="icon-lg" variant="green_outline">
-                    <IconHistory class="size-5"/>
-                  </Button>
-                </AlertHistoryDialog>
 
+                <!-- dialog link -->
+                <RouterLink :to="`/alerts_history/${alert.id}`">
+                  <AlertHistoryDialog
+                    :isDialogOpen="isDialogOpen"
+                    :alert="alert"
+                  >
+                    <Button size="icon-lg" variant="green_outline">
+                      <IconHistory class="size-5"/>
+                    </Button>
+                  </AlertHistoryDialog>
+                </RouterLink>
               </TableCell>
             </TableRow>
           </TableBody>

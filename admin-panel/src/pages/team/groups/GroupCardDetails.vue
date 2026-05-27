@@ -150,8 +150,8 @@ const changeName = async () => {
       </ButtonGroup>
     </TopH1Div>
     <span class="font-bold italic mb-8 items-center border-b-3 h-12 border-blue-badge/70 w-fit mx-6 flex space-x-2 text-xl">
-      <span class=" tems-baseline w-full">Group name:</span>
-      <span v-if="editNameOpen" class="flex justify-center relative w-full">
+      <span class=" tems-baseline w-fit">Group name:</span>
+      <span v-if="editNameOpen" class="flex justify-center relative w-fit">
         <Input
           :aria-invalid=" newName?.length == 0 || !newName"
           :default-value="groupDetails.name"

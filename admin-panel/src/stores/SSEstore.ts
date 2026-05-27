@@ -1,7 +1,7 @@
 import { api_url } from "@/types/types.ts";
 import { h, ref } from "vue";
 import { toast } from "vue-sonner";
-import { IconAlertTriangle, IconCircleDashedCheck, IconRefresh } from "@tabler/icons-vue";
+import { IconAlertTriangle, IconCircleCheck, IconRefresh } from "@tabler/icons-vue";
 import { useAlertStore } from "@/stores/alertStore.ts";
 import { defineStore } from "pinia";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
@@ -32,7 +32,7 @@ export const useSSEstore = defineStore('SSE', () => {
           break;
         }
         case 'ALERT_RESOLVED': {
-          toast.success(`Alert resolved: ${event.message.subject}`, { icon: IconCircleDashedCheck });
+          toast.success(`Alert resolved: ${event.message.subject}`, { icon: IconCircleCheck });
           alertStore.deleteCurrentAlert(event.message.id);
           break;
         }

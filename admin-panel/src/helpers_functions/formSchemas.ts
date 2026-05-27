@@ -22,6 +22,7 @@ export const wazuhSchema = toTypedSchema(
     wazuh_warning_level: z.number()
       .min(0, '0 is minimal warning level')
       .max(16, '16 is maximal warning level'),
+    wazuh_info_as_alerts: z.boolean(),
   })
     .superRefine((data, ctx) => {
       if(data.wazuh_warning_level > data.wazuh_critical_level) {
@@ -116,7 +117,6 @@ export const editCurrentUserSchema = toTypedSchema(
     firstname: z.string().min(2, 'Firstname must be at least 2 characters.'),
     surname: z.string().min(2, 'Surname must be at least 2 characters.'),
     autoLogoutMinutes: z.number().min(1, "Cannot be lower than 1 minute"),
-    role: z.enum(['TECHNICIAN', 'ADMINISTRATOR']),
     groups: z.array(z.object({
       name: z.string(),
       id: z.number(),

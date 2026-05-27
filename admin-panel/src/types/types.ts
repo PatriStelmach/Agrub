@@ -23,7 +23,7 @@ export interface ActiveAlert {
   message: string,
   source: string,
   originType: string,
-  isAcknowledged: boolean,
+  isAcknowledged: boolean | null,
   createdAt: Date,
   actions: ActionResponse[],
   severity: 0 | 1 | 2 | 3 | 4 | 5,
@@ -38,16 +38,18 @@ export interface Actions {
   id: number
   alertId?: number
   author: string,
-  ack?: boolean,
+  ack?: boolean | null,
   message?: string,
   newSeverity?: 0 | 1 | 2 | 3 | 4 | 5,
+  previousSeverity?: 0 | 1 | 2 | 3 | 4 | 5,
+  createdAt?: Date
+  closedAt?: Date
 }
 
 export interface ActionResponse extends Actions {
-  ackUpdate: boolean,
-  previousSeverity: 0 | 1 | 2 | 3 | 4 | 5,
+  ackUpdate: boolean | null,
   problemId: number,
-  createdAt: Date,
+  subject?: string
 }
 
 export interface AlertDetails {
@@ -132,7 +134,6 @@ export interface EditCurrentUser {
   firstname: string,
   surname: string,
   email: string,
-  role: "ADMINISTRATOR" | "TECHNICIAN"
   groups: UserGroup[],
   autoLogoutMinutes?: number
 }
@@ -232,6 +233,7 @@ export interface WazuhConfig {
   wazuh_enabled: boolean
   wazuh_warning_level: number
   wazuh_critical_level: number
+  wazuh_info_as_alerts: boolean
 }
 //tak przychodzi z api
 export interface NagiosConfig {
@@ -257,6 +259,7 @@ export interface MonitoringSystemsConfig  {
   enabled: boolean
   wazuh_warning_level?: number
   wazuh_critical_level?: number
+  wazuh_info_as_alerts?: boolean
 }
 
 //tak przychodzi z api
@@ -267,6 +270,7 @@ export interface AlertSystemSettings {
   wazuh_enabled: boolean
   wazuh_warning_level: number
   wazuh_critical_level: number
+  wazuh_info_as_alerts: boolean
 
   nagios_url: string
   nagios_enabled: boolean

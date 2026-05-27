@@ -86,7 +86,7 @@ watch(pageSize, () => {
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
-      <span class="text-md" >Results: <span class="font-extrabold text-md">{{ total}}</span></span>
+      <Label>Results: <span class="font-extrabold">{{ total}}</span></Label>
     </div>
   </Pagination>
 </template>

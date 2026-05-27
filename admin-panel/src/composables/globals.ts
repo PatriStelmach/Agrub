@@ -1,5 +1,6 @@
 import {onMounted, onUnmounted, ref, watchEffect} from "vue";
 import {dateParser} from "@/composables/dateParser.ts";
+import {toast} from "vue-sonner";
 
 export function globals(timeout: () => number, onTimeout: () => void) {
   const date = new Date();
@@ -29,10 +30,12 @@ export function globals(timeout: () => number, onTimeout: () => void) {
   const resetTimer = () => {
     if(timer) clearTimeout(timer)
 
-    const timeoutMinutes = timeout() || 1
+    const timeoutMinutes = timeout() || 5
 
     timer = setTimeout(() => {
       onTimeout()
+      toast.info('You were logged out because of inactivity, please log in again.')
+      console.log('You were logged out because of inactivity, please log in again.')
     }, timeoutMinutes * 60 * 1000)
   }
 

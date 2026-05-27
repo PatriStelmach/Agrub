@@ -8,20 +8,23 @@ import {
   DialogTitle, DialogTrigger
 } from "@/components/ui/dialog";
 import {Badge} from "@/components/ui/badge";
-import DialogLabel from "@/helpers_components/DialogLabel.vue";
-
-
-import ActionsTable from "@/pages/alerts/ActionsTable.vue";
+import ActionsList from "@/helpers_components/ActionsList.vue";
 import {Button} from "@/components/ui/button";
 import {IconCheck, IconX} from "@tabler/icons-vue";
 import type {ActionResponse, HistoryAlert} from "@/types/types.ts";
-import {ref} from "vue";
+import {ref, watch, watchEffect} from "vue";
 import SeverityDiv from "@/helpers_components/SeverityDiv.vue";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
+import {bigNameLabel} from "@/assets/cssFunctions.ts";
+import {useRoute} from "vue-router";
+import router from "@/router";
 
 const props = defineProps<{
   alert: HistoryAlert
 }>()
+const route = useRoute()
 const isLoading = ref(true);
+const isDialogOpen = defineModel<boolean>('isDialogOpen')
 
 const actions = ref<ActionResponse[]>([])
 const getActions = async () => {
@@ -29,69 +32,100 @@ const getActions = async () => {
   isLoading.value = false
 }
 
+watchEffect( () => {
+  if(route.params.alert === String(props.alert.id)) {
+    isDialogOpen.value = true
+  }
+})
+
+watch(isDialogOpen, (newValue, oldValue) => {
+  if (newValue === false && oldValue === true) {
+    router.replace({ path: '/alerts_history' })
+  }
+})
 
 </script>
 
 <template>
-  <Dialog >
+  <Dialog v-model:open="isDialogOpen">
     <DialogTrigger as-child @click="getActions">
       <slot />
     </DialogTrigger>
-    <DialogContent :class="` h-fit border-2 shadow-[0_0_1rem_2px] max-md:max-w-4/5! md:max-w-2/5! shadow-severity-${alert.severity}/70 border-severity-${alert.severity}/70 duration-500`" >
-      <DialogHeader>
-        <DialogTitle :class="`border-b-2 pb-2 border-severity-${alert.severity}/70 duration-500`">Alert actions</DialogTitle>
-        <DialogDescription></DialogDescription>
+    <DialogContent
+      :show-close-button="false"
+      :class=" 'max-w-280! h-140!' +
+        ` border-2 shadow-[0_0_1rem_2px] shadow-severity-${alert.severity}/70 border-severity-${alert.severity}/70 duration-500`">
+      <Tabs>
+        <TabsList class="absolute  right-4">
+          <TabsTrigger  value="details">
+            Details
+          </TabsTrigger>
+          <TabsTrigger value="history">
+            History
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="details">
+          <DialogHeader :class="`border-b-2 pb-2 mb-4 border-severity-${alert.severity}/70 duration-500`">
+            <DialogTitle>Alert actions</DialogTitle>
+            <DialogDescription>
+              Review alert details
+            </DialogDescription>
+          </DialogHeader>
+            <div class="grid gap-y-4  *:flex *:space-x-2 *:items-center [&_p]:text-lg! [&_p]:text-comment  pb-2">
+              <div >
+                <h1 :class="bigNameLabel">Subject: </h1>
+                <p id="subject"  > {{ props.alert.subject}}</p>
+              </div>
+              <div class="items-start!" >
+                <h1 :class="bigNameLabel">Message: </h1>
+                <p id="alert-message" > {{ props.alert.message}}</p>
+              </div>
+              <div >
+                <h1 :class="bigNameLabel">Source: </h1>
+                <Badge variant="source">{{ props.alert.source}}</Badge>
+              </div>
+              <div >
+                <h1 :class="bigNameLabel">Origin: </h1>
+                <Badge variant="origin">{{ props.alert.originType}}</Badge>
+              </div>
+              <div class="flex items-end">
+                <h1 :class="bigNameLabel">ACK: </h1>
+                <div class="flex items-end space-x-2">
+                  <Button variant="outline" class="size-7 cursor-default">
+                    <IconCheck
+                      v-if="alert.isAcknowledged"
+                      class="size-5 text-green-badge "/>
+                    <IconX
+                      v-else
+                      class="size-5  text-red-badge "/>
+                  </Button>
+                  <span class="text-comment text-lg">{{ alert.isAcknowledged ? 'Acknowledged' : 'Unacknowledged'  }}</span>
+                </div>
 
-      </DialogHeader>
-      <div class="flex flex-col max-h-[35vh] md:max-h-[60vh]  border-b-2 pb-2 ">
-        <div class="grid gap-y-3 [&_p]:text-comment ">
-          <div class="grid  ">
-            <DialogLabel for="alert-subject" text="Subject"/>
-            <p id="subject"  class="text-sm"> {{ props.alert.subject}}</p>
-          </div>
-          <div class="grid">
-            <DialogLabel text="Message" for="alert-message"/>
-            <p id="alert-message" class="text-sm"> {{ props.alert.message}}</p>
-          </div>
-          <div class="flex space-x-2 ">
-            <div>
-              <DialogLabel text="Source" for="alert-source" />
-              <Badge variant="source" >{{ props.alert.source }}</Badge>
-            </div>
-            <div>
-              <DialogLabel text="Origin"  for="alert-origin"/>
-              <Badge variant="origin">{{ props.alert.originType}}</Badge>
-            </div>
-          </div>
+              </div>
+              <div>
+                <h1 :class="bigNameLabel">Severity: </h1>
+                <SeverityDiv
+                  :severity="alert.severity"
+                />
+              </div>
+             </div>
+        </TabsContent>
 
-          <div class="flex items-end ">
-            <DialogLabel for="ack" class="w-36  mb-0 pb-0" :text="alert.isAcknowledged ? 'Acknowledged' : 'Unacknowledged' "/>
-            <Button variant="outline" class="size-7 cursor-default">
-              <IconCheck
-                v-if="alert.isAcknowledged"
-                class="size-5 text-green-badge "/>
-              <IconX
-                v-else
-                class="size-5  text-red-badge "/>
-            </Button>
-
-          </div>
-          <div class="flex items-end">
-            <DialogLabel for="severity" class="w-36 pb-0 " text="Severity level"/>
-            <SeverityDiv
-              :severity="alert.severity"
-            />
-          </div>
-        </div>
-      </div>
-      <!-- zmienić na tabs z shadcn dla actions -->
-      <ActionsTable
-        :actions="actions"
-        :isLoading="isLoading"
-      >
-        <DialogLabel text="Actions" for="actions-history" />
-      </ActionsTable>
-      <DialogFooter class=" items-center">
+        <TabsContent value="history">
+          <DialogHeader :class="`border-b-2 pb-2 mb-4 border-severity-${alert.severity}/70 duration-500`">
+            <DialogTitle >Actions history</DialogTitle>
+            <DialogDescription>All interactions with alert</DialogDescription>
+          </DialogHeader>
+          <ActionsList
+            :userView="false"
+            max-h="24rem"
+            max-w="65rem"
+            :actions="alert.actions"
+          />
+        </TabsContent>
+      </Tabs>
+      <DialogFooter class="absolute bottom-6 right-6 items-center">
         <DialogClose as-child>
           <Button variant="red_outline">
             Exit

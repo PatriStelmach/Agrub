@@ -73,8 +73,8 @@ export const updateAlertRequest = async (action: Actions) => {
       return
     }
   }
-  catch {
-    toast.error('Failed to send ack!')
+  catch (error) {
+    throw error
   }
 }
 
@@ -218,6 +218,18 @@ export const changeUserPasswordRequest = async (oldPassword: string, newPassword
       throw (error)
     }
   }
+
+export const getUserActions = async (id: number) => {
+  try {
+    const res = await api.get(`/users/${id}/actions`)
+    if (res.status === 200) {
+      return res.data ?? []
+    }
+  }
+  catch (error) {
+    throw (error)
+  }
+}
 
 
 
