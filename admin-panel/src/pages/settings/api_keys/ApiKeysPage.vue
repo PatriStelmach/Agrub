@@ -22,7 +22,7 @@ onMounted(async () => {
       .catch(error => toast.error(`Error retrieving api keys: ${error}`))
       .finally(() =>  isPageLoading.value = false)
   }
-  else isPageLoading.value = false
+  isPageLoading.value = false
 })
 
 const apiKeys = computed(() => settingsStore.apiKeys)
