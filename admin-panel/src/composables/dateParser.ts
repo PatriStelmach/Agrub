@@ -1,3 +1,5 @@
+import { getLocalTimeZone, CalendarDateTime, ZonedDateTime, CalendarDate} from '@internationalized/date'
+
 export function dateParser(date: Date | string) {
   const d = new Date(date);
   const pad = (n: number) => String(n).padStart(2, '0');
@@ -11,6 +13,7 @@ export function dateParser(date: Date | string) {
   }
   const month = pad(d.getUTCMonth() + 1);
   const year = d.getUTCFullYear();
+
   return {
     hours,
     minutes,
@@ -25,4 +28,9 @@ export function dateParser(date: Date | string) {
     apiDate: `${year}-${month}-${day}T${hours}:${minutes}:${seconds}Z`,
     toDate: d,
   }
+}
+
+export const toApiDate = (date: CalendarDate | CalendarDateTime | ZonedDateTime) => {
+  const tz = getLocalTimeZone()
+  return dateParser(date.toDate(tz)).apiDate
 }

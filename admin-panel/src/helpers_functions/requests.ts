@@ -1,12 +1,14 @@
 import api from "@/lib/axios.ts";
 import {toast} from "vue-sonner";
 import type {
-  Actions,
+  Actions, Granularity,
   GroupDetails, LibraryPlugin,
   PluginDetails,
   Rule,
   UserGroupStats
 } from "@/types/types.ts";
+import { CalendarDateTime, ZonedDateTime, CalendarDate} from '@internationalized/date'
+import {toApiDate} from "@/composables/dateParser.ts";
 
 export const getPluginTagsResponse = async () => {
   try {
@@ -230,6 +232,28 @@ export const getUserActionsRequest = async (id: number) => {
 export const getHistoryAlertByIdRequest = async (id: number) => {
   try {
     const res = await api.get(`/alerts/${id}`)
+    if (res.status === 200) {
+      return res.data
+    }
+  } catch (error) {
+    throw (error)
+  }
+}
+
+export const getAnalyticsAlertsCount = async (
+  start: CalendarDate | CalendarDateTime | ZonedDateTime,
+  end: CalendarDate | CalendarDateTime | ZonedDateTime,
+  granularity: Granularity,
+  chartType: "alerts-count" | "avg-ack-time" | "avg-close-time"
+) => {
+  try {
+    const res = await api.get(`/analytics/${chartType}`, {
+      params: {
+        start: toApiDate(start),
+        end: toApiDate(end),
+        granularity: granularity,
+      }
+    })
     if (res.status === 200) {
       return res.data
     }

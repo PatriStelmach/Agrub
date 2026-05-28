@@ -102,7 +102,7 @@ const navItems = [
                 </SidebarGroupLabel>
                   <RouterLink
                     :class="{'bg-blue-badge/50 border-blue-badge' : route.name?.toString().includes(link.to.toString())}"
-                    class="flex text-sm items-center xl:text-lg ml-3 border-l-4 w-full gap-x-2 p-2 hover:bg-input rounded-[0_0.5rem_0.5rem_0]"
+                    class="flex text-sm items-center xl:text-md ml-3 border-l-4 w-full gap-x-2 p-2 hover:bg-input rounded-[0_0.5rem_0.5rem_0]"
                     v-for="link in item.links" :key="link.to" :to="{ name: link.to}">
                       <component class="size-5  xl:size-6" :is="link.icon"/>
                     <span>{{link.label}}</span>
