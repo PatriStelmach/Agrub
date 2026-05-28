@@ -67,7 +67,7 @@ const {startLogoutTimer } = globals(
       <NavBar  class=" border-none bg-card"/>
       <div class="h-screen w-full flex flex-col  ">
         <main class="bg-card flex flex-1 ">
-          <SidebarTrigger class="mt-8 z-99"/>
+          <SidebarTrigger class="mt-8 z-9 md:z-99"/>
           <RouterView class="bg-background  border-3 flex-1 overflow-auto  " />
         </main>
         <slot/>

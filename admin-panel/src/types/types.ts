@@ -267,7 +267,7 @@ export interface AlertSystemSettings {
   zabbix_api_token_SECRET?: string
 
   smtp_host: string
-  smtp_port: string
+  smtp_port: "25" | "587" | "465" | "2525"
   smtp_user: string
   smtp_password_SECRET?: string
   smtp_enabled: boolean
@@ -282,6 +282,29 @@ export interface AlertSystemSettings {
   SECURITY_AD_URL: string
   SECURITY_LDAP_BASE_DN: string
   SECURITY_LDAP_USER_DN_PATTERN: string
+}
+
+export interface SecuritySettings {
+  SECURITY_PASSWORD_LIFETIME_DAYS: number
+  SECURITY_ACCESS_TOKEN_EXP_MINUTES: number
+  SECURITY_REFRESH_TOKEN_EXP_HOURS: number
+  SECURITY_AD_DOMAIN: string
+  SECURITY_AD_URL: string
+  SECURITY_LDAP_BASE_DN: string
+  SECURITY_LDAP_USER_DN_PATTERN: string
+}
+
+export interface AlertSettings {
+  external_system_sync_timer: number
+  scripts_execution_timeout_seconds: number
+}
+
+export interface SmtpSettings {
+  smtp_host: string
+  smtp_port: "25" | "587" | "465" | "2525"
+  smtp_user: string
+  smtp_password_SECRET?: string
+  smtp_enabled: boolean
 }
 
 export interface ApiKey {

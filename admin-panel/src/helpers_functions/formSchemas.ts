@@ -19,12 +19,12 @@ export const wazuhSchema = toTypedSchema(
       .number()
       .int('Must be a positive integer')
       .min(0, '0 is minimal critical level')
-      .max(15, '16 is maximal critical level'),
+      .max(15, '15 is maximal critical level'),
     wazuh_warning_level: z
       .number()
       .int('Must be a positive integer')
       .min(0, '0 is minimal warning level')
-      .max(15, '16 is maximal warning level'),
+      .max(15, '15 is maximal warning level'),
     wazuh_info_as_alerts: z.boolean(),
   })
     .superRefine((data, ctx) => {
@@ -176,10 +176,12 @@ export const securitySettingSchema = toTypedSchema(  z.object({
     SECURITY_LDAP_BASE_DN: z
       .string()
       .trim()
-      .regex(/^(?:[A-Za-z][A-Za-z0-9-]*|(?:0|[1-9][0-9]*)(?:\.(?:0|[1-9][0-9]*))+)=(?:#(?:[0-9A-Fa-f]{2})+|(?:[^,=\+<>#;\\\"]|\\[,=\+<>#;\\\"\ ]|\\[0-9A-Fa-f]{2}|\"[^\"]*\")*(?:(?:[^,=\+<>#;\\\"\  ]|\\[,=\+<>#;\\\"\ ]|\\[0-9A-Fa-f]{2}|\"[^\"]*\")(?:[^,=\+<>#;\\\"]|\\[,=\+<>#;\\\"\ ]|\\[0-9A-Fa-f]{2}|\"[^\"]*\")*)?)(?:\s*[,;+]\s*(?:[A-Za-z][A-Za-z0-9-]*|(?:0|[1-9][0-9]*)(?:\.(?:0|[1-9][0-9]*))+)=(?:#(?:[0-9A-Fa-f]{2})+|(?:[^,=\+<>#;\\\"]|\\[,=\+<>#;\\\"\ ]|\\[0-9A-Fa-f]{2}|\"[^\"]*\")*(?:(?:[^,=\+<>#;\\\"\  ]|\\[,=\+<>#;\\\"\ ]|\\[0-9A-Fa-f]{2}|\"[^\"]*\")(?:[^,=\+<>#;\\\"]|\\[,=\+<>#;\\\"\ ]|\\[0-9A-Fa-f]{2}|\"[^\"]*\")*)?))*$/),
+      .regex(/^(?:[A-Za-z][A-Za-z0-9-]*|(?:0|[1-9][0-9]*)(?:\.(?:0|[1-9][0-9]*))+)=(?:#(?:[0-9A-Fa-f]{2})+|(?:[^,=\+<>#;\\\"]|\\[,=\+<>#;\\\"\ ]|\\[0-9A-Fa-f]{2}|\"[^\"]*\")*(?:(?:[^,=\+<>#;\\\"\  ]|\\[,=\+<>#;\\\"\ ]|\\[0-9A-Fa-f]{2}|\"[^\"]*\")(?:[^,=\+<>#;\\\"]|\\[,=\+<>#;\\\"\ ]|\\[0-9A-Fa-f]{2}|\"[^\"]*\")*)?)(?:\s*[,;+]\s*(?:[A-Za-z][A-Za-z0-9-]*|(?:0|[1-9][0-9]*)(?:\.(?:0|[1-9][0-9]*))+)=(?:#(?:[0-9A-Fa-f]{2})+|(?:[^,=\+<>#;\\\"]|\\[,=\+<>#;\\\"\ ]|\\[0-9A-Fa-f]{2}|\"[^\"]*\")*(?:(?:[^,=\+<>#;\\\"\  ]|\\[,=\+<>#;\\\"\ ]|\\[0-9A-Fa-f]{2}|\"[^\"]*\")(?:[^,=\+<>#;\\\"]|\\[,=\+<>#;\\\"\ ]|\\[0-9A-Fa-f]{2}|\"[^\"]*\")*)?))*$/,
+        'Invalid LDAP base dn'),
     SECURITY_LDAP_USER_DN_PATTERN: z
       .string()
-      .regex(/^(?:[A-Za-z][A-Za-z0-9-]*|(?:0|[1-9][0-9]*)(?:\.(?:0|[1-9][0-9]*))+)=\{0\}(?:\s*[,;]\s*(?:[A-Za-z][A-Za-z0-9-]*|(?:0|[1-9][0-9]*)(?:\.(?:0|[1-9][0-9]*))+)=(?:#(?:[0-9A-Fa-f]{2})*|(?:[^,=+<>#;\\"]|\\[,=+<>#;\\" ]|\\[0-9A-Fa-f]{2})*))*$/)
+      .regex(/^(?:[A-Za-z][A-Za-z0-9-]*|(?:0|[1-9][0-9]*)(?:\.(?:0|[1-9][0-9]*))+)=\{0\}(?:\s*[,;]\s*(?:[A-Za-z][A-Za-z0-9-]*|(?:0|[1-9][0-9]*)(?:\.(?:0|[1-9][0-9]*))+)=(?:#(?:[0-9A-Fa-f]{2})*|(?:[^,=+<>#;\\"]|\\[,=+<>#;\\" ]|\\[0-9A-Fa-f]{2})*))*$/,
+        'Invalid LDAP user dn pattern'),
   }))
 
 export const smtpSettingSchema = toTypedSchema(
@@ -187,7 +189,7 @@ export const smtpSettingSchema = toTypedSchema(
     smtp_host: z.string().url('Must be a valid URL'),
     smtp_port: z.enum(["25", "587", "465", "2525"]),
     smtp_user: z.string().email('Invalid email address'),
-    smtp_password: z.string(),
+    smtp_password_SECRET: z.string(),
     smtp_enabled: z.boolean(),
   }))
 
