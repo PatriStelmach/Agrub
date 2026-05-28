@@ -1,7 +1,5 @@
 import 'package:alert_app/data/models/user_model.dart';
 import 'package:alert_app/data/repositories/user_repository.dart';
-import 'package:alert_app/data/services/push_notification_service.dart';
-import 'package:alert_app/logic/alerts_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
@@ -9,48 +7,34 @@ class UserViewModel extends ChangeNotifier {
   final UserRepository repository;
 
   UserModel? _user;
-  UserModel? get user => _user;
   bool _isLoggedIn = false;
   bool _isLoading = false;
 
+  UserModel? get user => _user;
   bool get isLoggedIn => _isLoggedIn;
   bool get isLoading => _isLoading;
 
-  UserViewModel({required this.repository}) {}
+  UserViewModel({required this.repository});
 
-  Future<void> checkAuthStatus(AlertsViewModel alertsViewModel) async {
-    _isLoading = true;
-    notifyListeners();
+  ///Authorization method, returns true when logged in
+  Future<bool> checkAuthStatus() async {
+    _setLoading(true);
 
     String? token = await repository.getToken();
     if (token != null && !JwtDecoder.isExpired(token)) {
       _user = repository.getUserFromToken(token);
       _isLoggedIn = (_user != null);
-
-      if (_isLoggedIn && _user != null) {
-        alertsViewModel.initSseConnection(
-          userGroup: _user!.group,
-          token: token,
-        );
-
-        alertsViewModel.fetchInitialAlerts();
-      }
     } else {
       _isLoggedIn = false;
     }
 
-    _isLoading = false;
-    notifyListeners();
+    _setLoading(false);
+    return _isLoggedIn;
   }
 
-  Future<bool> signIn(
-    String email,
-    String password,
-    PushNotificationService pushService,
-    AlertsViewModel alertsViewModel,
-  ) async {
-    _isLoading = true;
-    notifyListeners();
+  ///Log in the user
+  Future<bool> signIn(String email, String password) async {
+    _setLoading(true);
 
     bool success = await repository.login(email, password);
     if (success) {
@@ -58,45 +42,30 @@ class UserViewModel extends ChangeNotifier {
       if (token != null) {
         _user = repository.getUserFromToken(token);
         _isLoggedIn = true;
-
-        alertsViewModel.initSseConnection(
-          userGroup: _user!.group,
-          token: token,
-        );
-        alertsViewModel.fetchInitialAlerts();
-
-        try {
-          // Wywołujemy asynchronicznie, żeby nie opóźniać wejścia na główny ekran
-          pushService.registerDevice(token);
-          print(
-            "LOGIN DEBUG: Pomyślnie przekazano token JWT do rejestracji FCM.",
-          );
-        } catch (e) {
-          print("LOGIN DEBUG: Błąd podczas uruchamiania registerDevice: $e");
-        }
-        // ========================================================
       }
     }
 
-    _isLoading = false;
-    notifyListeners();
+    _setLoading(false);
+
     return success;
   }
 
   Future<void> signOut() async {
-    _isLoading = true;
-    notifyListeners();
+    _setLoading(true);
 
     try {
       await repository.logout();
     } catch (e) {
-      print("Błąd podczas operacji logout w repozytorium: $e");
+      debugPrint("USER VIEW MODEL ERROR: $e");
     } finally {
       _user = null;
       _isLoggedIn = false;
-      _isLoading = false;
-
-      notifyListeners();
+      _setLoading(false);
     }
+  }
+
+  void _setLoading(bool value) {
+    _isLoading = value;
+    notifyListeners();
   }
 }

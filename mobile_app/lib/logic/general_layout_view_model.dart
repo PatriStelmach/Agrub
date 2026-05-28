@@ -1,12 +1,31 @@
 import 'package:flutter/material.dart';
 
+enum AppScreen { home, alerts, plugins, user, settings }
+
 class GeneralLayoutViewModel extends ChangeNotifier {
-  String _activeScreenName = 'Home';
+  AppScreen _activeScreen = AppScreen.home;
 
-  String get activeScreenName => _activeScreenName;
+  AppScreen get activeScreen => _activeScreen;
 
-  void changePage(String newPage) {
-    _activeScreenName = newPage;
-    notifyListeners();
+  int get currentIndex => _activeScreen.index;
+
+  /// Change the page using enum
+  void changePage(AppScreen newPage) {
+    if (_activeScreen != newPage) {
+      _activeScreen = newPage;
+      notifyListeners();
+    }
+  }
+
+  /// Bottom navigation
+  void setPageByIndex(int index) {
+    if (index >= 0 && index < AppScreen.values.length) {
+      final newScreen = AppScreen.values[index];
+
+      if (_activeScreen != newScreen) {
+        _activeScreen = newScreen;
+        notifyListeners();
+      }
+    }
   }
 }

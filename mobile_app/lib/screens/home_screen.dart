@@ -107,7 +107,9 @@ class HomeScreen extends StatelessWidget {
                   icon: Icons.list_alt,
                   color: Colors.indigo,
                   onTap: () {
-                    context.read<GeneralLayoutViewModel>().changePage('Alerts');
+                    context.read<GeneralLayoutViewModel>().changePage(
+                      AppScreen.alerts,
+                    );
                   },
                 ),
                 const SizedBox(width: 12),
@@ -118,7 +120,7 @@ class HomeScreen extends StatelessWidget {
                   color: Colors.teal,
                   onTap: () {
                     context.read<GeneralLayoutViewModel>().changePage(
-                      'Plugins',
+                      AppScreen.plugins,
                     );
                   },
                 ),

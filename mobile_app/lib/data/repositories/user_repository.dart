@@ -5,39 +5,36 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
-//connecting to server to check authorization of user
-
-class UserRepository extends ChangeNotifier {
+///Login and getting user information for View Model to use
+class UserRepository {
   final Dio dio;
-  final AuthService _authService = AuthService();
-  final _storage = const FlutterSecureStorage();
+  final AuthService authService;
+  final FlutterSecureStorage storage;
 
-  UserRepository(this.dio);
+  UserRepository({
+    required this.dio,
+    required this.authService,
+    required this.storage,
+  });
 
   Future<bool> login(String email, String password) async {
-    // 1. Pytamy API o token
-    final String? token = await _authService.login(email, password);
+    final String? token = await authService.login(email, password);
 
-    // 2. Jeśli token jest, zapisujemy go i zwracamy true
     if (token != null) {
-      await _storage.write(key: 'jwt_token', value: token);
+      await storage.write(key: 'jwt_token', value: token);
       return true;
     }
-
-    // 3. Jeśli nie ma tokena, logowanie się nie udało
     return false;
   }
 
-  Future<String?> getToken() async => await _storage.read(key: 'jwt_token');
+  Future<String?> getToken() async => await storage.read(key: 'jwt_token');
 
-  Future<void> logout() async => await _storage.delete(key: 'jwt_token');
+  Future<void> logout() async => await storage.delete(key: 'jwt_token');
 
   UserModel? getUserFromToken(String token) {
     if (token.isEmpty) return null;
 
-    // Decoding token to get user data
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
-    //Debug do sprawdzenia czy mam info dobre
     debugPrint("JWT DECODED: $decodedToken");
 
     return UserModel.fromJwt(decodedToken);

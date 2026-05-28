@@ -1,38 +1,29 @@
 import 'package:alert_app/data/models/plugin_model.dart';
-import 'package:alert_app/locator.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 
+///Getting "my plugins" data from remote source
 class PluginRepository extends ChangeNotifier {
-  final Map<String, Plugin> pluginsCache = {};
+  final Dio dio;
 
-  final Dio dio = locator<Dio>();
+  PluginRepository({required this.dio});
 
-  PluginRepository(Dio dio);
-
-  Future<void> updateAllPlugins() async {
+  ///Getting all plugins from backend
+  Future<List<Plugin>> fetchAllPlugins() async {
     try {
       final response = await dio.get('/api/local-scripts/list');
-
       final List<dynamic> data = response.data as List<dynamic>;
 
-      pluginsCache.clear();
-
-      final List<Plugin> allPlugins = data.map((item) {
+      return data.map((item) {
         return Plugin.fromJson(item as Map<String, dynamic>);
       }).toList();
-
-      for (var plugin in allPlugins) {
-        pluginsCache[plugin.fileName] = plugin;
-      }
-
-      notifyListeners();
-      debugPrint("PLUGIN DEBUG: Loaded ${pluginsCache.length} plugin(s)");
     } catch (e) {
-      debugPrint("PLUGIN DEBUG: Error when connecting to API $e");
+      debugPrint("PLUGIN REPOSITORY DEBUG: Error when connecting to API $e");
+      rethrow;
     }
   }
 
+  ///Forcing plugin to run immediately once
   Future<String> forcePlugin(Plugin plugin, {String? arguments}) async {
     try {
       final String fileName = plugin.fileName;
@@ -54,11 +45,14 @@ class PluginRepository extends ChangeNotifier {
 
       return response.data.toString();
     } catch (e) {
-      debugPrint("PLUGIN DEBUG: Error while running ${plugin.fileName}: $e");
+      debugPrint(
+        "PLUGIN REPOSITORY DEBUG: Error while running ${plugin.fileName}: $e",
+      );
       return "Run error: $e";
     }
   }
 
+  ///Modifying plugin run options and setting it as active or inactive
   Future<bool> activatePluginWithCron({
     required String fileName,
     required String extension,
@@ -75,20 +69,10 @@ class PluginRepository extends ChangeNotifier {
         data: {'cronExpression': cronExpression, 'active': active},
       );
 
-      if (response.statusCode == 200) {
-        if (pluginsCache.containsKey(fileName)) {
-          final oldPlugin = pluginsCache[fileName]!;
-        }
-        notifyListeners();
-        updateAllPlugins();
-        return true;
-      }
-      return false;
+      return response.statusCode == 200;
     } catch (e) {
-      debugPrint("PLUGIN DEBUG: Cron save error: $e");
+      debugPrint("PLUGIN REPOSITORY DEBUG: Cron save error: $e");
       return false;
     }
   }
-
-  Future<void> stopPlugin(String id) async {}
 }

@@ -16,15 +16,14 @@ class AlertsScreen extends StatefulWidget {
 
 class _AlertsScreenState extends State<AlertsScreen>
     with WidgetsBindingObserver {
-  String dropDownValue = 'id';
-
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<AlertsViewModel>().fetchInitialAlerts();
+      if (mounted) {
+        context.read<AlertsViewModel>().fetchInitialAlerts();
+      }
     });
   }
 
@@ -36,7 +35,6 @@ class _AlertsScreenState extends State<AlertsScreen>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // user wraca pushem do aplikacji
     if (state == AppLifecycleState.resumed) {
       debugPrint("Ekran: Aplikacja wybudzona! Synchronizuję dane...");
       context.read<AlertsViewModel>().fetchInitialAlerts();
@@ -45,15 +43,13 @@ class _AlertsScreenState extends State<AlertsScreen>
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("--- REBUILD ---");
+    debugPrint("--- REBUILD ALERTS SCREEN ---");
     final alertsViewModel = context.watch<AlertsViewModel>();
     final t = AppLocalizations.of(context)!;
 
     if (alertsViewModel.isLoading && alertsViewModel.alertsList.isEmpty) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-    final currentSort = alertsViewModel.currentSortProperty;
-    final isAsc = alertsViewModel.isAscending;
 
     if (alertsViewModel.alertsList.isEmpty) {
       return Scaffold(body: Center(child: Text(t.alerts_no_alerts_found)));
@@ -63,255 +59,272 @@ class _AlertsScreenState extends State<AlertsScreen>
 
     return Column(
       children: [
-        Row(
-          children: [
-            Text(t.alerts_sort_by, style: TextStyle(fontSize: 30)),
-            Expanded(
-              child: DropdownButton<String>(
-                isExpanded: true,
-                padding: EdgeInsets.all(6),
-                borderRadius: BorderRadius.all(Radius.circular(16)),
-                value: currentSort,
-                icon: const Icon(Icons.menu),
-                style: TextStyle(
-                  color: Theme.of(context).textTheme.bodyLarge?.color,
-                  fontSize: 18,
-                  fontFamily: 'JetBrainsMono',
-                ),
-                onChanged: (String? newValue) {
-                  if (newValue != null) {
-                    alertsViewModel.sortAlertsBy(newValue);
-                  }
-                },
-                items: [
-                  DropdownMenuItem<String>(
-                    value: 'id',
-                    child: Text(
-                      t.alerts_sort_id,
-                      style: TextStyle(fontSize: 30),
-                    ),
-                  ),
-                  DropdownMenuItem<String>(
-                    value: 'title',
-                    child: Text(
-                      t.alerts_sort_title,
-                      style: TextStyle(fontSize: 30),
-                    ),
-                  ),
-                  DropdownMenuItem<String>(
-                    value: 'createdAt',
-                    child: Text(
-                      t.alerts_sort_created_at,
-                      style: TextStyle(fontSize: 30),
-                    ),
-                  ),
-                  DropdownMenuItem<String>(
-                    value: 'acknowledged',
-                    child: Text(
-                      t.alerts_sort_acknowledged,
-                      style: TextStyle(fontSize: 30),
-                    ),
-                  ),
-                  DropdownMenuItem<String>(
-                    value: 'severity',
-                    child: Text(
-                      t.alerts_sort_severity,
-                      style: TextStyle(fontSize: 30),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            IconButton(
-              icon: Icon(isAsc ? Icons.arrow_upward : Icons.arrow_downward),
-              onPressed: () {
-                alertsViewModel.sortAlertsBy(currentSort, ascending: !isAsc);
-              },
-            ),
-          ],
-        ),
-
+        _buildSortHeader(context, alertsViewModel, t),
         Expanded(
           child: ListView.builder(
             itemCount: sortedList.length,
             itemBuilder: (context, index) {
-              final alert = alertsViewModel.sortedAlerts[index];
-
-              final cardBackgroundColor = alert.severityColor(context);
-
-              final cardBrightness = ThemeData.estimateBrightnessForColor(
-                cardBackgroundColor,
-              );
-
-              final textColor = cardBrightness == Brightness.dark
-                  ? Colors.white
-                  : const Color(0xFF1E1E1E);
-
-              return Theme(
-                data: Theme.of(context).copyWith(
-                  brightness: cardBrightness,
-                  iconTheme: IconThemeData(color: textColor),
-                  textTheme: TextTheme(
-                    titleLarge: TextStyle(
-                      color: textColor,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    bodyLarge: TextStyle(color: textColor),
-                    bodyMedium: TextStyle(color: textColor),
-                    bodySmall: TextStyle(color: textColor),
-                  ),
-                ),
-                child: Card(
-                  color: cardBackgroundColor,
-                  child: ExpansionTile(
-                    iconColor: textColor,
-                    collapsedIconColor: textColor,
-                    leading: Icon(Icons.warning, color: textColor),
-
-                    title: Text(
-                      alert?.subject ?? t.alerts_tile_no_title,
-                      style: TextStyle(
-                        color: textColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    subtitle: Text(
-                      alert.acknowledged
-                          ? t.alerts_status_acknowledged
-                          : t.alerts_status_not_acknowledged,
-                      style: TextStyle(color: textColor.withOpacity(0.8)),
-                    ),
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  alert?.source ?? t.alerts_tile_unknown_host,
-                                  style: TextStyle(color: textColor),
-                                ),
-                                const Spacer(),
-                                Text(
-                                  alert?.createdAt != null
-                                      ? DateFormat(
-                                          'dd.MM.yyyy HH:mm:ss',
-                                        ).format(alert!.createdAt)
-                                      : t.alerts_tile_unknown_time,
-                                  style: TextStyle(color: textColor),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            Row(
-                              children: [
-                                const Spacer(),
-                                Text(
-                                  t.alerts_tile_severity_prefix(
-                                    alert!.severity.label,
-                                  ),
-                                  style: TextStyle(
-                                    color: textColor,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      cardBrightness == Brightness.dark
-                                      ? Colors.white24
-                                      : Colors.black12,
-                                  foregroundColor: textColor,
-                                  elevation: 0,
-                                ),
-                                onPressed: () {
-                                  _openAckDialog(context, alert.id, t);
-                                },
-                                child: Text(t.alerts_button_actions),
-                              ),
-                            ),
-                            FutureBuilder<ProblemAction?>(
-                              future: context
-                                  .read<AlertsViewModel>()
-                                  .getLatestActionForAlert(alert.id),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return const Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: LinearProgressIndicator(),
-                                  );
-                                }
-                                final theme = Theme.of(context);
-
-                                final latestAction = snapshot.data;
-                                if (latestAction == null) {
-                                  return ListTile(
-                                    title: Text(
-                                      t.alerts_history_empty,
-                                      style: theme.textTheme.bodyLarge
-                                          ?.copyWith(
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                    ),
-                                  );
-                                }
-
-                                return ListTile(
-                                  leading: Icon(
-                                    Icons.history,
-                                    color:
-                                        theme.iconTheme.color?.withOpacity(
-                                          0.7,
-                                        ) ??
-                                        Colors.grey,
-                                  ),
-                                  title: Text(
-                                    latestAction.message.isNotEmpty
-                                        ? latestAction.message
-                                        : t.alerts_history_no_comment,
-                                    style: theme.textTheme.bodyLarge?.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  subtitle: Text(
-                                    t.alerts_history_subtitle(
-                                      latestAction.author,
-                                      latestAction.ack ? t.yes : t.no,
-                                    ),
-                                    style: theme.textTheme.bodyMedium?.copyWith(
-                                      color: theme.textTheme.bodyMedium?.color
-                                          ?.withOpacity(0.7),
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
+              final alert = sortedList[index];
+              return _buildAlertCard(context, alert, alertsViewModel, t);
             },
           ),
         ),
       ],
     );
   }
+
+  Widget _buildSortHeader(
+    BuildContext context,
+    AlertsViewModel viewModel,
+    AppLocalizations t,
+  ) {
+    final currentSort = viewModel.currentSortProperty;
+    final isAsc = viewModel.isAscending;
+
+    return Row(
+      children: [
+        Text(t.alerts_sort_by, style: const TextStyle(fontSize: 25)),
+        Expanded(
+          child: DropdownButton<String>(
+            isExpanded: true,
+            padding: const EdgeInsets.all(6),
+            borderRadius: const BorderRadius.all(Radius.circular(16)),
+            value: currentSort,
+            icon: const Icon(Icons.menu),
+            style: TextStyle(
+              color: Theme.of(context).textTheme.bodyLarge?.color,
+              fontSize: 18,
+              fontFamily: 'JetBrainsMono',
+            ),
+            onChanged: (String? newValue) {
+              if (newValue != null) {
+                viewModel.sortAlertsBy(newValue);
+              }
+            },
+            items: [
+              DropdownMenuItem(
+                value: 'id',
+                child: Text(
+                  t.alerts_sort_id,
+                  style: const TextStyle(fontSize: 25),
+                ),
+              ),
+              DropdownMenuItem(
+                value: 'title',
+                child: Text(
+                  t.alerts_sort_title,
+                  style: const TextStyle(fontSize: 25),
+                ),
+              ),
+              DropdownMenuItem(
+                value: 'createdAt',
+                child: Text(
+                  t.alerts_sort_created_at,
+                  style: const TextStyle(fontSize: 25),
+                ),
+              ),
+              DropdownMenuItem(
+                value: 'acknowledged',
+                child: Text(
+                  t.alerts_sort_acknowledged,
+                  style: const TextStyle(fontSize: 30),
+                ),
+              ),
+              DropdownMenuItem(
+                value: 'severity',
+                child: Text(
+                  t.alerts_sort_severity,
+                  style: const TextStyle(fontSize: 30),
+                ),
+              ),
+            ],
+          ),
+        ),
+        IconButton(
+          icon: Icon(isAsc ? Icons.arrow_upward : Icons.arrow_downward),
+          onPressed: () {
+            viewModel.sortAlertsBy(currentSort, ascending: !isAsc);
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAlertCard(
+    BuildContext context,
+    Alert alert,
+    AlertsViewModel viewModel,
+    AppLocalizations t,
+  ) {
+    final cardBackgroundColor = alert.severityColor(context);
+    final cardBrightness = ThemeData.estimateBrightnessForColor(
+      cardBackgroundColor,
+    );
+    final textColor = cardBrightness == Brightness.dark
+        ? Colors.white
+        : const Color(0xFF1E1E1E);
+
+    return Theme(
+      data: Theme.of(context).copyWith(
+        brightness: cardBrightness,
+        iconTheme: IconThemeData(color: textColor),
+        textTheme: TextTheme(
+          titleLarge: TextStyle(color: textColor, fontWeight: FontWeight.bold),
+          bodyLarge: TextStyle(color: textColor),
+          bodyMedium: TextStyle(color: textColor),
+          bodySmall: TextStyle(color: textColor),
+        ),
+      ),
+      child: Card(
+        color: cardBackgroundColor,
+        child: ExpansionTile(
+          iconColor: textColor,
+          collapsedIconColor: textColor,
+          leading: Icon(Icons.warning, color: textColor),
+          title: Text(
+            alert.subject ?? t.alerts_tile_no_title,
+            style: TextStyle(color: textColor, fontWeight: FontWeight.bold),
+          ),
+          subtitle: Text(
+            alert.acknowledged
+                ? t.alerts_status_acknowledged
+                : t.alerts_status_not_acknowledged,
+            style: TextStyle(color: textColor.withOpacity(0.8)),
+          ),
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                children: [
+                  _buildAlertDetails(alert, textColor, t),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: cardBrightness == Brightness.dark
+                            ? Colors.white24
+                            : Colors.black12,
+                        foregroundColor: textColor,
+                        elevation: 0,
+                      ),
+                      onPressed: () => _openAckDialog(context, alert, t),
+                      child: Text(t.alerts_button_actions),
+                    ),
+                  ),
+                  _buildActionHistory(context, alert.id, viewModel, t),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAlertDetails(Alert alert, Color textColor, AppLocalizations t) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              alert.source ?? t.alerts_tile_unknown_host,
+              style: TextStyle(color: textColor),
+            ),
+            Text(
+              alert.createdAt != null
+                  ? DateFormat('dd.MM.yyyy HH:mm:ss').format(alert.createdAt!)
+                  : t.alerts_tile_unknown_time,
+              style: TextStyle(color: textColor),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Text(
+              t.alerts_tile_severity_prefix(alert.severity.label),
+              style: TextStyle(color: textColor, fontWeight: FontWeight.w500),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActionHistory(
+    BuildContext context,
+    int alertId,
+    AlertsViewModel viewModel,
+    AppLocalizations t,
+  ) {
+    return FutureBuilder<ProblemAction?>(
+      future: viewModel.getLatestActionForAlert(alertId),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: LinearProgressIndicator(),
+          );
+        }
+
+        final theme = Theme.of(context);
+        final latestAction = snapshot.data;
+
+        if (latestAction == null) {
+          return ListTile(
+            title: Text(
+              t.alerts_history_empty,
+              style: theme.textTheme.bodyLarge?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          );
+        }
+
+        return ListTile(
+          leading: Icon(
+            Icons.history,
+            color: theme.iconTheme.color?.withOpacity(0.7) ?? Colors.grey,
+          ),
+          title: Text(
+            latestAction.message.isNotEmpty
+                ? latestAction.message
+                : t.alerts_history_no_comment,
+            style: theme.textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          subtitle: Text(
+            t.alerts_history_subtitle(
+              latestAction.author,
+              latestAction.ack ? t.yes : t.no,
+            ),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.textTheme.bodyMedium?.color?.withOpacity(0.7),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _openAckDialog(BuildContext context, Alert alert, AppLocalizations t) {
+    showDialog(
+      context: context,
+      builder: (context) => AckDialog(alert: alert, t: t),
+    );
+  }
 }
 
 class AckDialog extends StatefulWidget {
-  final int alertId;
+  // Przekazujemy cały obiekt Alert zamiast samego ID
+  final Alert alert;
   final AppLocalizations t;
-  const AckDialog({super.key, required this.alertId, required this.t});
+
+  const AckDialog({super.key, required this.alert, required this.t});
 
   @override
   State<AckDialog> createState() => _AckDialogState();
@@ -319,32 +332,16 @@ class AckDialog extends StatefulWidget {
 
 class _AckDialogState extends State<AckDialog> {
   late TextEditingController _controller;
-
-  bool isAck = true;
-  int selectedSeverity = 0;
+  late bool isAck;
+  late int selectedSeverity;
 
   @override
   void initState() {
     super.initState();
     _controller = TextEditingController();
 
-    final alertsViewModel = context.read<AlertsViewModel>();
-    final currentAlert = alertsViewModel.alertsList.firstWhere(
-      (a) => a.id == widget.alertId,
-      // Fallback if alert disappear in the meantime
-      orElse: () => Alert(
-        id: widget.alertId,
-        subject: '',
-        source: '',
-        severity: AlertSeverity.info,
-        status: AlertStatus.sent,
-        createdAt: DateTime.now(),
-        acknowledged: false,
-      ),
-    );
-
-    selectedSeverity = currentAlert.severity.index;
-    isAck = currentAlert.acknowledged;
+    selectedSeverity = widget.alert.severity.index;
+    isAck = widget.alert.acknowledged;
   }
 
   @override
@@ -356,8 +353,9 @@ class _AckDialogState extends State<AckDialog> {
   @override
   Widget build(BuildContext context) {
     final t = widget.t;
+
     return AlertDialog(
-      title: Text(t.alerts_dialog_title(widget.alertId.toString())),
+      title: Text(t.alerts_dialog_title(widget.alert.id.toString())),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -369,15 +367,13 @@ class _AckDialogState extends State<AckDialog> {
               ),
             ),
             const SizedBox(height: 15),
-
             Text(
               t.alerts_dialog_section_severity,
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 5),
-
             DropdownButtonFormField<int>(
-              initialValue: selectedSeverity,
+              value: selectedSeverity,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 contentPadding: EdgeInsets.symmetric(
@@ -412,9 +408,9 @@ class _AckDialogState extends State<AckDialog> {
                 ),
               ],
               onChanged: (int? newValue) {
-                setState(() {
-                  selectedSeverity = newValue ?? 0;
-                });
+                if (newValue != null) {
+                  setState(() => selectedSeverity = newValue);
+                }
               },
             ),
             CheckboxListTile(
@@ -422,9 +418,9 @@ class _AckDialogState extends State<AckDialog> {
               value: isAck,
               contentPadding: EdgeInsets.zero,
               onChanged: (bool? value) {
-                setState(() {
-                  isAck = value ?? false;
-                });
+                if (value != null) {
+                  setState(() => isAck = value);
+                }
               },
             ),
           ],
@@ -435,22 +431,19 @@ class _AckDialogState extends State<AckDialog> {
           onPressed: () => Navigator.pop(context),
           child: Text(t.alerts_dialog_button_cancel),
         ),
-
         ElevatedButton(
           onPressed: () {
-            final String commentValue = _controller.text;
-            final userViewModel = context.read<UserViewModel>();
-            final currentUser = userViewModel.user;
+            final commentValue = _controller.text;
+            final currentUser = context.read<UserViewModel>().user;
+            final currentAuthor = currentUser?.login ?? "Mobile User";
 
-            final String currentAuthor = currentUser != null
-                ? currentUser.login
-                : "Mobile User";
             context.read<AlertsViewModel>().acknowledgeAlert(
-              widget.alertId,
+              widget.alert.id,
               author: currentAuthor,
               comment: commentValue,
               isAck: isAck,
             );
+
             Navigator.pop(context);
           },
           child: Text(t.alerts_dialog_button_update),
@@ -458,11 +451,4 @@ class _AckDialogState extends State<AckDialog> {
       ],
     );
   }
-}
-
-void _openAckDialog(BuildContext context, int alertId, AppLocalizations t) {
-  showDialog(
-    context: context,
-    builder: (context) => AckDialog(alertId: alertId, t: t),
-  );
 }

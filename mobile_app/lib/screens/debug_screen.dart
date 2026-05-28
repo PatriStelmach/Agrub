@@ -59,7 +59,7 @@ class DebugScreen extends StatelessWidget {
                     Provider.of<PluginRepository>(
                       context,
                       listen: false,
-                    ).updateAllPlugins();
+                    ).fetchAllPlugins();
                   },
                   child: Text(' Push - new plugins'),
                 ),

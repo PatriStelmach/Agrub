@@ -21,29 +21,33 @@ class _LoginScreenState extends State<LoginScreen> {
   void initState() {
     super.initState();
     //Checking the token before loading the screen
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        final alertsVM = context.read<AlertsViewModel>();
-
-        //can skip login
-        context.read<UserViewModel>().checkAuthStatus(alertsVM);
-      }
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
     });
   }
 
-  void _handleLogin() async {
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleLogin() async {
     final userViewModel = context.read<UserViewModel>();
-    final pushService = context.read<PushNotificationService>();
-    final alertsViewModel = context.read<AlertsViewModel>();
     final t = AppLocalizations.of(context)!;
-    bool success = await userViewModel.signIn(
+
+    final success = await userViewModel.signIn(
       _emailController.text.trim(),
       _passwordController.text,
-      pushService,
-      alertsViewModel,
     );
 
-    if (!success && mounted) {
+    // Safety against using BuildContext if the screen was closed earlier
+    if (!mounted) return;
+
+    if (success) {
+    } else {
+      // Failure snackbar
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(t.login_error_message),
@@ -56,7 +60,9 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context)!;
-    final isLoading = context.watch<UserViewModel>().isLoading;
+    final isLoading = context.select<UserViewModel, bool>(
+      (viewModel) => viewModel.isLoading,
+    );
 
     return Scaffold(
       body: Center(
@@ -76,19 +82,17 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 40),
 
-              // Pole Email
               TextField(
                 controller: _emailController,
                 decoration: InputDecoration(
                   labelText: t.login_field_email,
-                  prefixIcon: Icon(Icons.email),
-                  border: OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.email),
+                  border: const OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 20),
 
-              // Pole Hasło
               TextField(
                 controller: _passwordController,
                 obscureText: _obscurePassword,
@@ -123,7 +127,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ? const CircularProgressIndicator(color: Colors.white)
                       : Text(
                           t.login_button_submit,
-                          style: TextStyle(fontSize: 18),
+                          style: const TextStyle(fontSize: 18),
                         ),
                 ),
               ),

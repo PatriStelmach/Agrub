@@ -1,14 +1,17 @@
-import 'package:alert_app/logic/general_layout_view_model.dart';
-import 'package:alert_app/logic/home_view_model.dart';
-import 'package:alert_app/screens/debug_screen.dart';
-import 'package:alert_app/screens/plugins_screen.dart';
-import 'package:alert_app/screens/home_screen.dart';
-import 'package:alert_app/screens/alerts_screen.dart';
-import 'package:alert_app/screens/settings_screen.dart';
-import 'package:alert_app/screens/user_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import 'package:alert_app/l10n/app_localizations.dart';
+import 'package:alert_app/logic/general_layout_view_model.dart';
+import 'package:alert_app/logic/user_view_model.dart';
+import 'package:alert_app/logic/alerts_view_model.dart';
+import 'package:alert_app/data/services/push_notification_service.dart';
+
+import 'package:alert_app/screens/home_screen.dart';
+import 'package:alert_app/screens/alerts_screen.dart';
+import 'package:alert_app/screens/plugins_screen.dart';
+import 'package:alert_app/screens/user_screen.dart';
+import 'package:alert_app/screens/settings_screen.dart';
 
 class GeneralLayout extends StatefulWidget {
   const GeneralLayout({super.key});
@@ -17,55 +20,35 @@ class GeneralLayout extends StatefulWidget {
   State<GeneralLayout> createState() => _GeneralLayoutState();
 }
 
-class _GeneralLayoutState extends State<GeneralLayout>
-    with WidgetsBindingObserver {
+class _GeneralLayoutState extends State<GeneralLayout> {
   @override
   void initState() {
     super.initState();
-    // Rejestrujemy nasłuchiwanie powrotu z tła dla całej aplikacji
-    WidgetsBinding.instance.addObserver(this);
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        context.read<HomeViewModel>().refresh();
-      }
+      _startBackgroundServices();
     });
   }
 
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
+  Future<void> _startBackgroundServices() async {
+    if (!mounted) return;
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    debugPrint("GeneralLayout: Zmiana stanu aplikacji na: $state");
+    final userVM = context.read<UserViewModel>();
+    final alertsVM = context.read<AlertsViewModel>();
+    final pushService = context.read<PushNotificationService>();
 
-    if (state == AppLifecycleState.resumed) {
-      debugPrint(
-        "GeneralLayout: Aplikacja wybudzona! Synchronizuję cache z dyskiem i API...",
-      );
-      if (mounted) {
-        context.read<HomeViewModel>().refresh();
+    final token = await userVM.repository.getToken();
+    final user = userVM.user;
+
+    if (token != null && user != null) {
+      alertsVM.initSseConnection(userGroup: user.group, token: token);
+      alertsVM.fetchInitialAlerts();
+
+      try {
+        pushService.registerDevice(token);
+        debugPrint("LAYOUT DEBUG: FCM Device registered successfully.");
+      } catch (e) {
+        debugPrint("LAYOUT DEBUG: Błąd rejestracji FCM: $e");
       }
-    }
-  }
-
-  String _getScreenTitle(String screenName, AppLocalizations t) {
-    switch (screenName) {
-      case 'Alerts':
-        return t.layout_menu_alerts;
-      case 'Plugins':
-        return t.layout_menu_plugins;
-      case 'Settings':
-        return t.layout_menu_settings;
-      case 'Debug':
-        return t.layout_menu_debug;
-      case 'User':
-        return t.layout_menu_user;
-      default:
-        return t.layout_menu_home;
     }
   }
 
@@ -74,92 +57,155 @@ class _GeneralLayoutState extends State<GeneralLayout>
     final layoutViewModel = context.watch<GeneralLayoutViewModel>();
     final t = AppLocalizations.of(context)!;
 
+    const List<Widget> screens = [
+      HomeScreen(),
+      AlertsScreen(),
+      PluginsScreen(),
+      UserScreen(),
+      SettingsScreen(),
+    ];
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          _getScreenTitle(layoutViewModel.activeScreenName, t).toUpperCase(),
-        ),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(4.0),
-          child: Container(color: Colors.black, height: 4.0),
-        ),
+        title: Text(_getAppBarTitle(layoutViewModel.activeScreen, t)),
+        elevation: 2,
       ),
 
-      drawer: Drawer(
-        child: Column(
-          children: [
-            DrawerHeader(child: Center(child: Text(t.layout_menu_header))),
-            ListTile(
-              leading: const Icon(Icons.home),
-              title: Text(t.layout_menu_home),
-              onTap: () {
-                layoutViewModel.changePage('Home');
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.warning),
-              title: Text(t.layout_menu_alerts),
-              onTap: () {
-                layoutViewModel.changePage('Alerts');
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.computer_rounded),
-              title: Text(t.layout_menu_plugins),
-              onTap: () {
-                layoutViewModel.changePage('Plugins');
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.settings),
-              title: Text(t.layout_menu_settings),
-              onTap: () {
-                layoutViewModel.changePage('Settings');
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.person_3_outlined),
-              title: Text(t.layout_menu_user),
-              onTap: () {
-                layoutViewModel.changePage('User');
-                Navigator.pop(context);
-              },
-            ),
-            // Commenting way to debug screen for now
-            // ListTile(
-            //   leading: const Icon(Icons.warning),
-            //   title: const Text(t.layout_menu_debug),
-            //   onTap: () {
-            //     layoutViewModel.changePage('Debug');
-            //     Navigator.pop(context);
-            //   },
-            // ),
-          ],
-        ),
-      ),
+      drawer: const NavDrawer(),
 
-      body: _buildBody(layoutViewModel.activeScreenName),
+      body: IndexedStack(
+        index: layoutViewModel.currentIndex,
+        children: screens,
+      ),
     );
   }
 
-  Widget _buildBody(String screenName) {
-    switch (screenName) {
-      case 'Alerts':
-        return const AlertsScreen();
-      case 'Plugins':
-        return const PluginsScreen();
-      case 'Settings':
-        return const SettingsScreen();
-      case 'Debug':
-        return const DebugScreen();
-      case 'User':
-        return const UserScreen();
-      default:
-        return const HomeScreen();
+  /// Showing correct title in app bar
+  String _getAppBarTitle(AppScreen screen, AppLocalizations t) {
+    switch (screen) {
+      case AppScreen.home:
+        return 'Home';
+      case AppScreen.alerts:
+        return 'Alerts';
+      case AppScreen.plugins:
+        return 'Plugins';
+      case AppScreen.user:
+        return 'User Profile';
+      case AppScreen.settings:
+        return 'Settings';
     }
+  }
+}
+
+/// Main class for nav side drawer
+class NavDrawer extends StatelessWidget {
+  const NavDrawer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final layoutViewModel = context.watch<GeneralLayoutViewModel>();
+
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          DrawerHeader(
+            decoration: BoxDecoration(color: Theme.of(context).primaryColor),
+            child: const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  'Alert App',
+                  style: TextStyle(color: Colors.white, fontSize: 24),
+                ),
+              ],
+            ),
+          ),
+          _DrawerItemWidget(
+            icon: Icons.home,
+            title: 'Home',
+            targetScreen: AppScreen.home,
+            currentScreen: layoutViewModel.activeScreen,
+            onTap: () => _navigate(context, layoutViewModel, AppScreen.home),
+          ),
+          _DrawerItemWidget(
+            icon: Icons.warning_amber_rounded,
+            title: 'Alerts',
+            targetScreen: AppScreen.alerts,
+            currentScreen: layoutViewModel.activeScreen,
+            onTap: () => _navigate(context, layoutViewModel, AppScreen.alerts),
+          ),
+          _DrawerItemWidget(
+            icon: Icons.extension,
+            title: 'Plugins',
+            targetScreen: AppScreen.plugins,
+            currentScreen: layoutViewModel.activeScreen,
+            onTap: () => _navigate(context, layoutViewModel, AppScreen.plugins),
+          ),
+          _DrawerItemWidget(
+            icon: Icons.person,
+            title: 'User Profile',
+            targetScreen: AppScreen.user,
+            currentScreen: layoutViewModel.activeScreen,
+            onTap: () => _navigate(context, layoutViewModel, AppScreen.user),
+          ),
+          _DrawerItemWidget(
+            icon: Icons.settings,
+            title: 'Settings',
+            targetScreen: AppScreen.settings,
+            currentScreen: layoutViewModel.activeScreen,
+            onTap: () =>
+                _navigate(context, layoutViewModel, AppScreen.settings),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Drawer navigation
+  void _navigate(
+    BuildContext context,
+    GeneralLayoutViewModel layoutViewModel,
+    AppScreen screen,
+  ) {
+    layoutViewModel.changePage(screen);
+    Navigator.pop(context);
+  }
+}
+
+/// Single responsive nav element
+class _DrawerItemWidget extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final AppScreen targetScreen;
+  final AppScreen currentScreen;
+  final VoidCallback onTap;
+
+  const _DrawerItemWidget({
+    required this.icon,
+    required this.title,
+    required this.targetScreen,
+    required this.currentScreen,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isSelected = targetScreen == currentScreen;
+    final pressedColor = Colors.yellow;
+
+    return ListTile(
+      leading: Icon(icon, color: isSelected ? pressedColor : Colors.grey[600]),
+      title: Text(
+        title,
+        style: TextStyle(
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          color: isSelected ? pressedColor : null,
+        ),
+      ),
+      selected: isSelected,
+      onTap: onTap,
+    );
   }
 }

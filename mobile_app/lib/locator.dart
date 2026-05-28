@@ -3,6 +3,7 @@ import 'package:alert_app/data/datasources/alert_remote_data_source.dart';
 import 'package:alert_app/data/repositories/alert_repository.dart';
 import 'package:alert_app/data/repositories/plugin_repository.dart';
 import 'package:alert_app/data/repositories/user_repository.dart';
+import 'package:alert_app/data/services/auth_service.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -68,9 +69,13 @@ Future<void> setupLocator() async {
   locator.registerLazySingleton<NavigationService>(() => NavigationService());
 
   locator.registerLazySingleton<UserRepository>(
-    () => UserRepository(locator<Dio>()),
+    () => UserRepository(
+      dio: locator<Dio>(),
+      authService: AuthService(),
+      storage: FlutterSecureStorage(),
+    ),
   );
   locator.registerLazySingleton<PluginRepository>(
-    () => PluginRepository(locator<Dio>()),
+    () => PluginRepository(dio: locator<Dio>()),
   );
 }

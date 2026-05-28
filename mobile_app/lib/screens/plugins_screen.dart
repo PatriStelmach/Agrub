@@ -13,19 +13,12 @@ class PluginsScreen extends StatefulWidget {
 }
 
 class _PluginsScreenState extends State<PluginsScreen> {
-  bool _isLoading = true;
-
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        await context.read<PluginsViewModel>().loadPlugins();
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-          });
-        }
+        context.read<PluginsViewModel>().loadPlugins();
       }
     });
   }
@@ -33,294 +26,350 @@ class _PluginsScreenState extends State<PluginsScreen> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context)!;
-    final pluginsViewModel = context.watch<PluginsViewModel>();
+    final viewModel = context.watch<PluginsViewModel>();
 
-    if (_isLoading) {
+    if (viewModel.isLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    if (pluginsViewModel.pluginList.isEmpty) {
+    if (viewModel.errorMessage != null) {
+      return Scaffold(
+        body: Center(
+          child: Text(
+            viewModel.errorMessage!,
+            style: const TextStyle(color: Colors.red),
+          ),
+        ),
+      );
+    }
+    final sortedList = viewModel.sortedPlugins;
+    if (sortedList.isEmpty) {
       return Scaffold(body: Center(child: Text(t.plugins_no_plugins_found)));
     }
 
-    final sortedList = pluginsViewModel.sortedPlugins;
-    final currentSort = pluginsViewModel.currentSortProperty;
-    final isAsc = pluginsViewModel.isAscending;
-
     return Column(
       children: [
-        Row(
-          children: [
-            Text(t.plugins_sort_by, style: TextStyle(fontSize: 30)),
-            DropdownButton<String>(
-              padding: EdgeInsets.all(6),
-              borderRadius: BorderRadius.all(Radius.circular(16)),
-              value: currentSort,
-              icon: const Icon(Icons.menu),
-              style: TextStyle(
-                color: Theme.of(context).textTheme.bodyLarge?.color,
-                fontSize: 18,
-                fontFamily: 'JetBrainsMono',
-              ),
-              onChanged: (String? newValue) {
-                if (newValue != null) {
-                  pluginsViewModel.sortPluginsBy(newValue);
-                }
-              },
+        _buildSortHeader(context, viewModel, t),
+        Expanded(
+          child: ListView.builder(
+            itemCount: sortedList.length,
+            padding: const EdgeInsets.all(10),
+            itemBuilder: (context, index) {
+              final plugin = sortedList[index];
+              return _buildPluginCard(context, plugin, t);
+            },
+          ),
+        ),
+      ],
+    );
+  }
 
-              items: [
-                DropdownMenuItem<String>(
-                  value: 'fileName',
-                  child: Text(
-                    t.plugins_sort_filename,
-                    style: TextStyle(fontSize: 30),
+  Widget _buildSortHeader(
+    BuildContext context,
+    PluginsViewModel viewModel,
+    AppLocalizations t,
+  ) {
+    return Row(
+      children: [
+        Text(t.plugins_sort_by, style: const TextStyle(fontSize: 25)),
+        DropdownButton<String>(
+          padding: const EdgeInsets.all(6),
+          borderRadius: const BorderRadius.all(Radius.circular(16)),
+          value: viewModel.currentSortProperty,
+          icon: const Icon(Icons.menu),
+          style: TextStyle(
+            color: Theme.of(context).textTheme.bodyLarge?.color,
+            fontSize: 18,
+            fontFamily: 'JetBrainsMono',
+          ),
+          onChanged: (String? newValue) {
+            if (newValue != null) {
+              viewModel.sortPluginsBy(newValue);
+            }
+          },
+          items: [
+            DropdownMenuItem(
+              value: 'fileName',
+              child: Text(
+                t.plugins_sort_filename,
+                style: const TextStyle(fontSize: 25),
+              ),
+            ),
+            DropdownMenuItem(
+              value: 'creator',
+              child: Text(
+                t.plugins_sort_creator,
+                style: const TextStyle(fontSize: 25),
+              ),
+            ),
+            DropdownMenuItem(
+              value: 'language',
+              child: Text(
+                t.plugins_sort_language,
+                style: const TextStyle(fontSize: 25),
+              ),
+            ),
+          ],
+        ),
+        IconButton(
+          icon: Icon(
+            viewModel.isAscending ? Icons.arrow_upward : Icons.arrow_downward,
+          ),
+          onPressed: () {
+            viewModel.sortPluginsBy(
+              viewModel.currentSortProperty,
+              ascending: !viewModel.isAscending,
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPluginCard(
+    BuildContext context,
+    Plugin plugin,
+    AppLocalizations t,
+  ) {
+    return Card(
+      color: plugin.activeColor(context),
+      child: ExpansionTile(
+        title: Text(plugin.fileName ?? t.plugins_tile_no_name),
+        subtitle: Text(plugin.creator ?? t.plugins_tile_unknown_creator),
+        leading: Icon(
+          plugin.active ? Icons.play_arrow : Icons.pause_circle,
+          color: Colors.black,
+        ),
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(plugin.language.toString()),
+                    Text(
+                      plugin.tags?.toString() ?? t.plugins_tile_unknown_time,
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(plugin.active.toString()),
+                    Text(
+                      plugin.updatedAt?.toString() ??
+                          t.plugins_tile_unknown_severity,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => _showCronDialog(context, plugin),
+                    child: Text(t.plugins_button_edit),
                   ),
                 ),
-                DropdownMenuItem<String>(
-                  value: 'creator',
-                  child: Text(
-                    t.plugins_sort_creator,
-                    style: TextStyle(fontSize: 30),
-                  ),
-                ),
-                DropdownMenuItem<String>(
-                  value: 'language',
-                  child: Text(
-                    t.plugins_sort_language,
-                    style: TextStyle(fontSize: 30),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => _showRunArgsDialog(context, plugin),
+                    child: const Text('Run plugin'),
                   ),
                 ),
               ],
             ),
-            IconButton(
-              icon: Icon(isAsc ? Icons.arrow_upward : Icons.arrow_downward),
-              onPressed: () {
-                pluginsViewModel.sortPluginsBy(currentSort, ascending: !isAsc);
-              },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showCronDialog(BuildContext context, Plugin plugin) {
+    showDialog(
+      context: context,
+      builder: (_) => CronEditDialog(plugin: plugin),
+    );
+  }
+
+  void _showRunArgsDialog(BuildContext context, Plugin plugin) {
+    showDialog(
+      context: context,
+      builder: (_) => RunPluginDialog(plugin: plugin),
+    );
+  }
+}
+
+class CronEditDialog extends StatefulWidget {
+  final Plugin plugin;
+  const CronEditDialog({super.key, required this.plugin});
+
+  @override
+  State<CronEditDialog> createState() => _CronEditDialogState();
+}
+
+class _CronEditDialogState extends State<CronEditDialog> {
+  late TextEditingController _cronController;
+  late TextEditingController _argsController;
+  late bool _isActive;
+
+  @override
+  void initState() {
+    super.initState();
+    _cronController = TextEditingController(text: widget.plugin.cronExpression);
+    _argsController = TextEditingController(text: '');
+    _isActive = widget.plugin.active;
+  }
+
+  @override
+  void dispose() {
+    _cronController.dispose();
+    _argsController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
+
+    return AlertDialog(
+      title: Text(t.plugins_cron_title(widget.plugin.fileName ?? '')),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _cronController,
+              decoration: InputDecoration(
+                labelText: t.plugins_cron_field_cron,
+                hintText: '*/5 * * * *',
+              ),
+            ),
+            TextField(
+              controller: _argsController,
+              decoration: InputDecoration(
+                labelText: t.plugins_cron_field_args,
+                hintText: '--verbose --save-logs',
+              ),
+            ),
+            const SizedBox(height: 16),
+            SwitchListTile(
+              title: Text(t.plugins_cron_switch_active),
+              value: _isActive,
+              onChanged: (value) => setState(() => _isActive = value),
             ),
           ],
         ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(t.plugins_cron_button_cancel),
+        ),
+        ElevatedButton(
+          onPressed: () async {
+            // Logika jest delegowana do ViewModelu!
+            final viewModel = context.read<PluginsViewModel>();
 
-        Expanded(
-          child: ListView.builder(
-            itemCount: sortedList.length,
-            itemBuilder: (context, index) {
-              final plugin = sortedList[index];
+            final success = await viewModel.saveCronSettings(
+              plugin: widget.plugin,
+              cronExpression: _cronController.text,
+              isActive: _isActive,
+            );
 
-              return Card(
-                color: plugin.activeColor(context),
-                child: ExpansionTile(
-                  title: Text(plugin?.fileName ?? t.plugins_tile_no_name),
-                  subtitle: Text(
-                    plugin?.creator ?? t.plugins_tile_unknown_creator,
+            if (mounted) {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    success
+                        ? t.plugins_cron_toast_success
+                        : t.plugins_cron_toast_error,
                   ),
-                  leading: Icon(
-                    plugin.active ? Icons.play_arrow : Icons.pause_circle,
-                    color: Colors.black,
-                  ),
-                  children: [
-                    Column(
-                      children: [
-                        Row(
-                          children: [
-                            Text(plugin.language.toString()),
-                            Spacer(),
-                            Text(
-                              plugin?.tags.toString() ??
-                                  t.plugins_tile_unknown_time,
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Text(
-                              plugin?.active.toString() ??
-                                  t.plugins_tile_unknown_status,
-                            ),
-                            Spacer(),
-                            Text(
-                              plugin?.updatedAt.toString() ??
-                                  t.plugins_tile_unknown_severity,
-                            ),
-                          ],
-                        ),
-
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              showCronDialog(context, plugin, t);
-                            },
-
-                            child: Text(t.plugins_button_edit),
-                          ),
-                        ),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              showRunArgsDialog(
-                                context,
-                                plugin,
-                                pluginsViewModel,
-                                t,
-                              );
-                            },
-
-                            child: Text('Run plugin'),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                  backgroundColor: success ? Colors.green : Colors.red,
                 ),
               );
-            },
-            padding: const EdgeInsets.all(10),
-            scrollDirection: Axis.vertical,
-          ),
+            }
+          },
+          child: Text(t.plugins_cron_button_save),
         ),
       ],
     );
   }
 }
 
-void showCronDialog(BuildContext context, Plugin plugin, AppLocalizations t) {
-  final cronController = TextEditingController(text: plugin.cronExpression);
-  final argsController = TextEditingController(text: '');
-  bool isActive = plugin.active;
-  final theme = Theme.of(context);
+class RunPluginDialog extends StatefulWidget {
+  final Plugin plugin;
+  const RunPluginDialog({super.key, required this.plugin});
 
-  showDialog(
-    context: context,
-    builder: (context) {
-      // StatefullBuilder pozwala na odświeżanie Switcha wewnątrz okienka dialogowego
-      return StatefulBuilder(
-        builder: (context, setState) {
-          return AlertDialog(
-            title: Text(t.plugins_cron_title(plugin.fileName)),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: cronController,
-                    decoration: InputDecoration(
-                      labelText: t.plugins_cron_field_cron,
-                      hintText: '*/5 * * * *',
-                    ),
-                  ),
-                  TextField(
-                    controller: argsController,
-                    style: theme.textTheme.bodyLarge,
-                    decoration: InputDecoration(
-                      labelText: t.plugins_cron_field_args,
-                      hintText: '--verbose --save-logs',
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  SwitchListTile(
-                    title: Text(t.plugins_cron_switch_active),
-                    value: isActive,
-                    onChanged: (value) {
-                      setState(() {
-                        isActive = value;
-                      });
-                    },
-                  ),
-                ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text(t.plugins_cron_button_cancel),
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  final success = await context
-                      .read<PluginRepository>()
-                      .activatePluginWithCron(
-                        fileName: plugin.fileName,
-                        extension: plugin.language.value,
-                        cronExpression: cronController.text,
-                        active: isActive,
-                      );
-
-                  if (context.mounted) {
-                    Navigator.pop(context);
-                    // snackbar z informacja zwrotna
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          success
-                              ? t.plugins_cron_toast_success
-                              : t.plugins_cron_toast_error,
-                        ),
-                      ),
-                    );
-                  }
-                },
-                child: Text(t.plugins_cron_button_save),
-              ),
-            ],
-          );
-        },
-      );
-    },
-  );
+  @override
+  State<RunPluginDialog> createState() => _RunPluginDialogState();
 }
 
-void showRunArgsDialog(
-  BuildContext context,
-  Plugin plugin,
-  PluginsViewModel viewModel,
-  AppLocalizations t,
-) {
-  final argsController = TextEditingController();
+class _RunPluginDialogState extends State<RunPluginDialog> {
+  final _argsController = TextEditingController();
 
-  showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: Text(
-          t.plugins_args_title(plugin.fileName),
-          style: Theme.of(context).textTheme.titleLarge,
+  @override
+  void dispose() {
+    _argsController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
+
+    return AlertDialog(
+      title: Text(t.plugins_args_title(widget.plugin.fileName ?? '')),
+      content: TextField(
+        controller: _argsController,
+        decoration: InputDecoration(
+          labelText: t.plugins_args_field_args,
+          hintText: '--verbose --mode=production',
         ),
-        content: TextField(
-          controller: argsController,
-          decoration: InputDecoration(
-            labelText: t.plugins_args_field_args,
-            hintText: '--verbose --mode=production',
-          ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(t.plugins_args_button_cancel),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(t.plugins_args_button_cancel),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final String? enteredArgs = argsController.text.trim().isNotEmpty
-                  ? argsController.text.trim()
-                  : null;
+        ElevatedButton(
+          onPressed: () async {
+            final args = _argsController.text.trim();
+            final enteredArgs = args.isNotEmpty ? args : null;
 
-              viewModel.startPlugin(plugin, arguments: enteredArgs);
+            final viewModel = context.read<PluginsViewModel>();
+            final messenger = ScaffoldMessenger.of(context);
+            final pluginName = widget.plugin.fileName ?? '';
 
-              Navigator.pop(context);
+            Navigator.pop(context);
 
-              ScaffoldMessenger.of(context).showSnackBar(
+            try {
+              await viewModel.startPlugin(
+                widget.plugin,
+                arguments: enteredArgs,
+              );
+
+              messenger.showSnackBar(
                 SnackBar(
-                  content: Text(
-                    t.plugins_args_toast_triggered(plugin.fileName),
-                  ),
+                  content: Text(t.plugins_args_toast_triggered(pluginName)),
+                  backgroundColor: Colors.green,
                 ),
               );
-            },
-            child: Text(t.plugins_args_button_run),
-          ),
-        ],
-      );
-    },
-  );
+            } catch (e) {
+              messenger.showSnackBar(
+                SnackBar(
+                  content: Text("Błąd uruchamiania: $e"),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+          },
+          child: Text(t.plugins_args_button_run),
+        ),
+      ],
+    );
+  }
 }

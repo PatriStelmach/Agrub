@@ -150,6 +150,7 @@ T0D0:
 - komentarze porządne
 - testy
 - AlertRemoteDataSourceTest - There is no SSE test here - T0D0 as integration test for alert repository
-- refactoring, (pluginy, FCM, pozostałe drobiazgi)
+- refactoring, (FCM, pozostałe drobiazgi)
+- CONSIDER: refactoring, wywalenie wszystkich helper widget na rzecz class widget
 
   */
