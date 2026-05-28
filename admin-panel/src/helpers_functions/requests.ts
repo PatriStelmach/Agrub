@@ -216,7 +216,7 @@ export const changeUserPasswordRequest = async (oldPassword: string, newPassword
     }
   }
 
-export const getUserActions = async (id: number) => {
+export const getUserActionsRequest = async (id: number) => {
   try {
     const res = await api.get(`/users/${id}/actions`)
     if (res.status === 200) {
@@ -227,6 +227,16 @@ export const getUserActions = async (id: number) => {
   }
 }
 
+export const getHistoryAlertByIdRequest = async (id: number) => {
+  try {
+    const res = await api.get(`/alerts/${id}`)
+    if (res.status === 200) {
+      return res.data
+    }
+  } catch (error) {
+    throw (error)
+  }
+}
 
 
 

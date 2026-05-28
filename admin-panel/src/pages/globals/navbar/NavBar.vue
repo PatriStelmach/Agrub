@@ -17,7 +17,8 @@ import {
   IconPassword,
   IconLockCode,
   IconCode,
-  IconHelp
+  IconHelp,
+  IconChartBar,
 } from "@tabler/icons-vue";
 import {
   Sidebar, SidebarContent,
@@ -63,6 +64,12 @@ const navItems = [
       { label: 'External systems', to: 'settings/systems', icon: IconDeviceDesktopAnalytics },
       { label: 'Configuration', to: 'settings/configuration', icon: IconSettings },
       { label: 'API keys', to:  'settings/api_keys', icon: IconLockCode}
+    ]
+  },
+  {
+    label: 'Analytics',
+    links: [
+      { label: 'Charts', to: 'charts', icon: IconChartBar },
     ]
   },
   {

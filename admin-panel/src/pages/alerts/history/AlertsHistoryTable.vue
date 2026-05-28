@@ -13,7 +13,7 @@ import {
   TableRow
 } from "@/components/ui/table";
 import SortableHead from "@/helpers_components/SortableHead.vue";
-import {computed, ref, watchEffect} from "vue";
+import {computed, ref, watch, watchEffect} from "vue";
 import {type AlertDetails, type HistoryAlert} from "@/types/types.ts";
 import {Badge} from "@/components/ui/badge";
 import {IconCircleCheck, IconCircleX, IconHistory} from "@tabler/icons-vue";
@@ -24,15 +24,22 @@ import SeverityDiv from "@/helpers_components/SeverityDiv.vue";
 import {hoverListRow} from "@/assets/cssFunctions.ts";
 import LoadingTable from "@/helpers_components/LoadingTable.vue";
 import AlertHistoryDialog from '@/pages/alerts/history/AlertHistoryDialog.vue'
+import {useRoute} from "vue-router";
+import LinkAlertHistoryDialog from "@/pages/alerts/history/LinkAlertHistoryDialog.vue";
+import {getHistoryAlertByIdRequest} from "@/helpers_functions/requests.ts";
+import { toast } from "vue-sonner";
 
 const props = defineProps<{
   alerts: HistoryAlert[]
   isLoading: boolean
 }>()
-
+const route = useRoute()
 const hoveredAlert = defineModel<AlertDetails | null>('hoveredAlert')
 const sortedHead = defineModel<{ sortKey: string; sortOrder: string }>('sortedHead')
 const isDialogOpen = ref(false)
+const linkAlertRoute = computed(() =>  Number(route.params.alert))
+const isLinkDialogOpen = ref(false)
+const linkHistoryAlert = ref<HistoryAlert | null>(null)
 const { sortKey, sortOrder, toggleSort } = useSortRequests<HistoryAlert>(() => props.alerts, 'createdAt')
 
 const hoveredId = ref<number | null>(null);
@@ -52,10 +59,27 @@ watchEffect(() => {
   sortedHead.value = { sortKey: sortKey.value, sortOrder: sortOrder.value };
 });
 
+watch((linkAlertRoute), async (newAlert) => {
+  if(!props.isLoading && newAlert && !props.alerts.find((a) => a.id === newAlert)) {
+    await getHistoryAlertByIdRequest(newAlert)
+      .then((res) => {
+        linkHistoryAlert.value = res;
+      })
+      .catch(e => toast.error(`Error downloading alert ${newAlert} from history: ${e}`))
+  }
+}, {immediate: true, deep: true});
+
+watch(linkHistoryAlert, () =>{
+  isLinkDialogOpen.value = !!linkHistoryAlert.value;
+})
+
 
 </script>
 
 <template>
+  <LinkAlertHistoryDialog
+    :isDialogOpen="isLinkDialogOpen"
+    :alert="linkHistoryAlert"/>
       <Table id="alert-history-table" :class="dataTable">
         <TableCaption :class="tableCaption">
             <slot/>

@@ -21,6 +21,7 @@ import FormNumberInput from "@/helpers_components/form/FormNumberInput.vue";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import {Label} from "@/components/ui/label";
 import MyFieldLabel from "@/helpers_components/form/MyFieldLabel.vue";
+import FormCheckbox from "@/helpers_components/form/FormCheckbox.vue";
 
 const props = defineProps<{
   system: MonitoringSystemsConfig
@@ -50,27 +51,27 @@ const { handleSubmit, setValues, setFieldValue, values } = useForm({
   },
 })
 
-const onSubmit = handleSubmit(async (values) => {
+const onSubmit = handleSubmit(async (data) => {
   isLoading.value = true
   const changedValues: Record<string, string> = {}
 
-  if (values.wazuh_url !== props.system.url) {
-    changedValues.wazuh_url = values.wazuh_url
+  if (data.wazuh_url !== props.system.url) {
+    changedValues.wazuh_url = data.wazuh_url
   }
-  if (values.wazuh_user && values.wazuh_user !== props.system.user) {
-    changedValues.wazuh_user = values.wazuh_user
+  if (data.wazuh_user && data.wazuh_user !== props.system.user) {
+    changedValues.wazuh_user = data.wazuh_user
   }
-  if (values.wazuh_warning_level !== props.system.wazuh_warning_level) {
-    changedValues.wazuh_warning_level = String(values.wazuh_warning_level)
+  if (data.wazuh_warning_level !== props.system.wazuh_warning_level) {
+    changedValues.wazuh_warning_level = String(data.wazuh_warning_level)
   }
-  if (values.wazuh_critical_level !== props.system.wazuh_critical_level) {
-    changedValues.wazuh_critical_level = String(values.wazuh_critical_level)
+  if (data.wazuh_critical_level !== props.system.wazuh_critical_level) {
+    changedValues.wazuh_critical_level = String(data.wazuh_critical_level)
   }
-  if (!!values.wazuh_password_SECRET) {
-    changedValues.wazuh_password_SECRET = values.wazuh_password_SECRET
+  if (!!data.wazuh_password_SECRET) {
+    changedValues.wazuh_password_SECRET = data.wazuh_password_SECRET
   }
-  if (values.wazuh_info_as_alerts !== props.system.wazuh_info_as_alerts) {
-    changedValues.wazuh_info_as_alerts = String(values.wazuh_info_as_alerts)
+  if (data.wazuh_info_as_alerts !== props.system.wazuh_info_as_alerts) {
+    changedValues.wazuh_info_as_alerts = String(data.wazuh_info_as_alerts)
   }
   if (Object.keys(changedValues).length === 0) {
     toast.info("No changes detected.")
@@ -161,21 +162,7 @@ const onCancel = () => {
           </FormNumberInput>
         </div>
         <div>
-          <MyFieldLabel class="mr-2" for="wazuh_info_as_alerts" text="Info as alerts:"/>
-          <RadioGroup
-            @update:model-value="(val) => setFieldValue('wazuh_info_as_alerts', val === 'true')"
-            :model-value="values.wazuh_info_as_alerts ? 'true' : 'false'"
-            :default-value="system.wazuh_info_as_alerts ? 'true' : 'false'"
-            class="flex space-x-2">
-            <div class="flex items-center space-x-2">
-              <RadioGroupItem class="size-4 lg:size-5 xl:size-6 2xl:size-8" id="radio-true" value="true" />
-              <Label class="cursor-pointer text-green-badge"  for="radio-true">True</Label>
-            </div>
-            <div class="flex items-center space-x-2">
-              <RadioGroupItem class="size-4 lg:size-5 xl:size-6 2xl:size-8" id="radio-false" value="false" />
-              <Label class="cursor-pointer text-destructive" for="radio-false">False</Label>
-            </div>
-          </RadioGroup>
+          <FormCheckbox name="wazuh_info_as_alerts" label="Info as alerts:"/>
         </div>
       </CardDescription>
       <CardFooter class="bottom-4 absolute justify-between w-full">

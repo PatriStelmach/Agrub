@@ -13,7 +13,7 @@ import { useSort } from "@/composables/sorting.js";
 import {type HTMLAttributes, onMounted, ref} from "vue";
 import {useAuthStore} from "@/stores/authStore.ts";
 import {useUserStore} from "@/stores/userStore.ts";
-import {getUserActions} from "@/helpers_functions/requests.ts";
+import {getUserActionsRequest} from "@/helpers_functions/requests.ts";
 import { toast } from "vue-sonner";
 import LoadingTable from "@/helpers_components/LoadingTable.vue";
 
@@ -37,17 +37,14 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort(
 )
 onMounted(async () => {
   if (props.userView && props.userId) {
-    await getUserActions(props.userId)
+    await getUserActionsRequest(props.userId)
       .then(res => userActions.value = res )
       .catch(error => toast.error(`Error retrieving actions: ${error}`))
-      .finally(() => areActionsLoading.value = false)
   }
-  else{
-    if (userStore.allUsers.length === 0 || !userStore.allUsers) {
-      await userStore.getAllUsersRequest()
-    }
-    areActionsLoading.value = false
+  else if(userStore.allUsers.length === 0 || !userStore.allUsers) {
+    await userStore.getAllUsersRequest()
   }
+  areActionsLoading.value = false
 })
 
 const givenUser = (author: string, withId: boolean) => {
