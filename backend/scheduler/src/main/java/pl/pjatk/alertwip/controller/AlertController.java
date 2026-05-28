@@ -121,6 +121,11 @@ public class AlertController {
         return ResponseEntity.ok(history);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<GlobalProblem> getAlertById(@PathVariable Long id) {
+        return ResponseEntity.ok(alertHistoryService.getAlertById(id));
+    }
+
     @GetMapping("/origins")
     public ResponseEntity<List<String>> getAvailableOrigins() {
         return ResponseEntity.ok(alertHistoryService.getAllOriginTypes());
