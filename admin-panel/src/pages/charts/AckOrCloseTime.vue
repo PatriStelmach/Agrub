@@ -3,9 +3,9 @@ import { VisAxis, VisXYContainer, VisLine } from '@unovis/vue'
 import { ChartContainer, ChartCrosshair, ChartLegendContent, ChartTooltip, ChartTooltipContent, componentToString } from '@/components/ui/chart'
 import { bigNameLabel } from "@/assets/cssFunctions.ts"
 import { computed, onMounted, ref } from "vue"
-import { alertCountChartConfig, type Granularity, type XYAnalytics } from "@/types/types.ts"
+import { type Granularity, type XYAnalytics } from "@/types/types.ts"
 import { getAnalyticsAlertsCount } from "@/helpers_functions/requests.ts"
-import { getLocalTimeZone, today, fromDate, ZonedDateTime, CalendarDateTime, CalendarDate } from '@internationalized/date'
+import { fromDate, ZonedDateTime, CalendarDateTime, CalendarDate } from '@internationalized/date'
 import { toast } from "vue-sonner"
 import { getWeekNumber } from "reka-ui/date"
 import {useColorMode} from "@vueuse/core";

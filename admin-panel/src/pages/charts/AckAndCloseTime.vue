@@ -35,7 +35,6 @@ const timeConfig = computed(() => ({
   }
 }))
 
-// 2. Scalanie dwóch tablic w jedną spójną strukturę dla Unovis (zoptymalizowane O(N))
 const chartData = computed(() => {
   const ackArr = props.closedAndAcked?.ack || []
   const closeArr = props.closedAndAcked?.close || []
