@@ -1,6 +1,7 @@
 package pl.pjatk.alertwip.service;
 
 import org.springframework.stereotype.Service;
+import pl.pjatk.alertwip.dto.AlertsBySeverityDTO;
 import pl.pjatk.alertwip.dto.ChartDataPointDTO;
 import pl.pjatk.alertwip.model.GlobalProblem;
 import pl.pjatk.alertwip.model.TimeGranularity;
@@ -26,18 +27,21 @@ public class AnalyticsService {
     }
 
     // 1. WYKRES: Ilość alertów w czasie (Oś Y = Ilość sztuk)
-    public List<ChartDataPointDTO> getAlertsCount(LocalDateTime start, LocalDateTime end, TimeGranularity granularity) {
+    public List<AlertsBySeverityDTO> getAlertsCount(LocalDateTime start, LocalDateTime end, TimeGranularity granularity) {
         List<GlobalProblem> problems = problemRepository.findAllByCreatedAtBetween(start, end);
 
-        Map<Long, Long> grouped = problems.stream()
+        Map<Long, Map<Integer, Long>> grouped = problems.stream()
                 .collect(Collectors.groupingBy(
                         p -> getBucketTimestamp(p.getCreatedAt(), granularity),
                         TreeMap::new,
-                        Collectors.counting()
+                        Collectors.groupingBy(
+                                GlobalProblem::getSeverity,
+                                Collectors.counting()
+                        )
                 ));
 
         return grouped.entrySet().stream()
-                .map(e -> new ChartDataPointDTO(e.getKey(), e.getValue().doubleValue()))
+                .map(e -> new AlertsBySeverityDTO(e.getKey(), e.getValue()))
                 .toList();
     }
 

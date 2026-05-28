@@ -3,6 +3,7 @@ package pl.pjatk.alertwip.controller;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.pjatk.alertwip.dto.AlertsBySeverityDTO;
 import pl.pjatk.alertwip.dto.ChartDataPointDTO;
 import pl.pjatk.alertwip.model.TimeGranularity;
 import pl.pjatk.alertwip.service.AnalyticsService;
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/analitycs")
+@RequestMapping("/api/analytics")
 public class AnalyticsController {
 
     private final AnalyticsService analyticsService;
@@ -21,7 +22,7 @@ public class AnalyticsController {
     }
 
     @GetMapping("/alerts-count")
-    public ResponseEntity<List<ChartDataPointDTO>> getAlertsCount(
+    public ResponseEntity<List<AlertsBySeverityDTO>> getAlertsCount(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end,
             @RequestParam(defaultValue = "DAY") TimeGranularity granularity) {
