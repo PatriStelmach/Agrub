@@ -1,7 +1,4 @@
-import {useColorMode} from "@vueuse/core";
-
 export const api_url = '/api'
-const mode = useColorMode()
 
 export enum Language {
   PYTHON = ".py",
@@ -32,6 +29,14 @@ export interface ActiveAlert {
   severity: 0 | 1 | 2 | 3 | 4 | 5
 }
 
+export type Severity =
+  | 'UNKNOWN'
+  | 'INFO'
+  | 'LOW'
+  | 'MEDIUM'
+  | 'HIGH'
+  | 'CRITICAL';
+
 export interface AlertCountAnalytics {
   x: number,
   severities: {
@@ -49,6 +54,12 @@ export interface XYAnalytics {
   y: number
 }
 
+export interface CumulativeData {
+  alerts: AlertCountAnalytics[]
+  ack: XYAnalytics[]
+  close: XYAnalytics[]
+}
+
 export interface ChartDataPoint {
   date: number
   0: number
@@ -57,33 +68,6 @@ export interface ChartDataPoint {
   3: number
   4: number
   5: number
-}
-
-export const alertCountChartConfig = {
-  0 : {
-    label: "INFO",
-    color: mode.value === 'light' ? '#00A3FFFF' : '#61C8FFFF'
-  },
-  1: {
-    label: 'LOW',
-    color: mode.value === 'light' ? '#48CF00FF' : '#08A800FF',
-  },
-  2: {
-    label: 'MODERATE',
-    color: mode.value ==='light' ? '#ECCC00FF' : '#FFDF20FF',
-  },
-  3 : {
-    label: 'MEDIUM',
-    color: mode.value === 'light' ? '#FE9A00FF' : '#E98600FF',
-  },
-  4 : {
-    label: 'HIGH',
-    color: '#FF6900FF'
-  },
-  5 : {
-    label: 'CRITICAL',
-    color: '#F40031FF',
-  }
 }
 
 export type Granularity = 'DAY' | 'WEEK' | 'MONTH'
