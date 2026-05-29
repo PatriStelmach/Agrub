@@ -47,12 +47,10 @@ public class AnalyticsService {
     }
 
     public List<AlertsBySeverityDTO> getAlertsCountBySeverity(LocalDateTime start, LocalDateTime end, TimeGranularity granularity) {
-        // 1. Pobranie płaskich wyników z bazy MySQL
         List<SeverityChartProjection> rows = problemRepository.countAlertsBySeverityAndGranularity(
                 start, end, mapGranularity(granularity)
         );
 
-        // 2. Grupowanie po timestampie (Chrono-porządek zapewnia TreeMap)
         Map<Long, List<SeverityChartProjection>> groupedByTimestamp = rows.stream()
                 .collect(Collectors.groupingBy(
                         SeverityChartProjection::getBucketTimestamp,
@@ -60,18 +58,15 @@ public class AnalyticsService {
                         Collectors.toList()
                 ));
 
-        // 3. Mapowanie na końcowe DTO z pełną inicjalizacją poziomów severity (0-5)
         return groupedByTimestamp.entrySet().stream()
                 .map(entry -> {
                     Long timestamp = entry.getKey();
 
-                    // Przygotowanie bezpiecznej mapy z domyślnymi zerami dla poziomów 0-5
                     Map<Integer, Long> severityMap = new java.util.HashMap<>();
                     for (int i = 0; i <= 5; i++) {
                         severityMap.put(i, 0L);
                     }
 
-                    // Uzupelnienie mapy faktycznymi danymi z bazy
                     for (SeverityChartProjection row : entry.getValue()) {
                         if (row.getSeverity() != null) {
                             severityMap.put(row.getSeverity(), row.getTotalCount());

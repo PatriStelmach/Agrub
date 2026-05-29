@@ -27,7 +27,7 @@ public class AnalyticsController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end,
             @RequestParam(defaultValue = "DAY") TimeGranularity granularity) {
 
-        return ResponseEntity.ok(analyticsService.getAlertsCount(start, end, granularity));
+        return ResponseEntity.ok(analyticsService.getAlertsCountBySeverity(start, end, granularity));
     }
 
     @GetMapping("/avg-close-time")
