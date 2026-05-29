@@ -90,4 +90,21 @@ public interface GlobalProblemRepository extends JpaRepository<GlobalProblem, Lo
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end,
             @Param("granularity") String granularity);
+
+    @Query(value = "SELECT " +
+            "  CASE " +
+            "    WHEN :granularity = 'day' THEN UNIX_TIMESTAMP(DATE(created_at)) * 1000 " +
+            "    WHEN :granularity = 'week' THEN UNIX_TIMESTAMP(DATE_SUB(DATE(created_at), INTERVAL WEEKDAY(created_at) DAY)) * 1000 " +
+            "    WHEN :granularity = 'month' THEN UNIX_TIMESTAMP(STR_TO_DATE(DATE_FORMAT(created_at, '%Y-%m-01'), '%Y-%m-%d')) * 1000 " +
+            "  END AS bucketTimestamp, " +
+            "  severity, " +
+            "  COUNT(id) AS totalCount " +
+            "FROM global_problem " +
+            "WHERE created_at BETWEEN :start AND :end " +
+            "GROUP BY bucketTimestamp, severity " +
+            "ORDER BY bucketTimestamp, severity", nativeQuery = true)
+    List<SeverityChartProjection> countAlertsBySeverityAndGranularity(
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end,
+            @Param("granularity") String granularity);
 }
