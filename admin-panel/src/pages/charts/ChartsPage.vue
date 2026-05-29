@@ -40,29 +40,22 @@ const dateRange = ref({
 }) as Ref<DateRange>
 
 const periodLabel = computed(() => {
+  const diffMs =
+    dateRange.value.end!.toDate(tz).getTime() -
+    dateRange.value.start!.toDate(tz).getTime()
+
+  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24))
+
   switch (granularityAfterReload.value) {
-    case 'DAY': {
-      const days = end.value.compare(start.value as ZonedDateTime) === 0
-        ? 1
-        : Math.round(
-          (end.value.toDate(tz).getTime() -
-            start.value.toDate(tz).getTime()) /
-          (1000 * 60 * 60 * 24))
-      return `${days} days`
-    }
-    case 'WEEK': {
-      const days =
-        (end.value.toDate(tz).getTime() -
-          start.value.toDate(tz).getTime()) /
-        (1000 * 60 * 60 * 24)
-      return `${Math.round(days / 7)} weeks`
-    }
-    case 'MONTH': {
-      const months =
-        (end.value.year - start.value.year) * 12 +
-        (end.value.month - start.value.month)
-      return `${months} months`
-    }
+    case 'DAY':
+      return `${diffDays} days`
+
+    case 'WEEK':
+      return `${Math.ceil(diffDays / 7)} weeks`
+
+    case 'MONTH':
+      return `${Math.ceil(diffDays / 30)} months`
+
     default:
       return ''
   }
@@ -99,7 +92,7 @@ const onDateRangeChange = async () => {
               class="rounded-md border-2  shadow-xl"
               :number-of-months="3"
               disable-days-outside-current-view
-              :isDateDisabled="date => date.add({days:1}) > today(tz)"
+              :isDateDisabled="date => date.subtract({days:1}) > today(tz)"
             />
             <div class="mt-3">
               <div class="flex space-x-2 items-baseline">
