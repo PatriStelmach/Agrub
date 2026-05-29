@@ -8,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import pl.pjatk.alertwip.dto.ActionRequestDTO;
+import pl.pjatk.alertwip.dto.GlobalProblemHistoryDTO;
 import pl.pjatk.alertwip.model.GlobalProblem;
 import pl.pjatk.alertwip.model.ProblemAction;
 import pl.pjatk.alertwip.repository.GlobalProblemRepository;
@@ -74,7 +75,7 @@ public class AlertController {
     }
 
     @GetMapping("/history")
-    public ResponseEntity<org.springframework.data.domain.Page<GlobalProblem>> getHistory(
+    public ResponseEntity<org.springframework.data.domain.Page<GlobalProblemHistoryDTO>> getHistory(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int pageSize,
             @RequestParam(defaultValue = "createdAt") String sortKey,
@@ -85,7 +86,7 @@ public class AlertController {
         log.info("Otrzymano zapytanie do historii z filtrami: {}", filters);
         log.info("Paginacja i sortowanie -> strona: {}, rozmiar: {}, sortKey: {}, sortOrder: {}", page, pageSize, sortKey, sortOrder);
 
-        org.springframework.data.domain.Page<GlobalProblem> historyPage =
+        org.springframework.data.domain.Page<GlobalProblemHistoryDTO> historyPage =
                 alertHistoryService.getAlertHistory(page, pageSize, sortKey, sortOrder, filters);
 
         return ResponseEntity.ok(historyPage);
