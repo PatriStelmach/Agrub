@@ -19,8 +19,9 @@ const props = defineProps<{
 const route = useRoute()
 const isDialogOpen = ref(false)
 const authStore = useAuthStore()
+
 watchEffect( () => {
-  if(route.params.user === `${props.user.firstname} ${props.user.surname}`) {
+  if(route.params.user === `${props.user.firstname} ${props.user.surname}` && route.params.id === `${props.user.id}`) {
     isDialogOpen.value = true
   }
 })
@@ -53,7 +54,7 @@ watch(isDialogOpen, (newValue, oldValue) => {
         action-type="edit"
         :user="user"
       >
-        <RouterLink :to=" authStore.currentUser?.id === user.id ? '/team_members/my_account' : `/team_members/${user.firstname} ${user.surname}`">
+        <RouterLink :to=" authStore.currentUser?.id === user.id ? '/team_members/my_account' : `/team_members/${user.id}/${user.firstname} ${user.surname}`">
           <IconEdit
             class="absolute -top-2 right-2 text-green-badge hover:scale-105 cursor-pointer" />
         </RouterLink>

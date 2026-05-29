@@ -5,12 +5,12 @@ import {computed, onMounted, ref, watchEffect} from "vue";
 import BigLoadingBlock from "@/helpers_components/loaders/BigLoadingBlock.vue";
 import type {
   MonitoringSystemsConfig,
-} from "@/types/types.ts";
+} from "@/types/types.js";
 import {toast} from "vue-sonner";
-import NagiosCard from "@/pages/systems/NagiosCard.vue";
-import {useWrapping} from "@/composables/unwrapping.ts";
-import WazuhCard from "@/pages/systems/WazuhCard.vue";
-import ZabbixCard from "@/pages/systems/ZabbixCard.vue";
+import NagiosCard from "@/pages/settings/systems/NagiosCard.vue";
+import {useWrapping} from "@/composables/unwrapping.js";
+import WazuhCard from "@/pages/settings/systems/WazuhCard.vue";
+import ZabbixCard from "@/pages/settings/systems/ZabbixCard.vue";
 import {useRoute, useRouter} from "vue-router";
 
 const isPageLoading = ref(true);
@@ -19,9 +19,12 @@ const route = useRoute()
 const router = useRouter()
 const systemsConfig = computed(() => settingStore.systemsConfig)
 onMounted(async () => {
-  await settingStore.getSystemFullSettingsRequest()
-    .catch((err) => toast.error(err.message))
-    .finally(() => isPageLoading.value = false)
+  if (!settingStore.systemFullSettings){
+    await settingStore.getSystemFullSettingsRequest()
+      .catch((err) => toast.error(err.message))
+      .finally(() => isPageLoading.value = false)
+  }
+  else isPageLoading.value = false
 })
 
 const {
@@ -40,11 +43,11 @@ watchEffect(() => {
 })
 
 const onCloseAndSave = () => {
-  router.replace({path: '/my_systems'})
+  router.replace({path: '/settings/systems'})
 }
 
 const onEdit = (system: string) => {
-  router.replace({path: `/my_systems/${system}`})
+  router.replace({path: `/settings/systems/${system}`})
 }
 
 </script>
@@ -60,7 +63,7 @@ const onEdit = (system: string) => {
           :key="index"/>
       </div>
       <div
-        class=" px-6 py-2 pr-3 grid sm:grid-cols-2 md:grid-cols-3 gap-6 max-h-[85vh] overflow-y-auto"
+        class=" px-6 py-2 grid sm:grid-cols-2 md:grid-cols-3 gap-6 max-h-[90vh] overflow-y-auto"
         v-else>
         <NagiosCard
           v-if="systemsConfig[2]"

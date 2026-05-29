@@ -11,6 +11,7 @@ const props = defineProps<{
   placeholder?: string
   type?: string
   class?: HTMLAttributes["class"]
+  labelClass?: HTMLAttributes["class"]
   orientation: "horizontal" | "vertical"
   autocomplete?: string
 }>()
@@ -23,7 +24,7 @@ const fieldId = props.name
     <Field class="gap-y-1" :orientation="props.orientation" :class="props.class" :data-invalid="!!errors.length">
       <div class="flex space-x-2 items-center">
         <slot/>
-        <MyFieldLabel :text="label" :for="fieldId" />
+        <MyFieldLabel :class="labelClass" :text="label" :for="fieldId" />
       </div>
       <Input
         :autocomplete="autocomplete"

@@ -77,7 +77,7 @@ watch(values, (newValues) => {
       <FormInput name="surname" label="Surname" orientation="vertical">
         <IconLabel class="size-4"/>
       </FormInput>
-      <FormInput autocomplete="email" type="email" name="email" label="e-mail" orientation="vertical">
+      <FormInput autocomplete="email" type="email" name="email" label="E-mail" orientation="vertical">
         <IconMail class="size-4"/>
       </FormInput>
       <FormInput v-if="actionType === 'create'" autocomplete="password" type="password" name="password" label="Password" orientation="vertical">

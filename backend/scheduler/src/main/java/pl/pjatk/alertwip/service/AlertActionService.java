@@ -1,6 +1,7 @@
 package pl.pjatk.alertwip.service;
 
 import org.springframework.stereotype.Service;
+import pl.pjatk.alertwip.dto.ProblemActionDTO;
 import pl.pjatk.alertwip.model.*;
 import pl.pjatk.alertwip.dto.ActionRequestDTO;
 import pl.pjatk.alertwip.dto.AlertUpdateEventDTO;
@@ -138,7 +139,7 @@ public class AlertActionService {
 
     // pobranie wszystkich akcji dla usera
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
-    public List<ProblemAction> getActionsByAuthor(String author) {
+    public List<ProblemActionDTO> getActionsByAuthor(String author) {
         return actionRepository.findByAuthorOrderByCreatedAtDesc(author);
     }
 }

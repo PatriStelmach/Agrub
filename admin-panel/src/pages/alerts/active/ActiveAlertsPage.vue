@@ -6,7 +6,7 @@ import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/inpu
 
 import {useClientSearchFilter} from "@/composables/useClientSearchFilter";
 import { useAlertStore } from "@/stores/alertStore";
-import { onMounted, ref} from "vue";
+import {onMounted, ref, watchEffect} from "vue";
 import {
   tableDiv,
 } from "@/assets/cssFunctions.js";
@@ -14,6 +14,7 @@ import TopH1Div from "@/helpers_components/TopH1Div.vue";
 import ActiveAlertsTable from "@/pages/alerts/active/ActiveAlertsTable.vue";
 import MyClientPagination from "@/helpers_components/MyClientPagination.vue";
 import DetailsCard from '@/pages/alerts/DetailsCard.vue'
+import {useRoute} from "vue-router";
 
 const isLoading = ref(true)
 const alertStore = useAlertStore();
@@ -23,6 +24,8 @@ onMounted(async () => {
 const hoveredAlert = ref<AlertDetails | null>(null)
 const {pageSize, filteredData, updateData, currentPage, searchFilter, tableData } =
   useClientSearchFilter<ActiveAlert>(() => alertStore.currentAlerts,(item) => item.subject)
+
+
 
 </script>
 

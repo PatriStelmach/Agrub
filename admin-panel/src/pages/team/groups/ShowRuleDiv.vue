@@ -65,11 +65,8 @@ const props = defineProps<{
             <IconLoader v-if="isRuleDeleting" class="animate-spin"/>
             <IconTrash v-else />
           </Button>
-
         </div>
-
       </div>
     </div>
-
   </div>
 </template>

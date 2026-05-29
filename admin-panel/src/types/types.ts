@@ -1,4 +1,7 @@
+import {useColorMode} from "@vueuse/core";
+
 export const api_url = '/api'
+const mode = useColorMode()
 
 export enum Language {
   PYTHON = ".py",
@@ -19,15 +22,71 @@ export enum MatchType {
 export interface ActiveAlert {
   id: number
   externalEventId: string
-  subject: string,
-  message: string,
-  source: string,
-  originType: string,
-  isAcknowledged: boolean,
-  createdAt: Date,
-  actions: ActionResponse[],
-  severity: 0 | 1 | 2 | 3 | 4 | 5,
+  subject: string
+  message: string
+  source: string
+  originType: string
+  isAcknowledged: boolean | null
+  createdAt: Date
+  actions: ActionResponse[]
+  severity: 0 | 1 | 2 | 3 | 4 | 5
 }
+
+export interface AlertCountAnalytics {
+  x: number,
+  severities: {
+    0: number
+    1: number
+    2: number
+    3: number
+    4: number
+    5: number
+  }
+}
+
+export interface XYAnalytics {
+  x: number
+  y: number
+}
+
+export interface ChartDataPoint {
+  date: number
+  0: number
+  1: number
+  2: number
+  3: number
+  4: number
+  5: number
+}
+
+export const alertCountChartConfig = {
+  0 : {
+    label: "INFO",
+    color: mode.value === 'light' ? '#00A3FFFF' : '#61C8FFFF'
+  },
+  1: {
+    label: 'LOW',
+    color: mode.value === 'light' ? '#48CF00FF' : '#08A800FF',
+  },
+  2: {
+    label: 'MODERATE',
+    color: mode.value ==='light' ? '#ECCC00FF' : '#FFDF20FF',
+  },
+  3 : {
+    label: 'MEDIUM',
+    color: mode.value === 'light' ? '#FE9A00FF' : '#E98600FF',
+  },
+  4 : {
+    label: 'HIGH',
+    color: '#FF6900FF'
+  },
+  5 : {
+    label: 'CRITICAL',
+    color: '#F40031FF',
+  }
+}
+
+export type Granularity = 'DAY' | 'WEEK' | 'MONTH'
 
 
 export interface HistoryAlert extends ActiveAlert {
@@ -38,16 +97,18 @@ export interface Actions {
   id: number
   alertId?: number
   author: string,
-  ack?: boolean,
+  ack?: boolean | null,
   message?: string,
   newSeverity?: 0 | 1 | 2 | 3 | 4 | 5,
+  previousSeverity?: 0 | 1 | 2 | 3 | 4 | 5,
+  createdAt?: Date
+  closedAt?: Date
 }
 
 export interface ActionResponse extends Actions {
-  ackUpdate: boolean,
-  previousSeverity: 0 | 1 | 2 | 3 | 4 | 5,
+  ackUpdate: boolean | null,
   problemId: number,
-  createdAt: Date,
+  subject?: string
 }
 
 export interface AlertDetails {
@@ -132,7 +193,6 @@ export interface EditCurrentUser {
   firstname: string,
   surname: string,
   email: string,
-  role: "ADMINISTRATOR" | "TECHNICIAN"
   groups: UserGroup[],
   autoLogoutMinutes?: number
 }
@@ -194,21 +254,6 @@ export interface PluginDetails
   code: string,
 }
 
-export interface SystemsStatus {
-  wazuh_enabled: boolean
-  nagios_enabled: boolean
-  zabbix_enabled: boolean
-}
-
-export interface ImportPlugin {
-  name: string,
-  creator: string,
-  language: Language,
-  code: string,
-  description: string,
-  tags: string[],
-  log: boolean
-}
 
 export interface LibraryPlugin
 {
@@ -232,6 +277,7 @@ export interface WazuhConfig {
   wazuh_enabled: boolean
   wazuh_warning_level: number
   wazuh_critical_level: number
+  wazuh_info_as_alerts: boolean
 }
 //tak przychodzi z api
 export interface NagiosConfig {
@@ -257,6 +303,7 @@ export interface MonitoringSystemsConfig  {
   enabled: boolean
   wazuh_warning_level?: number
   wazuh_critical_level?: number
+  wazuh_info_as_alerts?: boolean
 }
 
 //tak przychodzi z api
@@ -267,6 +314,7 @@ export interface AlertSystemSettings {
   wazuh_enabled: boolean
   wazuh_warning_level: number
   wazuh_critical_level: number
+  wazuh_info_as_alerts: boolean
 
   nagios_url: string
   nagios_enabled: boolean
@@ -278,40 +326,53 @@ export interface AlertSystemSettings {
   zabbix_api_token_SECRET?: string
 
   smtp_host: string
-  smtp_port: string
+  smtp_port: "25" | "587" | "465" | "2525"
   smtp_user: string
   smtp_password_SECRET?: string
   smtp_enabled: boolean
 
-  external_system_sync_timer: string
-  scripts_execution_timeout_seconds: string
+  external_system_sync_timer: number
+  scripts_execution_timeout_seconds: number
 
-  SECURITY_PASSWORD_LIFETIME_DAYS: string
-  SECURITY_ACCESS_TOKEN_EXP_MINUTES: string
-  SECURITY_REFRESH_TOKEN_EXP_HOURS: string
+  SECURITY_PASSWORD_LIFETIME_DAYS: number
+  SECURITY_ACCESS_TOKEN_EXP_MINUTES: number
+  SECURITY_REFRESH_TOKEN_EXP_HOURS: number
   SECURITY_AD_DOMAIN: string
   SECURITY_AD_URL: string
   SECURITY_LDAP_BASE_DN: string
   SECURITY_LDAP_USER_DN_PATTERN: string
 }
 
-export interface System
-{
+export interface SecuritySettings {
+  SECURITY_PASSWORD_LIFETIME_DAYS: number
+  SECURITY_ACCESS_TOKEN_EXP_MINUTES: number
+  SECURITY_REFRESH_TOKEN_EXP_HOURS: number
+  SECURITY_AD_DOMAIN: string
+  SECURITY_AD_URL: string
+  SECURITY_LDAP_BASE_DN: string
+  SECURITY_LDAP_USER_DN_PATTERN: string
+}
+
+export interface AlertSettings {
+  external_system_sync_timer: number
+  scripts_execution_timeout_seconds: number
+}
+
+export interface SmtpSettings {
+  smtp_host: string
+  smtp_port: "25" | "587" | "465" | "2525"
+  smtp_user: string
+  smtp_password_SECRET?: string
+  smtp_enabled: boolean
+}
+
+export interface ApiKey {
+  active: boolean,
   id: number,
-  name: string,
-  img: string,
-  openSource: boolean,
-  description: string
+  description: string,
+  createdAt: Date,
+  token: string | null,
 }
-
-export interface fileType
-{
-  id:number,
-  file:File,
-  progress:number
-}
-
-
 
 export interface GroupDetails {
   id?: number,
@@ -319,8 +380,6 @@ export interface GroupDetails {
   rules: Rule[],
   users: User[]
 }
-
-
 
 export interface Rule {
   id?: number

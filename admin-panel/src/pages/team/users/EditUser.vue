@@ -39,9 +39,6 @@ const isOpen = defineModel<boolean>('open', { default: false })
         :action-type="props.actionType"
         v-if="isOpen"
         :user="user" />
-      <div v-else class="flex justify-center p-10">
-        <IconLoader class="animate-spin" />
-      </div>
     </SheetContent>
   </Sheet>
 </template>

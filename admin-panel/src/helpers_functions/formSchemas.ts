@@ -14,14 +14,18 @@ export const wazuhSchema = toTypedSchema(
   z.object({
     wazuh_url: z.string().url('Must be a valid URL'),
     wazuh_user: z.string().min(1, 'User is required'),
-    wazuh_password_SECRET: z.string()
-  .optional(),
-    wazuh_critical_level: z.number()
+    wazuh_password_SECRET: z.string().optional(),
+    wazuh_critical_level: z
+      .number()
+      .int('Must be a positive integer')
       .min(0, '0 is minimal critical level')
-      .max(16, '16 is maximal critical level'),
-    wazuh_warning_level: z.number()
+      .max(15, '15 is maximal critical level'),
+    wazuh_warning_level: z
+      .number()
+      .int('Must be a positive integer')
       .min(0, '0 is minimal warning level')
-      .max(16, '16 is maximal warning level'),
+      .max(15, '15 is maximal warning level'),
+    wazuh_info_as_alerts: z.boolean(),
   })
     .superRefine((data, ctx) => {
       if(data.wazuh_warning_level > data.wazuh_critical_level) {
@@ -115,8 +119,10 @@ export const editCurrentUserSchema = toTypedSchema(
     email: z.string().email('Invalid email address'),
     firstname: z.string().min(2, 'Firstname must be at least 2 characters.'),
     surname: z.string().min(2, 'Surname must be at least 2 characters.'),
-    autoLogoutMinutes: z.number().min(1, "Cannot be lower than 1 minute"),
-    role: z.enum(['TECHNICIAN', 'ADMINISTRATOR']),
+    autoLogoutMinutes: z
+      .number()
+      .int('Must be a positive integer')
+      .min(1, "Cannot be lower than 1 minute"),
     groups: z.array(z.object({
       name: z.string(),
       id: z.number(),
@@ -151,3 +157,50 @@ export const changePasswordSchema = toTypedSchema(
     }
   })
 )
+
+export const securitySettingSchema = toTypedSchema(  z.object({
+    SECURITY_PASSWORD_LIFETIME_DAYS: z
+      .number()
+      .int('Must be a positive integer')
+      .min(1, "Cannot be lower than 1 dat"),
+    SECURITY_ACCESS_TOKEN_EXP_MINUTES: z
+      .number()
+      .int('Must be a positive integer')
+      .min(1, "Cannot be lower than 1 hour"),
+    SECURITY_REFRESH_TOKEN_EXP_HOURS: z
+      .number()
+      .int('Must be a positive integer')
+      .min(1, "Cannot be lower than 1 minute"),
+    SECURITY_AD_DOMAIN: z.string().url('Must be a valid URL'),
+    SECURITY_AD_URL: z.string().url('Must be a valid URL'),
+    SECURITY_LDAP_BASE_DN: z
+      .string()
+      .trim()
+      .regex(/^(?:[A-Za-z][A-Za-z0-9-]*|(?:0|[1-9][0-9]*)(?:\.(?:0|[1-9][0-9]*))+)=(?:#(?:[0-9A-Fa-f]{2})+|(?:[^,=\+<>#;\\\"]|\\[,=\+<>#;\\\"\ ]|\\[0-9A-Fa-f]{2}|\"[^\"]*\")*(?:(?:[^,=\+<>#;\\\"\  ]|\\[,=\+<>#;\\\"\ ]|\\[0-9A-Fa-f]{2}|\"[^\"]*\")(?:[^,=\+<>#;\\\"]|\\[,=\+<>#;\\\"\ ]|\\[0-9A-Fa-f]{2}|\"[^\"]*\")*)?)(?:\s*[,;+]\s*(?:[A-Za-z][A-Za-z0-9-]*|(?:0|[1-9][0-9]*)(?:\.(?:0|[1-9][0-9]*))+)=(?:#(?:[0-9A-Fa-f]{2})+|(?:[^,=\+<>#;\\\"]|\\[,=\+<>#;\\\"\ ]|\\[0-9A-Fa-f]{2}|\"[^\"]*\")*(?:(?:[^,=\+<>#;\\\"\  ]|\\[,=\+<>#;\\\"\ ]|\\[0-9A-Fa-f]{2}|\"[^\"]*\")(?:[^,=\+<>#;\\\"]|\\[,=\+<>#;\\\"\ ]|\\[0-9A-Fa-f]{2}|\"[^\"]*\")*)?))*$/,
+        'Invalid LDAP base dn'),
+    SECURITY_LDAP_USER_DN_PATTERN: z
+      .string()
+      .regex(/^(?:[A-Za-z][A-Za-z0-9-]*|(?:0|[1-9][0-9]*)(?:\.(?:0|[1-9][0-9]*))+)=\{0\}(?:\s*[,;]\s*(?:[A-Za-z][A-Za-z0-9-]*|(?:0|[1-9][0-9]*)(?:\.(?:0|[1-9][0-9]*))+)=(?:#(?:[0-9A-Fa-f]{2})*|(?:[^,=+<>#;\\"]|\\[,=+<>#;\\" ]|\\[0-9A-Fa-f]{2})*))*$/,
+        'Invalid LDAP user dn pattern'),
+  }))
+
+export const smtpSettingSchema = toTypedSchema(
+  z.object({
+    smtp_host: z.string().url('Must be a valid URL'),
+    smtp_port: z.enum(["25", "587", "465", "2525"]),
+    smtp_user: z.string().email('Invalid email address'),
+    smtp_password_SECRET: z.string(),
+    smtp_enabled: z.boolean(),
+  }))
+
+export const alertSettingSchema = toTypedSchema(
+  z.object({
+    external_system_sync_timer: z
+      .number()
+      .int('Must be a positive integer')
+      .min(1, "Cannot be lower than 1 second"),
+    scripts_execution_timeout_seconds: z
+      .number()
+      .int('Must be a positive integer')
+      .min(1, "Cannot be lower than 1 second"),
+  }))

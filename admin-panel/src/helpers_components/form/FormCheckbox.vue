@@ -17,7 +17,8 @@ const fieldId = props.name
         type="checkbox"
         :id="fieldId"
         :checked="field.value"
-        @update:checked="field.onChange"
+        v-bind="field"
+        @change="field.onChange(($event.target as HTMLInputElement).checked)"
       />
       <MyFieldLabel :text="label" :for="fieldId" class="cursor-pointer" />
       <FieldError v-if="errors.length" :errors="errors" />

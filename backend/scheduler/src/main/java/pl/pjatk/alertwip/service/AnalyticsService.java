@@ -1,6 +1,7 @@
 package pl.pjatk.alertwip.service;
 
 import org.springframework.stereotype.Service;
+import pl.pjatk.alertwip.dto.AlertsBySeverityDTO;
 import pl.pjatk.alertwip.dto.ChartDataPointDTO;
 import pl.pjatk.alertwip.repository.ChartDataProjection;
 import pl.pjatk.alertwip.model.TimeGranularity;

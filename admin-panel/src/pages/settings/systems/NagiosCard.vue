@@ -1,23 +1,20 @@
 <script setup lang="ts">
-import wazuh_logo_black from "/icons/wazuh_logo_black.svg"
-import wazuh_logo_white from "/icons/wazuh_logo_white.svg"
+import nagios_logo from "/icons/nagios_logo.svg"
 import {ref} from "vue"
-import { useColorMode } from "@vueuse/core"
 import {
   bigNameLabel,
   gridSystemCard,
-  gridSystemCardUnwrapped, smallNameLabel
-} from "@/assets/cssFunctions.ts"
-import { IconDeviceFloppy, IconLock, IconPower, IconAlertTriangle, IconUser, IconBellExclamation, IconLink, IconCheck, IconEdit, IconX } from "@tabler/icons-vue"
+  gridSystemCardUnwrapped
+} from "@/assets/cssFunctions.js"
+import { IconDeviceFloppy, IconLock, IconPower, IconUser, IconLink, IconCheck, IconEdit, IconX } from "@tabler/icons-vue"
 import { Card, CardDescription, CardFooter, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import FormInput from "@/helpers_components/form/FormInput.vue"
-import type { MonitoringSystemsConfig} from "@/types/types.ts";
+import type {MonitoringSystemsConfig} from "@/types/types.js";
 import {useForm} from "vee-validate";
-import {wazuhSchema} from "@/helpers_functions/formSchemas.ts";
-import {useSettingStore} from "@/stores/settingStore.ts";
+import {nagiosSchema} from "@/helpers_functions/formSchemas.js";
+import {useSettingStore} from "@/stores/settingStore.js";
 import {toast} from "vue-sonner";
-import FormNumberInput from "@/helpers_components/form/FormNumberInput.vue";
 
 const props = defineProps<{
   system: MonitoringSystemsConfig
@@ -33,16 +30,13 @@ const emit = defineEmits<{
 const changePassword = ref(false)
 const settingStore = useSettingStore()
 const isLoading = ref(false)
-const colorMode = useColorMode()
 
 const { handleSubmit, setValues } = useForm({
-  validationSchema: wazuhSchema,
+  validationSchema: nagiosSchema,
   initialValues: {
-    wazuh_url: props.system.url,
-    wazuh_user: props.system.user,
-    wazuh_password_SECRET: '',
-    wazuh_critical_level: props.system.wazuh_critical_level,
-    wazuh_warning_level: props.system.wazuh_warning_level
+    nagios_url: props.system.url,
+    nagios_user: props.system.user,
+    nagios_password_SECRET: '',
   },
 })
 
@@ -50,20 +44,14 @@ const onSubmit = handleSubmit(async (values) => {
   isLoading.value = true
   const changedValues: Record<string, string> = {}
 
-  if (values.wazuh_url !== props.system.url) {
-    changedValues.wazuh_url = values.wazuh_url
+  if (values.nagios_url !== props.system.url) {
+    changedValues.nagios_url = values.nagios_url
   }
-  if (values.wazuh_user && values.wazuh_user !== props.system.user) {
-    changedValues.wazuh_user = values.wazuh_user
+ if (values.nagios_user && values.nagios_user !== props.system.user) {
+    changedValues.nagios_user = values.nagios_user
   }
-  if (values.wazuh_warning_level !== props.system.wazuh_warning_level) {
-    changedValues.wazuh_warning_level = String(values.wazuh_warning_level)
-  }
-  if (values.wazuh_critical_level !== props.system.wazuh_critical_level) {
-    changedValues.wazuh_critical_level = String(values.wazuh_critical_level)
-  }
-  if (!!values.wazuh_password_SECRET) {
-    changedValues.wazuh_password_SECRET = values.wazuh_password_SECRET
+  if (!!values.nagios_password_SECRET) {
+    changedValues.nagios_password_SECRET = values.nagios_password_SECRET
   }
   if (Object.keys(changedValues).length === 0) {
     toast.info("No changes detected.")
@@ -72,18 +60,19 @@ const onSubmit = handleSubmit(async (values) => {
   }
 
   await settingStore.updateSystemFullSettingsRequest(changedValues)
-    .then(() => emit('save'))
+    .then(() => {
+      toast.success('Nagios configuration updated')
+      emit('save')
+    })
     .catch((error) => toast.error(`Error updating system configuration: ${error.message}`))
     .finally(() => isLoading.value = false)
 })
 
 const onEdit = () => {
   setValues({
-    wazuh_url: props.system.url,
-    wazuh_user: props.system.user,
-    wazuh_warning_level: props.system.wazuh_warning_level,
-    wazuh_critical_level: props.system.wazuh_critical_level,
-    wazuh_password_SECRET: '',
+    nagios_url: props.system.url,
+    nagios_user: props.system.user,
+    nagios_password_SECRET: '',
   })
   emit('edit', props.system.name)
 }
@@ -99,33 +88,33 @@ const onCancel = () => {
   <!-- EDIT CARD -->
   <Card
     v-if="props.isUnwrapped"
-    :class="gridSystemCardUnwrapped"
+    :class="`${gridSystemCardUnwrapped} h-120 xl:h-160`"
   >
-    <form id="wazuh-form" @submit.prevent="onSubmit">
+    <form id="nagios-form" @submit.prevent="onSubmit">
       <CardHeader class="left-1/2 -translate-x-1/2 items-center relative">
         <div class="w-48 h-20 mx-auto">
           <img
-            :src="colorMode === 'dark' ? wazuh_logo_white : wazuh_logo_black"
-            alt="wazuh_logo"
-            class="-mt-2"
+            :src="nagios_logo"
+            alt="nagios_logo"
+            class="-mt-4"
           />
         </div>
       </CardHeader>
-      <CardDescription class="px-3 space-y-3 *:flex *:items-center *:mr-2 -mt-4 max-h-50 lg:max-h-60 xl:max-h-70 overflow-auto">
+      <CardDescription class="px-3 space-y-3 *:flex *:items-center *:mr-2 -mt-4 max-h-76 overflow-auto">
         <div>
           <div class="flex items-center space-x-2 text-label">
             <IconPower class="size-5 text-label"/>
-            <h1 :class="smallNameLabel">Enabled:</h1>
+            <h1 :class="bigNameLabel">Enabled:</h1>
             <component :is="system.enabled ? IconCheck : IconX" :class="system.enabled ? 'text-green-badge' : 'text-red-badge'" />
           </div>
         </div>
         <div>
-          <FormInput  orientation="vertical" name="wazuh_url" label="URL: ">
+          <FormInput  orientation="vertical" name="nagios_url" label="URL: ">
             <IconLink class="size-5 text-label"/>
           </FormInput>
         </div>
         <div>
-          <FormInput autocomplete="user" orientation="vertical" name="wazuh_user" label="User: ">
+          <FormInput autocomplete="user" orientation="vertical" name="nagios_user" label="User: ">
             <IconUser class="size-5 text-label"/>
           </FormInput>
         </div>
@@ -134,29 +123,19 @@ const onCancel = () => {
             autocomplete="new_password"
             orientation="vertical"
             type="password"
-            name="wazuh_password_SECRET"
+            name="nagios_password_SECRET"
             label="New password:">
             <IconLock class="size-5 text-label"/>
           </FormInput>
         </div>
-        <div>
-          <FormNumberInput orientation="vertical" name="wazuh_warning_level" label="Warning level: ">
-            <IconBellExclamation class="size-5"/>
-          </FormNumberInput>
-        </div>
-        <div>
-          <FormNumberInput orientation="vertical" name="wazuh_critical_level" label="Critical level: ">
-            <IconAlertTriangle class="size-5"/>
-          </FormNumberInput>
-        </div>
       </CardDescription>
       <CardFooter class="bottom-4 absolute justify-between w-full">
-        <Button @click="onCancel" variant="red_outline" class="*:size-5!">
-          Cancel <IconX />
-        </Button>
-        <Button class="border-l-2!" form="wazuh-form" type="submit" variant="green_outline">
-          Save <IconDeviceFloppy />
-        </Button>
+          <Button @click="onCancel" variant="red_outline" class="*:size-5!">
+            Cancel <IconX />
+          </Button>
+          <Button class="border-l-2!" form="nagios-form" type="submit" variant="green_outline">
+            Save <IconDeviceFloppy />
+          </Button>
       </CardFooter>
     </form>
   </Card>
@@ -166,16 +145,16 @@ const onCancel = () => {
     <CardHeader class="left-1/2 -translate-x-1/2 items-center relative">
       <div class="w-48 h-20 mx-auto">
         <img
-          :src="colorMode === 'dark' ? wazuh_logo_white : wazuh_logo_black"
-          alt="wazuh_logo"
-          class="-mt-2"
+          :src="nagios_logo"
+          alt="nagios_logo"
+          class="-mt-4"
         />
       </div>
     </CardHeader>
     <CardDescription class="px-3 space-y-2 *:flex *:space-x-1 *:items-center *:mr-2 -mt-4">
       <div>
         <div class="flex items-center space-x-2 text-label">
-          <IconPower class="size-5 "/>
+          <IconPower class="size-5 text-label"/>
           <h1 :class="bigNameLabel">Enabled:</h1>
         </div>
         <component :is="system.enabled ? IconCheck : IconX" :class="system.enabled ? 'text-green-badge' : 'text-red-badge'" />
@@ -195,20 +174,6 @@ const onCancel = () => {
           <h1 :class="bigNameLabel">Username: </h1>
         </div>
         <p class="text-lg text-comment">{{ system.user }}</p>
-      </div>
-      <div>
-        <div class="flex items-center space-x-2 text-label">
-          <IconBellExclamation class="size-5"/>
-          <h1 :class="bigNameLabel">Warning level: </h1>
-        </div>
-        <p class="text-lg text-comment">{{ system.wazuh_warning_level }}</p>
-      </div>
-      <div>
-        <div class="flex items-center space-x-2 text-label">
-          <IconAlertTriangle class="size-5"/>
-          <h1 :class="bigNameLabel">Critical level: </h1>
-        </div>
-        <p class="text-lg text-comment">{{ system.wazuh_critical_level }}</p>
       </div>
 
     </CardDescription>
