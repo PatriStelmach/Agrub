@@ -13,7 +13,7 @@ import { useSort } from "@/composables/sorting.js";
 import {type HTMLAttributes, onMounted, ref} from "vue";
 import {useAuthStore} from "@/stores/authStore.ts";
 import {useUserStore} from "@/stores/userStore.ts";
-import {getUserActions} from "@/helpers_functions/requests.ts";
+import {getUserActionsRequest} from "@/helpers_functions/requests.ts";
 import { toast } from "vue-sonner";
 import LoadingTable from "@/helpers_components/LoadingTable.vue";
 
@@ -37,22 +37,19 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort(
 )
 onMounted(async () => {
   if (props.userView && props.userId) {
-    await getUserActions(props.userId)
+    await getUserActionsRequest(props.userId)
       .then(res => userActions.value = res )
       .catch(error => toast.error(`Error retrieving actions: ${error}`))
-      .finally(() => areActionsLoading.value = false)
   }
-  else{
-    if (userStore.allUsers.length === 0 || !userStore.allUsers) {
-      await userStore.getAllUsersRequest()
-    }
-    areActionsLoading.value = false
+  else if(userStore.allUsers.length === 0 || !userStore.allUsers) {
+    await userStore.getAllUsersRequest()
   }
+  areActionsLoading.value = false
 })
 
-const givenUser = (author: string) => {
+const givenUser = (author: string, withId: boolean) => {
   const user = userStore.allUsers.find(u => u.email === author)
-  return `${user?.firstname} ${user?.surname}`
+  return withId ? `${user?.id}/${user?.firstname} ${user?.surname}` : `${user?.firstname} ${user?.surname}`
 }
 
 const link = (action: ActionResponse) => {
@@ -63,7 +60,7 @@ const link = (action: ActionResponse) => {
     if (authStore.currentUser?.email === action.author)
       return '/team_members/my_account'
     else
-      return `/team_members/${givenUser(action.author)}`
+      return `/team_members/${givenUser(action.author, true)}`
   }
 
 }
@@ -129,7 +126,7 @@ const link = (action: ActionResponse) => {
                 :to="link(action)">
                 <span
                   class="hover:border-b font-semibold text-blue-badge/80 hover:border-b-blue-600 hover:text-blue-600 text-xs whitespace-break-spaces"
-                >{{ userView ? action.subject : `${givenUser(action.author)}` }}</span>
+                >{{ userView ? action.subject : `${givenUser(action.author, false)}` }}</span>
               </RouterLink>
             </TableCell>
             <TableCell class=" pr-2 tabular-nums text-comment whitespace-break-spaces">

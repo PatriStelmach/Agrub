@@ -11,9 +11,11 @@ import {computed, onMounted, ref, watchEffect} from "vue";
 import {Skeleton} from "@/components/ui/skeleton";
 import {dateParser} from "@/composables/dateParser.ts";
 import {globals} from "@/composables/globals.ts";
+import {IconMoon2, IconMoonFilled, IconMoonStars, IconSunFilled} from "@tabler/icons-vue";
+import {useColorMode} from "@vueuse/core";
 
 
-
+const mode = useColorMode()
 const authStore = useAuthStore()
 const logoutTimeout = computed(() => authStore.currentUser?.autoLogoutMinutes)
 const isLoading = ref(true);
@@ -23,11 +25,11 @@ onMounted(() => {
     if (authStore.isAuthenticated) {
       useSSEstore()
       console.log(authStore.accessToken)
+      startLogoutTimer()
     }
   });
-  changeTime()
 })
-const { time, changeTime } = globals(
+const {startLogoutTimer } = globals(
   () => Number(logoutTimeout.value),
   () => {
     if (authStore.isAuthenticated) {
@@ -57,20 +59,16 @@ const { time, changeTime } = globals(
       position="top-center"
       :expand="true"
     />
-    <header class="relative w-full">
-      <nav class="absolute top-0 flex w-full h-10 bg-card justify-center items-center">
-        <div class="text-lg p-2 ">
-          {{ `${time.hour}:${time.minute}:${time.second}` }}
-        </div>
-        <TopRightButtons/>
-      </nav>
+    <header class="absolute top-0 right-2 flex w-full h-10 items-center">
+        <component stroke="1.5" :is="mode === 'light' ? IconSunFilled : IconMoonStars" @click="mode == 'light' ? mode = 'dark' : mode = 'light' "
+                   class="cursor-pointer absolute right-2 size-6 rounded-full  hover:scale-115 duration-100"/>
     </header>
     <SidebarProvider>
       <NavBar  class=" border-none bg-card"/>
       <div class="h-screen w-full flex flex-col  ">
         <main class="bg-card flex flex-1 ">
-          <SidebarTrigger class="mt-8 z-99"/>
-          <RouterView class="bg-background mt-10 border-3 flex-1 overflow-auto rounded-[1rem_0_0_0] " />
+          <SidebarTrigger class="mt-8 z-9 md:z-99"/>
+          <RouterView class="bg-background  border-3 flex-1 overflow-auto  " />
         </main>
         <slot/>
       </div>

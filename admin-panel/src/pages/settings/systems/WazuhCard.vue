@@ -7,17 +7,21 @@ import {
   bigNameLabel,
   gridSystemCard,
   gridSystemCardUnwrapped, smallNameLabel
-} from "@/assets/cssFunctions.ts"
-import { IconDeviceFloppy, IconLock, IconPower, IconAlertTriangle, IconUser, IconBellExclamation, IconLink, IconCheck, IconEdit, IconX } from "@tabler/icons-vue"
+} from "@/assets/cssFunctions.js"
+import { IconDeviceFloppy, IconLogs, IconLock, IconPower, IconAlertTriangle, IconUser, IconBellExclamation, IconLink, IconCheck, IconEdit, IconX } from "@tabler/icons-vue"
 import { Card, CardDescription, CardFooter, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import FormInput from "@/helpers_components/form/FormInput.vue"
-import type { MonitoringSystemsConfig} from "@/types/types.ts";
+import type { MonitoringSystemsConfig} from "@/types/types.js";
 import {useForm} from "vee-validate";
-import {wazuhSchema} from "@/helpers_functions/formSchemas.ts";
-import {useSettingStore} from "@/stores/settingStore.ts";
+import {wazuhSchema} from "@/helpers_functions/formSchemas.js";
+import {useSettingStore} from "@/stores/settingStore.js";
 import {toast} from "vue-sonner";
 import FormNumberInput from "@/helpers_components/form/FormNumberInput.vue";
+import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
+import {Label} from "@/components/ui/label";
+import MyFieldLabel from "@/helpers_components/form/MyFieldLabel.vue";
+import FormCheckbox from "@/helpers_components/form/FormCheckbox.vue";
 
 const props = defineProps<{
   system: MonitoringSystemsConfig
@@ -35,7 +39,7 @@ const settingStore = useSettingStore()
 const isLoading = ref(false)
 const colorMode = useColorMode()
 
-const { handleSubmit, setValues } = useForm({
+const { handleSubmit, setValues, setFieldValue, values } = useForm({
   validationSchema: wazuhSchema,
   initialValues: {
     wazuh_url: props.system.url,
@@ -47,27 +51,27 @@ const { handleSubmit, setValues } = useForm({
   },
 })
 
-const onSubmit = handleSubmit(async (values) => {
+const onSubmit = handleSubmit(async (data) => {
   isLoading.value = true
   const changedValues: Record<string, string> = {}
 
-  if (values.wazuh_url !== props.system.url) {
-    changedValues.wazuh_url = values.wazuh_url
+  if (data.wazuh_url !== props.system.url) {
+    changedValues.wazuh_url = data.wazuh_url
   }
-  if (values.wazuh_user && values.wazuh_user !== props.system.user) {
-    changedValues.wazuh_user = values.wazuh_user
+  if (data.wazuh_user && data.wazuh_user !== props.system.user) {
+    changedValues.wazuh_user = data.wazuh_user
   }
-  if (values.wazuh_warning_level !== props.system.wazuh_warning_level) {
-    changedValues.wazuh_warning_level = String(values.wazuh_warning_level)
+  if (data.wazuh_warning_level !== props.system.wazuh_warning_level) {
+    changedValues.wazuh_warning_level = String(data.wazuh_warning_level)
   }
-  if (values.wazuh_critical_level !== props.system.wazuh_critical_level) {
-    changedValues.wazuh_critical_level = String(values.wazuh_critical_level)
+  if (data.wazuh_critical_level !== props.system.wazuh_critical_level) {
+    changedValues.wazuh_critical_level = String(data.wazuh_critical_level)
   }
-  if (!!values.wazuh_password_SECRET) {
-    changedValues.wazuh_password_SECRET = values.wazuh_password_SECRET
+  if (!!data.wazuh_password_SECRET) {
+    changedValues.wazuh_password_SECRET = data.wazuh_password_SECRET
   }
-  if (values.wazuh_info_as_alerts !== props.system.wazuh_info_as_alerts) {
-    changedValues.wazuh_info_as_alerts = String(values.wazuh_info_as_alerts)
+  if (data.wazuh_info_as_alerts !== props.system.wazuh_info_as_alerts) {
+    changedValues.wazuh_info_as_alerts = String(data.wazuh_info_as_alerts)
   }
   if (Object.keys(changedValues).length === 0) {
     toast.info("No changes detected.")
@@ -76,7 +80,10 @@ const onSubmit = handleSubmit(async (values) => {
   }
 
   await settingStore.updateSystemFullSettingsRequest(changedValues)
-    .then(() => emit('save'))
+    .then(() => {
+      toast.success('Wazuh configuration updated')
+      emit('save')
+    })
     .catch((error) => toast.error(`Error updating system configuration: ${error.message}`))
     .finally(() => isLoading.value = false)
 })
@@ -104,7 +111,7 @@ const onCancel = () => {
   <!-- EDIT CARD -->
   <Card
     v-if="props.isUnwrapped"
-    :class="`${gridSystemCardUnwrapped} h-164 xl:h-200 `"
+    :class="`${gridSystemCardUnwrapped} h-160 xl:h-200 `"
   >
     <form id="wazuh-form" @submit.prevent="onSubmit">
       <CardHeader class="left-1/2 -translate-x-1/2 items-center relative">
@@ -116,7 +123,7 @@ const onCancel = () => {
           />
         </div>
       </CardHeader>
-      <CardDescription class="px-3 space-y-3 *:flex *:items-center *:mr-2 -mt-4 max-h-120 overflow-auto">
+      <CardDescription class="px-3 space-y-3 *:flex *:items-center *:mr-2 py-4 -mt-4 max-h-115 border-y-3 overflow-auto">
         <div>
           <div class="flex items-center space-x-2 text-label">
             <IconPower class="size-5 text-label"/>
@@ -153,6 +160,9 @@ const onCancel = () => {
           <FormNumberInput orientation="vertical" name="wazuh_critical_level" label="Critical level: ">
             <IconAlertTriangle class="size-5"/>
           </FormNumberInput>
+        </div>
+        <div>
+          <FormCheckbox name="wazuh_info_as_alerts" label="Info as alerts:"/>
         </div>
       </CardDescription>
       <CardFooter class="bottom-4 absolute justify-between w-full">
@@ -206,7 +216,7 @@ const onCancel = () => {
           <IconBellExclamation class="size-5"/>
           <h1 :class="bigNameLabel">Warning level: </h1>
         </div>
-        <p class="text-md text-comment">{{ system.wazuh_warning_level }}</p>
+        <p class="text-lg text-comment">{{ system.wazuh_warning_level }}</p>
       </div>
       <div>
         <div class="flex items-center space-x-2 text-label">
@@ -214,6 +224,13 @@ const onCancel = () => {
           <h1 :class="bigNameLabel">Critical level: </h1>
         </div>
         <p class="text-lg text-comment">{{ system.wazuh_critical_level }}</p>
+      </div>
+      <div>
+        <div class="flex items-center space-x-2 text-label">
+          <IconLogs class="size-5"/>
+          <h1 :class="bigNameLabel">Info as alerts: </h1>
+        </div>
+        <component :is="system.wazuh_info_as_alerts ? IconCheck : IconX" :class="system.wazuh_info_as_alerts ? 'text-green-badge' : 'text-red-badge'" />
       </div>
 
     </CardDescription>

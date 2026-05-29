@@ -30,6 +30,10 @@ public class ApiKeysService {
         return repository.save(apiKey);
     }
 
+    public boolean getApiKey(Long id) {
+        return  repository.findById(id).orElseThrow().isActive();
+    }
+
     //Sprawdzanie tokena
     public boolean isValidKey(String token) {
         if (token == null || token.isBlank()) return false;
@@ -43,7 +47,7 @@ public class ApiKeysService {
     @Transactional
     public void revokeKey(Long id) {
         repository.findById(id).ifPresent(apiKey -> {
-            apiKey.setActive(false);
+            apiKey.setActive(!apiKey.isActive());
             repository.save(apiKey);
         });
     }

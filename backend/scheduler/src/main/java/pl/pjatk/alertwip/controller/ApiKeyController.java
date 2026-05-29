@@ -27,7 +27,7 @@ public class ApiKeyController {
 
     @PostMapping("/generate")
     public ResponseEntity<ApiKey> generateKey(@RequestBody Map<String, String> payload) {
-        String description = payload.getOrDefault("description", "Klucz bez opisu");
+        String description = payload.getOrDefault("description", "Empty description");
         ApiKey newKey = apiKeysService.generateApiKey(description);
         return ResponseEntity.ok(newKey); // Zwróci pełen obiekt, w tym wygenerowany token "awip_live_..."
     }
@@ -35,7 +35,8 @@ public class ApiKeyController {
     @PutMapping("/{id}/revoke")
     public ResponseEntity<String> revokeKey(@PathVariable Long id) {
         apiKeysService.revokeKey(id);
-        return ResponseEntity.ok("Klucz został dezaktywowany");
+        var isRevoked = !apiKeysService.getApiKey(id);
+        return ResponseEntity.ok( isRevoked ? "Successfully revoked key" : "Successfully unrevoked key");
     }
 
     @DeleteMapping("/{id}")

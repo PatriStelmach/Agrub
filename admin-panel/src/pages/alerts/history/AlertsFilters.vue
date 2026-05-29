@@ -30,7 +30,7 @@ import { alertSources } from "@/data/alertSources.ts";
 import { now, getLocalTimeZone, CalendarDateTime } from '@internationalized/date'
 import MyDateRangePicker from "@/helpers_components/MyDateRangePicker.vue";
 import type {AlertHistoryFilters} from "@/types/types.ts";
-import {dateParser} from "@/composables/dateParser.ts";
+import {dateParser, toApiDate} from "@/composables/dateParser.ts";
 import MyTagInput from "@/helpers_components/MyTagInput.vue";
 
 const emit = defineEmits<{
@@ -102,7 +102,6 @@ const onCancel = () => {
 }
 
 const onSubmit = () => {
-  const toApiDate = (date: any) => date?.toDate(tz) ? dateParser(date.toDate(tz)).apiDate : undefined;
   emit("update:filters", {
     severity: filters.severity,
     message: filters.message,
@@ -111,10 +110,10 @@ const onSubmit = () => {
     source: filters.source,
     ack: filters.ack,
     unack: filters.unack,
-    createdDateFrom: toApiDate(filters.createdDateRange.start),
-    createdDateTo: toApiDate(filters.createdDateRange.end),
-    closedDateFrom: toApiDate(filters.closedDateRange.start),
-    closedDateTo: toApiDate(filters.closedDateRange.end),
+    createdDateFrom: toApiDate(filters.createdDateRange.start as CalendarDateTime),
+    createdDateTo: toApiDate(filters.createdDateRange.end as CalendarDateTime),
+    closedDateFrom: toApiDate(filters.closedDateRange.start as CalendarDateTime),
+    closedDateTo: toApiDate(filters.closedDateRange.end as CalendarDateTime),
   })
 }
 </script>

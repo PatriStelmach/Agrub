@@ -38,7 +38,7 @@
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
   --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent-foreground: FE9A00FF;
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-selected: var(--selected);
@@ -160,7 +160,7 @@
 @theme
 {
   --breakpoint-sm: 720px;
-  --breakpoint-md: 1400px;
+  --breakpoint-md: 1500px;
   --breakpoint-lg: 1920px;
   --breakpoint-xl: 2560px;
   --breakpoint-2xl: 3600px;

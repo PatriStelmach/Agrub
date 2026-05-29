@@ -43,4 +43,8 @@ public class AlertHistoryService {
     public List<String> getAllOriginTypes() {
         return repository.findDistinctOriginTypes();
     }
+
+    public GlobalProblem getAlertById(Long id) {
+        return repository.findById(id).orElse(null);
+    }
 }

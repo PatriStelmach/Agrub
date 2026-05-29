@@ -5,15 +5,15 @@ import {
   bigNameLabel,
   gridSystemCard,
   gridSystemCardUnwrapped
-} from "@/assets/cssFunctions.ts"
+} from "@/assets/cssFunctions.js"
 import { IconDeviceFloppy, IconLock, IconPower, IconUser, IconLink, IconCheck, IconEdit, IconX } from "@tabler/icons-vue"
 import { Card, CardDescription, CardFooter, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import FormInput from "@/helpers_components/form/FormInput.vue"
-import type {MonitoringSystemsConfig} from "@/types/types.ts";
+import type {MonitoringSystemsConfig} from "@/types/types.js";
 import {useForm} from "vee-validate";
-import {nagiosSchema} from "@/helpers_functions/formSchemas.ts";
-import {useSettingStore} from "@/stores/settingStore.ts";
+import {nagiosSchema} from "@/helpers_functions/formSchemas.js";
+import {useSettingStore} from "@/stores/settingStore.js";
 import {toast} from "vue-sonner";
 
 const props = defineProps<{
@@ -60,7 +60,10 @@ const onSubmit = handleSubmit(async (values) => {
   }
 
   await settingStore.updateSystemFullSettingsRequest(changedValues)
-    .then(() => emit('save'))
+    .then(() => {
+      toast.success('Nagios configuration updated')
+      emit('save')
+    })
     .catch((error) => toast.error(`Error updating system configuration: ${error.message}`))
     .finally(() => isLoading.value = false)
 })
