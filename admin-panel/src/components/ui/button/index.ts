@@ -21,7 +21,7 @@ export const buttonVariants = cva(
         green_outline:
         "bg-background border-2  font-bold border-input  hover:bg-green-badge/60 bg-input/30 text-green-badge/90 light:hover:bg-green-badge/70 hover:border-green-badge shadow-green-badge/70 hover:text-primary",
         yellow_outline:
-          "bg-background border-2  font-bold border-input  bg-input/30 text-yellow-badge/90 light:hover:bg-yellow-badge/70 hover:bg-yellow-badge/80 shadow-yellow-badge/70  hover:border-yellow-badge hover:text-primary",
+          "bg-background border-2  font-bold border-input  bg-input/30 light:text-yellow-badge text-yellow-badge/70 light:hover:bg-yellow-badge/60 hover:bg-yellow-badge/70 shadow-yellow-badge/70  hover:border-yellow-badge hover:text-primary!",
         red_outline:
           "bg-background border-2  font-bold border-input hover:bg-red-badge/70 light:hover:bg-red-badge/60  bg-input/30 text-red-badge shadow-red-badge/70 hover:border-red-badge hover:text-primary",
         blue_outline:

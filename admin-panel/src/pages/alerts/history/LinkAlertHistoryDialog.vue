@@ -18,9 +18,7 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {bigNameLabel} from "@/assets/cssFunctions.ts";
 import router from "@/router";
 
-defineProps<{
-  alert: HistoryAlert | null
-}>()
+const alert = defineModel<HistoryAlert | null>('alert');
 const isDialogOpen = defineModel<boolean>('isDialogOpen')
 
 watch(isDialogOpen, (newValue, oldValue) => {

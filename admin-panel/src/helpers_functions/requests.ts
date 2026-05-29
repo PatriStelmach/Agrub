@@ -1,7 +1,7 @@
 import api from "@/lib/axios.ts";
 import {toast} from "vue-sonner";
 import type {
-  Actions, Granularity,
+  Actions, CumulativeData, Granularity,
   GroupDetails, LibraryPlugin,
   PluginDetails,
   Rule,
@@ -244,18 +244,33 @@ export const getAnalyticsAlertsCount = async (
   start: CalendarDate | CalendarDateTime | ZonedDateTime,
   end: CalendarDate | CalendarDateTime | ZonedDateTime,
   granularity: Granularity,
-  chartType: "alerts-count" | "avg-ack-time" | "avg-close-time"
 ) => {
+  const params = {
+    start: toApiDate(start),
+    end: toApiDate(end),
+    granularity: granularity,
+  };
   try {
-    const res = await api.get(`/analytics/${chartType}`, {
-      params: {
-        start: toApiDate(start),
-        end: toApiDate(end),
-        granularity: granularity,
-      }
-    })
-    if (res.status === 200) {
-      return res.data
+    const [alerts, ack, close] = await Promise.all([
+      api.get('/analytics/alerts-count', {
+        params: params,
+      }),
+
+      api.get('/analytics/avg-ack-time', {
+        params: params,
+      }),
+
+      api.get('/analytics/avg-close-time', {
+        params: params,
+      }),
+    ]);
+    if (alerts.status === 200 && ack.status === 200 && close.status === 200) {
+      console.log(alerts);
+      return {
+        alerts: alerts.data,
+        ack: ack.data,
+        close: close.data,
+      } as CumulativeData
     }
   } catch (error) {
     throw (error)

@@ -19,7 +19,7 @@ import {
   IconClockBolt,
   IconDeviceFloppy,
   IconLabel,
-  IconMessageCode,
+  IconCode,
   IconStatusChange,
   IconSend2,
   IconCodeDots,
@@ -70,9 +70,10 @@ import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {Input} from "@/components/ui/input";
 const myPluginStore = useMyPluginStore()
 const { sortedData, sortKey, sortOrder, toggleSort } = useSort<MyPlugin>(() => props.data, 'updatedAt')
-const { isUnwrapped, unwrap, unwrappedItem, save } = useWrapping(sortedData, 'name')
+const { isUnwrapped, unwrap, unwrappedItem, save } = useWrapping(sortedData, 'fullName')
 const router = useRouter()
 const route = useRoute()
+const paramRoute = computed(() => route.params.plugin)
 
 const args = ref<string>('')
 const searchFilter = ref<string>("")
@@ -93,8 +94,7 @@ const blockTrigger = computed(() =>
   checkedPlugins.value.length > 1
 )
 
-const allChecked = computed(() =>  props.data.length > 0 &&
-  checkedPlugins.value.length === props.data.length)
+const allChecked = computed(() =>  checkedPlugins.value && checkedPlugins.value.length === props.data.length)
 
 const nextUnwrappedCron = computed(() =>
   unwrappedItem.value ? dateParser(cronParser.parse(unwrappedItem.value.cronExpression).next().toDate()).fullDate : '')
@@ -129,35 +129,38 @@ watch(searchFilter, () => {
 }, {immediate: true})
 
 const checkAll = () => {
-  return !allChecked.value ?
+  return checkedPlugins.value.length < props.data.length ?
     checkedPlugins.value = props.data.map(plugin => plugin.fullName) : checkedPlugins.value = []
 }
 
 const changeStatus = () => {
   if(!unwrappedItem.value) {
     myPluginStore.changeStatus(checkedPlugins.value)
+      .catch(e => toast.error(`Error changing status: ${e}`))
+      .then(()=> toast.success(`Successfully changed status`))
+      .finally(()=> checkedPlugins.value = [])
   }
 }
 
 const deletePlugins = () => {
   if(!unwrappedItem.value) {
     myPluginStore.deleteMyPlugins(checkedPlugins.value)
+      .catch(e => toast.error(`Error deleting plugins: ${e}`))
+      .then(()=> toast.success(`Successfully deleted plugins`))
+      .finally(()=> checkedPlugins.value = [])
   }
 }
 
 const getDetails = async (fileName: string) => {
-  if(unwrappedItem.value) {
-    getDetailsLoading.value = true
-    await getPluginDetailsRequest(fileName, 'local-scripts')
-      .then((res) => {
-        if(unwrappedItem.value) {
-          unwrappedItem.value.code = res?.code
-          unwrappedItem.value.description = res?.description
-        }
-      })
-      .catch((err) => toast.error(`Error fetching plugin details: ${err}`))
-      .finally(() => getDetailsLoading.value = false)
-  }
+  await getPluginDetailsRequest(fileName, 'local-scripts')
+    .then((res) => {
+      if(unwrappedItem.value) {
+        unwrappedItem.value.code = res?.code
+        unwrappedItem.value.description = res?.description
+      }
+    })
+    .catch((err) => toast.error(`Error fetching plugin details: ${err}`))
+    .finally(() => getDetailsLoading.value = false)
 }
 
 const nextRun = (plugin: MyPlugin) => {
@@ -202,10 +205,17 @@ const savePlugin = async () => {
 }
 
 watchEffect(async () => {
-  if(route.params.plugin) {
-    unwrap(String(route.params.plugin))
+  if(paramRoute.value) {
+    const plugin = sortedData.value.find((pl) => pl.name === paramRoute.value)
+    if(plugin) {
+      unwrap(plugin.fullName)
+    }
     if(unwrappedItem.value) {
-      await getDetails(unwrappedItem.value.fullName)
+      getDetailsLoading.value = true
+      setTimeout(async () => {
+        await getDetails(unwrappedItem.value!.fullName)
+      },500 )
+
     }
   }
   else {
@@ -218,7 +228,7 @@ const onCloseAndSave = () => {
 }
 
 const onEdit = (plugin: MyPlugin) => {
-  if(isUnwrapped(plugin.name)) {
+  if(isUnwrapped(plugin.fullName)) {
     return
   }
   else {
@@ -303,6 +313,7 @@ const onEdit = (plugin: MyPlugin) => {
         <TableRow :class="tableHeaders">
         <TableHead class="w-14 px-4 ">
           <input
+            v-model="allChecked"
             :disabled="blockedCheckbox"
             type="checkbox"
             class="size-[1vw] cursor-pointer align-middle"
@@ -325,11 +336,11 @@ const onEdit = (plugin: MyPlugin) => {
           <TableRow
             class="cursor-pointer duration-0 border-radius-0  [&_td]:py-2 [&_td]:pr-4 hover:bg-green-badge/20"
             v-for="plugin in sortedData"
-            :key="plugin.name"
+            :key="plugin.fullName"
             @click="onEdit(plugin)"
             :class="{'hover:bg-destructive/20': !plugin.active,
              'bg-selected [&_td]:align-top cursor-auto sticky h-40! [&_td]:pt-4! top-9 bottom-22 hover:bg-card z-9 '
-                    : isUnwrapped(plugin.name) }">
+                    : isUnwrapped(plugin.fullName) }">
             <TableCell @click.stop class="px-4">
 
               <input
@@ -341,7 +352,7 @@ const onEdit = (plugin: MyPlugin) => {
                 v-model="checkedPlugins"
               />
             </TableCell>
-            <TableCell v-if="isUnwrapped(plugin.name) && unwrappedItem">
+            <TableCell v-if="isUnwrapped(plugin.fullName) && unwrappedItem">
               <InputGroup
                 class="w-full xl:h-10 2xl:h-12 ">
                 <InputGroupInput
@@ -358,7 +369,7 @@ const onEdit = (plugin: MyPlugin) => {
             <!-- Tags -->
             <TableCell class="whitespace-break-spaces" >
               <MyTagInput
-                v-if="unwrappedItem && isUnwrapped(plugin.name)"
+                v-if="unwrappedItem && isUnwrapped(plugin.fullName)"
                 v-model:tags="unwrappedItem.tags"
                 :all-tags="availableTags"
                 input-id="tags-input"
@@ -372,7 +383,7 @@ const onEdit = (plugin: MyPlugin) => {
                 >{{tag}}</Badge>
               </TransitionGroup>
             </TableCell>
-            <TableCell v-if="!isUnwrapped(plugin.name)" class="whitespace-break-spaces">
+            <TableCell v-if="!isUnwrapped(plugin.fullName)" class="whitespace-break-spaces">
               <span
                 class="grid w-full whitespace-break-spaces "
                 :class="{'text-destructive' : !cronWrappedDescription(plugin.cronExpression)[2]}"
@@ -404,7 +415,7 @@ const onEdit = (plugin: MyPlugin) => {
                     Next run: {{ cronDescription[1]}}</span>
                 </span>
             </TableCell>
-            <TableCell v-if="isUnwrapped(plugin.name) && unwrappedItem" >
+            <TableCell v-if="isUnwrapped(plugin.fullName) && unwrappedItem" >
               <SeveritySelect
                 v-model:severity="unwrappedItem.severity"
               />
@@ -418,7 +429,7 @@ const onEdit = (plugin: MyPlugin) => {
               <LanguageImage :language="plugin.language" sizeClass="size-7 lg:size-8" />
             </TableCell>
             <DateCell class="" v-if="plugin.updatedAt" :date="plugin.updatedAt"></DateCell>
-            <TableCell v-if="isUnwrapped(plugin.name) && unwrappedItem" >
+            <TableCell v-if="isUnwrapped(plugin.fullName) && unwrappedItem" >
               <RadioGroup
                 @update:model-value="unwrappedItem.active = $event === 'on'"
                 :model-value="unwrappedItem.active ? 'on' : 'off'"
@@ -436,13 +447,15 @@ const onEdit = (plugin: MyPlugin) => {
             </TableCell>
             <TableCell v-else class=" text-green-badge" :class="{'text-destructive' : !plugin.active}">{{ plugin.active ? 'On' : 'Off'}}</TableCell>
             <TableCell class="">{{plugin.weight}} KB
-              <ButtonGroup v-if="isUnwrapped(plugin.name) && unwrappedItem" class="flex **:truncate absolute bottom-4 right-3 *:items-center *:align-middle *:flex">
+              <ButtonGroup v-if="isUnwrapped(plugin.fullName) && unwrappedItem" class="flex **:truncate absolute bottom-4 right-3 *:items-center *:align-middle *:flex">
                 <Button
                   @click.stop="onCloseAndSave"
                   variant="red_outline">
                   Cancel<IconCancel class="size-4 xl:size-5"/>
                 </Button>
-                <Button variant="orange_outline" class="border-l-2! p-0">
+                <Button
+                  :disabled="getDetailsLoading"
+                  variant="blue_outline" class="border-l-2! p-0">
                   <PluginDetailsDialog
                     :editable="true"
                     :code="unwrappedItem.code ?? ''"
@@ -451,10 +464,11 @@ const onEdit = (plugin: MyPlugin) => {
                   >
                     <Button
                       @click.stop
-                      class="m-0 rounded-none bg-transparent! text-severity-3 hover:text-primary"
+                      class="m-0 rounded-none bg-transparent! hover:scale-100 text-blue-badge hover:text-primary"
                     >
-                      Details
-                      <IconMessageCode class="size-4 xl:size-5"/>
+                      Code
+                      <IconLoader v-if="getDetailsLoading" class="animate-spin"/>
+                      <IconCode v-else class="size-4 xl:size-5"/>
                     </Button>
                   </PluginDetailsDialog>
                 </Button>
