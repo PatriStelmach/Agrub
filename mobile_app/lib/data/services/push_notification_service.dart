@@ -1,12 +1,10 @@
 import 'dart:async';
 
-import 'package:alert_app/data/repositories/alert_repository.dart';
 import 'package:alert_app/locator.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:get_it/get_it.dart';
 
 //mock imports
 //import 'dart:convert';

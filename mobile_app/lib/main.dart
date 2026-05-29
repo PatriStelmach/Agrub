@@ -120,28 +120,39 @@ class MainApp extends StatelessWidget {
       themeMode: settingsViewModel.themeMode,
       navigatorKey: locator<NavigationService>().navigatorKey,
 
-      home: Consumer<UserViewModel>(
-        builder: (context, userViewModel, child) {
-          // Sprawdzanie secure storage
-          if (userViewModel.isLoading) {
-            return const Scaffold(
-              body: Center(child: CircularProgressIndicator()),
-            );
-          }
-
-          // For logged in user, show main layout
-          if (userViewModel.isLoggedIn) {
-            return const GeneralLayout();
-          }
-
-          // For not logged in user - show login screen
-          return const LoginScreen();
-        },
-      ),
+      home: const AuthGate(),
     );
   }
 }
 
+class AuthGate extends StatelessWidget {
+  const AuthGate({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<bool>(
+      future: context.read<UserViewModel>().checkAuthStatus(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        final isLoggedIn = snapshot.data ?? false;
+        if (isLoggedIn) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            context.read<GeneralLayoutViewModel>().changePage(AppScreen.home);
+          });
+
+          return const GeneralLayout(); //
+        }
+
+        return const LoginScreen();
+      },
+    );
+  }
+}
   /*
 
 T0D0:

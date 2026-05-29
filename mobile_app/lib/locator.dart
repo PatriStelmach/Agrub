@@ -59,6 +59,7 @@ Future<void> setupLocator() async {
     () => const FlutterSecureStorage(),
   );
 
+  locator.registerLazySingleton<AuthService>(() => AuthService());
   locator.registerLazySingleton<AlertRepository>(
     () => AlertRepository(
       remoteDataSource: locator<AlertRemoteDataSource>(),
@@ -71,7 +72,7 @@ Future<void> setupLocator() async {
   locator.registerLazySingleton<UserRepository>(
     () => UserRepository(
       dio: locator<Dio>(),
-      authService: AuthService(),
+      authService: locator<AuthService>(),
       storage: FlutterSecureStorage(),
     ),
   );

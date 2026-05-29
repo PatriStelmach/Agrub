@@ -1,11 +1,13 @@
+//dart:io is needed for Plaftorm class in below code
 import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:vibration/vibration.dart';
 
+///Service class starting and stopping sound and vibration on physical devices
 class AlarmService {
   final player = AudioPlayer();
 
-  void triggerAlarm() async {
+  Future<void> triggerAlarm() async {
     if (Platform.isAndroid) {
       await player.setReleaseMode(ReleaseMode.loop);
       await player.play(AssetSource('audio/alarm.mp3'));

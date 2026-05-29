@@ -8,7 +8,8 @@ class NavigationService {
   final AlarmService alarmService = AlarmService();
   bool _isOverlayVisible = false;
 
-  void showEmergencyOverlay() {
+  ///Showing the alarm overlay, containing safeguard against overlay spam
+  Future<void> showEmergencyOverlay() async {
     // If there is an alarm overlay already, return
     if (_isOverlayVisible) return;
 
@@ -17,8 +18,6 @@ class NavigationService {
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (navigatorKey.currentState == null) return;
-
-      _isOverlayVisible = true;
 
       await navigatorKey.currentState?.push(
         PageRouteBuilder(
@@ -35,12 +34,13 @@ class NavigationService {
     });
   }
 
+  ///Stopping the sound and closing the overlay
   void stopAlarmAndDismiss() {
-    // Wyłącza dźwięk
+    //stop sound
     alarmService.stopAlarm();
-    // Zamyka overlay
+    // close overlay
     navigatorKey.currentState?.pop();
-    // Kończy pętlę alarmową androida
+    // End adroid alarm loop
     FlutterLocalNotificationsPlugin().cancelAll();
   }
 }

@@ -85,7 +85,7 @@ class AlertsViewModel extends ChangeNotifier {
       for (var alert in alerts) {
         _alertsCache[alert.id] = alert;
         if (alert.severity == AlertSeverity.extreme) {
-          _triggerEmergencyOverlayForNewAlert(alert);
+          unawaited(_triggerEmergencyOverlayForNewAlert(alert));
         }
       }
     } catch (e) {
@@ -108,7 +108,7 @@ class AlertsViewModel extends ChangeNotifier {
   }
 
   ///Processing update from SSE and updating the view
-  void _handleIncomingSseUpdate(dynamic message) {
+  void _handleIncomingSseUpdate(dynamic message) async {
     if (message is! Map<String, dynamic>) return;
 
     int? id = _extractId(message['alertId']);
@@ -118,7 +118,9 @@ class AlertsViewModel extends ChangeNotifier {
     if (message.containsKey('subject')) {
       final alert = Alert.fromJson(message);
       _alertsCache[alert.id] = alert;
-      _triggerEmergencyOverlayForNewAlert(alert);
+
+      // unawaited to inform linters etc. and others that this is intentionally without await
+      unawaited(_triggerEmergencyOverlayForNewAlert(alert));
     }
     // If the update is partial and alert exist in cache
     else if (_alertsCache.containsKey(id)) {
@@ -141,31 +143,29 @@ class AlertsViewModel extends ChangeNotifier {
       _alertsCache[id] = updated;
       _triggerEmergencyOverlayForNewAlert(updated);
     } else {
-      //Alert update that isn't in the cache, using api
-      fetchInitialAlerts();
+      //Alert update that isn't in the cache, using api. Await to wait for fetch from API
+      await fetchInitialAlerts();
       return;
     }
-    alertsRepository.saveAlertsToOfflineCache(alertsList);
+    await alertsRepository.saveAlertsToOfflineCache(alertsList);
 
     notifyListeners();
   }
 
-  void _triggerEmergencyOverlayForNewAlert(Alert alert) async {
+  Future<void> _triggerEmergencyOverlayForNewAlert(Alert alert) async {
     final alreadyNotified = await alertsRepository.isAlertAlreadyNotified(
       alert.id,
     );
 
     if (alert.severity == AlertSeverity.extreme && !alreadyNotified) {
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        try {
-          locator<NavigationService>().showEmergencyOverlay();
-          debugPrint("OVERLAY TRIGGERED");
+      try {
+        await locator<NavigationService>().showEmergencyOverlay();
+        debugPrint("OVERLAY TRIGGERED");
 
-          await alertsRepository.markAlertAsNotified(alert.id);
-        } catch (e) {
-          debugPrint("-> OVERLAY ERROR: $e");
-        }
-      });
+        await alertsRepository.markAlertAsNotified(alert.id);
+      } catch (e) {
+        debugPrint("-> OVERLAY ERROR: $e");
+      }
     }
   }
 

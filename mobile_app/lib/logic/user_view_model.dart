@@ -19,34 +19,45 @@ class UserViewModel extends ChangeNotifier {
   ///Authorization method, returns true when logged in
   Future<bool> checkAuthStatus() async {
     _setLoading(true);
-
-    String? token = await repository.getToken();
-    if (token != null && !JwtDecoder.isExpired(token)) {
-      _user = repository.getUserFromToken(token);
-      _isLoggedIn = (_user != null);
-    } else {
+    try {
+      String? token = await repository.getToken();
+      if (token != null && !JwtDecoder.isExpired(token)) {
+        _user = repository.getUserFromToken(token);
+        _isLoggedIn = (_user != null);
+      } else {
+        _isLoggedIn = false;
+      }
+    } catch (e) {
+      debugPrint("USER VIEW MODEL - checkAuthStatus ERROR: $e");
       _isLoggedIn = false;
+      _user = null;
+    } finally {
+      _setLoading(false);
     }
-
-    _setLoading(false);
     return _isLoggedIn;
   }
 
   ///Log in the user
   Future<bool> signIn(String email, String password) async {
     _setLoading(true);
+    bool success = false;
 
-    bool success = await repository.login(email, password);
-    if (success) {
-      final token = await repository.getToken();
-      if (token != null) {
-        _user = repository.getUserFromToken(token);
-        _isLoggedIn = true;
+    try {
+      success = await repository.login(email, password);
+      if (success) {
+        final token = await repository.getToken();
+        if (token != null) {
+          _user = repository.getUserFromToken(token);
+          _isLoggedIn = true;
+        }
       }
+    } catch (e) {
+      debugPrint("USER VIEW MODEL - signIn ERROR: $e");
+      success = false;
+      _isLoggedIn = false;
+    } finally {
+      _setLoading(false);
     }
-
-    _setLoading(false);
-
     return success;
   }
 

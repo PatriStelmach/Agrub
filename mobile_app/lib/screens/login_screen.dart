@@ -1,5 +1,7 @@
 import 'package:alert_app/data/services/push_notification_service.dart';
 import 'package:alert_app/logic/alerts_view_model.dart';
+import 'package:alert_app/logic/general_layout_view_model.dart';
+import 'package:alert_app/screens/general_layout_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:alert_app/logic/user_view_model.dart';
@@ -20,10 +22,6 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    //Checking the token before loading the screen
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (!mounted) return;
-    });
   }
 
   @override
@@ -35,6 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _handleLogin() async {
     final userViewModel = context.read<UserViewModel>();
+    final layoutViewModel = context.read<GeneralLayoutViewModel>();
     final t = AppLocalizations.of(context)!;
 
     final success = await userViewModel.signIn(
@@ -46,6 +45,10 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!mounted) return;
 
     if (success) {
+      layoutViewModel.changePage(AppScreen.home);
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const GeneralLayout()),
+      );
     } else {
       // Failure snackbar
       ScaffoldMessenger.of(context).showSnackBar(
