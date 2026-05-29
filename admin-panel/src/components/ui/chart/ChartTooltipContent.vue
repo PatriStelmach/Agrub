@@ -5,6 +5,7 @@ import { computed } from "vue"
 import { cn } from "@/lib/utils"
 
 const props = withDefaults(defineProps<{
+  valueFormatter?: (value: number) => string
   hideLabel?: boolean
   hideIndicator?: boolean
   indicator?: "line" | "dot" | "dashed"
@@ -94,9 +95,13 @@ const tooltipLabel = computed(() => {
                 {{ itemConfig?.label || value }}
               </span>
             </div>
-            <span v-if="value" class="text-foreground  font-medium tabular-nums">
-              {{ value.toLocaleString() }}
-            </span>
+            <span v-if="value" class="text-foreground font-medium tabular-nums">
+  {{
+                props.valueFormatter
+                  ? props.valueFormatter(value)
+                  : value.toLocaleString()
+              }}
+</span>
           </div>
         </div>
       </div>

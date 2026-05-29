@@ -21,15 +21,22 @@ import {computed, ref, watchEffect} from "vue";
 import SeverityDiv from "@/helpers_components/SeverityDiv.vue";
 import {dateParser} from "@/composables/dateParser.ts";
 import LoadingTable from "@/helpers_components/LoadingTable.vue";
+import {useAlertStore} from "@/stores/alertStore.ts";
+import {useRoute} from "vue-router";
 
 const props = defineProps<{
   tableData: ActiveAlert[]
   isLoading: boolean
 }>()
 
+const alertStore = useAlertStore();
+const route = useRoute();
+const { sortedData, sortKey, sortOrder, toggleSort } = useSort<ActiveAlert>(() => props.tableData as ActiveAlert[], 'createdAt');
+
 const isDialogOpen = ref(false)
-const hoveredAlert = defineModel<AlertDetails | null>('hoveredAlert')
+const hoveredAlert = defineModel<AlertDetails | null>('hoveredAlert');
 const hoveredId = ref<number | null>(null);
+const openedAlert = computed(()=> alertStore.currentAlerts.find(a => a.id === Number(route.params.alert)))
 
 const computedHoveredAlert = computed(() => {
   const alert = props.tableData.find(a => a.id === hoveredId.value);
@@ -42,13 +49,20 @@ watchEffect(() => {
   hoveredAlert.value = computedHoveredAlert.value;
 });
 
-const { sortedData, sortKey, sortOrder, toggleSort } = useSort<ActiveAlert>(() => props.tableData as ActiveAlert[], 'createdAt')
-
+watchEffect( () => {
+  if(!props.isLoading && openedAlert.value) {
+    isDialogOpen.value = true
+  }
+})
 
 
 </script>
 
 <template>
+  <EditAlertDialog
+    v-model:isDialogOpen="isDialogOpen"
+    v-model:alert="openedAlert"
+  />
   <Table id="alert-table" :class="dataTable">
     <TableCaption :class="tableCaption">
       <slot/>
@@ -106,16 +120,12 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort<ActiveAlert>(() =
           </TableCell>
           <DateCell   :date="dateParser(alert.createdAt).toDate "></DateCell>
           <TableCell>
-            <!-- dialog link -->
             <RouterLink :to="`/active_alerts/${alert.id}`">
-              <EditAlertDialog
-                v-model:isDialogOpen="isDialogOpen"
-                :alert="alert"
-              >
-                <Button size="icon-sm" variant="green_outline">
-                  <IconEdit class="size-4"/>
-                </Button>
-              </EditAlertDialog>
+              <Button
+                size="icon-sm"
+                variant="green_outline">
+                <IconEdit class="size-4"/>
+              </Button>
             </RouterLink>
           </TableCell>
         </TableRow>

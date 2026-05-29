@@ -16,14 +16,13 @@ import SortableHead from "@/helpers_components/SortableHead.vue";
 import {computed, ref, watch, watchEffect} from "vue";
 import {type AlertDetails, type HistoryAlert} from "@/types/types.ts";
 import {Badge} from "@/components/ui/badge";
-import {IconCircleCheck, IconCircleX, IconHistory} from "@tabler/icons-vue";
+import {IconCircleCheck, IconLoader, IconCircleX, IconHistory} from "@tabler/icons-vue";
 import {Button} from "@/components/ui/button";
 import DateCell from "@/helpers_components/DateCell.vue";
 import {useSortRequests} from "@/composables/useSortRequests.ts";
 import SeverityDiv from "@/helpers_components/SeverityDiv.vue";
 import {hoverListRow} from "@/assets/cssFunctions.ts";
 import LoadingTable from "@/helpers_components/LoadingTable.vue";
-import AlertHistoryDialog from '@/pages/alerts/history/AlertHistoryDialog.vue'
 import {useRoute} from "vue-router";
 import LinkAlertHistoryDialog from "@/pages/alerts/history/LinkAlertHistoryDialog.vue";
 import {getHistoryAlertByIdRequest} from "@/helpers_functions/requests.ts";
@@ -36,7 +35,7 @@ const props = defineProps<{
 const route = useRoute()
 const hoveredAlert = defineModel<AlertDetails | null>('hoveredAlert')
 const sortedHead = defineModel<{ sortKey: string; sortOrder: string }>('sortedHead')
-const isDialogOpen = ref(false)
+const isDialogLoading = ref(false)
 const linkAlertRoute = computed(() =>  Number(route.params.alert))
 const isLinkDialogOpen = ref(false)
 const linkHistoryAlert = ref<HistoryAlert | null>(null)
@@ -59,27 +58,27 @@ watchEffect(() => {
   sortedHead.value = { sortKey: sortKey.value, sortOrder: sortOrder.value };
 });
 
-watch((linkAlertRoute), async (newAlert) => {
-  if(!props.isLoading && newAlert && !props.alerts.find((a) => a.id === newAlert)) {
-    await getHistoryAlertByIdRequest(newAlert)
-      .then((res) => {
-        linkHistoryAlert.value = res;
-      })
-      .catch(e => toast.error(`Error downloading alert ${newAlert} from history: ${e}`))
-  }
-}, {immediate: true, deep: true});
-
-watch(linkHistoryAlert, () =>{
-  isLinkDialogOpen.value = !!linkHistoryAlert.value;
-})
+watch(
+  [() => props.isLoading, linkAlertRoute],
+  async ([isLoading, route]) => {
+    if (isLoading || !route) return;
+    isDialogLoading.value = true;
+      await getHistoryAlertByIdRequest(route)
+        .catch(e => toast.error(`Error downloading alert ${route} from history: ${e}`))
+        .then((res) => linkHistoryAlert.value = res)
+        .finally(() => {
+          isDialogLoading.value = false;
+          isLinkDialogOpen.value = true
+        })
+  },{ immediate: true , deep: true });
 
 
 </script>
 
 <template>
   <LinkAlertHistoryDialog
-    :isDialogOpen="isLinkDialogOpen"
-    :alert="linkHistoryAlert"/>
+    v-model:isDialogOpen="isLinkDialogOpen"
+    v-model:alert="linkHistoryAlert"/>
       <Table id="alert-history-table" :class="dataTable">
         <TableCaption :class="tableCaption">
             <slot/>
@@ -141,17 +140,11 @@ watch(linkHistoryAlert, () =>{
               <DateCell  :date="alert.createdAt "></DateCell>
               <DateCell  :date="alert.closedAt "></DateCell>
               <TableCell>
-
-                <!-- dialog link -->
                 <RouterLink :to="`/alerts_history/${alert.id}`">
-                  <AlertHistoryDialog
-                    :isDialogOpen="isDialogOpen"
-                    :alert="alert"
-                  >
                     <Button size="icon-lg" variant="green_outline">
-                      <IconHistory class="size-5"/>
+                      <IconLoader v-if="isDialogLoading && linkAlertRoute === alert.id" class="size-5 animate-spin"/>
+                      <IconHistory v-else class="size-5"/>
                     </Button>
-                  </AlertHistoryDialog>
                 </RouterLink>
               </TableCell>
             </TableRow>
