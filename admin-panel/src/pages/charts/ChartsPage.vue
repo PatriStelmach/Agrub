@@ -1,79 +1,79 @@
 <script setup lang="ts">
 
-import TopH1Div from "@/helpers_components/TopH1Div.vue";
-import AlertsCount from "@/pages/charts/AlertsCount.vue";
-import { IconCalendarQuestion, IconSend2, IconLoader} from "@tabler/icons-vue";
-import {computed, onMounted, type Ref, ref} from "vue";
-import type {DateRange} from "reka-ui";
-import AckOrCloseTime from "@/pages/charts/AckOrCloseTime.vue";
-import { getLocalTimeZone, today, ZonedDateTime, CalendarDateTime, CalendarDate,  } from '@internationalized/date'
-import type {CumulativeData, Granularity} from "@/types/types.ts";
-import AckAndCloseTime from "@/pages/charts/AckAndCloseTime.vue";
-import {getAnalyticsAlertsCount} from "@/helpers_functions/requests.ts";
-import {toast} from "vue-sonner";
-import {Button} from "@/components/ui/button";
-import {ButtonGroup} from "@/components/ui/button-group";
-import BigLoadingBlock from "@/helpers_components/loaders/BigLoadingBlock.vue";
-import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
-import {RangeCalendar} from "@/components/ui/range-calendar";
-import MyFieldLabel from "@/helpers_components/form/MyFieldLabel.vue";
-import {bigNameLabel} from "@/assets/cssFunctions.ts";
-
-const locale = navigator.language
-const tz = getLocalTimeZone()
-
-onMounted(async () => {
-  await onDateRangeChange()
-})
-
-const end = ref<CalendarDate | CalendarDateTime | ZonedDateTime>(today(tz).add({days: 1}))
-const start = ref<CalendarDate | CalendarDateTime | ZonedDateTime>(end.value.subtract({ days: 7 }))
-const currentGranularity = ref<Granularity>('DAY')
-const granularityAfterReload = ref<Granularity>(currentGranularity.value)
-const areChartsLoading = ref<boolean>(true)
-const rawAnalyticsData = ref<CumulativeData>()
-const isPopoverOpen = ref(false)
-
-const dateRange = ref({
-  start,
-  end,
-}) as Ref<DateRange>
-
-const periodLabel = computed(() => {
-  const diffMs =
-    dateRange.value.end!.toDate(tz).getTime() -
-    dateRange.value.start!.toDate(tz).getTime()
-
-  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24))
-
-  switch (granularityAfterReload.value) {
-    case 'DAY':
-      return `${diffDays} days`
-
-    case 'WEEK':
-      return `${Math.ceil(diffDays / 7)} weeks`
-
-    case 'MONTH':
-      return `${Math.ceil(diffDays / 30)} months`
-
-    default:
-      return ''
-  }
-})
-
-const onDateRangeChange = async () => {
-  areChartsLoading.value = true
-  await getAnalyticsAlertsCount(dateRange.value.start as ZonedDateTime, dateRange.value.end as ZonedDateTime, currentGranularity.value)
-    .catch((e) => toast.error(`Error retrieving Analytics data: ${e}`))
-    .then((res) => {
-      rawAnalyticsData.value = res as CumulativeData
-      granularityAfterReload.value = currentGranularity.value
-    })
-    .finally(() => {
-      areChartsLoading.value = false
-      isPopoverOpen.value = false
-    })
-}
+// import TopH1Div from "@/helpers_components/TopH1Div.vue";
+// import AlertsCount from "@/pages/charts/AlertsCount.vue";
+// import { IconCalendarQuestion, IconSend2, IconLoader} from "@tabler/icons-vue";
+// import {computed, onMounted, type Ref, ref} from "vue";
+// import type {DateRange} from "reka-ui";
+// import AckOrCloseTime from "@/pages/charts/AckOrCloseTime.vue";
+// import { getLocalTimeZone, today, ZonedDateTime, CalendarDateTime, CalendarDate,  } from '@internationalized/date'
+// import type {CumulativeData, Granularity} from "@/types/types.ts";
+// import AckAndCloseTime from "@/pages/charts/AckAndCloseTime.vue";
+// import {getAnalyticsAlertsCount} from "@/helpers_functions/requests.ts";
+// import {toast} from "vue-sonner";
+// import {Button} from "@/components/ui/button";
+// import {ButtonGroup} from "@/components/ui/button-group";
+// import BigLoadingBlock from "@/helpers_components/loaders/BigLoadingBlock.vue";
+// import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
+// import {RangeCalendar} from "@/components/ui/range-calendar";
+// import MyFieldLabel from "@/helpers_components/form/MyFieldLabel.vue";
+// import {bigNameLabel} from "@/assets/cssFunctions.ts";
+//
+// const locale = navigator.language
+// const tz = getLocalTimeZone()
+//
+// onMounted(async () => {
+//   await onDateRangeChange()
+// })
+//
+// const end = ref<CalendarDate | CalendarDateTime | ZonedDateTime>(today(tz).add({days: 1}))
+// const start = ref<CalendarDate | CalendarDateTime | ZonedDateTime>(end.value.subtract({ days: 7 }))
+// const currentGranularity = ref<Granularity>('DAY')
+// const granularityAfterReload = ref<Granularity>(currentGranularity.value)
+// const areChartsLoading = ref<boolean>(true)
+// const rawAnalyticsData = ref<CumulativeData>()
+// const isPopoverOpen = ref(false)
+//
+// const dateRange = ref({
+//   start,
+//   end,
+// }) as Ref<DateRange>
+//
+// const periodLabel = computed(() => {
+//   const diffMs =
+//     dateRange.value.end!.toDate(tz).getTime() -
+//     dateRange.value.start!.toDate(tz).getTime()
+//
+//   const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24))
+//
+//   switch (granularityAfterReload.value) {
+//     case 'DAY':
+//       return `${diffDays} days`
+//
+//     case 'WEEK':
+//       return `${Math.ceil(diffDays / 7)} weeks`
+//
+//     case 'MONTH':
+//       return `${Math.ceil(diffDays / 30)} months`
+//
+//     default:
+//       return ''
+//   }
+// })
+//
+// const onDateRangeChange = async () => {
+//   areChartsLoading.value = true
+//   await getAnalyticsAlertsCount(dateRange.value.start as ZonedDateTime, dateRange.value.end as ZonedDateTime, currentGranularity.value)
+//     .catch((e) => toast.error(`Error retrieving Analytics data: ${e}`))
+//     .then((res) => {
+//       rawAnalyticsData.value = res as CumulativeData
+//       granularityAfterReload.value = currentGranularity.value
+//     })
+//     .finally(() => {
+//       areChartsLoading.value = false
+//       isPopoverOpen.value = false
+//     })
+// }
 
 </script>
 
