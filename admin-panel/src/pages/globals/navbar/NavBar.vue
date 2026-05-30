@@ -26,7 +26,7 @@ import NavUser from "@/pages/globals/navbar/NavUser.vue";
 import {useRoute} from "vue-router";
 import {globals} from "@/composables/globals.ts";
 import {onMounted} from "vue";
-console.log('IconChartBar', IconChartBar)
+
 const { time, dayMonthYear, weekday, changeTime } = globals()
 const route = useRoute()
 onMounted(() => changeTime())
