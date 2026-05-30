@@ -77,138 +77,142 @@ const onDateRangeChange = async () => {
 
 </script>
 
+<!--<template>-->
+<!--  <div>-->
+<!--    <TopH1Div h1="Analytics">-->
+<!--      <ButtonGroup>-->
+<!--        <Popover v-model:open="isPopoverOpen">-->
+<!--          <PopoverTrigger as-child>-->
+<!--            <Button variant="green_outline"> Date range <IconCalendarQuestion/>-->
+<!--            </Button>-->
+<!--          </PopoverTrigger>-->
+<!--          <PopoverContent class="w-fit bg-background">-->
+<!--            <RangeCalendar-->
+<!--              v-model="dateRange"-->
+<!--              class="rounded-md border-2  shadow-xl"-->
+<!--              :number-of-months="3"-->
+<!--              disable-days-outside-current-view-->
+<!--              :isDateDisabled="date => date.subtract({days:1}) > today(tz)"-->
+<!--            />-->
+<!--            <div class="mt-3">-->
+<!--              <div class="flex space-x-2 items-baseline">-->
+<!--                <h1 :class="bigNameLabel">Granularity:</h1>-->
+<!--                <div class="flex *:cursor-pointer space-x-2">-->
+<!--                  <MyFieldLabel text="DAYS" for="days" />-->
+<!--                  <input-->
+<!--                    v-model="currentGranularity"-->
+<!--                    id="days"-->
+<!--                    type="radio"-->
+<!--                    value="DAY"-->
+<!--                    name="granularity"-->
+<!--                  />-->
+<!--                </div>-->
+
+<!--                <div class="flex *:cursor-pointer space-x-2">-->
+<!--                  <MyFieldLabel text="WEEKS" for="weeks" />-->
+<!--                  <input-->
+<!--                    v-model="currentGranularity"-->
+<!--                    id="weeks"-->
+<!--                    type="radio"-->
+<!--                    value="WEEK"-->
+<!--                    name="granularity"-->
+<!--                  />-->
+<!--                </div>-->
+
+<!--                <div class="flex *:cursor-pointer space-x-2">-->
+<!--                  <MyFieldLabel text="MONTHS" for="months" />-->
+<!--                  <input-->
+<!--                    v-model="currentGranularity"-->
+<!--                    id="months"-->
+<!--                    type="radio"-->
+<!--                    value="MONTH"-->
+<!--                    name="granularity"-->
+<!--                  />-->
+<!--                </div>-->
+
+<!--              </div>-->
+<!--            </div>-->
+<!--            <div class="flex space-x-2 items-baseline ">-->
+<!--              <h1 :class="bigNameLabel">Date range:</h1>-->
+<!--              <span class="text-label font-semibold">{{ dateRange.start }} — {{ dateRange.end }}</span>-->
+<!--              <Button-->
+<!--                @click="onDateRangeChange"-->
+<!--                class="ml-auto"-->
+<!--                variant="green_outline"-->
+<!--              >-->
+<!--                Submit-->
+<!--                <IconLoader v-if="areChartsLoading" class="animate-spin"/>-->
+<!--                <IconSend2 v-else/>-->
+<!--              </Button>-->
+<!--            </div>-->
+<!--          </PopoverContent>-->
+<!--        </Popover>-->
+<!--      </ButtonGroup>-->
+
+<!--    </TopH1Div>-->
+<!--      <Transition-->
+<!--        class="max-h-[90vh] mx-6 overflow-auto grid grid-cols-1 gap-y-30 *:h-[60vh]"-->
+<!--        tag="div"-->
+<!--        name="fade">-->
+<!--        <div v-if="areChartsLoading">-->
+<!--          <BigLoadingBlock-->
+<!--            v-for=" (_,i) in [1,2,3,4]"-->
+<!--            :key="i"-->
+<!--            class="h-120"-->
+<!--          />-->
+<!--        </div>-->
+<!--        <div v-else>-->
+<!--          <AlertsCount-->
+<!--            :periodLabel="periodLabel"-->
+<!--            :rawAnalyticsData="rawAnalyticsData?.alerts ?? []"-->
+<!--            :currentGranularity="granularityAfterReload"-->
+<!--            :locale="locale"-->
+<!--            :tz="tz"-->
+<!--            :end="end as ZonedDateTime"-->
+<!--            :start="start as ZonedDateTime"-->
+<!--          />-->
+<!--          <AckOrCloseTime-->
+<!--            :periodLabel="periodLabel"-->
+<!--            :rawAnalyticsData="rawAnalyticsData?.ack ?? []"-->
+<!--            :currentGranularity="granularityAfterReload"-->
+<!--            :locale="locale"-->
+<!--            :tz="tz"-->
+<!--            :end="end as ZonedDateTime"-->
+<!--            :start="start as ZonedDateTime"-->
+<!--            header="Average time to acknowledge an alert"-->
+<!--            :type="'avg-ack-time'"-->
+<!--          />-->
+<!--          <AckOrCloseTime-->
+<!--            :periodLabel="periodLabel"-->
+<!--            :rawAnalyticsData="rawAnalyticsData?.close ?? []"-->
+<!--            :currentGranularity="granularityAfterReload"-->
+<!--            :locale="locale"-->
+<!--            :tz="tz"-->
+<!--            :end="end as ZonedDateTime"-->
+<!--            :start="start as ZonedDateTime"-->
+<!--            header="Average time to close an alert"-->
+<!--            :type="'avg-close-time'"-->
+<!--          />-->
+<!--          <AckAndCloseTime-->
+<!--            :periodLabel="periodLabel"-->
+<!--            :currentGranularity="granularityAfterReload"-->
+<!--            header="Average acknowledge and close times compared"-->
+<!--            :start="start as ZonedDateTime"-->
+<!--            :end="end as ZonedDateTime"-->
+<!--            :locale="locale"-->
+<!--            :tz="tz"-->
+<!--            :closed-and-acked="{-->
+<!--          ack: rawAnalyticsData?.ack ?? [],-->
+<!--          close: rawAnalyticsData?.close ?? [],-->
+<!--        }"-->
+<!--          />-->
+<!--        </div>-->
+<!--      </Transition>-->
+
+<!--  </div>-->
+
+<!--</template>-->
+
 <template>
-  <div>
-    <TopH1Div h1="Analytics">
-      <ButtonGroup>
-        <Popover v-model:open="isPopoverOpen">
-          <PopoverTrigger as-child>
-            <Button variant="green_outline"> Date range <IconCalendarQuestion/>
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent class="w-fit bg-background">
-            <RangeCalendar
-              v-model="dateRange"
-              class="rounded-md border-2  shadow-xl"
-              :number-of-months="3"
-              disable-days-outside-current-view
-              :isDateDisabled="date => date.subtract({days:1}) > today(tz)"
-            />
-            <div class="mt-3">
-              <div class="flex space-x-2 items-baseline">
-                <h1 :class="bigNameLabel">Granularity:</h1>
-                <div class="flex *:cursor-pointer space-x-2">
-                  <MyFieldLabel text="DAYS" for="days" />
-                  <input
-                    v-model="currentGranularity"
-                    id="days"
-                    type="radio"
-                    value="DAY"
-                    name="granularity"
-                  />
-                </div>
-
-                <div class="flex *:cursor-pointer space-x-2">
-                  <MyFieldLabel text="WEEKS" for="weeks" />
-                  <input
-                    v-model="currentGranularity"
-                    id="weeks"
-                    type="radio"
-                    value="WEEK"
-                    name="granularity"
-                  />
-                </div>
-
-                <div class="flex *:cursor-pointer space-x-2">
-                  <MyFieldLabel text="MONTHS" for="months" />
-                  <input
-                    v-model="currentGranularity"
-                    id="months"
-                    type="radio"
-                    value="MONTH"
-                    name="granularity"
-                  />
-                </div>
-
-              </div>
-            </div>
-            <div class="flex space-x-2 items-baseline ">
-              <h1 :class="bigNameLabel">Date range:</h1>
-              <span class="text-label font-semibold">{{ dateRange.start }} — {{ dateRange.end }}</span>
-              <Button
-                @click="onDateRangeChange"
-                class="ml-auto"
-                variant="green_outline"
-              >
-                Submit
-                <IconLoader v-if="areChartsLoading" class="animate-spin"/>
-                <IconSend2 v-else/>
-              </Button>
-            </div>
-          </PopoverContent>
-        </Popover>
-      </ButtonGroup>
-
-    </TopH1Div>
-      <Transition
-        class="max-h-[90vh] mx-6 overflow-auto grid grid-cols-1 gap-y-30 *:h-[60vh]"
-        tag="div"
-        name="fade">
-        <div v-if="areChartsLoading">
-          <BigLoadingBlock
-            v-for=" (_,i) in [1,2,3,4]"
-            :key="i"
-            class="h-120"
-          />
-        </div>
-        <div v-else>
-          <AlertsCount
-            :periodLabel="periodLabel"
-            :rawAnalyticsData="rawAnalyticsData?.alerts ?? []"
-            :currentGranularity="granularityAfterReload"
-            :locale="locale"
-            :tz="tz"
-            :end="end as ZonedDateTime"
-            :start="start as ZonedDateTime"
-          />
-          <AckOrCloseTime
-            :periodLabel="periodLabel"
-            :rawAnalyticsData="rawAnalyticsData?.ack ?? []"
-            :currentGranularity="granularityAfterReload"
-            :locale="locale"
-            :tz="tz"
-            :end="end as ZonedDateTime"
-            :start="start as ZonedDateTime"
-            header="Average time to acknowledge an alert"
-            :type="'avg-ack-time'"
-          />
-          <AckOrCloseTime
-            :periodLabel="periodLabel"
-            :rawAnalyticsData="rawAnalyticsData?.close ?? []"
-            :currentGranularity="granularityAfterReload"
-            :locale="locale"
-            :tz="tz"
-            :end="end as ZonedDateTime"
-            :start="start as ZonedDateTime"
-            header="Average time to close an alert"
-            :type="'avg-close-time'"
-          />
-          <AckAndCloseTime
-            :periodLabel="periodLabel"
-            :currentGranularity="granularityAfterReload"
-            header="Average acknowledge and close times compared"
-            :start="start as ZonedDateTime"
-            :end="end as ZonedDateTime"
-            :locale="locale"
-            :tz="tz"
-            :closed-and-acked="{
-          ack: rawAnalyticsData?.ack ?? [],
-          close: rawAnalyticsData?.close ?? [],
-        }"
-          />
-        </div>
-      </Transition>
-
-  </div>
-
+  <div>Charts works</div>
 </template>
