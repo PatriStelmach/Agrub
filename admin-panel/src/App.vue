@@ -12,6 +12,7 @@ import {Skeleton} from "@/components/ui/skeleton";
 import {globals} from "@/composables/globals.ts";
 import {IconMoonStars, IconSunFilled} from "@tabler/icons-vue";
 import {useColorMode} from "@vueuse/core";
+import router from "@/router";
 
 
 const mode = useColorMode()
@@ -19,6 +20,7 @@ const authStore = useAuthStore()
 const logoutTimeout = computed(() => authStore.currentUser?.autoLogoutMinutes)
 const isLoading = ref(true);
 onMounted(() => {
+  console.log(router.getRoutes())
   authStore.refreshToken().finally(() => {
     isLoading.value = false
     if (authStore.isAuthenticated) {
