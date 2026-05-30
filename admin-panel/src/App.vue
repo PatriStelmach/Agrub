@@ -13,13 +13,18 @@ import {dateParser} from "@/composables/dateParser.ts";
 import {globals} from "@/composables/globals.ts";
 import {IconMoon2, IconMoonFilled, IconMoonStars, IconSunFilled} from "@tabler/icons-vue";
 import {useColorMode} from "@vueuse/core";
+import { getLocalTimeZone, today, ZonedDateTime, CalendarDateTime, CalendarDate,  } from '@internationalized/date'
 
 
+const locale = navigator.language
+const tz = getLocalTimeZone()
 const mode = useColorMode()
 const authStore = useAuthStore()
 const logoutTimeout = computed(() => authStore.currentUser?.autoLogoutMinutes)
 const isLoading = ref(true);
 onMounted(() => {
+  console.log('locale', )
+  console.log('tz', tz)
   authStore.refreshToken().finally(() => {
     isLoading.value = false
     if (authStore.isAuthenticated) {
