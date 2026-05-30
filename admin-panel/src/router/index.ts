@@ -9,9 +9,10 @@ import TeamPage from '../pages/team/users/TeamPage.vue'
 import Groups from '../pages/team/groups/Groups.vue'
 import GroupCardDetails from '../pages/team/groups/GroupCardDetails.vue'
 import MyAccount from "@/pages/team/users/MyAccount.vue";
-import ConfigPage from "@/pages/settings/Configuration/ConfigPage.vue"
-import ApiKeysPage from "@/pages/settings/api_keys/ApiKeysPage.vue";
+import ConfigPage from "@/pages/settings/Configuration/ConfigPage.vue";
 import ChartsPage from "@/pages/charts/ChartsPage.vue";
+import ApiKeysPage from "@/pages/settings/api_keys/ApiKeysPage.vue";
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -29,8 +30,8 @@ const router = createRouter({
     { path: '/settings/api_keys',      name: 'settings/api_keys',      component: ApiKeysPage },
     { path: '/settings/configuration',      name: 'settings/configuration',      component: ConfigPage },
     { path: '/settings/systems/:system?',      name: 'settings/systems',      component: ExternalSystems },
+    { path: '/help' , name: 'help', component: Groups},
     { path: '/charts' , name: 'charts', component: ChartsPage},
-    { path: '/help' , name: 'help', component: Groups}
   ],
 })
 
