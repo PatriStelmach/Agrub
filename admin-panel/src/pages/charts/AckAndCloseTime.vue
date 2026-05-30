@@ -127,7 +127,7 @@ const yAxisTickFormat = (value: number) => {
       <VisXYContainer
         v-if="chartData.length > 0"
         :data="chartData"
-        :y-domain="[0, Math.max(...chartData.map(d => Math.max(d.close*1.012)))]">
+        :y-domain="[0, Math.max(...chartData.map(d => Math.max(d.ack,d.close*1.012)))]">
 
         <VisLine
           :curveType="CurveType.Cardinal"
