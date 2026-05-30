@@ -23,7 +23,7 @@ const authStore = useAuthStore()
 const logoutTimeout = computed(() => authStore.currentUser?.autoLogoutMinutes)
 const isLoading = ref(true);
 onMounted(() => {
-  console.log('locale', )
+  console.log('locale', locale)
   console.log('tz', tz)
   authStore.refreshToken().finally(() => {
     isLoading.value = false
