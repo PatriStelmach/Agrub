@@ -1,4 +1,4 @@
-package pl.pjatk.alertwip.repository.specification;
+package pl.pjatk.alertwip.repository.spec;
 
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;

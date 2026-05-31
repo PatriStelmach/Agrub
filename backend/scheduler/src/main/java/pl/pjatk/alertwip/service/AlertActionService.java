@@ -146,7 +146,7 @@ public class AlertActionService {
             org.springframework.data.domain.Pageable pageable) {
 
         // Budowanie specyfikacji filtrowania
-        var spec = pl.pjatk.alertwip.repository.specification.ProblemActionSpecifications
+        var spec = pl.pjatk.alertwip.repository.spec.ProblemActionSpecifications
                 .buildActionFilter(author, filters);
 
         return actionRepository.findAll(spec, pageable);
