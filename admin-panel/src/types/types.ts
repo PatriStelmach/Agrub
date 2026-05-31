@@ -1,5 +1,4 @@
-export const api_url = 'http://localhost:10000/api'
-import type { DateRange } from "reka-ui"
+export const api_url = '/api'
 
 export enum Language {
   PYTHON = ".py",
