@@ -3,9 +3,15 @@
 import TopH1Div from "@/helpers_components/TopH1Div.vue";
 import {bigNameLabel} from "@/assets/cssFunctions.ts";
 import {IconForbid, IconExclamationCircle} from "@tabler/icons-vue";
-import {useRoute} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
+import {useAuthStore} from "@/stores/authStore.ts";
 
+const router = useRouter();
 const route = useRoute();
+const authStore = useAuthStore();
+if (authStore.isAdmin) {
+  router.back();
+}
 </script>
 
 <template>

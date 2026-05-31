@@ -26,11 +26,15 @@ const locale = navigator.language
 const tz = getLocalTimeZone()
 
 onMounted(async () => {
-  await onDateRangeChange()
+  setTimeout(async () =>{
+    await onDateRangeChange()
+
+  }, 500)
+
 })
 
 const origin = ref<string[]>([])
-const end = ref<CalendarDate | CalendarDateTime | ZonedDateTime>(today(tz))
+const end = ref<CalendarDate | CalendarDateTime | ZonedDateTime>(today(tz).subtract({days:1}))
 const start = ref<CalendarDate | CalendarDateTime | ZonedDateTime>(end.value.subtract({ weeks: 4 }))
 const currentGranularity = ref<Granularity>('WEEK')
 const granularityAfterReload = ref<Granularity>(currentGranularity.value)
@@ -44,25 +48,25 @@ const dateRange = ref({
 }) as Ref<DateRange>
 
 const periodLabel = computed(() => {
-  const timestamp =
-    dateRange.value.end!.toDate(tz).getTime() -
-    dateRange.value.start!.toDate(tz).getTime()
+  if(dateRange.value.start && dateRange.value.end){
+    const timestamp =
+      dateRange.value.end!.toDate(tz).getTime() -
+      dateRange.value.start!.toDate(tz).getTime()
 
-  const diffDays = Math.ceil(timestamp / (1000 * 60 * 60 * 24))
+    const diffDays = Math.ceil(timestamp / (1000 * 60 * 60 * 24))
 
-  switch (granularityAfterReload.value) {
-    case 'DAY':
-      return `${diffDays} days`
+    switch (granularityAfterReload.value) {
+      case 'DAY':
+        return `${diffDays} days`
 
-    case 'WEEK':
-      return `${Math.ceil(diffDays / 7)} weeks`
+      case 'WEEK':
+        return `${Math.ceil(diffDays / 7)} weeks`
 
-    case 'MONTH':
-      return `${Math.ceil(diffDays / 30)} months`
-
-    default:
-      return ''
+      case 'MONTH':
+        return `${Math.ceil(diffDays / 30)} months`
+    }
   }
+  return ''
 })
 
 const onDateRangeChange = async () => {
@@ -81,6 +85,7 @@ const onDateRangeChange = async () => {
     .finally(() => {
       areChartsLoading.value = false
       isPopoverOpen.value = false
+      console.log(end, start, currentGranularity.value)
     })
 }
 
@@ -102,7 +107,7 @@ const onDateRangeChange = async () => {
               :locale="locale"
               :number-of-months="3"
               :disable-days-outside-current-view="true"
-              :isDateDisabled="date => date > today(tz)"
+              :isDateDisabled="date => date >= today(tz)"
             />
             <div class="mt-3">
               <div class="flex space-x-2 items-baseline">

@@ -116,9 +116,9 @@ const router = createRouter({
   ],
 })
 
-router.beforeEach((to, next) => {
+router.beforeEach((to) => {
   const authStore = useAuthStore()
-  if (to.meta.requiresAdmin) {
+  if (to.meta.requiresAdmin && !authStore.isAdmin) {
       return `/no_privileges${to.fullPath}`
   }
 })
