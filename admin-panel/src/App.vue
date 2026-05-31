@@ -17,15 +17,11 @@ import {useColorMode} from "@vueuse/core";
 const mode = useColorMode()
 const authStore = useAuthStore()
 const logoutTimeout = computed(() => authStore.currentUser?.autoLogoutMinutes)
-const isLoading = ref(true);
 onMounted(() => {
-  authStore.refreshToken().finally(() => {
-    isLoading.value = false
     if (authStore.isAuthenticated) {
       useSSEstore()
       startLogoutTimer()
     }
-  });
 })
 const {startLogoutTimer } = globals(
   () => Number(logoutTimeout.value),
@@ -40,17 +36,10 @@ const {startLogoutTimer } = globals(
 </script>
 
 <template>
-  <div
-    v-if="isLoading">
-    <Skeleton
-      class="w-screen h-screen text-blue-badge"
-    />
-
-  </div>
-  <div v-else-if="!isLoading && !authStore.isAuthenticated ">
+  <div v-if="!authStore.isAuthenticated ">
     <LoginPage/>
   </div>
-  <div v-else-if="!isLoading && authStore.isAuthenticated" >
+  <div v-else >
     <Toaster
       :duration="60000"
       theme="system"

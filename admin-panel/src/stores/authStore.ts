@@ -94,7 +94,8 @@ export const useAuthStore = defineStore('auth', () => {
       if (response.status === 200 && response.data.access_token) {
         setToken(response.data.access_token)
       }
-    }catch  {
+    }catch (error) {
+      toast.error(`Error during refresh token: ${error}`)
       setToken(null)
     }
   }
