@@ -9,6 +9,7 @@ import pl.pjatk.alertwip.repository.GlobalProblemRepository;
 import pl.pjatk.alertwip.repository.ProblemActionRepository;
 import pl.pjatk.alertwip.service.adapter.AlertSourceAdapter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -139,7 +140,13 @@ public class AlertActionService {
 
     // pobranie wszystkich akcji dla usera
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
-    public List<ProblemActionDTO> getActionsByAuthor(String author) {
-        return actionRepository.findByAuthorOrderByCreatedAtDesc(author);
+    public org.springframework.data.domain.Page<ProblemAction> getFilteredActionsByAuthor(
+            String author, LocalDate createdAt, String comment, String subject, Boolean ack, org.springframework.data.domain.Pageable pageable) {
+
+        // Budowanie specyfikacji filtrowania
+        var spec = pl.pjatk.alertwip.repository.specification.ProblemActionSpecifications
+                .buildActionFilter(author, createdAt, comment, subject, ack);
+
+        return actionRepository.findAll(spec, pageable);
     }
 }

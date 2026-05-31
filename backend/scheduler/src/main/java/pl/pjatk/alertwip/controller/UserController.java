@@ -6,6 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import pl.pjatk.alertwip.dto.GroupResponseDTO;
 import pl.pjatk.alertwip.dto.UserResponseDTO;
+import pl.pjatk.alertwip.model.ProblemAction;
 import pl.pjatk.alertwip.model.User;
 import pl.pjatk.alertwip.repository.UserRepository;
 import pl.pjatk.alertwip.service.AlertActionService;
@@ -14,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/users")
@@ -146,12 +148,32 @@ public class UserController {
     }
 
     @GetMapping("/{id}/actions")
-    public ResponseEntity<?> getAllActionsByUsers(@PathVariable Long id) {
+    public ResponseEntity<org.springframework.data.domain.Page<ProblemAction>> getAllActionsByUsers(
+            @PathVariable Long id,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) LocalDate createdAt,
+            @RequestParam(required = false) String comment,
+            @RequestParam(required = false) String subject,
+            @RequestParam(required = false) Boolean ack,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "DESC") String sortDir
+    ) {
+        // 1. Wyciągamy użytkownika
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Nie znaleziono użytkownika o ID: " + id));
 
         String authorIdentifier = user.getUsername();
-        List<?> userActions = alertActionService.getActionsByAuthor(authorIdentifier);
-        return ResponseEntity.ok(userActions);
+
+        // 2. Przygotowanie konfiguracji paginacji i sortowania dla MySQL
+        org.springframework.data.domain.Sort.Direction direction = org.springframework.data.domain.Sort.Direction.fromString(sortDir.toUpperCase());
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, org.springframework.data.domain.Sort.by(direction, sortBy));
+
+        // 3. Pobranie przefiltrowanej i stronicowanej bazy akcji
+        org.springframework.data.domain.Page<ProblemAction> actionsPage = alertActionService.getFilteredActionsByAuthor(
+                authorIdentifier, createdAt, comment, subject, ack, pageable
+        );
+
+        return ResponseEntity.ok(actionsPage);
     }
 }
