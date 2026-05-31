@@ -23,6 +23,8 @@ const props = defineProps<{
   editable: boolean
 }>()
 
+const isCodeDialogOpen = defineModel<boolean>('isCodeDialogOpen')
+
 const newCode = ref<string>(props.code)
 const newDescription = ref<string>(props.description)
 
@@ -45,7 +47,7 @@ const emits = defineEmits<{
 </script>
 
 <template>
-  <Dialog>
+  <Dialog v-model:open="isCodeDialogOpen">
     <form>
       <DialogTrigger as-child>
         <slot/>

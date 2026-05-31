@@ -14,6 +14,7 @@ const props = defineProps<{
   labelClass?: HTMLAttributes["class"]
   orientation: "horizontal" | "vertical"
   autocomplete?: string
+  disabled?: boolean
 }>()
 
 const fieldId = props.name
@@ -27,6 +28,7 @@ const fieldId = props.name
         <MyFieldLabel :class="labelClass" :text="label" :for="fieldId" />
       </div>
       <Input
+        :disabled="disabled"
         :autocomplete="autocomplete"
         :id="fieldId"
         :type="type ?? 'text'"

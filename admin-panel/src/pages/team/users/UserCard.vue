@@ -50,6 +50,7 @@ watch(isDialogOpen, (newValue, oldValue) => {
         <span class="text-muted-foreground truncate text-xs">{{ user.email }}</span>
       </div>
       <EditUser
+        v-if="authStore.isAdmin"
         v-model:open="isDialogOpen"
         action-type="edit"
         :user="user"

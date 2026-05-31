@@ -26,12 +26,14 @@ import NavUser from "@/pages/globals/navbar/NavUser.vue";
 import {useRoute} from "vue-router";
 import {globals} from "@/composables/globals.ts";
 import {onMounted} from "vue";
+import {useAuthStore} from "@/stores/authStore.ts";
 
 const { time, dayMonthYear, weekday, changeTime } = globals()
 const route = useRoute()
+const authStore = useAuthStore()
 onMounted(() => changeTime())
 
-const navItems = [
+const navItems = authStore.isAdmin ? [
   {
     label: 'Alerts',
     links: [
@@ -67,14 +69,30 @@ const navItems = [
       { label: 'Charts', to: 'charts', icon: IconChartBar },
     ]
   },
-  {
-    label: 'Help',
-    links: [
-      { label: 'Tutorial', to: 'help', icon: IconHelp },
-    ]
-  }
+] :
+  [
+    {
+      label: 'Alerts',
+      links: [
+        { label: 'Active', to: 'active_alerts', icon: IconAlertTriangle },
+        { label: 'History', to: 'alerts_history', icon: IconHistory },
+      ]
+    },
+    {
+      label: 'Plugins',
+      links: [
+        { label: 'My plugins', to: 'my_plugins', icon: IconCode },
+        { label: 'Library', to: 'plugins_library', icon: IconDatabase },
+      ]
+    },
+    {
+      label: 'Team',
+      links: [
+        { label: 'Team members', to: 'team_members', icon: IconUsers },
+      ],
+    }
+  ]
 
-]
 </script>
 
 <template>
@@ -104,12 +122,28 @@ const navItems = [
                   </RouterLink>
               </SidebarMenuButton>
             </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton as-child>
+                <SidebarGroupLabel class="hover:bg-transparent pl-1 flex items-center text-center">
+                  Help
+                </SidebarGroupLabel>
+                <a
+                  target="_blank"
+                  href="https://github.com/PatriStelmach/AlertVIP/tree/main"
+                  class="flex text-sm items-center xl:text-md ml-3 border-l-4 w-full gap-x-2 p-2 hover:bg-input rounded-[0_0.5rem_0.5rem_0]">
+                  <IconHelp class="size-5  xl:size-6"/>
+                  <span >
+                    Documentation
+                  </span>
+                </a>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroupContent>
       </SidebarGroup>
     </SidebarContent>
     <SidebarFooter>
-      <div class="grid space-y-2 **:text-comment justify-between *:items-center border-b-3 py-2">
+      <div class="grid space-y-2 **:text-comment justify-between *:items-center  border-b-3 pb-2">
         <div class="flex space-x-1 ">
           <IconClock class="size-4"/>
           <span class="text-xs mt-1 ">
@@ -126,6 +160,7 @@ const navItems = [
           </span>
         </div>
       </div>
+
       <NavUser/>
     </SidebarFooter>
   </Sidebar>

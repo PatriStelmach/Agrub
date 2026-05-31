@@ -16,8 +16,10 @@ import UserCard from './UserCard.vue'
 import EditUser from "./EditUser.vue"
 import GridCardTransitionGroup from "@/helpers_components/loaders/GridCardTransitionGroup.vue"
 import {gridSkeletons} from "@/assets/cssFunctions.ts";
+import {useAuthStore} from "@/stores/authStore.ts";
 
 const userStore = useUserStore();
+const authStore = useAuthStore();
 const isLoading = ref(true);
 
 const { filteredData,  searchFilter } =
@@ -25,10 +27,15 @@ const { filteredData,  searchFilter } =
 
 onMounted(async () => {
   if(userStore.allUsers.length === 0 || userStore.allGroups.length === 0) {
-    await Promise.all([
-      userStore.getAllUsersRequest(),
-      userStore.getAllGroupsRequest()
-    ]).finally(() => isLoading.value = false)
+    if(authStore.isAdmin) {
+      await Promise.all([
+        userStore.getAllUsersRequest(),
+        userStore.getAllGroupsRequest()
+      ]).finally(() => isLoading.value = false)
+    } else {
+      await userStore.getAllUsersRequest().finally(() => isLoading.value = false)
+    }
+
   }
   else isLoading.value = false;
 })
@@ -41,6 +48,7 @@ onMounted(async () => {
   <TopH1Div h1="Team">
     <ButtonGroup>
       <EditUser
+        v-if="authStore.isAdmin"
         action-type="create"
         :user="blankUser as User"
       >

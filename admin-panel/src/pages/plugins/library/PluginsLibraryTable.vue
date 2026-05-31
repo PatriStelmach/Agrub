@@ -23,12 +23,14 @@ import LoadingTable from "@/helpers_components/LoadingTable.vue";
 import {downloadPluginRequest, getPluginDetailsRequest} from "@/helpers_functions/requests.ts";
 import {toast} from "vue-sonner";
 import PluginDetailsDialog from "@/pages/plugins/PluginDetailsDialog.vue";
+import {useAuthStore} from "@/stores/authStore.ts";
 
 const props = defineProps<{
   plugins: LibraryPlugin[]
   isLoading: boolean;
 }>()
 
+const authStore = useAuthStore();
 const getDetailsLoading = ref<boolean>(false);
 
 const sortedHead =  defineModel<{ sortKey: string; sortOrder: string }>('sortedHead')
@@ -107,6 +109,7 @@ const getDetails = async (plugin: LibraryPlugin) => {
                 </PluginDetailsDialog>
 
                 <Button
+                  v-if="authStore.isAdmin"
                   @click="downloadPluginRequest(plugin)"
                   variant="green_outline"
                   class="border-l-2!"

@@ -218,17 +218,6 @@ export const changeUserPasswordRequest = async (oldPassword: string, newPassword
     }
   }
 
-export const getUserActionsRequest = async (id: number) => {
-  try {
-    const res = await api.get(`/users/${id}/actions`)
-    if (res.status === 200) {
-      return res.data ?? []
-    }
-  } catch (error) {
-    throw (error)
-  }
-}
-
 export const getHistoryAlertByIdRequest = async (id: number) => {
   try {
     const res = await api.get(`/alerts/${id}`)
@@ -244,24 +233,42 @@ export const getAnalyticsAlertsCount = async (
   start: CalendarDate | CalendarDateTime | ZonedDateTime,
   end: CalendarDate | CalendarDateTime | ZonedDateTime,
   granularity: Granularity,
+  origin: string[]
 ) => {
   const params = {
     start: toApiDate(start),
     end: toApiDate(end),
     granularity: granularity,
+    origin: origin,
   };
   try {
-    const [alerts, ack, close] = await Promise.all([
+    const [severity, alerts, ack, close] = await Promise.all([
+      api.get('/analytics/alerts-severity', {
+        params: params,
+          paramsSerializer: {
+            indexes: null
+          }
+      },
+        ),
       api.get('/analytics/alerts-count', {
         params: params,
+        paramsSerializer: {
+          indexes: null
+        }
       }),
 
       api.get('/analytics/avg-ack-time', {
         params: params,
+        paramsSerializer: {
+          indexes: null
+        }
       }),
 
       api.get('/analytics/avg-close-time', {
         params: params,
+        paramsSerializer: {
+          indexes: null
+        }
       }),
     ]);
     if (alerts.status === 200 && ack.status === 200 && close.status === 200) {
@@ -270,6 +277,7 @@ export const getAnalyticsAlertsCount = async (
         alerts: alerts.data,
         ack: ack.data,
         close: close.data,
+        severity: severity.data
       } as CumulativeData
     }
   } catch (error) {

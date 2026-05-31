@@ -1,13 +1,14 @@
 import { defineStore } from 'pinia'
-import {ref, computed, watch, watchEffect} from "vue"
+import {ref, computed} from "vue"
 import {type MyJWTPayload, type User} from "@/types/types.ts"
 import { jwtDecode } from "jwt-decode"
 import api from "@/lib/axios"
 import {toast} from "vue-sonner";
 
 export const useAuthStore = defineStore('auth', () => {
-  const isAuthenticated = ref<boolean>(false)
-  const accessToken = ref<string | null>(null)
+  const isAuthenticated = computed(() => !!accessToken.value)
+  const isAdmin = computed(() => currentUser.value?.role === 'ADMINISTRATOR')
+  const accessToken = ref<string|null>()
   const fullName = computed(() => `${currentUser.value?.firstname} ${currentUser.value?.surname}`)
   const avFallback = computed(() =>  `${currentUser.value?.firstname.slice(0,1)}${currentUser.value?.surname.slice(0,1)}`)
   const currentUser = computed(() => {
@@ -29,14 +30,31 @@ export const useAuthStore = defineStore('auth', () => {
     }
   })
 
+  const authChannel = new BroadcastChannel("auth")
+
+  authChannel.onmessage = (event) => {
+    if (event.data.type === 'alert-global-logout') {
+      setToken(null)
+      console.log('logged-out')
+    }
+    else if (event.data.type === 'alert-global-login') {
+      setToken(event.data.token)
+      console.log('logged in')
+    }
+  }
+
+  const setToken = (token: string | null) => {
+    accessToken.value = token
+  }
 
   async function alertLogin(credentials: { email: string; password: string }) {
     try {
       const response = await api.post('/auth/login', credentials)
       if (response.status === 200 && response.data.access_token) {
-        accessToken.value = response.data.access_token
-        isAuthenticated.value = true
+        setToken(response.data.access_token)
+        authChannel.postMessage({type: 'alert-global-login', token: response.data.access_token})
         console.log(response.data.access_token)
+
         return true
       }
 
@@ -49,9 +67,8 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const response = await api.post('/auth/login/ad', credentials)
       if (response.status === 200 && response.data.access_token) {
-        accessToken.value = response.data.access_token
-        isAuthenticated.value = true
-        console.log(response.data.access_token)
+        setToken(response.data.access_token)
+        authChannel.postMessage({type: 'alert-global-login', token: response.data.access_token})
         return true
       }
 
@@ -66,23 +83,22 @@ export const useAuthStore = defineStore('auth', () => {
     } catch (error) {
       toast.error(`Error during logout: ${error}`)
     } finally {
-      isAuthenticated.value = false
-      accessToken.value = null
+      authChannel.postMessage({type:'alert-global-logout'})
+      setToken(null)
     }
   }
 
   async function refreshToken() {
     try {
-      const response = await api.post(`/auth/refresh`, { withCredentials: true });
+      const response = await api.post(`/auth/refresh`, {withCredentials: true});
       if (response.status === 200 && response.data.access_token) {
-        accessToken.value = response.data.access_token
-        isAuthenticated.value = true
+        setToken(response.data.access_token)
       }
-      else isAuthenticated.value = false
-    } catch  {
-      isAuthenticated.value = false
+    }catch  {
+      setToken(null)
     }
   }
+
 
 
   return {
@@ -91,6 +107,7 @@ export const useAuthStore = defineStore('auth', () => {
     accessToken,
     isAuthenticated,
     avFallback,
+    isAdmin,
     alertLogin,
     ADLogin,
     logout,

@@ -68,7 +68,9 @@ import {toast} from "vue-sonner";
 import {useRoute, useRouter} from "vue-router";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {Input} from "@/components/ui/input";
+import {useAuthStore} from "@/stores/authStore.ts";
 const myPluginStore = useMyPluginStore()
+const authStore = useAuthStore()
 const { sortedData, sortKey, sortOrder, toggleSort } = useSort<MyPlugin>(() => props.data, 'updatedAt')
 const { isUnwrapped, unwrap, unwrappedItem, save } = useWrapping(sortedData, 'fullName')
 const router = useRouter()
@@ -82,10 +84,12 @@ const loadingTrigger = ref<boolean>(false)
 const blockedCheckbox = computed(() => !!unwrappedItem.value)
 const getDetailsLoading = ref<boolean>(false)
 const isEditLoading = ref<boolean>(false)
+const isCodeDialogOpen = ref<boolean>(false)
 
 const blockDeleteAndChangeStatus = computed(() =>
   !checkedPlugins.value.length ||
-  !!unwrappedItem.value
+  !!unwrappedItem.value ||
+  !authStore.isAdmin
 )
 
 const blockTrigger = computed(() =>
@@ -134,7 +138,7 @@ const checkAll = () => {
 }
 
 const changeStatus = () => {
-  if(!unwrappedItem.value) {
+  if(!unwrappedItem.value && authStore.isAdmin) {
     myPluginStore.changeStatus(checkedPlugins.value)
       .catch(e => toast.error(`Error changing status: ${e}`))
       .then(()=> toast.success(`Successfully changed status`))
@@ -143,7 +147,7 @@ const changeStatus = () => {
 }
 
 const deletePlugins = () => {
-  if(!unwrappedItem.value) {
+  if(!unwrappedItem.value && authStore.isAdmin) {
     myPluginStore.deleteMyPlugins(checkedPlugins.value)
       .catch(e => toast.error(`Error deleting plugins: ${e}`))
       .then(()=> toast.success(`Successfully deleted plugins`))
@@ -192,7 +196,7 @@ const triggerScript = async (args: string) => {
 const savePlugin = async () => {
   isEditLoading.value = true
   try {
-    if (unwrappedItem.value) {
+    if (unwrappedItem.value && authStore.isAdmin) {
       await save(() => myPluginStore.editMyPlugin(unwrappedItem.value!))
     }
   } catch (e) {
@@ -205,22 +209,21 @@ const savePlugin = async () => {
 }
 
 watchEffect(async () => {
-  if(paramRoute.value) {
-    const plugin = sortedData.value.find((pl) => pl.name === paramRoute.value)
-    if(plugin) {
-      unwrap(plugin.fullName)
+    if(paramRoute.value) {
+      const plugin = sortedData.value.find((pl) => pl.name === paramRoute.value)
+      if(plugin) {
+        unwrap(plugin.fullName)
+      }
+      if(unwrappedItem.value) {
+        getDetailsLoading.value = true
+        setTimeout(async () => {
+          await getDetails(unwrappedItem.value!.fullName)
+        },500 )
+      }
     }
-    if(unwrappedItem.value) {
-      getDetailsLoading.value = true
-      setTimeout(async () => {
-        await getDetails(unwrappedItem.value!.fullName)
-      },500 )
-
+    else {
+      unwrappedItem.value = null
     }
-  }
-  else {
-    unwrappedItem.value = null
-  }
 })
 
 const onCloseAndSave = () => {
@@ -235,6 +238,7 @@ const onEdit = (plugin: MyPlugin) => {
     router.replace({path: `/my_plugins/${plugin.name}`})
   }
 }
+
 
 </script>
 
@@ -277,6 +281,7 @@ const onEdit = (plugin: MyPlugin) => {
       </PopoverContent>
     </Popover>
     <Button
+      v-if="authStore.isAdmin"
       class="border-l-2!"
       @click="changeStatus"
       :disabled="blockDeleteAndChangeStatus"
@@ -285,6 +290,7 @@ const onEdit = (plugin: MyPlugin) => {
       <IconStatusChange/>
     </Button>
     <Button
+      v-if="authStore.isAdmin"
       class="border-l-2!"
       @click="deletePlugins"
       :disabled="blockDeleteAndChangeStatus"
@@ -337,7 +343,7 @@ const onEdit = (plugin: MyPlugin) => {
             class="cursor-pointer duration-0 border-radius-0  [&_td]:py-2 [&_td]:pr-4 hover:bg-green-badge/20"
             v-for="plugin in sortedData"
             :key="plugin.fullName"
-            @click="onEdit(plugin)"
+            @click="onEdit(plugin) "
             :class="{'hover:bg-destructive/20': !plugin.active,
              'bg-selected [&_td]:align-top cursor-auto sticky h-40! [&_td]:pt-4! top-9 bottom-22 hover:bg-card z-9 '
                     : isUnwrapped(plugin.fullName) }">
@@ -352,7 +358,7 @@ const onEdit = (plugin: MyPlugin) => {
                 v-model="checkedPlugins"
               />
             </TableCell>
-            <TableCell v-if="isUnwrapped(plugin.fullName) && unwrappedItem">
+            <TableCell v-if="isUnwrapped(plugin.fullName) && unwrappedItem && authStore.isAdmin">
               <InputGroup
                 class="w-full xl:h-10 2xl:h-12 ">
                 <InputGroupInput
@@ -369,7 +375,7 @@ const onEdit = (plugin: MyPlugin) => {
             <!-- Tags -->
             <TableCell class="whitespace-break-spaces" >
               <MyTagInput
-                v-if="unwrappedItem && isUnwrapped(plugin.fullName)"
+                v-if="unwrappedItem && isUnwrapped(plugin.fullName) && authStore.isAdmin"
                 v-model:tags="unwrappedItem.tags"
                 :all-tags="availableTags"
                 input-id="tags-input"
@@ -383,20 +389,7 @@ const onEdit = (plugin: MyPlugin) => {
                 >{{tag}}</Badge>
               </TransitionGroup>
             </TableCell>
-            <TableCell v-if="!isUnwrapped(plugin.fullName)" class="whitespace-break-spaces">
-              <span
-                class="grid w-full whitespace-break-spaces "
-                :class="{'text-destructive' : !cronWrappedDescription(plugin.cronExpression)[2]}"
-              >
-                <span>{{cronWrappedDescription(plugin.cronExpression)[0]}}</span>
-                <span  v-if="cronWrappedDescription(plugin.cronExpression)[2]">Next run: {{nextRun(plugin)}}
-                </span>
-                <span class="text-primary truncate" v-else-if="!cronWrappedDescription(plugin.cronExpression)[0]">
-                  Next run: -------------
-                </span>
-              </span>
-            </TableCell>
-            <TableCell v-else class="grid space-y-2">
+            <TableCell v-if="!isUnwrapped(plugin.fullName) && authStore.isAdmin" class="grid space-y-2">
               <InputGroup class="relative w-full xl:h-10 2xl:h-12 mb-2">
                 <InputGroupInput
                   class=" text-center input-text"
@@ -415,7 +408,21 @@ const onEdit = (plugin: MyPlugin) => {
                     Next run: {{ cronDescription[1]}}</span>
                 </span>
             </TableCell>
-            <TableCell v-if="isUnwrapped(plugin.fullName) && unwrappedItem" >
+            <TableCell v-else class="whitespace-break-spaces">
+              <span
+                class="grid w-full whitespace-break-spaces "
+                :class="{'text-destructive' : !cronWrappedDescription(plugin.cronExpression)[2]}"
+              >
+                <span>{{cronWrappedDescription(plugin.cronExpression)[0]}}</span>
+                <span  v-if="cronWrappedDescription(plugin.cronExpression)[2]">Next run: {{nextRun(plugin)}}
+                </span>
+                <span class="text-primary truncate" v-else-if="!cronWrappedDescription(plugin.cronExpression)[0]">
+                  Next run: -------------
+                </span>
+              </span>
+            </TableCell>
+
+            <TableCell v-if="isUnwrapped(plugin.fullName) && unwrappedItem && authStore.isAdmin" >
               <SeveritySelect
                 v-model:severity="unwrappedItem.severity"
               />
@@ -429,21 +436,15 @@ const onEdit = (plugin: MyPlugin) => {
               <LanguageImage :language="plugin.language" sizeClass="size-7 lg:size-8" />
             </TableCell>
             <DateCell class="" v-if="plugin.updatedAt" :date="plugin.updatedAt"></DateCell>
-            <TableCell v-if="isUnwrapped(plugin.fullName) && unwrappedItem" >
-              <RadioGroup
-                @update:model-value="unwrappedItem.active = $event === 'on'"
-                :model-value="unwrappedItem.active ? 'on' : 'off'"
-                :default-value="plugin.active ? 'on' : 'off'"
-                class="">
-                <div class="flex items-center space-x-2">
-                  <RadioGroupItem class="size-4 lg:size-5 xl:size-6 2xl:size-8" id=radio-on value="on" />
-                  <Label class="cursor-pointer text-green-badge"  for="radio-on">On</Label>
-                </div>
-                <div class="flex items-center space-x-2">
-                  <RadioGroupItem class="size-4 lg:size-5 xl:size-6 2xl:size-8" id="radio-off" value="off" />
-                  <Label class="cursor-pointer text-destructive" for="radio-off">Off</Label>
-                </div>
-              </RadioGroup>
+            <TableCell v-if="isUnwrapped(plugin.fullName) && unwrappedItem && authStore.isAdmin" >
+              <div class="flex items-center gap-x-2">
+                <input v-model="unwrappedItem.active" type="radio" class="size-4 cursor-pointer lg:size-5 xl:size-6 2xl:size-8" id=radio-on :value="true" />
+                <Label class="cursor-pointer text-green-badge"  for="radio-on">On</Label>
+              </div>
+              <div class="flex items-center gap-x-2">
+                <input v-model="unwrappedItem.active" type="radio" class="size-4 cursor-pointer lg:size-5 xl:size-6 2xl:size-8" id="radio-off" :value="false" />
+                <Label class="cursor-pointer text-destructive" for="radio-off">Off</Label>
+              </div>
             </TableCell>
             <TableCell v-else class=" text-green-badge" :class="{'text-destructive' : !plugin.active}">{{ plugin.active ? 'On' : 'Off'}}</TableCell>
             <TableCell class="">{{plugin.weight}} KB
@@ -457,7 +458,8 @@ const onEdit = (plugin: MyPlugin) => {
                   :disabled="getDetailsLoading"
                   variant="blue_outline" class="border-l-2! p-0">
                   <PluginDetailsDialog
-                    :editable="true"
+                    v-model:isCodeDialogOpen="isCodeDialogOpen"
+                    :editable="authStore.isAdmin"
                     :code="unwrappedItem.code ?? ''"
                     :description="unwrappedItem.description ?? ''"
                     @update:save-changes="updateDetails"
@@ -473,6 +475,7 @@ const onEdit = (plugin: MyPlugin) => {
                   </PluginDetailsDialog>
                 </Button>
                 <Button
+                  v-if="authStore.isAdmin"
                   :disabled="!cronDescription[2]"
                   class="border-l-2!"
                   @click.stop="savePlugin"

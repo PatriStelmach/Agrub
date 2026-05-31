@@ -15,7 +15,7 @@ import {IconX, IconCheck, IconSend2} from "@tabler/icons-vue";
 import DialogLabel from "@/helpers_components/DialogLabel.vue";
 import type { ActiveAlert} from "@/types/types.js";
 import {Badge} from "@/components/ui/badge";
-import ActionsList from "@/helpers_components/ActionsList.vue";
+import ActionsTable from "@/helpers_components/ActionsTable.vue";
 import {useAuthStore} from "@/stores/authStore.ts";
 import SeveritySelect from "@/helpers_components/SeveritySelect.vue";
 import {updateAlertRequest} from "@/helpers_functions/requests.ts";
@@ -56,13 +56,13 @@ const onClose = () => {
       newMessage.value = ""
     }, 500)
   }
-
 }
 
 watch(isDialogOpen, (newValue, oldValue) => {
   if (newValue === true && oldValue === false) {
     newSeverity.value = alert.value?.severity
     newAck.value = alert.value?.isAcknowledged
+    newMessage.value = ""
   }
   else if (newValue === false && oldValue === true) {
     router.replace({ path: '/active_alerts' })
@@ -148,7 +148,7 @@ watch(isDialogOpen, (newValue, oldValue) => {
                 <DialogTitle >Actions history</DialogTitle>
                 <DialogDescription>All interactions with alert</DialogDescription>
               </DialogHeader>
-              <ActionsList
+              <ActionsTable
                 :userView="false"
                 max-h="32rem"
                 max-w="65rem"
