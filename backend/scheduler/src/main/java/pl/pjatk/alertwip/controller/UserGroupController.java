@@ -31,6 +31,7 @@ public class UserGroupController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('ROLE_ADMINISTRATOR')")
     public ResponseEntity<List<UserGroup>> getAllGroups() {
         return ResponseEntity.ok(groupRepository.findAll());
     }
@@ -43,6 +44,7 @@ public class UserGroupController {
 
     //Pobieranie wszystkich grup razem z liczbą userów do nich przypisanych i liczbą zasad do nich przypisanych
     @GetMapping("/stats")
+    @PreAuthorize("hasAuthority('ROLE_ADMINISTRATOR')")
     public ResponseEntity<List<UserGroupStatsDTO>> getAllGroupsWithStats() {
         List<UserGroup> groups = groupRepository.findAll();
 
@@ -58,6 +60,7 @@ public class UserGroupController {
 
     //endpoint na pobranie wszystkich userów oraz wszystkich zasad dla konkretnej grupy
     @GetMapping("/{id}/details")
+    @PreAuthorize("hasAuthority('ROLE_ADMINISTRATOR')")
     public ResponseEntity<pl.pjatk.alertwip.dto.UserGroupDetailsDTO> getGroupDetails(@PathVariable Long id) {
 
         // 1. Sprawdzamy czy grupa w ogóle istnieje
