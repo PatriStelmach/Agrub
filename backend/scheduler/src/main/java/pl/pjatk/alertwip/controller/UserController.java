@@ -146,7 +146,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/actions")
-    public ResponseEntity<org.springframework.data.domain.Page<ProblemAction>> getAllActionsByUsers(
+    public ResponseEntity<org.springframework.data.domain.Page<pl.pjatk.alertwip.dto.ProblemActionDTO>> getAllActionsByUsers(
             @PathVariable Long id,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -164,11 +164,28 @@ public class UserController {
         org.springframework.data.domain.Sort.Direction direction = org.springframework.data.domain.Sort.Direction.fromString(sortDir.toUpperCase());
         org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, org.springframework.data.domain.Sort.by(direction, sortBy));
 
-        // 3. Przekazanie DTO filtrów do serwisu
-        org.springframework.data.domain.Page<ProblemAction> actionsPage = alertActionService.getFilteredActionsByAuthor(
-                authorIdentifier, filters, pageable
+        // 3. Pobranie z serwisu strony z ENCJI (zastosowano filtry)
+        org.springframework.data.domain.Page<pl.pjatk.alertwip.model.ProblemAction> actionsPage =
+                alertActionService.getFilteredActionsByAuthor(authorIdentifier, filters, pageable);
+
+        // 4. MAPOWANIE: Przepisujemy encje na lekkie DTO (tutaj wyciągamy subject!)
+        org.springframework.data.domain.Page<pl.pjatk.alertwip.dto.ProblemActionDTO> dtoPage = actionsPage.map(action ->
+                new pl.pjatk.alertwip.dto.ProblemActionDTO(
+                        action.getId(),
+                        action.getProblem().getId(),
+                        action.getProblem().getSubject(), // <--- Temat wyciągnięty z relacji
+                        action.getAuthor(),
+                        action.getMessage(),
+                        action.getCreatedAt(),
+                        action.getProblem().getClosedAt(), // <--- Data zamknięcia wyciągnięta z relacji
+                        action.getAckUpdate(),
+                        action.getPreviousSeverity(),
+                        action.getNewSeverity(),
+                        action.getSyncStatus()
+                )
         );
 
-        return ResponseEntity.ok(actionsPage);
+        // Zwracamy czyste, bezpieczne i zmapowane dane
+        return ResponseEntity.ok(dtoPage);
     }
 }
