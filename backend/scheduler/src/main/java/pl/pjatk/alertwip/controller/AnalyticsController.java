@@ -2,6 +2,7 @@ package pl.pjatk.alertwip.controller;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pl.pjatk.alertwip.dto.AlertsBySeverityDTO;
 import pl.pjatk.alertwip.dto.ChartDataPointDTO;
@@ -13,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/analytics")
+@PreAuthorize("hasAuthority('ROLE_ADMINISTRATOR')")
 public class AnalyticsController {
 
     private final AnalyticsService analyticsService;
