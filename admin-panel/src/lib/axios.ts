@@ -30,7 +30,6 @@ api.interceptors.response.use(
 
     if (originalRequest.url?.includes(['refresh', 'logout', 'login']) ) {
       authStore.accessToken = null
-      authStore.isAuthenticated = false
       return Promise.reject(error);
     }
 
