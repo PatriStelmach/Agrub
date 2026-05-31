@@ -150,14 +150,11 @@ public class UserController {
     @GetMapping("/{id}/actions")
     public ResponseEntity<org.springframework.data.domain.Page<ProblemAction>> getAllActionsByUsers(
             @PathVariable Long id,
-            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) LocalDate createdAt,
-            @RequestParam(required = false) String comment,
-            @RequestParam(required = false) String subject,
-            @RequestParam(required = false) Boolean ack,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
-            @RequestParam(defaultValue = "DESC") String sortDir
+            @RequestParam(defaultValue = "DESC") String sortDir,
+            @ModelAttribute pl.pjatk.alertwip.dto.AlertHistoryFiltersDTO filters
     ) {
         // 1. Wyciągamy użytkownika
         User user = userRepository.findById(id)
@@ -165,13 +162,13 @@ public class UserController {
 
         String authorIdentifier = user.getUsername();
 
-        // 2. Przygotowanie konfiguracji paginacji i sortowania dla MySQL
+        // 2. Przygotowanie paginacji
         org.springframework.data.domain.Sort.Direction direction = org.springframework.data.domain.Sort.Direction.fromString(sortDir.toUpperCase());
         org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, org.springframework.data.domain.Sort.by(direction, sortBy));
 
-        // 3. Pobranie przefiltrowanej i stronicowanej bazy akcji
+        // 3. Przekazanie DTO filtrów do serwisu
         org.springframework.data.domain.Page<ProblemAction> actionsPage = alertActionService.getFilteredActionsByAuthor(
-                authorIdentifier, createdAt, comment, subject, ack, pageable
+                authorIdentifier, filters, pageable
         );
 
         return ResponseEntity.ok(actionsPage);

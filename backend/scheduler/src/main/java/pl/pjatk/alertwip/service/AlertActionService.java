@@ -141,11 +141,13 @@ public class AlertActionService {
     // pobranie wszystkich akcji dla usera
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public org.springframework.data.domain.Page<ProblemAction> getFilteredActionsByAuthor(
-            String author, LocalDate createdAt, String comment, String subject, Boolean ack, org.springframework.data.domain.Pageable pageable) {
+            String author,
+            pl.pjatk.alertwip.dto.AlertHistoryFiltersDTO filters,
+            org.springframework.data.domain.Pageable pageable) {
 
         // Budowanie specyfikacji filtrowania
         var spec = pl.pjatk.alertwip.repository.specification.ProblemActionSpecifications
-                .buildActionFilter(author, createdAt, comment, subject, ack);
+                .buildActionFilter(author, filters);
 
         return actionRepository.findAll(spec, pageable);
     }
