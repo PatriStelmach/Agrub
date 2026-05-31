@@ -1,14 +1,14 @@
 <script setup lang="ts">
 
 import TopH1Div from "@/helpers_components/TopH1Div.vue";
-import AlertsCount from "@/pages/charts/AlertsCount.vue";
+import ChartAlertsCountBySeverity from "@/pages/charts/ChartAlertsCountBySeverity.vue";
 import { IconCalendarQuestion, IconSend2, IconLoader} from "@tabler/icons-vue";
 import {computed, onMounted, type Ref, ref} from "vue";
 import type {DateRange} from "reka-ui";
-import AckOrCloseTime from "@/pages/charts/AckOrCloseTime.vue";
+import ChartAckOrCloseTime from "@/pages/charts/ChartAckOrCloseTime.vue";
 import { getLocalTimeZone, today, ZonedDateTime, CalendarDateTime, CalendarDate,  } from '@internationalized/date'
 import type {CumulativeData, Granularity} from "@/types/types.ts";
-import AckAndCloseTime from "@/pages/charts/AckAndCloseTime.vue";
+import ChartAckAndCloseTime from "@/pages/charts/ChartAckAndCloseTime.vue";
 import {getAnalyticsAlertsCount} from "@/helpers_functions/requests.ts";
 import {toast} from "vue-sonner";
 import {Button} from "@/components/ui/button";
@@ -18,6 +18,9 @@ import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {RangeCalendar} from "@/components/ui/range-calendar";
 import MyFieldLabel from "@/helpers_components/form/MyFieldLabel.vue";
 import {bigNameLabel} from "@/assets/cssFunctions.ts";
+import ChartAllAlerts from "@/pages/charts/ChartAllAlerts.vue";
+import MyTagInput from "@/helpers_components/MyTagInput.vue";
+import {alertOriginType} from "@/data/alertOriginType.ts";
 
 const locale = navigator.language
 const tz = getLocalTimeZone()
@@ -26,9 +29,10 @@ onMounted(async () => {
   await onDateRangeChange()
 })
 
-const end = ref<CalendarDate | CalendarDateTime | ZonedDateTime>(today(tz).add({days: 1}))
-const start = ref<CalendarDate | CalendarDateTime | ZonedDateTime>(end.value.subtract({ days: 7 }))
-const currentGranularity = ref<Granularity>('DAY')
+const origin = ref<string[]>([])
+const end = ref<CalendarDate | CalendarDateTime | ZonedDateTime>(today(tz))
+const start = ref<CalendarDate | CalendarDateTime | ZonedDateTime>(end.value.subtract({ weeks: 4 }))
+const currentGranularity = ref<Granularity>('WEEK')
 const granularityAfterReload = ref<Granularity>(currentGranularity.value)
 const areChartsLoading = ref<boolean>(true)
 const rawAnalyticsData = ref<CumulativeData>()
@@ -40,11 +44,11 @@ const dateRange = ref({
 }) as Ref<DateRange>
 
 const periodLabel = computed(() => {
-  const diffMs =
+  const timestamp =
     dateRange.value.end!.toDate(tz).getTime() -
     dateRange.value.start!.toDate(tz).getTime()
 
-  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24))
+  const diffDays = Math.ceil(timestamp / (1000 * 60 * 60 * 24))
 
   switch (granularityAfterReload.value) {
     case 'DAY':
@@ -63,7 +67,12 @@ const periodLabel = computed(() => {
 
 const onDateRangeChange = async () => {
   areChartsLoading.value = true
-  await getAnalyticsAlertsCount(dateRange.value.start as ZonedDateTime, dateRange.value.end as ZonedDateTime, currentGranularity.value)
+  await getAnalyticsAlertsCount(
+    dateRange.value.start as ZonedDateTime,
+    dateRange.value.end as ZonedDateTime,
+    currentGranularity.value,
+    origin.value
+  )
     .catch((e) => toast.error(`Error retrieving Analytics data: ${e}`))
     .then((res) => {
       rawAnalyticsData.value = res as CumulativeData
@@ -83,16 +92,17 @@ const onDateRangeChange = async () => {
       <ButtonGroup>
         <Popover v-model:open="isPopoverOpen">
           <PopoverTrigger as-child>
-            <Button variant="green_outline"> Date range <IconCalendarQuestion/>
+            <Button variant="green_outline"> Charts configuration<IconCalendarQuestion/>
             </Button>
           </PopoverTrigger>
-          <PopoverContent class="w-fit bg-background">
+          <PopoverContent class="w-fit p-5 shadow-xl bg-background">
             <RangeCalendar
               v-model="dateRange"
               class="rounded-md border-2  shadow-xl"
+              :locale="locale"
               :number-of-months="3"
-              disable-days-outside-current-view
-              :isDateDisabled="date => date.subtract({days:1}) > today(tz)"
+              :disable-days-outside-current-view="true"
+              :isDateDisabled="date => date > today(tz)"
             />
             <div class="mt-3">
               <div class="flex space-x-2 items-baseline">
@@ -145,33 +155,52 @@ const onDateRangeChange = async () => {
                 <IconSend2 v-else/>
               </Button>
             </div>
+            <div>
+              <MyTagInput
+                class="w-3/4"
+                :all-tags="alertOriginType"
+                input-id="origin-input"
+                :can-add-new="false"
+                v-model:tags="origin"
+                tagsLabel="Origins: "
+              />
+            </div>
           </PopoverContent>
         </Popover>
       </ButtonGroup>
 
     </TopH1Div>
       <Transition
-        class="max-h-[90vh] mx-6 overflow-auto grid grid-cols-1 gap-y-30 *:h-[60vh]"
+        class="max-h-[90vh] px-6 overflow-auto grid grid-cols-1 gap-y-30 *:h-[60vh]"
         tag="div"
         name="fade">
         <div v-if="areChartsLoading">
           <BigLoadingBlock
-            v-for=" (_,i) in [1,2,3,4]"
+            v-for=" (_,i) in [1,2,3,5]"
             :key="i"
-            class="h-120"
+            class="h-140"
           />
         </div>
         <div v-else>
-          <AlertsCount
-            :periodLabel="periodLabel"
+          <ChartAllAlerts
+            :locale="locale"
+            :tz="tz"
+            :start="start as ZonedDateTime"
+            :end="end as ZonedDateTime"
+            :currentGranularity="granularityAfterReload"
             :rawAnalyticsData="rawAnalyticsData?.alerts ?? []"
+            :period-label="periodLabel"
+          />
+          <ChartAlertsCountBySeverity
+            :periodLabel="periodLabel"
+            :rawAnalyticsData="rawAnalyticsData?.severity ?? []"
             :currentGranularity="granularityAfterReload"
             :locale="locale"
             :tz="tz"
             :end="end as ZonedDateTime"
             :start="start as ZonedDateTime"
           />
-          <AckOrCloseTime
+          <ChartAckOrCloseTime
             :periodLabel="periodLabel"
             :rawAnalyticsData="rawAnalyticsData?.ack ?? []"
             :currentGranularity="granularityAfterReload"
@@ -182,7 +211,7 @@ const onDateRangeChange = async () => {
             header="Average time to acknowledge an alert"
             :type="'avg-ack-time'"
           />
-          <AckOrCloseTime
+          <ChartAckOrCloseTime
             :periodLabel="periodLabel"
             :rawAnalyticsData="rawAnalyticsData?.close ?? []"
             :currentGranularity="granularityAfterReload"
@@ -193,7 +222,7 @@ const onDateRangeChange = async () => {
             header="Average time to close an alert"
             :type="'avg-close-time'"
           />
-          <AckAndCloseTime
+          <ChartAckAndCloseTime
             :periodLabel="periodLabel"
             :currentGranularity="granularityAfterReload"
             header="Average acknowledge and close times compared"

@@ -1,4 +1,5 @@
-export const api_url = '/api'
+export const api_url = 'http://localhost:10000/api'
+import type { DateRange } from "reka-ui"
 
 export enum Language {
   PYTHON = ".py",
@@ -37,7 +38,7 @@ export type Severity =
   | 'HIGH'
   | 'CRITICAL';
 
-export interface AlertCountAnalytics {
+export interface AlertSeverityAnalitycs {
   x: number,
   severities: {
     0: number
@@ -55,9 +56,10 @@ export interface XYAnalytics {
 }
 
 export interface CumulativeData {
-  alerts: AlertCountAnalytics[]
+  alerts: XYAnalytics[]
   ack: XYAnalytics[]
   close: XYAnalytics[]
+  severity: AlertSeverityAnalitycs[]
 }
 
 export interface ChartDataPoint {
@@ -114,7 +116,7 @@ export interface MyJWTPayload {
   exp: number;
 }
 
-export const undefinedAlertsFilters = {
+export const undefinedActionsOrAlertsFilters = {
   severity: undefined,
   message: undefined,
   subject: undefined,
@@ -128,7 +130,7 @@ export const undefinedAlertsFilters = {
   closedDateTo: undefined
 }
 
-export interface AlertHistoryFilters {
+export interface ActionsOrAlertHistoryFilters {
   severity?: number[]
   message?: string
   subject?: string

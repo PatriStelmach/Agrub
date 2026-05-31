@@ -9,6 +9,7 @@ import { getWeekNumber } from "reka-ui/date"
 import {useColorMode} from "@vueuse/core";
 import {CurveType} from "@unovis/ts";
 
+const mode = useColorMode()
 const props = defineProps<{
   header: string
   type: "avg-close-time" | "avg-ack-time"
@@ -19,8 +20,6 @@ const props = defineProps<{
   periodLabel: string
 }>()
 
-
-const mode = useColorMode()
 const formatDuration = (seconds: number) => {
   const totalSeconds = Math.round(seconds)
 
@@ -29,7 +28,6 @@ const formatDuration = (seconds: number) => {
 
   return `${minutes} min ${remainingSeconds.toString().padStart(2, '0')} s`
 }
-
 
 const averageValueFormatted = computed(() => {
   const values = props.rawAnalyticsData.map(x => x.y)
@@ -42,16 +40,14 @@ const xAxisTickFormat = computed(() => {
     const zonedTime = fromDate(date, props.tz)
 
     if (props.currentGranularity === 'DAY') {
-      return date.toLocaleDateString(props.locale, { timeZone: props.tz, weekday: 'short' })
+      return date.toLocaleDateString(props.locale, { timeZone: props.tz, day: 'numeric', month: 'long', year: 'numeric' })
     }
     if (props.currentGranularity === 'WEEK') {
-      return `week ${getWeekNumber(zonedTime)}`
+      return `week ${getWeekNumber(zonedTime)}, ${date.getFullYear()}`
     }
-    return date.toLocaleDateString(props.locale, { timeZone: props.tz, month: 'short' })
+    return date.toLocaleDateString(props.locale, { timeZone: props.tz, month: 'short', year: 'numeric' })
   }
 })
-
-
 
 const tooltipLabelFormatter = computed(() => {
   return (d: number | Date) => {
@@ -62,9 +58,9 @@ const tooltipLabelFormatter = computed(() => {
       return date.toLocaleDateString(props.locale, { timeZone: props.tz, day: 'numeric', month: 'long', year: 'numeric' })
     }
     if (props.currentGranularity === 'WEEK') {
-      return `Week ${getWeekNumber(zonedTime)}, ${date.getFullYear()}`
+      return `week ${getWeekNumber(zonedTime)}, ${date.getFullYear()}`
     }
-    return date.toLocaleDateString(props.locale, { timeZone: props.tz, month: 'long', year: 'numeric' })
+    return date.toLocaleDateString(props.locale, { timeZone: props.tz, month: 'short', year: 'numeric' })
   }
 })
 
@@ -72,13 +68,13 @@ const yAxisTickFormat = (value: number) => {
   return formatDuration(value)
 }
 
-const time = {
+const time = computed(()=> ({
   y : {
     label: props.type === 'avg-close-time' ? "Average close time in minutes:" : "Average acknowledge in minutes: ",
     color: props.type === 'avg-close-time' ? '#F40031FF' : mode.value === 'light' ? '#48CF00FF' : '#08A800FF',
     text: averageValueFormatted.value
   },
-}
+}))
 
 
 </script>
@@ -95,16 +91,17 @@ const time = {
       class="w-full" >
       <VisXYContainer
         v-if="rawAnalyticsData.length > 0"
-        :y-domain="[Math.min(...rawAnalyticsData.map(d => Math.max(d.y*0.995))), Math.max(...rawAnalyticsData.map(d => Math.max(d.y*1.012)))]"
+        :y-domain="[Math.min(...rawAnalyticsData.map(d => Math.max(d.y*0.995))), Math.max(...rawAnalyticsData.map(d => Math.max(d.y*1.02)))]"
         :data="rawAnalyticsData" >
 
         <VisLine
-          :curveType="CurveType.Cardinal"
+          :fallbackValue="rawAnalyticsData.map(i => i.y).reduce((sum, value) => sum + value, 0) / rawAnalyticsData.length"
+          :curveType="CurveType.Linear"
           :highlightOnHover="true"
           :line-width="3"
           :x="(d: any) => d.x"
           :y="(d: any) => d.y"
-          :color="props.type === 'avg-close-time' ? '#F40031FF' : mode === 'light' ? '#48CF00FF' : '#08A800FF'"
+          :color="time['y'].color"
         />
 
         <VisAxis
@@ -126,7 +123,7 @@ const time = {
             labelFormatter: tooltipLabelFormatter,
             valueFormatter: formatDuration,
           })"
-          :color="props.type === 'avg-ack-time' ? '#F40031FF' : mode === 'light' ? '#48CF00FF' : '#08A800FF'"
+          :color="time['y'].color"
         />
       </VisXYContainer>
       <div

@@ -121,7 +121,7 @@ public class AlertController {
         return ResponseEntity.ok(history);
     }
 
-    @GetMapping("/origins")
+    @GetMapping("/alertOriginType")
     public ResponseEntity<List<String>> getAvailableOrigins() {
         return ResponseEntity.ok(alertHistoryService.getAllOriginTypes());
     }

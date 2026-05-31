@@ -32,5 +32,5 @@ export function dateParser(date: Date | string) {
 
 export const toApiDate = (date: CalendarDate | CalendarDateTime | ZonedDateTime) => {
   const tz = getLocalTimeZone()
-  return dateParser(date.toDate(tz)).apiDate
+  return date ? dateParser(date.toDate(tz)).apiDate : undefined
 }

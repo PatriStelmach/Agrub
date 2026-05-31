@@ -128,6 +128,22 @@ export const editCurrentUserSchema = toTypedSchema(
       id: z.number(),
     }))
   }))
+export const editCurrentAdUserSchema = toTypedSchema(
+  z.object({
+    id: z.number(),
+    email: z.string(),
+    firstname: z.string(),
+    surname: z.string(),
+    autoLogoutMinutes: z
+      .number()
+      .int('Must be a positive integer')
+      .min(1, "Cannot be lower than 1 minute"),
+    groups: z.array(z.object({
+      name: z.string(),
+      id: z.number(),
+    }))
+  }))
+
 
 export const changePasswordSchema = toTypedSchema(
   z.object({

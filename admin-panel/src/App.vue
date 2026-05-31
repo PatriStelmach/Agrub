@@ -23,7 +23,6 @@ onMounted(() => {
     isLoading.value = false
     if (authStore.isAuthenticated) {
       useSSEstore()
-      console.log(authStore.accessToken)
       startLogoutTimer()
     }
   });

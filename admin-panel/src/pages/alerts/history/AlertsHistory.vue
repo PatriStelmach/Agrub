@@ -5,15 +5,15 @@ import {ButtonGroup} from "@/components/ui/button-group";
 import TopH1Div from "@/helpers_components/TopH1Div.vue";
 import {
   type AlertDetails,
-  type AlertHistoryFilters,
+  type ActionsOrAlertHistoryFilters,
   type HistoryAlert,
-  undefinedAlertsFilters
+  undefinedActionsOrAlertsFilters
 } from "@/types/types.js";
 import {onMounted, ref} from "vue";
 import {IconFilterCog} from "@tabler/icons-vue";
 import AlertsHistoryTable from "@/pages/alerts/history/AlertsHistoryTable.vue";
 import MyServerPagination from "@/helpers_components/MyServerPagination.vue";
-import AlertsFilters from "@/pages/alerts/history/AlertsFilters.vue";
+import ActionsOrAlertsFilters from "@/pages/alerts/history/ActionsOrAlertsFilters.vue";
 import {useServerSearchFilter} from "@/composables/useServerSearchFilter.ts";
 import api from "@/lib/axios.ts";
 import {toast} from "vue-sonner";
@@ -48,11 +48,9 @@ const getAlertsHistory = async () => {
       items.value = response.data.content.map((a:any) => ({
         ...a,
         createdAt: new Date(a.createdAt),
-        closedAt: new Date(a.closedAt),
-        isAcknowledged: a.acknowledged
+        closedAt: new Date(a.closedAt)
       }))
       totalElements.value = response.data.totalElements
-      console.log(response.data)
     }
   } catch {
     toast.error('Error getting alerts history')
@@ -72,9 +70,9 @@ const {
   sortedHead,
   isLoading,
   updateFilters
-} = useServerSearchFilter<HistoryAlert, AlertHistoryFilters>(
+} = useServerSearchFilter<HistoryAlert, ActionsOrAlertHistoryFilters>(
   getAlertsHistory,
-  undefinedAlertsFilters,
+  undefinedActionsOrAlertsFilters,
   'createdAt',
   'desc'
 )
@@ -88,11 +86,13 @@ const hoveredAlert = ref<AlertDetails | null>(null)
   <div>
     <TopH1Div h1="Alerts history">
       <ButtonGroup>
-        <AlertsFilters @update:filters="updateFilters">
+        <ActionsOrAlertsFilters
+          type="alerts"
+          @update:filters="updateFilters">
           <Button variant="blue_outline">
             Filters <IconFilterCog />
           </Button>
-        </AlertsFilters>
+        </ActionsOrAlertsFilters>
       </ButtonGroup>
     </TopH1Div>
     <div :class="tableDiv">

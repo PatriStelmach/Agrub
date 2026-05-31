@@ -26,15 +26,21 @@ import {
 } from "@/components/ui/select";
 import {computed, reactive, useTemplateRef} from "vue";
 import type { DateRange } from "reka-ui";
-import { alertSources } from "@/data/alertSources.ts";
+import { alertOriginType } from "@/data/alertOriginType";
 import { now, getLocalTimeZone, CalendarDateTime } from '@internationalized/date'
 import MyDateRangePicker from "@/helpers_components/MyDateRangePicker.vue";
-import type {AlertHistoryFilters} from "@/types/types.ts";
-import {dateParser, toApiDate} from "@/composables/dateParser.ts";
+import type {
+  ActionsOrAlertHistoryFilters
+} from "@/types/types.ts";
+import {toApiDate} from "@/composables/dateParser.ts";
 import MyTagInput from "@/helpers_components/MyTagInput.vue";
 
+defineProps<{
+  type: 'actions' | 'alerts'
+}>()
+
 const emit = defineEmits<{
-  'update:filters': [AlertHistoryFilters]
+  'update:filters': [ActionsOrAlertHistoryFilters]
 }>()
 
 const tz = getLocalTimeZone()
@@ -127,7 +133,7 @@ const onSubmit = () => {
       <div class="w-full">
         <SheetHeader>
           <SheetTitle>Filters</SheetTitle>
-          <SheetDescription>Set search filters for alerts history</SheetDescription>
+          <SheetDescription>{{`Set search filters for ${type === 'alerts' ? 'alerts' : 'actions'} history `}}</SheetDescription>
           <Button @click="clearFilters" variant="red_outline" class="text-md *:size-5!">
             Clear Filters <IconFilterOff />
           </Button>
@@ -173,7 +179,7 @@ const onSubmit = () => {
           <MyTagInput
             class="w-3/4"
             ref="tagsRef"
-            :all-tags="alertSources"
+            :all-tags="alertOriginType"
             input-id="origin-input"
             :can-add-new="false"
             v-model:tags="filters.origins"
@@ -196,7 +202,7 @@ const onSubmit = () => {
           <!-- Date Pickers -->
           <MyDateRangePicker
             v-model:range="filters.createdDateRange as DateRange"
-            labelText="Created at - range"
+            :labelText="`${type === 'alerts' ? 'Alerts' : 'Actions'} created at - range`"
             labelFor="created-at"
           />
           <Transition name="fade">
@@ -208,7 +214,7 @@ const onSubmit = () => {
 
           <MyDateRangePicker
             v-model:range="filters.closedDateRange as DateRange"
-            labelText="Closed at - range"
+            :labelText="`${type === 'alerts' ? 'Alerts' : 'Actions'} closed at - range`"
             labelFor="closed-at"
           />
           <Transition name="fade">

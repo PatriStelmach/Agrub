@@ -83,12 +83,12 @@ const xAxisTickFormat = computed(() => {
     const zonedTime = fromDate(date, props.tz)
 
     if (props.currentGranularity === 'DAY') {
-      return date.toLocaleDateString(props.locale, { timeZone: props.tz, weekday: 'short' })
+      return date.toLocaleDateString(props.locale, { timeZone: props.tz, day: 'numeric', month: 'long', year: 'numeric' })
     }
     if (props.currentGranularity === 'WEEK') {
-      return `week ${getWeekNumber(zonedTime)}`
+      return `week ${getWeekNumber(zonedTime)}, ${date.getFullYear()}`
     }
-    return date.toLocaleDateString(props.locale, { timeZone: props.tz, month: 'short' })
+    return date.toLocaleDateString(props.locale, { timeZone: props.tz, month: 'short', year: 'numeric' })
   }
 })
 
@@ -101,9 +101,9 @@ const tooltipLabelFormatter = computed(() => {
       return date.toLocaleDateString(props.locale, { timeZone: props.tz, day: 'numeric', month: 'long', year: 'numeric' })
     }
     if (props.currentGranularity === 'WEEK') {
-      return `Week ${getWeekNumber(zonedTime)}, ${date.getFullYear()}`
+      return `week ${getWeekNumber(zonedTime)}, ${date.getFullYear()}`
     }
-    return date.toLocaleDateString(props.locale, { timeZone: props.tz, month: 'long', year: 'numeric' })
+    return date.toLocaleDateString(props.locale, { timeZone: props.tz, month: 'short', year: 'numeric' })
   }
 })
 
@@ -127,10 +127,10 @@ const yAxisTickFormat = (value: number) => {
       <VisXYContainer
         v-if="chartData.length > 0"
         :data="chartData"
-        :y-domain="[0, Math.max(...chartData.map(d => Math.max(d.ack,d.close*1.012)))]">
+        :y-domain="[0, Math.max(...chartData.map(d => Math.max(d.ack,d.close*1.05)))]">
 
         <VisLine
-          :curveType="CurveType.Cardinal"
+          :curveType="CurveType.Linear"
           :highlightOnHover="true"
           :line-width="3"
           :x="(d: any) => d.date"
@@ -139,13 +139,12 @@ const yAxisTickFormat = (value: number) => {
         />
 
         <VisLine
-          :curveType="CurveType.Cardinal"
+          :curveType="CurveType.Linear"
           :highlightOnHover="true"
           :line-width="3"
           :x="(d: any) => d.date"
           :y="(d: any) => d.ack"
-          :color="timeConfig.ack.color"
-        />
+          :color="timeConfig.ack.color"/>
 
         <VisAxis
           type="x"

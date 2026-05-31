@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import {computed, onMounted, ref, watch} from "vue"
-import {useForm} from 'vee-validate'
+import {computed, onMounted, ref} from "vue"
 import { useUserStore } from "@/stores/userStore.js"
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -8,15 +7,9 @@ import { Button } from '@/components/ui/button'
 import {
   IconKey, IconTool, IconDeviceFloppy, IconLabel, IconLock,
   IconLogout, IconMail, IconCalendarEvent, IconLoader,
-  IconEdit, IconUsersGroup, IconEditOff, IconUserKey
+  IconEdit, IconUsersGroup, IconEditOff, IconUserKey, IconFilterCog
 } from '@tabler/icons-vue'
-import MyTagInput from "@/helpers_components/MyTagInput.vue"
 import {toast} from "vue-sonner";
-import FormInput from "@/helpers_components/form/FormInput.vue";
-import {
-  editCurrentUserSchema,
-} from "@/helpers_functions/formSchemas.ts";
-import FormNumberInput from "@/helpers_components/form/FormNumberInput.vue";
 import {bigNameLabel} from "@/assets/cssFunctions.ts";
 import {dateParser} from "@/composables/dateParser.ts";
 import ChangePasswordDialog from "@/pages/team/users/ChangePasswordDialog.vue";
@@ -24,70 +17,94 @@ import {useAuthStore} from "@/stores/authStore.ts";
 import {ButtonGroup} from "@/components/ui/button-group";
 import TopH1Div from "@/helpers_components/TopH1Div.vue";
 import {Badge} from "@/components/ui/badge";
-import type {ActionResponse} from "@/types/types.ts";
-import ActionsList from "@/helpers_components/ActionsList.vue";
+import {
+  type ActionResponse, type ActionsOrAlertHistoryFilters, undefinedActionsOrAlertsFilters,
+} from "@/types/types.ts";
+import UserActionsTable from "@/pages/team/users/UserActionsTable.vue";
+import EditMyAccountform from "@/pages/team/users/EditMyAccountform.vue";
+import MyServerPagination from "@/helpers_components/MyServerPagination.vue";
+import {useServerSearchFilter} from "@/composables/useServerSearchFilter.ts";
+import api from "@/lib/axios.ts";
+import ActionsOrAlertsFilters from "@/pages/alerts/history/ActionsOrAlertsFilters.vue";
 
 const authStore = useAuthStore();
 const user = computed(() => authStore.currentUser!)
 const userStore = useUserStore()
 
 onMounted(async () => {
-  try {
-    if (userStore.allGroups.length === 0)
-    await userStore.getAllGroupsRequest()
+  if (authStore.isAdmin) {
+    await Promise.all([
+      getUserActionsRequest(),
+      userStore.getAllGroupsRequest()
+    ])
+      .catch(e => toast.error(`${e}`))
+      .finally(() => isLoading.value = false)
   }
-  catch (error) {
-    toast.error(`${error}`)
-  }
-  finally {
-    isActionsLoading.value = false
+  else {
+    await getUserActionsRequest()
+      .catch(e => toast.error(`${e}`))
+      .finally(() => isLoading.value = false)
   }
 
 })
 
 const isSubmitLoading = ref(false)
-const isActionsLoading = ref(true)
-const actions = ref<ActionResponse[]>([])
 const isEditMode = ref<boolean>(false)
-const tagsForEdit = ref<string[] | undefined>(
-  user.value.groups?.map(g => g.name)
-)
 
-const { handleSubmit, resetForm, setFieldValue } = useForm({
-  validationSchema:  editCurrentUserSchema,
-  initialValues: {
-    id: user.value.id,
-    firstname: user.value.firstname,
-    surname: user.value.surname,
-    email: user.value.email,
-    autoLogoutMinutes: user.value.autoLogoutMinutes,
-    groups: user.value.groups,
-  }
-})
-
-const onSubmit = handleSubmit(async (data) => {
-  isSubmitLoading.value = true
-  await userStore.editUserRequest({...data, role: user.value.role})
-    .then((res) => toast.success(`User ${res} updated successfully.`))
-    .catch((error) => toast.error(`Error updating ${data.email}: ${error}`))
-  await authStore.refreshToken()
-    .then(() => {
-      isSubmitLoading.value = false
-      isEditMode.value = false
+const getUserActionsRequest = async () => {
+  try {
+    const response = await api.get(`/users/${user.value.id}/actions`, {
+      params: {
+        page: currentPage.value - 1,
+        size: pageSize.value,
+        sortBy: sortedHead.value.sortKey,
+        sortDir: sortedHead.value.sortOrder,
+        severity: filters.value.severity,
+        message: filters.value.message,
+        subject: filters.value.subject,
+        source: filters.value.source,
+        origin: filters.value.origin,
+        ack: filters.value.ack,
+        unack: filters.value.unack,
+        createdDateFrom: filters.value.createdDateFrom,
+        createdDateTo: filters.value.createdDateTo,
+        closedDateFrom: filters.value.closedDateFrom,
+        closedDateTo: filters.value.closedDateTo,
+      },
+      paramsSerializer: {
+        indexes: null
+      }
     })
-})
 
-const reset = () => {
-  resetForm()
-  isEditMode.value = !isEditMode.value
-  tagsForEdit.value = user.value.groups?.map(g => g.name)
+    if (response.status === 200) {
+      actions.value = response.data.content.map((a:any) => ({
+      ...a,
+      createdAt: new Date(a.createdAt),
+      closedAt: new Date(a.closedAt),
+      isAcknowledged: a.acknowledged
+    }))
+      totalElements.value = response.data.totalElements
+    }
+  } catch (e) {
+    toast.error(`Error getting actions history: ${e}`)
+  }
 }
 
-watch(tagsForEdit, (val) => {
-  if(val){
-    setFieldValue('groups', userStore.allGroups.filter(g => val.includes(g.name)))
-  }
-}, { deep: true })
+const {
+  currentPage,
+  pageSize,
+  filters,
+  items:actions,
+  isLoading,
+  sortedHead,
+  totalElements,
+  updateFilters,
+} = useServerSearchFilter<ActionResponse, ActionsOrAlertHistoryFilters>(
+  getUserActionsRequest,
+  undefinedActionsOrAlertsFilters,
+  'createdAt',
+  'desc',
+)
 
 </script>
 
@@ -105,9 +122,10 @@ watch(tagsForEdit, (val) => {
           </Button>
         </ChangePasswordDialog>
         <Button
+          v-if="authStore.isAdmin"
           :variant=" isEditMode ? 'red_outline' : 'blue_outline'"
           type="button"
-          @click="reset"
+          @click="isEditMode = !isEditMode"
           class="border-l-2! flex items-center">
           {{ isEditMode ? 'Cancel' : 'Edit' }}
           <component :is="isEditMode ? IconEditOff : IconEdit" class="pointer-events-none"/>
@@ -120,55 +138,13 @@ watch(tagsForEdit, (val) => {
     </TopH1Div>
     <div class="w-full flex space-x-10 max-h-[90vh]  overflow-y-auto">
       <div class="w-3/10 ml-6">
-        <form v-if="isEditMode" id="edit-user-form" @submit="onSubmit" class=" space-y-4 max-h-[70vh]  w-full overflow-auto">
-          <div class="grid space-y-3 w-9/10">
-            <Avatar class="size-14 rounded-full">
-              <AvatarFallback class="rounded-full text-2xl grayscale">
-                {{ authStore.avFallback }}
-              </AvatarFallback>
-            </Avatar>
+        <EditMyAccountform
+          v-model:isSubmitLoading="isSubmitLoading"
+          v-model:isEditMode="isEditMode"
+          v-if="isEditMode"
+          :user="user"
+        />
 
-            <FormInput autocomplete="name" name="firstname" label="Firstname" orientation="vertical">
-              <IconLabel class="size-5 mb-1"/>
-            </FormInput>
-            <FormInput name="surname" label="Surname" orientation="vertical">
-              <IconLabel class="size-5 mb-1"/>
-            </FormInput>
-            <FormInput autocomplete="email" type="email" name="email" label="E-mail" orientation="vertical">
-              <IconMail class="size-5 mb-1"/>
-            </FormInput>
-            <FormNumberInput :min="0"  name="autoLogoutMinutes" label="Auto logout (in minutes)" orientation="vertical" autocomplete="auto-logout">
-              <IconLogout class="size-5 mb-1"/>
-            </FormNumberInput>
-
-            <div class="space-x-2 flex items-center" >
-              <IconCalendarEvent class="size-5 mb-1" />
-              <h1 :class="bigNameLabel">Last password change:</h1>
-              <div class="text-sm text-comment  space-x-2">{{user.lastPasswordChangeDate ? dateParser(user.lastPasswordChangeDate).fullDate : '--------' }}</div>
-            </div>
-
-            <div class="space-x-2 flex items-center">
-              <h1 :class="bigNameLabel">User role:</h1>
-              <span class="flex space-x-2 text-comment">
-            <component :is="user.role === 'ADMINISTRATOR' ? IconKey : IconTool" class="size-5" :class="{ 'rotate-90' : user.role === 'TECHNICIAN' }"/>
-            <span>
-            {{ user.role }}
-          </span>
-
-          </span>
-
-            </div>
-            <div class="flex space-x-2">
-              <IconUsersGroup class="size-5 mt-1"/>
-              <MyTagInput
-                v-model:tags="tagsForEdit"
-                :all-tags="userStore.allGroups.map(g => g.name)"
-                :can-add-new="false"
-                tags-label="Groups"
-                input-id="groups"/>
-            </div>
-          </div>
-        </form>
         <div v-else class=" w-full space-y-4">
           <Avatar class="size-14 rounded-full">
             <AvatarFallback class="rounded-full text-2xl grayscale">
@@ -233,11 +209,21 @@ watch(tagsForEdit, (val) => {
               <IconUsersGroup class="size-5" />
               <div class="flex items-base gap-2 flex-wrap">
                 <h1 :class="bigNameLabel">User groups:</h1>
-                <RouterLink v-for="g in user.groups" :key="g.id" :to="`/groups/edit_group/${g.id}/${g.name}`">
-                  <Badge class="mt-0!" variant="tags">
-                    {{ g.name }}
-                  </Badge>
-                </RouterLink>
+                <div v-if="authStore.isAdmin">
+                  <RouterLink v-for="g in user.groups" :key="g.id" :to="`/groups/edit_group/${g.id}/${g.name}`">
+                    <Badge class="mt-0!" variant="tags">
+                      {{ g.name }}
+                    </Badge>
+                  </RouterLink>
+                </div>
+                <div v-else>
+                  <span v-for="g in user.groups" :key="g.id">
+                    <Badge class="mt-0!" variant="tags">
+                      {{ g.name }}
+                    </Badge>
+                  </span>
+                </div>
+
               </div>
             </div>
 
@@ -245,14 +231,33 @@ watch(tagsForEdit, (val) => {
         </div>
       </div>
       <div class="w-7/10 mr-4">
-        <h1 class="pb-1 mb-2 border-b-4  text-center">User interactions with alerts: {{ actions.length }}</h1>
-        <div class=" pb-2 border-b-4 ">
+        <div class="flex justify-end">
+          <ActionsOrAlertsFilters
+            type="actions"
+            @update:filters="updateFilters">
+            <Button
+              class=" ml-auto"
+              variant="blue_outline">
+              Filters <IconFilterCog />
+            </Button>
+          </ActionsOrAlertsFilters>
+        </div>
+
+        <div class=" pb-2 border-b-4 mt-2">
           <ul>
-            <ActionsList
-              :userId="user.id"
-              :userView="true"
+            <UserActionsTable
+              v-model:sorted-head="sortedHead"
+              :actions="actions"
+              :isLoading="isLoading"
               max-w="65vw"
-              max-h="80vh"/>
+              max-h="80vh"
+            >
+              <MyServerPagination
+                :total="totalElements"
+                v-model:pageSize="pageSize"
+                v-model:pageIndex="currentPage"
+              />
+            </UserActionsTable>
           </ul>
         </div>
       </div>
