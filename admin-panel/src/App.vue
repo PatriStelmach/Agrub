@@ -7,11 +7,10 @@ import {useSSEstore} from "@/stores/SSEstore.ts";
 import {SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
 import {useAuthStore} from "@/stores/authStore.ts";
 import LoginPage from "@/pages/login/LoginPage.vue";
-import {computed, onMounted, ref, watchEffect} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {Skeleton} from "@/components/ui/skeleton";
-import {dateParser} from "@/composables/dateParser.ts";
 import {globals} from "@/composables/globals.ts";
-import {IconMoon2, IconMoonFilled, IconMoonStars, IconSunFilled} from "@tabler/icons-vue";
+import {IconMoonStars, IconSunFilled} from "@tabler/icons-vue";
 import {useColorMode} from "@vueuse/core";
 
 

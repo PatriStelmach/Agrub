@@ -4,17 +4,12 @@ import {
   IconDatabase,
   IconHistory,
   IconPhoneRinging,
-  IconScript,
-  IconSitemap,
   IconDeviceDesktopAnalytics,
-  IconUpload,
   IconClock,
   IconCalendar,
   IconUsers,
   IconUsersGroup,
   IconSettings,
-  IconKey,
-  IconPassword,
   IconLockCode,
   IconCode,
   IconHelp,
@@ -23,7 +18,7 @@ import {
 import {
   Sidebar, SidebarContent,
   SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu,
-  SidebarMenuButton, SidebarMenuItem, SidebarRail
+  SidebarMenuButton, SidebarMenuItem
 } from "@/components/ui/sidebar";
 
 
