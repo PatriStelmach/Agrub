@@ -24,29 +24,42 @@ public class AnalyticsController {
     }
 
     @GetMapping("/alerts-count")
-    public ResponseEntity<List<AlertsBySeverityDTO>> getAlertsCount(
+    public ResponseEntity<List<ChartDataPointDTO>> getAlertsCount(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end,
-            @RequestParam(defaultValue = "DAY") TimeGranularity granularity) {
+            @RequestParam(defaultValue = "DAY") TimeGranularity granularity,
+            @RequestParam(required = false) List<String> origin) {
 
-        return ResponseEntity.ok(analyticsService.getAlertsCountBySeverity(start, end, granularity));
+        return ResponseEntity.ok(analyticsService.getAlertsCount(start, end, granularity, origin));
+    }
+
+    @GetMapping("/alerts-severity")
+    public ResponseEntity<List<AlertsBySeverityDTO>> getAlertsBySeverity(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end,
+            @RequestParam(defaultValue = "DAY") TimeGranularity granularity,
+            @RequestParam(required = false) List<String> origin) {
+
+        return ResponseEntity.ok(analyticsService.getAlertsCountBySeverity(start, end, granularity, origin));
     }
 
     @GetMapping("/avg-close-time")
     public ResponseEntity<List<ChartDataPointDTO>> getAvgCloseTime(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end,
-            @RequestParam(defaultValue = "DAY") TimeGranularity granularity) {
+            @RequestParam(defaultValue = "DAY") TimeGranularity granularity,
+            @RequestParam(required = false) List<String> origin) {
 
-        return ResponseEntity.ok(analyticsService.getAverageCloseTime(start, end, granularity));
+        return ResponseEntity.ok(analyticsService.getAverageCloseTime(start, end, granularity, origin));
     }
 
     @GetMapping("/avg-ack-time")
     public ResponseEntity<List<ChartDataPointDTO>> getAvgAckTime(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end,
-            @RequestParam(defaultValue = "DAY") TimeGranularity granularity) {
+            @RequestParam(defaultValue = "DAY") TimeGranularity granularity,
+            @RequestParam(required = false) List<String> origin) {
 
-        return ResponseEntity.ok(analyticsService.getAverageAckTime(start, end, granularity));
+        return ResponseEntity.ok(analyticsService.getAverageAckTime(start, end, granularity, origin));
     }
 }

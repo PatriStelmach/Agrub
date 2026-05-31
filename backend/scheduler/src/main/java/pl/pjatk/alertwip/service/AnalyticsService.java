@@ -23,32 +23,32 @@ public class AnalyticsService {
     }
 
     // Ilość alertów w czasie
-    public List<ChartDataPointDTO> getAlertsCount(LocalDateTime start, LocalDateTime end, TimeGranularity granularity) {
+    public List<ChartDataPointDTO> getAlertsCount(LocalDateTime start, LocalDateTime end, TimeGranularity granularity, List<String> origins) {
         List<ChartDataProjection> results = problemRepository.countAlertsByGranularity(
-                start, end, mapGranularity(granularity)
+                start, end, mapGranularity(granularity), isOriginFiltered(origins), getSafeOrigins(origins)
         );
         return mapToDTO(results);
     }
 
     // sredni czas zamknięcia
-    public List<ChartDataPointDTO> getAverageCloseTime(LocalDateTime start, LocalDateTime end, TimeGranularity granularity) {
+    public List<ChartDataPointDTO> getAverageCloseTime(LocalDateTime start, LocalDateTime end, TimeGranularity granularity, List<String> origins) {
         List<ChartDataProjection> results = problemRepository.avgCloseTimeByGranularity(
-                start, end, mapGranularity(granularity)
+                start, end, mapGranularity(granularity), isOriginFiltered(origins), getSafeOrigins(origins)
         );
         return mapToDTO(results);
     }
 
     // średni czas do pierwszego ACK
-    public List<ChartDataPointDTO> getAverageAckTime(LocalDateTime start, LocalDateTime end, TimeGranularity granularity) {
+    public List<ChartDataPointDTO> getAverageAckTime(LocalDateTime start, LocalDateTime end, TimeGranularity granularity, List<String> origins) {
         List<ChartDataProjection> results = problemRepository.avgAckTimeByGranularity(
-                start, end, mapGranularity(granularity)
+                start, end, mapGranularity(granularity), isOriginFiltered(origins), getSafeOrigins(origins)
         );
         return mapToDTO(results);
     }
 
-    public List<AlertsBySeverityDTO> getAlertsCountBySeverity(LocalDateTime start, LocalDateTime end, TimeGranularity granularity) {
+    public List<AlertsBySeverityDTO> getAlertsCountBySeverity(LocalDateTime start, LocalDateTime end, TimeGranularity granularity, List<String> origins) {
         List<SeverityChartProjection> rows = problemRepository.countAlertsBySeverityAndGranularity(
-                start, end, mapGranularity(granularity)
+                start, end, mapGranularity(granularity), isOriginFiltered(origins), getSafeOrigins(origins)
         );
 
         Map<Long, List<SeverityChartProjection>> groupedByTimestamp = rows.stream()
@@ -77,7 +77,15 @@ public class AnalyticsService {
                 })
                 .toList();
     }
-    
+
+    private int isOriginFiltered(List<String> origins) {
+        return (origins != null && !origins.isEmpty()) ? 1 : 0;
+    }
+
+    private List<String> getSafeOrigins(List<String> origins) {
+        // Zabezpieczenie przed pustą listą w IN () dla Hibernate
+        return (origins != null && !origins.isEmpty()) ? origins : List.of("IGNORE_ME");
+    }
 
     private String mapGranularity(TimeGranularity granularity) {
         return switch (granularity) {

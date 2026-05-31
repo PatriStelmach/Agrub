@@ -50,12 +50,15 @@ public interface GlobalProblemRepository extends JpaRepository<GlobalProblem, Lo
             "  COUNT(id) AS totalValue " +
             "FROM global_problem " +
             "WHERE created_at BETWEEN :start AND :end " +
+            "AND (:filterOrigin = 0 OR origin_type IN (:origins)) " +
             "GROUP BY bucketTimestamp " +
             "ORDER BY bucketTimestamp", nativeQuery = true)
     List<ChartDataProjection> countAlertsByGranularity(
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end,
-            @Param("granularity") String granularity);
+            @Param("granularity") String granularity,
+            @Param("filterOrigin") int filterOrigin,
+            @Param("origins") List<String> origins);
 
     // średni close time
     @Query(value = "SELECT " +
@@ -67,12 +70,15 @@ public interface GlobalProblemRepository extends JpaRepository<GlobalProblem, Lo
             "  ROUND(AVG(TIMESTAMPDIFF(SECOND, created_at, closed_at)), 2) AS totalValue " +
             "FROM global_problem " +
             "WHERE status = 'Done' AND closed_at IS NOT NULL AND created_at BETWEEN :start AND :end " +
+            "AND (:filterOrigin = 0 OR origin_type IN (:origins)) " +
             "GROUP BY bucketTimestamp " +
             "ORDER BY bucketTimestamp", nativeQuery = true)
     List<ChartDataProjection> avgCloseTimeByGranularity(
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end,
-            @Param("granularity") String granularity);
+            @Param("granularity") String granularity,
+            @Param("filterOrigin") int filterOrigin,
+            @Param("origins") List<String> origins);
 
     // średni ack time
     @Query(value = "SELECT " +
@@ -84,12 +90,15 @@ public interface GlobalProblemRepository extends JpaRepository<GlobalProblem, Lo
             "  ROUND(AVG(TIMESTAMPDIFF(SECOND, created_at, acknowledged_at)), 2) AS totalValue " +
             "FROM global_problem " +
             "WHERE (is_acknowledged = 1 OR is_acknowledged = true) AND acknowledged_at IS NOT NULL AND created_at BETWEEN :start AND :end " +
+            "AND (:filterOrigin = 0 OR origin_type IN (:origins)) " +
             "GROUP BY bucketTimestamp " +
             "ORDER BY bucketTimestamp", nativeQuery = true)
     List<ChartDataProjection> avgAckTimeByGranularity(
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end,
-            @Param("granularity") String granularity);
+            @Param("granularity") String granularity,
+            @Param("filterOrigin") int filterOrigin,
+            @Param("origins") List<String> origins);
 
     @Query(value = "SELECT " +
             "  CASE " +
@@ -101,10 +110,13 @@ public interface GlobalProblemRepository extends JpaRepository<GlobalProblem, Lo
             "  COUNT(id) AS totalCount " +
             "FROM global_problem " +
             "WHERE created_at BETWEEN :start AND :end " +
+            "AND (:filterOrigin = 0 OR origin_type IN (:origins)) " +
             "GROUP BY bucketTimestamp, severity " +
             "ORDER BY bucketTimestamp, severity", nativeQuery = true)
     List<SeverityChartProjection> countAlertsBySeverityAndGranularity(
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end,
-            @Param("granularity") String granularity);
+            @Param("granularity") String granularity,
+            @Param("filterOrigin") int filterOrigin,
+            @Param("origins") List<String> origins);
 }
