@@ -1,6 +1,7 @@
 package pl.pjatk.alertwip.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pl.pjatk.alertwip.dto.PluginDTO;
 import pl.pjatk.alertwip.dto.PluginDetailsDTO;
@@ -29,13 +30,11 @@ public class LocalScriptController {
         this.scriptExecutionService = scriptExecutionService;
     }
 
-    // Lista wszystkich plików na dysku + dane z ScheduledTask (jeśli istnieją)
     @GetMapping("/list")
     public List<PluginDTO> getMyLocalScripts() {
         return pluginManagerService.listLocalScripts();
     }
 
-    // Podgląd kodu i opisu na podstawie nazwy pliku (nie ID!)
     @GetMapping("/{fileName:.+}/details")
     public PluginDetailsDTO getDetails(@PathVariable String fileName) {
         return pluginManagerService.getPluginDetailsByFileName(fileName);
@@ -50,7 +49,6 @@ public class LocalScriptController {
             if (payload != null && payload.containsKey("arguments")) {
                 args = payload.get("arguments");
             }
-            // Wywołujemy jedną spójną metodę z Menedżera Pluginów
             ScriptExecutionService.ScriptResult result = pluginManagerService.runManualScript(fileName, args);
             return ResponseEntity.ok(result.output());
         } catch (Exception e) {
@@ -58,13 +56,12 @@ public class LocalScriptController {
         }
     }
 
-
     @PutMapping("/{fileName:.+}/edit")
+    @PreAuthorize("hasAuthority('ROLE_ADMINISTRATOR')")
     public ResponseEntity<String> editScript(
             @PathVariable String fileName,
             @RequestBody PluginSaveDTO partialDto) {
         try {
-            // Przekazujemy wszystko do serwisu
             pluginManagerService.updatePluginPartial(fileName, partialDto);
             return ResponseEntity.ok("Skrypt " + fileName + " został zaktualizowany pomyślnie.");
         } catch (Exception e) {
@@ -74,6 +71,7 @@ public class LocalScriptController {
     }
 
     @PostMapping("/save-all")
+    @PreAuthorize("hasAuthority('ROLE_ADMINISTRATOR')")
     public ResponseEntity<String> saveAll(@RequestBody PluginSaveDTO dto) {
         try {
             pluginManagerService.saveFullConfig(dto);
@@ -84,6 +82,7 @@ public class LocalScriptController {
     }
 
     @DeleteMapping("/delete")
+    @PreAuthorize("hasAuthority('ROLE_ADMINISTRATOR')")
     public ResponseEntity<String> deletePlugins(@RequestBody List<String> fileNames) {
         try {
             pluginManagerService.deletePlugins(fileNames);
@@ -94,6 +93,7 @@ public class LocalScriptController {
     }
 
     @PostMapping("/change-status")
+    @PreAuthorize("hasAuthority('ROLE_ADMINISTRATOR')")
     public ResponseEntity<String> toggleStatusBulk(@RequestBody List<String> fileNames) {
         try {
             pluginManagerService.togglePlugins(fileNames);
