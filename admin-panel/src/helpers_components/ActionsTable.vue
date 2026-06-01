@@ -54,6 +54,8 @@ const givenUser = (author: string, withId: boolean) => {
 const link = (action: ActionResponse) => {
   if (authStore.currentUser?.email === action.author)
     return '/team_members/my_account'
+  else if (!authStore.isAdmin)
+    return '/team_members'
   else
     return `/team_members/${givenUser(action.author, true)}`
 }

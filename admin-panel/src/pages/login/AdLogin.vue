@@ -9,10 +9,10 @@ import {
   CardTitle
 } from "@/components/ui/card";
 import {Field, FieldGroup} from "@/components/ui/field";
-import {IconLoader} from "@tabler/icons-vue";
+import {IconLoader, IconLockOpen} from "@tabler/icons-vue";
 import FormInput from "@/helpers_components/form/FormInput.vue";
 import {Button} from "@/components/ui/button";
-import {ADLoginSchema, alertLoginSchema} from "@/helpers_functions/formSchemas.ts";
+import {ADLoginSchema} from "@/helpers_functions/formSchemas.ts";
 import {useForm} from "vee-validate";
 import {useAuthStore} from "@/stores/authStore.ts";
 
@@ -41,8 +41,7 @@ const adSubmit = handleSubmit(async (data) => {
 </script>
 
 <template>
-  <Card class="border-blue-badge w-140 border-2 shadow-blue-badge/40 shadow-[0_5px_50px_1px] duration-500 "
-        :class="{'blur-xl' : showAlert}">
+  <Card class="border-blue-badge w-140 border-2 shadow-blue-badge/40 shadow-[0_5px_50px_1px] duration-500 ">
 
     <CardHeader>
       <CardTitle class="text-xl text-center">Log in</CardTitle>
@@ -54,14 +53,20 @@ const adSubmit = handleSubmit(async (data) => {
 
       <form class="p-2"  id="ad-login-form" @submit.prevent="adSubmit">
         <FieldGroup>
-          <FormInput placeholder="user..." name="email" type="username" label="Username" orientation="vertical"/>
-          <FormInput placeholder="password..." name="password" type="password" label="Password" orientation="vertical"/>
+          <FormInput :disabled="showAlert" placeholder="AD email or username..." name="email" type="username" label="Login" orientation="vertical"/>
+          <FormInput :disabled="showAlert" name="password" type="password" label="Password" orientation="vertical"/>
         </FieldGroup>
       </form>
+      <div class="p-2 flex space-x-2 *:text-comment">
+        <IconLockOpen/>
+        <span class="text-sm  border-b-2 hover:text-blue-badge/70 hover:border-blue-badge/70 duration-200 cursor-pointer">
+          Reset your password
+        </span>
+      </div>
     </CardContent>
     <CardFooter>
       <Field orientation="horizontal">
-        <Button @click="adSubmit" type="button" class="w-full" form="ad-login-form">
+        <Button :disabled="showAlert" @click="adSubmit" type="button" class="w-full" form="ad-login-form">
           <span v-if="!isLoading">Log in</span>
           <IconLoader v-else class="animate-spin duration-75"/>
         </Button>

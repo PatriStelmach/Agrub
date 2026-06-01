@@ -389,7 +389,7 @@ const onEdit = (plugin: MyPlugin) => {
                 >{{tag}}</Badge>
               </TransitionGroup>
             </TableCell>
-            <TableCell v-if="!isUnwrapped(plugin.fullName) && authStore.isAdmin" class="grid space-y-2">
+            <TableCell v-if="isUnwrapped(plugin.fullName) && authStore.isAdmin" class="grid space-y-2">
               <InputGroup class="relative w-full xl:h-10 2xl:h-12 mb-2">
                 <InputGroupInput
                   class=" text-center input-text"

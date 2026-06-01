@@ -1,4 +1,4 @@
-import {createRouter, createWebHistory, useRoute} from 'vue-router'
+import {createRouter, createWebHistory} from 'vue-router'
 
 import ExternalSystems from '@/pages/settings/systems/ExternalSystems.vue'
 import ActiveAlertsPage from '../pages/alerts/active/ActiveAlertsPage.vue'
@@ -14,15 +14,11 @@ import AllChartsPage from "@/pages/charts/AllChartsPage.vue";
 import ApiKeysPage from "@/pages/settings/api_keys/ApiKeysPage.vue";
 import {useAuthStore} from "@/stores/authStore.ts";
 import NoPrivileges from "@/pages/NoPrivileges.vue";
+import LoginPage from "@/pages/login/LoginPage.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    {
-      path: '/',
-      name: 'home',
-      component: ActiveAlertsPage
-    },
     {
       path: '/active_alerts/:alert?',
       name: 'active_alerts',
@@ -113,6 +109,16 @@ const router = createRouter({
       name: 'no_privileges',
       component: NoPrivileges
     },
+    {
+      path: '/login',
+      name:'login',
+      component: LoginPage
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'home',
+      component: ActiveAlertsPage
+    }
   ],
 })
 

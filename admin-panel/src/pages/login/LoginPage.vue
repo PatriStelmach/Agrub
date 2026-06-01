@@ -16,11 +16,11 @@ const isLoading = ref(false)
 <template>
   <Transition name="fade">
     <Alert
-      class="z-999 absolute w-1/3 left-1/2 -translate-x-1/2 top-1/2 translate-y-1/2 border-red-badge/50 border-2 "
+      class="z-999 absolute w-1/3 left-1/2 gap-y-4 -translate-x-1/2 top-80 *:text-lg border-red-badge/50 border-2 "
       v-if="showAlert" variant="destructive">
       <IconX @click="showAlert = false" class="size-5! absolute top-2 right-2 hover:border cursor-pointer"></IconX>
-      <IconAlertCircle />
-      <AlertTitle>Unable to log in!</AlertTitle>
+      <IconAlertCircle class="size-5!" />
+      <AlertTitle class="text-xl! ">Unable to log in!</AlertTitle>
       <AlertDescription>
 
         <p>Please verify your credentials:</p>
@@ -33,17 +33,17 @@ const isLoading = ref(false)
     </Alert>
   </Transition>
 
-  <div class="left-1/2 absolute -translate-x-1/2 top-1/2 translate-y-1/2">
-    <Tabs default-value="ALERT">
+
+    <Tabs :class="{'blur-xl' : showAlert}" class="left-1/2 absolute -translate-x-1/2 top-1/2 translate-y-1/2" default-value="ALERT">
       <TabsList class="mx-auto *:cursor-pointer">
-        <TabsTrigger value="ALERT">
+        <TabsTrigger :disabled="showAlert" value="ALERT">
           Alert credentials
         </TabsTrigger>
-        <TabsTrigger value="AD">
+        <TabsTrigger :disabled="showAlert" value="AD">
           Active Directory credentials
         </TabsTrigger>
       </TabsList>
-      <TabsContent value="ALERT">
+      <TabsContent  value="ALERT">
         <AlertLogin
           v-model:isLoading="isLoading"
           v-model:showAlert="showAlert"
@@ -51,7 +51,7 @@ const isLoading = ref(false)
 
         </AlertLogin>
       </TabsContent>
-      <TabsContent  value="AD">
+      <TabsContent value="AD">
         <AdLogin
           v-model:isLoading="isLoading"
           v-model:showAlert="showAlert"
@@ -60,6 +60,5 @@ const isLoading = ref(false)
         </AdLogin>
       </TabsContent>
     </Tabs>
-  </div>
 
 </template>
