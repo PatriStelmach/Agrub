@@ -18,9 +18,6 @@ import {wazuhSchema} from "@/helpers_functions/formSchemas.js";
 import {useSettingStore} from "@/stores/settingStore.js";
 import {toast} from "vue-sonner";
 import FormNumberInput from "@/helpers_components/form/FormNumberInput.vue";
-import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
-import {Label} from "@/components/ui/label";
-import MyFieldLabel from "@/helpers_components/form/MyFieldLabel.vue";
 import FormCheckbox from "@/helpers_components/form/FormCheckbox.vue";
 
 const props = defineProps<{
@@ -39,7 +36,7 @@ const settingStore = useSettingStore()
 const isLoading = ref(false)
 const colorMode = useColorMode()
 
-const { handleSubmit, setValues, setFieldValue, values } = useForm({
+const { handleSubmit, setValues } = useForm({
   validationSchema: wazuhSchema,
   initialValues: {
     wazuh_url: props.system.url,

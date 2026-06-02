@@ -9,7 +9,7 @@ import ChartAckOrCloseTime from "@/pages/charts/ChartAckOrCloseTime.vue";
 import { getLocalTimeZone, today, ZonedDateTime, CalendarDateTime, CalendarDate,  } from '@internationalized/date'
 import type {CumulativeData, Granularity} from "@/types/types.ts";
 import ChartAckAndCloseTime from "@/pages/charts/ChartAckAndCloseTime.vue";
-import {getAnalyticsAlertsCount} from "@/helpers_functions/requests.ts";
+import {getAnalyticsAlertsCountRequest} from "@/helpers_functions/requests.ts";
 import {toast} from "vue-sonner";
 import {Button} from "@/components/ui/button";
 import {ButtonGroup} from "@/components/ui/button-group";
@@ -26,11 +26,7 @@ const locale = navigator.language
 const tz = getLocalTimeZone()
 
 onMounted(async () => {
-  setTimeout(async () =>{
-    await onDateRangeChange()
-
-  }, 500)
-
+  await onDateRangeChange()
 })
 
 const origin = ref<string[]>([])
@@ -47,11 +43,13 @@ const dateRange = ref({
   end,
 }) as Ref<DateRange>
 
+const dateRangeAfterReload = ref<DateRange>(dateRange.value)
+
 const periodLabel = computed(() => {
-  if(dateRange.value.start && dateRange.value.end){
+  if(dateRangeAfterReload.value.start && dateRangeAfterReload.value.end){
     const timestamp =
-      dateRange.value.end!.toDate(tz).getTime() -
-      dateRange.value.start!.toDate(tz).getTime()
+      dateRangeAfterReload.value.end!.toDate(tz).getTime() -
+      dateRangeAfterReload.value.start!.toDate(tz).getTime()
 
     const diffDays = Math.ceil(timestamp / (1000 * 60 * 60 * 24))
 
@@ -71,7 +69,7 @@ const periodLabel = computed(() => {
 
 const onDateRangeChange = async () => {
   areChartsLoading.value = true
-  await getAnalyticsAlertsCount(
+  await getAnalyticsAlertsCountRequest(
     dateRange.value.start as ZonedDateTime,
     dateRange.value.end as ZonedDateTime,
     currentGranularity.value,
@@ -81,11 +79,11 @@ const onDateRangeChange = async () => {
     .then((res) => {
       rawAnalyticsData.value = res as CumulativeData
       granularityAfterReload.value = currentGranularity.value
+      dateRangeAfterReload.value = dateRange.value
     })
     .finally(() => {
       areChartsLoading.value = false
       isPopoverOpen.value = false
-      console.log(end, start, currentGranularity.value)
     })
 }
 
@@ -181,7 +179,7 @@ const onDateRangeChange = async () => {
         name="fade">
         <div v-if="areChartsLoading">
           <BigLoadingBlock
-            v-for=" (_,i) in [1,2,3,5]"
+            v-for=" i in [1,2,3,5]"
             :key="i"
             class="h-140"
           />
@@ -190,8 +188,8 @@ const onDateRangeChange = async () => {
           <ChartAllAlerts
             :locale="locale"
             :tz="tz"
-            :start="start as ZonedDateTime"
-            :end="end as ZonedDateTime"
+            :start="dateRangeAfterReload.start as ZonedDateTime"
+            :end="dateRangeAfterReload.end as ZonedDateTime"
             :currentGranularity="granularityAfterReload"
             :rawAnalyticsData="rawAnalyticsData?.alerts ?? []"
             :period-label="periodLabel"
@@ -202,8 +200,8 @@ const onDateRangeChange = async () => {
             :currentGranularity="granularityAfterReload"
             :locale="locale"
             :tz="tz"
-            :end="end as ZonedDateTime"
-            :start="start as ZonedDateTime"
+            :start="dateRangeAfterReload.start as ZonedDateTime"
+            :end="dateRangeAfterReload.end as ZonedDateTime"
           />
           <ChartAckOrCloseTime
             :periodLabel="periodLabel"
@@ -211,8 +209,8 @@ const onDateRangeChange = async () => {
             :currentGranularity="granularityAfterReload"
             :locale="locale"
             :tz="tz"
-            :end="end as ZonedDateTime"
-            :start="start as ZonedDateTime"
+            :start="dateRangeAfterReload.start as ZonedDateTime"
+            :end="dateRangeAfterReload.end as ZonedDateTime"
             header="Average time to acknowledge an alert"
             :type="'avg-ack-time'"
           />
@@ -222,8 +220,8 @@ const onDateRangeChange = async () => {
             :currentGranularity="granularityAfterReload"
             :locale="locale"
             :tz="tz"
-            :end="end as ZonedDateTime"
-            :start="start as ZonedDateTime"
+            :start="dateRangeAfterReload.start as ZonedDateTime"
+            :end="dateRangeAfterReload.end as ZonedDateTime"
             header="Average time to close an alert"
             :type="'avg-close-time'"
           />
@@ -231,8 +229,8 @@ const onDateRangeChange = async () => {
             :periodLabel="periodLabel"
             :currentGranularity="granularityAfterReload"
             header="Average acknowledge and close times compared"
-            :start="start as ZonedDateTime"
-            :end="end as ZonedDateTime"
+            :start="dateRangeAfterReload.start as ZonedDateTime"
+            :end="dateRangeAfterReload.end as ZonedDateTime"
             :locale="locale"
             :tz="tz"
             :closed-and-acked="{

@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import {RouterView} from 'vue-router'
-import TopRightButtons from "@/pages/globals/TopRightButtons.vue";
 import NavBar from "@/pages/globals/navbar/NavBar.vue";
 import {Toaster} from "vue-sonner";
 import {useSSEstore} from "@/stores/SSEstore.ts";
 import {SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
 import {useAuthStore} from "@/stores/authStore.ts";
 import LoginPage from "@/pages/login/LoginPage.vue";
-import {computed, onMounted, ref} from "vue";
-import {Skeleton} from "@/components/ui/skeleton";
+import {computed, onMounted, watch} from "vue";
 import {globals} from "@/composables/globals.ts";
 import {IconMoonStars, IconSunFilled} from "@tabler/icons-vue";
 import {useColorMode} from "@vueuse/core";
@@ -16,12 +14,18 @@ import {useColorMode} from "@vueuse/core";
 
 const mode = useColorMode()
 const authStore = useAuthStore()
+const sseStore = useSSEstore()
 const logoutTimeout = computed(() => authStore.currentUser?.autoLogoutMinutes)
 onMounted(() => {
-    if (authStore.isAuthenticated) {
-      useSSEstore()
-      startLogoutTimer()
-    }
+  if (authStore.isAuthenticated && !sseStore.isConnected) {
+    sseStore.connectToSSE()
+  }
+  startLogoutTimer()
+})
+watch(() => authStore.isAuthenticated,(newValue) => {
+  if (newValue && !sseStore.isConnected ) {
+    sseStore.connectToSSE()
+  }
 })
 const {startLogoutTimer } = globals(
   () => Number(logoutTimeout.value),

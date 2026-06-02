@@ -28,7 +28,7 @@ const settingStore = useSettingStore()
 const smtpEdit = defineModel<boolean>('smtpEdit')
 const smtpLoading = ref(false)
 
-const { values, handleSubmit, resetForm} = useForm({
+const { handleSubmit, resetForm} = useForm({
   validationSchema: smtpSettingSchema,
   initialValues: props.smtp
 })
@@ -38,9 +38,9 @@ const onSubmit = handleSubmit(async (data) => {
   const changedValues: Record<string, string> = {}
 
   for (const key of Object.keys(props.smtp) as (keyof SmtpSettings)[]) {
-    if (values[key] !== props.smtp[key]) {
-      if (key === 'smtp_password_SECRET' && !values[key]) continue
-      changedValues[key] = String(values[key])
+    if (data[key] !== props.smtp[key]) {
+      if (key === 'smtp_password_SECRET' && !data[key]) continue
+      changedValues[key] = String(data[key])
     }
   }
 

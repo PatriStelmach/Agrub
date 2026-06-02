@@ -10,7 +10,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import {Textarea} from "@/components/ui/textarea";
-import {ref, watch, watchEffect} from "vue";
+import {ref, watch} from "vue";
 import {IconX, IconCheck, IconSend2} from "@tabler/icons-vue";
 import DialogLabel from "@/helpers_components/DialogLabel.vue";
 import type { ActiveAlert} from "@/types/types.js";
@@ -22,8 +22,9 @@ import {updateAlertRequest} from "@/helpers_functions/requests.ts";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {toast} from "vue-sonner";
 import {bigNameLabel} from "@/assets/cssFunctions.ts";
-import {useRoute} from "vue-router";
-import router from "@/router";
+import {useRouter} from "vue-router";
+
+const router = useRouter();
 
 
 const alert = defineModel<ActiveAlert | null | undefined>("alert")
@@ -51,8 +52,6 @@ const sentAction = async () => {
 const onClose = () => {
   if (alert.value) {
     setTimeout(() => {
-      newAck.value = alert.value!.isAcknowledged
-      newSeverity.value = alert.value!.severity
       newMessage.value = ""
     }, 500)
   }

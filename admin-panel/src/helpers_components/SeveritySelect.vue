@@ -7,6 +7,7 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
+import {SeverityRecord, SeverityRecordNoUnknown} from "@/types/types.ts";
 
 const severity = defineModel<0 | 1 | 2 | 3 | 4 | 5 | undefined>('severity');
 </script>
@@ -15,13 +16,13 @@ const severity = defineModel<0 | 1 | 2 | 3 | 4 | 5 | undefined>('severity');
   <Select
     v-model="severity"
   >
-    <SelectTrigger class="text-center font-extrabold cursor-pointer max-w-30 ">
-      <SelectValue />
+    <SelectTrigger if="severity-select" class="text-center font-extrabold cursor-pointer max-w-30 ">
+      <SelectValue :placeholder="SeverityRecord[severity!]" />
     </SelectTrigger>
     <SelectContent>
       <SelectItem
         :class='`tabelar-nums  font-extrabold cursor-pointer hover:bg-severity-${value}/50! `'
-        v-for="value in [1,2,3,4,5]" :key="value" :value="value">{{value}}</SelectItem>
+        v-for="(key, value) in SeverityRecordNoUnknown" :key="key" :value="value">{{key}}</SelectItem>
     </SelectContent>
   </Select>
 </template>

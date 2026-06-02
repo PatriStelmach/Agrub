@@ -2,13 +2,15 @@ import {defineStore} from "pinia";
 import { ref} from "vue";
 import {
   type ActionResponse, type Actions,
-  type ActiveAlert
+  type ActiveAlert, SeverityRecord
 } from "@/types/types.ts";
 import api from "@/lib/axios";
 import {toast} from "vue-sonner";
+import {useRouter} from "vue-router";
 
 export const useAlertStore = defineStore('alert-store', () => {
   const currentAlerts = ref<ActiveAlert[]>([])
+  const router = useRouter();
 
   const addCurrentAlert  = (newAlert: ActiveAlert) => { currentAlerts.value.push(newAlert) }
   const deleteCurrentAlert  = (index: number) => {
@@ -25,7 +27,6 @@ export const useAlertStore = defineStore('alert-store', () => {
 
   const updateAlertActions = (action: Actions) => {
     const alert = findAlert(action.alertId)
-    console.log(action)
     if (alert) {
       const changes: string[] = []
 
@@ -35,7 +36,7 @@ export const useAlertStore = defineStore('alert-store', () => {
         alert.isAcknowledged = action.ack
       }
       if (action.newSeverity !== undefined && action.newSeverity !== alert.severity) {
-        changes.push(`Severity changed to ${action.newSeverity}`)
+        changes.push(`Severity changed to ${SeverityRecord[action.newSeverity]}`)
         alert.severity = action.newSeverity
       }
 
@@ -53,11 +54,17 @@ export const useAlertStore = defineStore('alert-store', () => {
         alertId: action.alertId,
         createdAt: action.createdAt
       } as ActionResponse)
-      console.log(alert)
 
       const changesText = changes.length > 0 ? changes.join(' | ') : 'Updated action'
 
-      toast.success(`${alert.subject} updated by: ${action.author} --> ${changesText} `)
+      toast.success(`${alert.subject} updated by: ${action.author} --> ${changesText}` , {
+        action: {
+          label: "Open",
+          onClick: async () => {
+            await router.push(`/active_alerts/${alert.id}`)
+          }
+        }
+      })
     }
   }
 

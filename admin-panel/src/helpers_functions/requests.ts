@@ -27,7 +27,6 @@ export const getGroupDataRequest = async (id: number) => {
   try {
     const res = await api.get(`/groups/${id}/details`)
     if (res.status === 200) {
-      console.log(res.data)
       return res.data as GroupDetails
     }
   }
@@ -118,7 +117,6 @@ export const updateRuleRequest = async (rule: Rule) => {
   try {
     const res = await api.put(`/rules/${rule.id}`, rule)
     if (res.status === 200) {
-      console.log(rule)
       toast.success('Rule updated successfully!')
       return res.data
     }
@@ -229,7 +227,7 @@ export const getHistoryAlertByIdRequest = async (id: number) => {
   }
 }
 
-export const getAnalyticsAlertsCount = async (
+export const getAnalyticsAlertsCountRequest = async (
   start: CalendarDate | CalendarDateTime | ZonedDateTime,
   end: CalendarDate | CalendarDateTime | ZonedDateTime,
   granularity: Granularity,
@@ -272,7 +270,6 @@ export const getAnalyticsAlertsCount = async (
       }),
     ]);
     if (alerts.status === 200 && ack.status === 200 && close.status === 200) {
-      console.log(alerts);
       return {
         alerts: alerts.data,
         ack: ack.data,

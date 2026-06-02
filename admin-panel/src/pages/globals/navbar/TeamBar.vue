@@ -7,7 +7,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator, DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { IconNotification, IconUserCircle} from "@tabler/icons-vue";
+import { IconUserCircle} from "@tabler/icons-vue";
 import type {User} from "@/types/types.ts";
 import {ref} from "vue";
 const usersData = ref<User[]>([])

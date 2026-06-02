@@ -26,18 +26,14 @@ const { filteredData,  searchFilter } =
   useClientSearchFilter<User>(() => userStore.allUsers,(user) => `${user.firstname} ${user.surname}` )
 
 onMounted(async () => {
-  if(userStore.allUsers.length === 0 || userStore.allGroups.length === 0) {
-    if(authStore.isAdmin) {
-      await Promise.all([
-        userStore.getAllUsersRequest(),
-        userStore.getAllGroupsRequest()
-      ]).finally(() => isLoading.value = false)
-    } else {
-      await userStore.getAllUsersRequest().finally(() => isLoading.value = false)
-    }
-
+  if(authStore.isAdmin) {
+    await Promise.all([
+      userStore.getAllUsersRequest(),
+      userStore.getAllGroupsRequest()
+    ]).finally(() => isLoading.value = false)
+  } else {
+    await userStore.getAllUsersRequest().finally(() => isLoading.value = false)
   }
-  else isLoading.value = false;
 })
 
 
