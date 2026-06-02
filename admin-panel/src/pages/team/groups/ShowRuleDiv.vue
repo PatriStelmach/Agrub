@@ -4,7 +4,7 @@ import {IconEdit, IconLoader, IconTrash} from "@tabler/icons-vue";
 import { type Rule } from "@/types/types.ts";
 import {Button} from "@/components/ui/button";
 
-const props = defineProps<{
+defineProps<{
   rule: Rule
   isRuleDeleting: boolean
 }>()

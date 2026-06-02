@@ -42,7 +42,6 @@ import {getPluginDetailsRequest, runScriptRequest} from "@/helpers_functions/req
 import {Button} from "@/components/ui/button";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
 import {Search} from "lucide-vue-next";
-import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import {Label} from "@/components/ui/label";
 import {ButtonGroup} from "@/components/ui/button-group";
 import {dateParser} from "@/composables/dateParser.ts";
@@ -389,7 +388,7 @@ const onEdit = (plugin: MyPlugin) => {
                 >{{tag}}</Badge>
               </TransitionGroup>
             </TableCell>
-            <TableCell v-if="!isUnwrapped(plugin.fullName) && authStore.isAdmin" class="grid space-y-2">
+            <TableCell v-if="isUnwrapped(plugin.fullName) && authStore.isAdmin" class="grid space-y-2">
               <InputGroup class="relative w-full xl:h-10 2xl:h-12 mb-2">
                 <InputGroupInput
                   class=" text-center input-text"

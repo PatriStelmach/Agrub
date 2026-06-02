@@ -63,14 +63,14 @@ const link = (action: ActionResponse) => {
         </TableRow>
         <TableRow v-else :class="tableHeaders">
           <SortableHead keyName="ackUpdate" label="ACK" class="w-7/100" :sort-key="sortKey as string" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-          <TableHead class="px-2 16-100">
+          <TableHead class="px-2 18-100">
           <span
             class=" items-center h-full truncate mx-0  font-bold text-sm lg:text-md xl:text-lg 2xl:text:xl">
             Severity
           </span>
           </TableHead>
           <SortableHead keyName="message" label="Comment" class="w-30/100" :sort-key="sortKey as string" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-          <SortableHead key-name="subject" class="w-30/100" label="Alert" :sort-key="sortKey as string" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+          <SortableHead key-name="subject" class="w-28/100" label="Alert" :sort-key="sortKey as string" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
           <SortableHead keyName="createdAt" label="Date" class="pr-2 w-17/100" :sort-key="sortKey as string" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
         </TableRow>
       </TableHeader>

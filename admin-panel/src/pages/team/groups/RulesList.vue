@@ -13,7 +13,7 @@ const emit = defineEmits<{
   'delete-rule': [number]
 }>()
 
-const {unwrap, isUnwrapped, wrap, save, unwrappedItem, originalItem} = useWrapping<Rule>(rules)
+const {unwrap, isUnwrapped, wrap, save, unwrappedItem} = useWrapping<Rule>(rules)
 
 const onEditSave = (data: Rule) => {
   Object.assign(unwrappedItem.value!, data)

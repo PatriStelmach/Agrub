@@ -6,10 +6,12 @@ import { useAlertStore } from "@/stores/alertStore.ts";
 import { defineStore } from "pinia";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
 import {useAuthStore} from "@/stores/authStore.ts";
+import {useRouter} from "vue-router";
 
 export const useSSEstore = defineStore('SSE', () => {
   const alertStore = useAlertStore()
   const authStore = useAuthStore()
+  const router = useRouter()
   const isConnected = ref(false)
 
   const handleSSEMessage = (event: any) => {
@@ -26,13 +28,29 @@ export const useSSEstore = defineStore('SSE', () => {
     if (event.status === 'success') {
       switch (event.eventType) {
         case 'NEW_ALERT': {
-          toast.error(`New alert: ${event.message.subject}`,
-            { icon: h(IconAlertTriangle, { class: 'animate-pulse duration-100' }) });
+          toast.error(`New alert: ${event.message.subject}`, {
+            action: {
+              label: "Open" ,
+              onClick: async () => {
+                await router.push(`/active_alerts/${event.message.id}`);
+              }
+            },
+            icon: h(IconAlertTriangle, {
+              class: 'animate-pulse duration-100'
+            }) });
           alertStore.addCurrentAlert(event.message);
           break;
         }
         case 'ALERT_RESOLVED': {
-          toast.success(`Alert resolved: ${event.message.subject}`, { icon: IconCircleCheck });
+          toast.success(`Alert resolved: ${event.message.subject}`, {
+            icon: IconCircleCheck,
+            action: {
+              label: "Open",
+              onClick: async () => {
+                await router.push({ path: `/alerts_history/${event.message.id}` });
+              }
+            }
+          });
           alertStore.deleteCurrentAlert(event.message.id);
           break;
         }
@@ -42,7 +60,14 @@ export const useSSEstore = defineStore('SSE', () => {
         }
         case 'ALERT_UPDATE' : {
           if(event.message)
-          toast.success(`Alert updated: ${event.message.subject}`);
+          toast.success(`Alert updated: ${event.message.subject}`,{
+            action: {
+              label: "Open",
+              onClick: async () => {
+                await router.push({ path: `/active_alerts/${event.message.alertId}` });
+              }
+            }
+          });
           alertStore.updateAlert(event.message);
           break;
         }
@@ -63,7 +88,6 @@ export const useSSEstore = defineStore('SSE', () => {
       async onopen(response) {
         if (response.ok && response.headers.get('content-type')?.includes('text/event-stream')) {
           isConnected.value = true;
-          console.log('connected to sse')
         } else if (response.status >= 400 && response.status < 500 && response.status !== 429) {
           throw new Error(`Fatal connection error: ${response.status}`);
         }
@@ -76,18 +100,16 @@ export const useSSEstore = defineStore('SSE', () => {
 
       onclose() {
         isConnected.value = false;
-        console.log("SSE connection closed by server");
       },
       onerror(err) {
-        console.error("SSE Error:", err);
-        throw err;
+        toast.error(`${err}`)
       },
     });
   };
 
-  connectToSSE();
 
   return {
-    isConnected
+    isConnected,
+    connectToSSE
   };
 });

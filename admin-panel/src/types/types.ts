@@ -29,13 +29,30 @@ export interface ActiveAlert {
   severity: 0 | 1 | 2 | 3 | 4 | 5
 }
 
-export type Severity =
+export type SeverityText =
   | 'UNKNOWN'
   | 'INFO'
   | 'LOW'
   | 'MEDIUM'
   | 'HIGH'
   | 'CRITICAL';
+
+export const SeverityRecord = {
+  0: 'UNKNOWN',
+  1: 'INFO',
+  2: 'LOW',
+  3: 'MEDIUM',
+  4: 'HIGH',
+  5: 'CRITICAL'
+}
+
+export const SeverityRecordNoUnknown = {
+  1: 'INFO',
+  2: 'LOW',
+  3: 'MEDIUM',
+  4: 'HIGH',
+  5: 'CRITICAL'
+}
 
 export interface AlertSeverityAnalitycs {
   x: number,
@@ -253,32 +270,7 @@ export interface LibraryPlugin
   tags: string[],
 }
 
-//tak przychodzi z api
-export interface WazuhConfig {
-  name: string
-  wazuh_user: string
-  wazuh_password_SECRET?: string
-  wazuh_url: string
-  wazuh_enabled: boolean
-  wazuh_warning_level: number
-  wazuh_critical_level: number
-  wazuh_info_as_alerts: boolean
-}
-//tak przychodzi z api
-export interface NagiosConfig {
-  name?: string
-  nagios_url: string
-  nagios_enabled: boolean
-  nagios_user: string
-  nagios_password_SECRET?: string
-}
-//tak przychodzi z api
-export interface ZabbixConfig {
-  name: string
-  zabbix_enabled: boolean
-  zabbix_url: string
-  zabbix_api_token_SECRET?: string
-}
+
 //to jest moje po mapowaniu
 export interface MonitoringSystemsConfig  {
   name: string

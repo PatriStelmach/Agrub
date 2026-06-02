@@ -26,7 +26,7 @@ const settingStore = useSettingStore()
 const alertEdit = defineModel<boolean>('alertEdit')
 const alertLoading = ref(false)
 
-const { values, handleSubmit, resetForm} = useForm({
+const { handleSubmit, resetForm} = useForm({
   validationSchema: alertSettingSchema,
   initialValues: props.alert,
 })
@@ -36,8 +36,8 @@ const onSubmit = handleSubmit(async (data) => {
   const changedValues: Record<string, string> = {}
 
   for (const key of Object.keys(props.alert) as (keyof AlertSettings)[]) {
-    if (values[key] !== props.alert[key]) {
-      changedValues[key] = String(values[key])
+    if (data[key] !== props.alert[key]) {
+      changedValues[key] = String(data[key])
     }
   }
 
