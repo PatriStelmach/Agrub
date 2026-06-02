@@ -17,11 +17,11 @@ import pl.pjatk.alertwip.repository.UserGroupRepository;
 import pl.pjatk.alertwip.repository.UserRepository;
 import pl.pjatk.alertwip.security.JwtService;
 
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.UUID;
 
 @Service
 public class AuthenticationService {
@@ -106,10 +106,7 @@ public class AuthenticationService {
             newUser.setRole(Role.TECHNICIAN);
             newUser.setActive(true);
 
-            UserGroup techGroup = userGroupRepository.findByName("TECH").orElse(null);
-            if (techGroup != null) {
-                newUser.getGroups().add(techGroup);
-            }
+            userGroupRepository.findByName("TECH").ifPresent(techGroup -> newUser.getGroups().add(techGroup));
 
             return repository.save(newUser);
         });
@@ -149,18 +146,18 @@ public class AuthenticationService {
             return;
         }
 
-        String token = UUID.randomUUID().toString();
+        SecureRandom random = new SecureRandom();
+        String token = String.format("%06d", random.nextInt(1_000_000));
         redisTemplate.opsForValue().set("reset:" + token, email, 15, TimeUnit.MINUTES);
-        String resetLink = "http://localhost:5173/reset-password?token=" + token;
-        String message = "Cześć " + user.getFirstname() + ",\n\n" +
-                "Link do resetu hasła (ważny 15 minut):\n" + resetLink;
-        emailService.sendSimpleMessage(email, "Resetowanie hasła - AlertWIP", message);
+        String message = "Hello " + user.getFirstname() + ",\n\n" +
+                "Copy this token to reset your password (valid for 15 minutes):\n" + token;
+        emailService.sendSimpleMessage(email, "Password reset - AlertVIP", message);
     }
 
     public void completePasswordReset(String token, String newPassword) {
         String email = redisTemplate.opsForValue().get("reset:" + token);
         if (email == null) {
-            throw new RuntimeException("Link wygasł lub jest nieprawidłowy.");
+            throw new RuntimeException("Token expired or is invalid");
         }
 
         User user = repository.findByEmail(email)

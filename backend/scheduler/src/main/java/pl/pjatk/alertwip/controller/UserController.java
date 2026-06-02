@@ -67,6 +67,7 @@ public class UserController {
 
         user.setFirstname(userDetails.getFirstname());
         user.setSurname(userDetails.getSurname());
+        user.setEmail(userDetails.getEmail());
         user.setRole(userDetails.getRole());
         user.setActive(userDetails.isActive());
         user.setGroups(userDetails.getGroups());
