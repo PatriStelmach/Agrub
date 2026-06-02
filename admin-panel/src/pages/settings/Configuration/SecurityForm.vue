@@ -27,7 +27,7 @@ const settingStore = useSettingStore()
 const securityEdit = defineModel<boolean>('securityEdit')
 const securityLoading = ref(false)
 
-const { values, handleSubmit, resetForm} = useForm({
+const { handleSubmit, resetForm} = useForm({
   validationSchema: securitySettingSchema,
   initialValues: props.security,
 })
@@ -37,8 +37,8 @@ const onSubmit = handleSubmit(async (data) => {
   const changedValues: Record<string, string> = {}
 
   for (const key of Object.keys(props.security) as (keyof SecuritySettings)[]) {
-    if (values[key] !== props.security[key]) {
-      changedValues[key] = String(values[key])
+    if (data[key] !== props.security[key]) {
+      changedValues[key] = String(data[key])
     }
   }
 
@@ -137,7 +137,7 @@ const onCancel = () => {
         </Button>
       </div>
     </form>
-    <!-- lista danych -->
+
     <ul v-else class="space-y-2">
       <li class="flex items-center space-x-2">
         <IconChevronsRight stroke="1.5" class="text-comment mb-1"/>

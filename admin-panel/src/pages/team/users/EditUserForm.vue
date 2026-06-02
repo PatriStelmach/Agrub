@@ -1,23 +1,22 @@
 <script setup lang="ts">
-import {onMounted, ref, watch, watchEffect} from "vue"
-import {useForm, useSetFieldValue} from 'vee-validate'
+import {ref, watch } from "vue"
+import {useForm} from 'vee-validate'
 import { useUserStore } from "@/stores/userStore.js"
 import { type User} from "@/types/types"
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Label } from '@/components/ui/label'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Button } from '@/components/ui/button'
 import { IconKey, IconTool, IconDeviceFloppy, IconLabel, IconLock, IconMail, IconX, IconLoader } from '@tabler/icons-vue'
 import { SheetFooter, SheetClose } from '@/components/ui/sheet'
 import MyTagInput from "@/helpers_components/MyTagInput.vue"
-import DialogLabel from "@/helpers_components/DialogLabel.vue"
 import {toast} from "vue-sonner";
 import FormInput from "@/helpers_components/form/FormInput.vue";
 import {
   createUserSchema,
   editUserSchema
 } from "@/helpers_functions/formSchemas.ts";
+import MyFieldLabel from "@/helpers_components/form/MyFieldLabel.vue";
 const props = defineProps<{
   user: User
   actionType: "create" | "edit"
@@ -42,6 +41,7 @@ const onSubmit = handleSubmit(async () => {
     await userStore.editUserRequest(updatedUser.value)
       .then((res) => toast.success(`User ${res} updated successfully.`))
       .catch((error) => toast.error(`Error updating ${updatedUser.value.email}: ${error}`))
+      .finally(() => isLoading.value = false)
   }
   else {
     await userStore.createUserRequest(updatedUser.value)
@@ -89,17 +89,17 @@ watch(values, (newValues) => {
 
       <div class="grid mt-4 space-y-6">
         <div>
-          <DialogLabel text="Role" for="role" class="mb-2" />
-          <RadioGroup id="role" v-model="updatedUser.role" class="grid **:text-md **:text-label">
+          <MyFieldLabel text="Role" for="role" class="mb-2" />
+          <div  class="grid **:text-md **:text-label">
             <div class="flex items-center space-x-2">
-              <RadioGroupItem id="radio-administrator" value="ADMINISTRATOR" />
-              <IconKey /><Label class="cursor-pointer" for="radio-administrator">ADMINISTRATOR</Label>
+              <input type="radio" v-model="updatedUser.role" id="radio-administrator" value="ADMINISTRATOR" />
+              <IconKey class="mx-2" /><Label class="cursor-pointer" for="radio-administrator">ADMINISTRATOR</Label>
             </div>
             <div class="flex items-center space-x-2">
-              <RadioGroupItem id="radio-technician" value="TECHNICIAN" />
-              <IconTool class="rotate-90" /><Label class="cursor-pointer" for="radio-technician">TECHNICIAN</Label>
+              <input type="radio" v-model="updatedUser.role" id="radio-technician" value="TECHNICIAN" />
+              <IconTool  class="rotate-90 mx-2" /><Label class="cursor-pointer" for="radio-technician">TECHNICIAN</Label>
             </div>
-          </RadioGroup>
+          </div>
         </div>
         <MyTagInput
           v-model:tags="tagsForEdit"

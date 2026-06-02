@@ -113,6 +113,13 @@ export const editUserSchema = toTypedSchema(
   })
 )
 
+export const changeForgottenPasswordSchema = toTypedSchema(
+  z.object({
+    token: z.string().min(6 ,'Token is invalid').max(6 ,'Token is invalid'),
+    newPassword: z.string().min(4, 'Password must be at least 4 characters.'),
+  })
+)
+
 export const editCurrentUserSchema = toTypedSchema(
   z.object({
     id: z.number(),
@@ -128,22 +135,6 @@ export const editCurrentUserSchema = toTypedSchema(
       id: z.number(),
     }))
   }))
-export const editCurrentAdUserSchema = toTypedSchema(
-  z.object({
-    id: z.number(),
-    email: z.string(),
-    firstname: z.string(),
-    surname: z.string(),
-    autoLogoutMinutes: z
-      .number()
-      .int('Must be a positive integer')
-      .min(1, "Cannot be lower than 1 minute"),
-    groups: z.array(z.object({
-      name: z.string(),
-      id: z.number(),
-    }))
-  }))
-
 
 export const changePasswordSchema = toTypedSchema(
   z.object({
@@ -187,7 +178,7 @@ export const securitySettingSchema = toTypedSchema(  z.object({
       .number()
       .int('Must be a positive integer')
       .min(1, "Cannot be lower than 1 minute"),
-    SECURITY_AD_DOMAIN: z.string().url('Must be a valid URL'),
+    SECURITY_AD_DOMAIN: z.string().min(5, 'Must be a valid URL'),
     SECURITY_AD_URL: z.string().url('Must be a valid URL'),
     SECURITY_LDAP_BASE_DN: z
       .string()
@@ -202,7 +193,7 @@ export const securitySettingSchema = toTypedSchema(  z.object({
 
 export const smtpSettingSchema = toTypedSchema(
   z.object({
-    smtp_host: z.string().url('Must be a valid URL'),
+    smtp_host: z.string().min(3, 'Too short smtp host'),
     smtp_port: z.enum(["25", "587", "465", "2525"]),
     smtp_user: z.string().email('Invalid email address'),
     smtp_password_SECRET: z.string(),
@@ -220,3 +211,8 @@ export const alertSettingSchema = toTypedSchema(
       .int('Must be a positive integer')
       .min(1, "Cannot be lower than 1 second"),
   }))
+
+export const resetPasswordSchema = toTypedSchema(
+  z.object({
+    reset_password_email: z.string().email('Invalid email address')
+}))

@@ -24,7 +24,7 @@ export const useUserStore = defineStore('user-store',() => {
       const res = await api.patch(`/users/${user.id}`, user )
       if (res.status === 200){
         await getAllUsersRequest()
-        return res.data.email
+        return res.data.firstname + ' ' +res.data.surname
       }
     }
     catch (error) {
@@ -44,7 +44,6 @@ export const useUserStore = defineStore('user-store',() => {
 
   const createUserRequest = async (user: User) => {
     try {
-      console.log(user)
       const res = await api.post('/users', user)
       if (res.status === 200) {
         await getAllUsersRequest()

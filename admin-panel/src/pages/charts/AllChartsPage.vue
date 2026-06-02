@@ -9,7 +9,7 @@ import ChartAckOrCloseTime from "@/pages/charts/ChartAckOrCloseTime.vue";
 import { getLocalTimeZone, today, ZonedDateTime, CalendarDateTime, CalendarDate,  } from '@internationalized/date'
 import type {CumulativeData, Granularity} from "@/types/types.ts";
 import ChartAckAndCloseTime from "@/pages/charts/ChartAckAndCloseTime.vue";
-import {getAnalyticsAlertsCount} from "@/helpers_functions/requests.ts";
+import {getAnalyticsAlertsCountRequest} from "@/helpers_functions/requests.ts";
 import {toast} from "vue-sonner";
 import {Button} from "@/components/ui/button";
 import {ButtonGroup} from "@/components/ui/button-group";
@@ -26,11 +26,7 @@ const locale = navigator.language
 const tz = getLocalTimeZone()
 
 onMounted(async () => {
-  setTimeout(async () =>{
-    await onDateRangeChange()
-
-  }, 500)
-
+  await onDateRangeChange()
 })
 
 const origin = ref<string[]>([])
@@ -73,7 +69,7 @@ const periodLabel = computed(() => {
 
 const onDateRangeChange = async () => {
   areChartsLoading.value = true
-  await getAnalyticsAlertsCount(
+  await getAnalyticsAlertsCountRequest(
     dateRange.value.start as ZonedDateTime,
     dateRange.value.end as ZonedDateTime,
     currentGranularity.value,
@@ -88,7 +84,6 @@ const onDateRangeChange = async () => {
     .finally(() => {
       areChartsLoading.value = false
       isPopoverOpen.value = false
-      console.log(end, start, currentGranularity.value)
     })
 }
 
@@ -184,7 +179,7 @@ const onDateRangeChange = async () => {
         name="fade">
         <div v-if="areChartsLoading">
           <BigLoadingBlock
-            v-for=" (_,i) in [1,2,3,5]"
+            v-for=" i in [1,2,3,5]"
             :key="i"
             class="h-140"
           />

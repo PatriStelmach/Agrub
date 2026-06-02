@@ -50,7 +50,6 @@ export function useTagsFilter(
 
   const removeTagFromList = (tag: string) => {
     tags.value = tags.value?.filter(t => t !== tag)
-    console.log(tags.value)
   }
 
   const clearItemTags = () => {

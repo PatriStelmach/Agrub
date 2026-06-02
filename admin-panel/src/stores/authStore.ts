@@ -35,11 +35,9 @@ export const useAuthStore = defineStore('auth', () => {
   authChannel.onmessage = (event) => {
     if (event.data.type === 'alert-global-logout') {
       setToken(null)
-      console.log('logged-out')
     }
     else if (event.data.type === 'alert-global-login') {
       setToken(event.data.token)
-      console.log('logged in')
     }
   }
 
@@ -53,7 +51,6 @@ export const useAuthStore = defineStore('auth', () => {
       if (response.status === 200 && response.data.access_token) {
         setToken(response.data.access_token)
         authChannel.postMessage({type: 'alert-global-login', token: response.data.access_token})
-        console.log(response.data.access_token)
 
         return true
       }

@@ -16,7 +16,7 @@ import {
   type AlertSeverityAnalitycs,
   type ChartDataPoint,
   type Granularity,
-  type Severity
+  type SeverityText
 } from "@/types/types.ts";
 import { fromDate} from '@internationalized/date'
 import {getWeekNumber} from "reka-ui/date";
@@ -46,7 +46,7 @@ const chartData = computed<ChartDataPoint[]>(() => {
     })
 })
 
-const severities = computed<Record<Severity, number[]>>(() => ({
+const severities = computed<Record<SeverityText, number[]>>(() => ({
   UNKNOWN: chartData.value.map(x => x['0']),
   INFO: chartData.value.map(x => x['1']),
   LOW: chartData.value.map(x => x['2']),
@@ -55,7 +55,7 @@ const severities = computed<Record<Severity, number[]>>(() => ({
   CRITICAL: chartData.value.map(x => x['5']),
 }))
 
-const averageAlertsValueFormatted = computed<Record<Severity, string>>(() => {
+const averageAlertsValueFormatted = computed<Record<SeverityText, string>>(() => {
   return Object.fromEntries(
     Object.entries(severities.value).map(([key, values]) => [
       key,
@@ -63,7 +63,7 @@ const averageAlertsValueFormatted = computed<Record<Severity, string>>(() => {
         ? '-'
         : (values.reduce((sum, value) => sum + value, 0) / values.length).toFixed(),
     ])
-  ) as Record<Severity, string>;
+  ) as Record<SeverityText, string>;
 });
 
 const xAxisTickFormat = computed(() => {

@@ -3,7 +3,6 @@ import type { HTMLAttributes } from "vue"
 import { computed, onMounted, ref } from "vue"
 import { cn } from "@/lib/utils"
 import {type ChartConfig, useChart} from "."
-import type {Severity} from "@/types/types.ts";
 
 const props = withDefaults(defineProps<{
   hideIcon?: boolean
@@ -12,7 +11,6 @@ const props = withDefaults(defineProps<{
   label2?: string
   alertsRawData?: ChartConfig
   verticalAlign?: "bottom" | "top"
-  // payload?: any[]
   class?: HTMLAttributes["class"]
 }>(), {
   verticalAlign: "bottom",

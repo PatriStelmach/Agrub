@@ -42,7 +42,6 @@ import {getPluginDetailsRequest, runScriptRequest} from "@/helpers_functions/req
 import {Button} from "@/components/ui/button";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
 import {Search} from "lucide-vue-next";
-import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import {Label} from "@/components/ui/label";
 import {ButtonGroup} from "@/components/ui/button-group";
 import {dateParser} from "@/composables/dateParser.ts";

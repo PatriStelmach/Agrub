@@ -1,23 +1,12 @@
 <script setup lang="ts">
-import {
-  Table,
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableCell,
-  TableCaption
-} from '@/components/ui/table'
-import type { ActionResponse } from "@/types/types.js";
-import { dateParser } from "@/composables/dateParser.js";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from '@/components/ui/table'
+import type {ActionResponse} from "@/types/types.js";
+import {dateParser} from "@/composables/dateParser.js";
 import {dataTable, hoverListRow, tableHeaders} from "@/assets/cssFunctions.js";
 import SeverityDiv from "@/helpers_components/SeverityDiv.vue";
-import {
-  IconCircleCheck,
-  IconCircleX
-} from "@tabler/icons-vue";
+import {IconCircleCheck, IconCircleX} from "@tabler/icons-vue";
 import SortableHead from "@/helpers_components/SortableHead.vue";
-import { useSort } from "@/composables/sorting.js";
+import {useSort} from "@/composables/sorting.js";
 import {type HTMLAttributes, onMounted, ref} from "vue";
 import {useAuthStore} from "@/stores/authStore.ts";
 import {useUserStore} from "@/stores/userStore.ts";
@@ -40,10 +29,8 @@ const { sortedData, sortKey, sortOrder, toggleSort } = useSort(
   'createdAt'
 )
 onMounted(async () => {
- if(userStore.allUsers.length === 0 || !userStore.allUsers) {
-    await userStore.getAllUsersRequest()
-  }
-  areActionsLoading.value = false
+  await userStore.getAllUsersRequest()
+    .finally(() => areActionsLoading.value = false)
 })
 
 const givenUser = (author: string, withId: boolean) => {
@@ -80,9 +67,9 @@ const link = (action: ActionResponse) => {
             Severity
           </span>
           </TableHead>
-          <SortableHead keyName="message" label="Comment" class="w-40/100" :sort-key="sortKey as string" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+          <SortableHead keyName="message" label="Comment" class="w-37/100" :sort-key="sortKey as string" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
           <SortableHead keyName="author" label="User" class="w-18/100" :sort-key="sortKey as string" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-          <SortableHead keyName="createdAt" label="Date" class="pr-2 'w-17/100'" :sort-key="sortKey as string" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+          <SortableHead keyName="createdAt" label="Date" class="pr-2 'w-20/100'" :sort-key="sortKey as string" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
         </TableRow>
       </TableHeader>
       <Transition name="fade" mode="out-in">

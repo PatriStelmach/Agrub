@@ -33,7 +33,6 @@ export const useMyPluginStore = defineStore('my-plugins', () => {
     try {
       const response= await api.get('/local-scripts/list')
       if(response.status === 200) {
-        console.log(response)
         allMyPlugins.value = response.data.map((item: MyPluginsFromApi) => ({
           active: item.active,
           creator: item.creator,

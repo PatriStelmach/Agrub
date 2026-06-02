@@ -48,8 +48,7 @@ const allSettings = computed(() => {
   else return {}
 })
 
-onMounted(async () => {
-  if(!settingsStore.systemFullSettings) {
+onMounted(async () => {{
     await settingsStore.getSystemFullSettingsRequest()
       .catch((error) => toast.error(`Error getting system configuration: ${error}`))
   }

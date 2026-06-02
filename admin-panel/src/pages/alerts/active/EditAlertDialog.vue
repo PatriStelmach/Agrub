@@ -52,8 +52,6 @@ const sentAction = async () => {
 const onClose = () => {
   if (alert.value) {
     setTimeout(() => {
-      newAck.value = alert.value!.isAcknowledged
-      newSeverity.value = alert.value!.severity
       newMessage.value = ""
     }, 500)
   }

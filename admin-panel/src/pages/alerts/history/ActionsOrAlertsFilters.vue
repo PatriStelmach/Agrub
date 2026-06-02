@@ -29,8 +29,8 @@ import type { DateRange } from "reka-ui";
 import { alertOriginType } from "@/data/alertOriginType";
 import { now, getLocalTimeZone, CalendarDateTime } from '@internationalized/date'
 import MyDateRangePicker from "@/helpers_components/MyDateRangePicker.vue";
-import type {
-  ActionsOrAlertHistoryFilters
+import {
+  type ActionsOrAlertHistoryFilters, SeverityRecordNoUnknown
 } from "@/types/types.ts";
 import {toApiDate} from "@/composables/dateParser.ts";
 import MyTagInput from "@/helpers_components/MyTagInput.vue";
@@ -148,17 +148,15 @@ const onSubmit = () => {
 
           <!-- Severity -->
           <div>
-            <DialogLabel text="Severity" for="severity-select" />
+            <DialogLabel text="Alert severity" for="severity-select" />
             <Select multiple v-model="filters.severity">
               <SelectTrigger id="severity-select" class="cursor-pointer w-2/5">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem
-                  :class="`cursor-pointer hover:bg-severity-${value}/70!`"
-                  v-for="value in [0, 1, 2, 3, 4, 5]" :key="value" :value="value">
-                  {{ value }}
-                </SelectItem>
+                  :class='`tabelar-nums  font-extrabold cursor-pointer hover:bg-severity-${value}/50! `'
+                  v-for="(key, value) in SeverityRecordNoUnknown" :key="key" :value="value">{{key}}</SelectItem>
               </SelectContent>
             </Select>
           </div>
