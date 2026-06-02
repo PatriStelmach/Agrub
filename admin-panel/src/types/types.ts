@@ -1,4 +1,4 @@
-export const api_url = 'http://localhost:10000/api'
+export const api_url = '/api'
 
 export enum Language {
   PYTHON = ".py",
