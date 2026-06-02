@@ -30,9 +30,9 @@ onMounted(async () => {
 })
 
 const origin = ref<string[]>([])
-const end = ref<CalendarDate | CalendarDateTime | ZonedDateTime>(today(tz).subtract({days:1}))
-const start = ref<CalendarDate | CalendarDateTime | ZonedDateTime>(end.value.subtract({ weeks: 4 }))
-const currentGranularity = ref<Granularity>('WEEK')
+const end = ref<CalendarDate | CalendarDateTime | ZonedDateTime>(today(tz).add({ days: 1}))
+const start = ref<CalendarDate | CalendarDateTime | ZonedDateTime>(end.value.subtract({ days: 7 }))
+const currentGranularity = ref<Granularity>('DAY')
 const granularityAfterReload = ref<Granularity>(currentGranularity.value)
 const areChartsLoading = ref<boolean>(true)
 const rawAnalyticsData = ref<CumulativeData>()
@@ -105,7 +105,7 @@ const onDateRangeChange = async () => {
               :locale="locale"
               :number-of-months="3"
               :disable-days-outside-current-view="true"
-              :isDateDisabled="date => date >= today(tz)"
+              :isDateDisabled="date => date > today(tz).add({ days: 1 })"
             />
             <div class="mt-3">
               <div class="flex space-x-2 items-baseline">
