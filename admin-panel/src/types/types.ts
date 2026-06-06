@@ -259,19 +259,17 @@ export interface PluginDetails
 
 export interface LibraryPlugin
 {
-  id: number,
-  fileName: string,
-  creator: string,
+  id: number
+  fileName: string
+  creator: string
   language: Language,
-  description?: string,
-  code?: string,
-  weight: number,
-  createdAt: Date,
-  tags: string[],
+  description?: string
+  code?: string
+  weight: number
+  createdAt: Date
+  tags: string[]
 }
 
-
-//to jest moje po mapowaniu
 export interface MonitoringSystemsConfig  {
   name: string
   user?: string
