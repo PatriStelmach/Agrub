@@ -254,8 +254,7 @@ export interface PluginDetails {
   code: string,
 }
 
-export interface LibraryPlugin
-{
+export interface LibraryPlugin {
   id: number
   fileName: string
   creator: string
