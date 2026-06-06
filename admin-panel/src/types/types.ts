@@ -236,8 +236,7 @@ export interface MyPlugin
   severity: 0 | 1 | 2 | 3 | 4 | 5,
 }
 
-export interface MyPluginsFromApi
-{
+export interface MyPluginsFromApi {
   active: boolean
   creator: string
   severity: 0 | 1 | 2 | 3 | 4 | 5
