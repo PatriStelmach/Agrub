@@ -240,7 +240,7 @@ export interface MyPluginsFromApi
 {
   active: boolean
   creator: string
-  severity: 0 | 1 | 2 | 3 | 4 | 5,
+  severity: 0 | 1 | 2 | 3 | 4 | 5
   name: string
   fileName: string
   language: Language
