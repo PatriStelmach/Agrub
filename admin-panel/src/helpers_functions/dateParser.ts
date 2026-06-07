@@ -11,7 +11,7 @@ export function dateParser(date: Date | string) {
   const weekday = () => {
     return weekDayString[d.getDay()]
   }
-  const month = pad(d.getUTCMonth() + 1);
+  const month = pad(d.getMonth() + 1);
   const year = d.getUTCFullYear();
 
   return {
