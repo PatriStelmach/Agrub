@@ -1,7 +1,10 @@
 import {ref, watch} from "vue";
 
-export function useServerSearchFilter<T, F>
-(getItemsRequest: () => Promise<void>, emptyFilters: F, sortKey: string, sortOrder: string) {
+export function useServerSearchFilter<T, F>(
+  getItemsRequest: () => Promise<void>,
+  emptyFilters: F,
+  sortKey: string,
+  sortOrder: string) {
   const items = ref<T[]>([])
   const searchFilter = ref<string | null>(null);
   const pageSize = ref<number>(100);
@@ -29,7 +32,10 @@ export function useServerSearchFilter<T, F>
     await wrappedRequest()
   })
 
-  watch([() => sortedHead.value.sortKey, () => sortedHead.value.sortOrder], async () => {
+  watch([() =>
+    sortedHead.value.sortKey,
+    () => sortedHead.value.sortOrder],
+    async () => {
     currentPage.value = 1
     await wrappedRequest()
   })
