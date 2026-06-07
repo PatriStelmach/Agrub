@@ -30,7 +30,7 @@ import { alertOriginType } from "@/data/alertOriginType";
 import { now, getLocalTimeZone, CalendarDateTime } from '@internationalized/date'
 import MyDateRangePicker from "@/helpers_components/MyDateRangePicker.vue";
 import {
-  type ActionsOrAlertHistoryFilters, SeverityRecordNoUnknown
+  type ActionsOrAlertHistoryFilters, SeverityRecord
 } from "@/types/types.ts";
 import {toApiDate} from "@/helpers_functions/dateParser.js";
 import MyTagInput from "@/helpers_components/MyTagInput.vue";
@@ -156,7 +156,7 @@ const onSubmit = () => {
               <SelectContent>
                 <SelectItem
                   :class='`tabelar-nums  font-extrabold cursor-pointer hover:bg-severity-${value}/50! `'
-                  v-for="(key, value) in SeverityRecordNoUnknown" :key="key" :value="value">{{key}}</SelectItem>
+                  v-for="(key, value) in SeverityRecord" :key="key" :value="value">{{key}}</SelectItem>
               </SelectContent>
             </Select>
           </div>
