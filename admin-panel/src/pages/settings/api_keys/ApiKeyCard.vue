@@ -1,11 +1,11 @@
 <script setup lang="ts">
 
-import {bigNameLabel, gridCard, smallNameLabel} from "@/assets/cssFunctions.ts";
-import {IconTrash, IconStatusChange, IconSquareKey, IconLockOff, IconClipboardText, IconCalendarDue, IconCopy, IconCheck, IconLoader, IconX} from "@tabler/icons-vue";
-import {Card, CardDescription, CardHeader} from "@/components/ui/card";
+import {bigNameLabel, gridCard} from "@/assets/cssFunctions.ts";
+import {IconTrash, IconStatusChange, IconSquareKey, IconClipboardText, IconCalendarDue, IconCopy, IconLoader} from "@tabler/icons-vue";
+import {Card, CardHeader} from "@/components/ui/card";
 import {Badge} from "@/components/ui/badge";
 import type {ApiKey} from "@/types/types.ts";
-import {dateParser} from "@/composables/dateParser.ts";
+import {dateParser} from "@/helpers_functions/dateParser.js";
 import {Button} from "@/components/ui/button";
 import {useClipboard} from "@vueuse/core";
 import {

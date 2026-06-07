@@ -25,7 +25,7 @@ const tz = getLocalTimeZone()
     >
     </DialogLabel>
     <DateRangeFieldRoot
-      class="flex w-95/100 select-none bg-input/60 items-center rounded-lg text-center text-comment border shadow-sm p-1 data-invalid:border-red-badge"
+      class="flex w-95/100 text-sm select-none bg-input/60 items-center rounded-lg text-center text-comment border shadow-sm p-1 data-invalid:border-red-badge"
       v-model="range"
       :weekStartsOn="1"
       :hourCycle="24"
@@ -50,7 +50,7 @@ const tz = getLocalTimeZone()
           <DateRangeFieldInput
             v-else
             :part="item.part"
-            class="rounded-md p-0.5 focus:outline-none focus:shadow-[0_0_5px_2px] focus:shadow-green-badge data-placeholder:text-green-badge"
+            class="rounded-md p-0.5 focus:outline-none focus:shadow-[0_0_5px_2px] focus:shadow-green-badge data-placeholder:text-comment"
             type="start"
           >
             {{ item.value }}
@@ -73,7 +73,7 @@ const tz = getLocalTimeZone()
           <DateRangeFieldInput
             v-else
             :part="item.part"
-            class="rounded-md p-0.5 focus:outline-none focus:shadow-[0_0_5px_2px] focus:shadow-green-badge data-placeholder:text-green-badge"
+            class="rounded-md p-0.5 focus:outline-none focus:shadow-[0_0_5px_2px] focus:shadow-green-badge data-placeholder:text-comment"
             type="end"
           >
             {{ item.value }}

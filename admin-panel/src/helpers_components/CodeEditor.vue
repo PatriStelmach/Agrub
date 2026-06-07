@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import {ref} from 'vue'
 
 const props = withDefaults(
   defineProps<{
@@ -7,7 +7,7 @@ const props = withDefaults(
     /** Ile spacji ma robić jeden Tab. 0, żeby wstawiać prawdziwy znak \t */
     tabSize?: number
   }>(),
-  { tabSize: 2 },
+  {tabSize: 2},
 )
 
 const emit = defineEmits<{

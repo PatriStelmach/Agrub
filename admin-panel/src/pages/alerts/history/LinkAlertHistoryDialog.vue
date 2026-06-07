@@ -8,7 +8,7 @@ import {
   DialogTitle, DialogTrigger
 } from "@/components/ui/dialog";
 import {Badge} from "@/components/ui/badge";
-import ActionsList from "@/helpers_components/ActionsList.vue";
+import ActionsTable from "@/helpers_components/ActionsTable.vue";
 import {Button} from "@/components/ui/button";
 import {IconCheck, IconX} from "@tabler/icons-vue";
 import type {HistoryAlert} from "@/types/types.ts";
@@ -18,9 +18,7 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {bigNameLabel} from "@/assets/cssFunctions.ts";
 import router from "@/router";
 
-defineProps<{
-  alert: HistoryAlert | null
-}>()
+const alert = defineModel<HistoryAlert | null>('alert');
 const isDialogOpen = defineModel<boolean>('isDialogOpen')
 
 watch(isDialogOpen, (newValue, oldValue) => {
@@ -103,7 +101,7 @@ watch(isDialogOpen, (newValue, oldValue) => {
             <DialogTitle >Actions history</DialogTitle>
             <DialogDescription>All interactions with alert</DialogDescription>
           </DialogHeader>
-          <ActionsList
+          <ActionsTable
             :userView="false"
             max-h="24rem"
             max-w="65rem"

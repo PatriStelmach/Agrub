@@ -13,27 +13,28 @@ import {
 } from "@/types/types.js"
 import SortableHead from "@/helpers_components/SortableHead.vue";
 import {tableCaption, dataTable, tableHeaders, hoverListRow} from "@/assets/cssFunctions.js";
-import {useSort} from "@/composables/sorting.js";
-import {ButtonGroup} from "@/components/ui/button-group";
 import {Button} from "@/components/ui/button";
 import { IconDownload, IconCode} from "@tabler/icons-vue";
 import {ref, watchEffect} from "vue";
-import {dateParser} from "@/composables/dateParser.js";
+import {dateParser} from "@/helpers_functions/dateParser";
 import LoadingTable from "@/helpers_components/LoadingTable.vue";
 import {downloadPluginRequest, getPluginDetailsRequest} from "@/helpers_functions/requests.ts";
 import {toast} from "vue-sonner";
 import PluginDetailsDialog from "@/pages/plugins/PluginDetailsDialog.vue";
+import {useAuthStore} from "@/stores/authStore.ts";
+import {useSortRequests} from "@/composables/useSortRequests.ts";
 
 const props = defineProps<{
   plugins: LibraryPlugin[]
   isLoading: boolean;
 }>()
 
+const authStore = useAuthStore();
 const getDetailsLoading = ref<boolean>(false);
 
 const sortedHead =  defineModel<{ sortKey: string; sortOrder: string }>('sortedHead')
 const { sortKey, sortOrder, toggleSort } =
-  useSort<LibraryPlugin>(() => props.plugins, 'createdAt')
+  useSortRequests<LibraryPlugin>(() => props.plugins, 'createdAt')
 
 watchEffect(() => {
   sortedHead.value = { sortKey: sortKey.value, sortOrder: sortOrder.value };
@@ -107,6 +108,7 @@ const getDetails = async (plugin: LibraryPlugin) => {
                 </PluginDetailsDialog>
 
                 <Button
+                  v-if="authStore.isAdmin"
                   @click="downloadPluginRequest(plugin)"
                   variant="green_outline"
                   class="border-l-2!"

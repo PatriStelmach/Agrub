@@ -2,7 +2,7 @@
 import {hoverListRow} from "@/assets/cssFunctions.ts";
 import ShowRuleDiv from "@/pages/team/groups/ShowRuleDiv.vue";
 import type {Rule} from "@/types/types.ts";
-import {useWrapping} from "@/composables/unwrapping.ts";
+import {useWrapping} from "@/composables/useWrapping.js";
 import {updateRuleRequest} from "@/helpers_functions/requests.ts";
 import EditRuleDiv from "@/pages/team/groups/EditRuleDiv.vue";
 
@@ -13,7 +13,7 @@ const emit = defineEmits<{
   'delete-rule': [number]
 }>()
 
-const {unwrap, isUnwrapped, wrap, save, unwrappedItem, originalItem} = useWrapping<Rule>(rules)
+const {unwrap, isUnwrapped, wrap, save, unwrappedItem} = useWrapping<Rule>(rules)
 
 const onEditSave = (data: Rule) => {
   Object.assign(unwrappedItem.value!, data)

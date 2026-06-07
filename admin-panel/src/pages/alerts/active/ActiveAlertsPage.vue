@@ -6,15 +6,14 @@ import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/inpu
 
 import {useClientSearchFilter} from "@/composables/useClientSearchFilter";
 import { useAlertStore } from "@/stores/alertStore";
-import {onMounted, ref, watchEffect} from "vue";
+import {onMounted, ref} from "vue";
 import {
   tableDiv,
 } from "@/assets/cssFunctions.js";
 import TopH1Div from "@/helpers_components/TopH1Div.vue";
 import ActiveAlertsTable from "@/pages/alerts/active/ActiveAlertsTable.vue";
-import MyClientPagination from "@/helpers_components/MyClientPagination.vue";
+import ClientPagination from "@/helpers_components/ClientPagination.vue";
 import DetailsCard from '@/pages/alerts/DetailsCard.vue'
-import {useRoute} from "vue-router";
 
 const isLoading = ref(true)
 const alertStore = useAlertStore();
@@ -49,13 +48,12 @@ const {pageSize, filteredData, updateData, currentPage, searchFilter, tableData 
         v-if="hoveredAlert"
         :data=hoveredAlert
       />
-    <ActiveAlertsTable
+      <ActiveAlertsTable
       :isLoading="isLoading"
       :tableData="tableData"
-      v-model:activeAlerts="alertStore.currentAlerts"
       v-model:hoveredAlert="hoveredAlert"
-    >
-      <MyClientPagination
+      >
+      <ClientPagination
         :total="alertStore.currentAlerts.length"
         :data="filteredData"
         v-model:page-index="currentPage"

@@ -3,7 +3,7 @@ import MyPluginsTable from "@/pages/plugins/my/MyPluginsTable.vue";
 import type { MyPlugin } from "@/types/types.js";
 import {useClientSearchFilter} from "@/composables/useClientSearchFilter.js";
 import {useMyPluginStore} from "@/stores/myPluginStore.js";
-import MyClientPagination from "@/helpers_components/MyClientPagination.vue";
+import ClientPagination from "@/helpers_components/ClientPagination.vue";
 import {onMounted, ref} from "vue";
 import {getPluginTagsResponse} from "@/helpers_functions/requests.js";
 
@@ -34,7 +34,7 @@ const {filteredData, tableData, updateData, updateSearchData, currentPage, pageS
       :availableTags="tags"
       @update:searchData="updateSearchData"
     >
-      <MyClientPagination
+      <ClientPagination
         :total="myPluginStore.allMyPlugins.length"
         :data="filteredData"
         v-model:page-index="currentPage"

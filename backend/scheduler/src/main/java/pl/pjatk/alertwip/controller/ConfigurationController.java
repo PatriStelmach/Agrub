@@ -21,6 +21,7 @@ public class ConfigurationController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('ROLE_ADMINISTRATOR')")
     public Map<String, String> getAllSettings() {
         return settingService.getMaskedSettings();
     }
@@ -59,7 +60,8 @@ public class ConfigurationController {
         return ResponseEntity.ok(systemSettings);
     }
 
-  @PatchMapping
+    @PatchMapping
+    @PreAuthorize("hasAuthority('ROLE_ADMINISTRATOR')")
     public ResponseEntity<Map<String, String>> saveSettings(@RequestBody Map<String, String> settings) {
         settingService.saveSettings(settings);
         return ResponseEntity.ok(settingService.getMaskedSettings());

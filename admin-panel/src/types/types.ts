@@ -1,7 +1,4 @@
-import {useColorMode} from "@vueuse/core";
-
 export const api_url = '/api'
-const mode = useColorMode()
 
 export enum Language {
   PYTHON = ".py",
@@ -32,7 +29,32 @@ export interface ActiveAlert {
   severity: 0 | 1 | 2 | 3 | 4 | 5
 }
 
-export interface AlertCountAnalytics {
+export type SeverityText =
+  | 'UNKNOWN'
+  | 'INFO'
+  | 'LOW'
+  | 'MEDIUM'
+  | 'HIGH'
+  | 'CRITICAL';
+
+export const SeverityRecord = {
+  0: 'UNKNOWN',
+  1: 'INFO',
+  2: 'LOW',
+  3: 'MEDIUM',
+  4: 'HIGH',
+  5: 'CRITICAL'
+}
+
+export const SeverityRecordNoUnknown = {
+  1: 'INFO',
+  2: 'LOW',
+  3: 'MEDIUM',
+  4: 'HIGH',
+  5: 'CRITICAL'
+}
+
+export interface AlertSeverityAnalitycs {
   x: number,
   severities: {
     0: number
@@ -49,6 +71,13 @@ export interface XYAnalytics {
   y: number
 }
 
+export interface CumulativeData {
+  alerts: XYAnalytics[]
+  ack: XYAnalytics[]
+  close: XYAnalytics[]
+  severity: AlertSeverityAnalitycs[]
+}
+
 export interface ChartDataPoint {
   date: number
   0: number
@@ -57,33 +86,6 @@ export interface ChartDataPoint {
   3: number
   4: number
   5: number
-}
-
-export const alertCountChartConfig = {
-  0 : {
-    label: "INFO",
-    color: mode.value === 'light' ? '#00A3FFFF' : '#61C8FFFF'
-  },
-  1: {
-    label: 'LOW',
-    color: mode.value === 'light' ? '#48CF00FF' : '#08A800FF',
-  },
-  2: {
-    label: 'MODERATE',
-    color: mode.value ==='light' ? '#ECCC00FF' : '#FFDF20FF',
-  },
-  3 : {
-    label: 'MEDIUM',
-    color: mode.value === 'light' ? '#FE9A00FF' : '#E98600FF',
-  },
-  4 : {
-    label: 'HIGH',
-    color: '#FF6900FF'
-  },
-  5 : {
-    label: 'CRITICAL',
-    color: '#F40031FF',
-  }
 }
 
 export type Granularity = 'DAY' | 'WEEK' | 'MONTH'
@@ -130,7 +132,7 @@ export interface MyJWTPayload {
   exp: number;
 }
 
-export const undefinedAlertsFilters = {
+export const undefinedActionsOrAlertsFilters = {
   severity: undefined,
   message: undefined,
   subject: undefined,
@@ -144,7 +146,7 @@ export const undefinedAlertsFilters = {
   closedDateTo: undefined
 }
 
-export interface AlertHistoryFilters {
+export interface ActionsOrAlertHistoryFilters {
   severity?: number[]
   message?: string
   subject?: string
@@ -159,11 +161,11 @@ export interface AlertHistoryFilters {
 }
 
 export interface LibraryPluginFilters {
-  name?: string,
-  language?: Language,
-  creator?: string,
-  tags?: string[],
-  maxWeight?: number,
+  name?: string
+  language?: Language
+  creator?: string
+  tags?: string[]
+  maxWeight?: number
 }
 
 export const undefinedLibraryFilters = {
@@ -173,27 +175,27 @@ export const undefinedLibraryFilters = {
 }
 
 export interface User {
-  id?: number,
-  firstname: string,
-  surname: string,
-  password?: string,
-  oldPassword?: string,
-  newPassword?: string,
-  confirmPassword?: string,
-  active?: boolean,
-  email: string,
+  id?: number
+  firstname: string
+  surname: string
+  password?: string
+  oldPassword?: string
+  newPassword?: string
+  confirmPassword?: string
+  active?: boolean
+  email: string
   role?: "ADMINISTRATOR" | "TECHNICIAN"
-  groups?: UserGroup[],
+  groups?: UserGroup[]
   autoLogoutMinutes?: number
-  lastPasswordChangeDate?: string,
+  lastPasswordChangeDate?: string
 }
 
 export interface EditCurrentUser {
-  id: number,
-  firstname: string,
-  surname: string,
-  email: string,
-  groups: UserGroup[],
+  id: number
+  firstname: string
+  surname: string
+  email: string
+  groups: UserGroup[]
   autoLogoutMinutes?: number
 }
 
@@ -209,92 +211,61 @@ export const blankUser = {
 }
 
 export interface UserGroup {
-  id: number,
-  name: string,
+  id: number
+  name: string
 }
 
 export interface UserGroupStats extends UserGroup {
-  userCount: number,
+  userCount: number
   ruleCount: number
 }
 
 export interface MyPlugin
 {
-  name: string,
+  name: string
   fullName: string
   creator: string,
   language: Language
-  description?: string,
-  code?: string,
-  weight: number,
+  description?: string
+  code?: string
+  weight: number
   tags: string[]
   cronExpression: string
-  updatedAt: Date,
-  active: boolean,
+  updatedAt: Date
+  active: boolean
   severity: 0 | 1 | 2 | 3 | 4 | 5,
 }
 
-export interface MyPluginsFromApi
-{
+export interface MyPluginsFromApi {
   active: boolean
-  creator: string,
-  severity: 0 | 1 | 2 | 3 | 4 | 5,
-  name: string,
-  fileName: string,
-  language: Language,
-  updatedAt: Date,
-  weight: number,
-  tags: string[],
+  creator: string
+  severity: 0 | 1 | 2 | 3 | 4 | 5
+  name: string
+  fileName: string
+  language: Language
+  updatedAt: Date
+  weight: number
+  tags: string[]
   cronExpression: string,
 }
 
-export interface PluginDetails
-{
+export interface PluginDetails {
   description: string,
   code: string,
 }
 
-
-export interface LibraryPlugin
-{
-  id: number,
-  fileName: string,
-  creator: string,
-  language: Language,
-  description?: string,
-  code?: string,
-  weight: number,
-  createdAt: Date,
-  tags: string[],
+export interface LibraryPlugin {
+  id: number
+  fileName: string
+  creator: string
+  language: Language
+  description?: string
+  code?: string
+  weight: number
+  createdAt: Date
+  tags: string[]
 }
 
-//tak przychodzi z api
-export interface WazuhConfig {
-  name: string
-  wazuh_user: string
-  wazuh_password_SECRET?: string
-  wazuh_url: string
-  wazuh_enabled: boolean
-  wazuh_warning_level: number
-  wazuh_critical_level: number
-  wazuh_info_as_alerts: boolean
-}
-//tak przychodzi z api
-export interface NagiosConfig {
-  name?: string
-  nagios_url: string
-  nagios_enabled: boolean
-  nagios_user: string
-  nagios_password_SECRET?: string
-}
-//tak przychodzi z api
-export interface ZabbixConfig {
-  name: string
-  zabbix_enabled: boolean
-  zabbix_url: string
-  zabbix_api_token_SECRET?: string
-}
-//to jest moje po mapowaniu
 export interface MonitoringSystemsConfig  {
   name: string
   user?: string

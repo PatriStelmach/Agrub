@@ -1,14 +1,14 @@
 import api from "@/lib/axios.ts";
 import {toast} from "vue-sonner";
 import type {
-  Actions, Granularity,
+  Actions, CumulativeData, Granularity,
   GroupDetails, LibraryPlugin,
   PluginDetails,
   Rule,
   UserGroupStats
 } from "@/types/types.ts";
 import { CalendarDateTime, ZonedDateTime, CalendarDate} from '@internationalized/date'
-import {toApiDate} from "@/composables/dateParser.ts";
+import {toApiDate} from "@/helpers_functions/dateParser.ts";
 
 export const getPluginTagsResponse = async () => {
   try {
@@ -27,7 +27,6 @@ export const getGroupDataRequest = async (id: number) => {
   try {
     const res = await api.get(`/groups/${id}/details`)
     if (res.status === 200) {
-      console.log(res.data)
       return res.data as GroupDetails
     }
   }
@@ -118,7 +117,6 @@ export const updateRuleRequest = async (rule: Rule) => {
   try {
     const res = await api.put(`/rules/${rule.id}`, rule)
     if (res.status === 200) {
-      console.log(rule)
       toast.success('Rule updated successfully!')
       return res.data
     }
@@ -218,17 +216,6 @@ export const changeUserPasswordRequest = async (oldPassword: string, newPassword
     }
   }
 
-export const getUserActionsRequest = async (id: number) => {
-  try {
-    const res = await api.get(`/users/${id}/actions`)
-    if (res.status === 200) {
-      return res.data ?? []
-    }
-  } catch (error) {
-    throw (error)
-  }
-}
-
 export const getHistoryAlertByIdRequest = async (id: number) => {
   try {
     const res = await api.get(`/alerts/${id}`)
@@ -240,22 +227,55 @@ export const getHistoryAlertByIdRequest = async (id: number) => {
   }
 }
 
-export const getAnalyticsAlertsCount = async (
+export const getAnalyticsAlertsCountRequest = async (
   start: CalendarDate | CalendarDateTime | ZonedDateTime,
   end: CalendarDate | CalendarDateTime | ZonedDateTime,
   granularity: Granularity,
-  chartType: "alerts-count" | "avg-ack-time" | "avg-close-time"
+  origin: string[]
 ) => {
+  const params = {
+    start: toApiDate(start),
+    end: toApiDate(end),
+    granularity: granularity,
+    origin: origin,
+  };
   try {
-    const res = await api.get(`/analytics/${chartType}`, {
-      params: {
-        start: toApiDate(start),
-        end: toApiDate(end),
-        granularity: granularity,
-      }
-    })
-    if (res.status === 200) {
-      return res.data
+    const [severity, alerts, ack, close] = await Promise.all([
+      api.get('/analytics/alerts-severity', {
+        params: params,
+          paramsSerializer: {
+            indexes: null
+          }
+      },
+        ),
+      api.get('/analytics/alerts-count', {
+        params: params,
+        paramsSerializer: {
+          indexes: null
+        }
+      }),
+
+      api.get('/analytics/avg-ack-time', {
+        params: params,
+        paramsSerializer: {
+          indexes: null
+        }
+      }),
+
+      api.get('/analytics/avg-close-time', {
+        params: params,
+        paramsSerializer: {
+          indexes: null
+        }
+      }),
+    ]);
+    if (alerts.status === 200 && ack.status === 200 && close.status === 200) {
+      return {
+        alerts: alerts.data,
+        ack: ack.data,
+        close: close.data,
+        severity: severity.data
+      } as CumulativeData
     }
   } catch (error) {
     throw (error)

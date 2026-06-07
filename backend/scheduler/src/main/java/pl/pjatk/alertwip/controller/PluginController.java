@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pl.pjatk.alertwip.dto.PluginDTO;
 import pl.pjatk.alertwip.model.Plugin;
@@ -51,7 +52,7 @@ public class PluginController {
                 )))
                 .orElse(ResponseEntity.notFound().build());
     }
-    
+
     // ==========================================
     // POBIERANIE UNIKALNYCH TAGÓW
     // ==========================================
@@ -104,6 +105,7 @@ public class PluginController {
     // DODAWANIE NOWEGO PLUGINU DO SKLEPU
     // ==========================================
     @PostMapping("/upload")
+    @PreAuthorize("hasAuthority('ROLE_ADMINISTRATOR')")
     public PluginDTO addCustomPlugin(@RequestBody Plugin plugin) {
         Plugin saved = pluginRepository.save(plugin);
         return pluginManagerService.mapStorePluginToDTO(saved);
@@ -113,6 +115,7 @@ public class PluginController {
     // POBIERANIE (INSTALACJA) PLUGINU NA DYSK
     // ==========================================
     @PostMapping("/download/{id}")
+    @PreAuthorize("hasAuthority('ROLE_ADMINISTRATOR')")
     public ResponseEntity<String> downloadPlugin(@PathVariable Long id) {
         try {
             Plugin plugin = pluginRepository.findById(id)
@@ -130,6 +133,7 @@ public class PluginController {
     // USUWANIE PLUGINÓW ZE SKLEPU
     // ==========================================
     @DeleteMapping("/delete")
+    @PreAuthorize("hasAuthority('ROLE_ADMINISTRATOR')")
     public void deletePlugins(@RequestBody Map<String, List<Long>> payload) {
         List<Long> ids = payload.get("id");
         if (ids != null && !ids.isEmpty()) {

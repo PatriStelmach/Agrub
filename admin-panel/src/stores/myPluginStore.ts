@@ -33,7 +33,6 @@ export const useMyPluginStore = defineStore('my-plugins', () => {
     try {
       const response= await api.get('/local-scripts/list')
       if(response.status === 200) {
-        console.log(response)
         allMyPlugins.value = response.data.map((item: MyPluginsFromApi) => ({
           active: item.active,
           creator: item.creator,
@@ -59,30 +58,23 @@ export const useMyPluginStore = defineStore('my-plugins', () => {
   const changeStatus = async (fileNames: string[]) => {
     try {
       const response = await api.post('/local-scripts/change-status', fileNames)
-      if (response.status === 200)
-        toast.success(`Status changed successfully`)
-      else
-        toast.error(`Failed to change status with status ${response.status}`)
+      if (response.status === 200){
+        await getAllMyPluginsRequest()
+      }
     } catch (error) {
-      toast.error(`Error changing status: ${error}`)
-    }
-    finally {
-      await getAllMyPluginsRequest()
+      throw error
     }
   }
 
   const deleteMyPlugins = async (fileNames: string[]) => {
     try {
       const response = await api.delete('/local-scripts/delete', { data: fileNames  })
-      if (response.status === 200)
-        toast.success('Plugins deleted successfully')
-      else
-        toast.error(`Failed to delete plugins with status ${response.status}`)
+      if (response.status === 200) {
+        await getAllMyPluginsRequest()
+        return true
+      }
     } catch (error) {
-      toast.error(`Error deleting plugins: ${error}`)
-    }
-    finally {
-      await getAllMyPluginsRequest()
+      throw error
     }
   }
 

@@ -12,7 +12,7 @@ import {
 } from "@/types/types.js"
 import {tableDiv} from "@/assets/cssFunctions.js";
 import TopH1Div from "@/helpers_components/TopH1Div.vue";
-import MyServerPagination from "@/helpers_components/MyServerPagination.vue";
+import ServerPagination from "@/helpers_components/ServerPagination.vue";
 import {useServerSearchFilter} from "@/composables/useServerSearchFilter.js";
 import api from "@/lib/axios.js";
 import PluginFilters from "@/pages/plugins/PluginFilters.vue";
@@ -75,7 +75,7 @@ const {filters, items, pageSize, currentPage, totalElements, sortedHead, updateF
       :isLoading="isLoading"
       v-model:sorted-head="sortedHead"
       :plugins="items">
-      <MyServerPagination
+      <ServerPagination
         :total="totalElements"
         v-model:page-index="currentPage"
         v-model:page-size="pageSize"

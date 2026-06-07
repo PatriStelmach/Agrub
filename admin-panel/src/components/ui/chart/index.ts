@@ -11,6 +11,7 @@ export const THEMES = { light: "", dark: ".dark" } as const
 
 export type ChartConfig = {
   [k in string]: {
+    text?: string
     label?: string | Component
     icon?: string | Component
   } & (

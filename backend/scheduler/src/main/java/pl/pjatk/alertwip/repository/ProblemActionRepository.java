@@ -1,12 +1,13 @@
 package pl.pjatk.alertwip.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import pl.pjatk.alertwip.dto.ProblemActionDTO;
 import pl.pjatk.alertwip.model.ProblemAction;
 import java.util.List;
 
-public interface ProblemActionRepository extends JpaRepository<ProblemAction, Long> {
+public interface ProblemActionRepository extends JpaRepository<ProblemAction, Long>, JpaSpecificationExecutor<ProblemAction> {
     // Pobiera całą historię akcji dla danego alertu, od najnowszych do najstarszych
     @Query("select a from ProblemAction a where a.problem.id = :problemId order by a.createdAt desc")
     List<ProblemAction> findAllByProblemIdOrderByCreatedAtDesc(Long problemId);

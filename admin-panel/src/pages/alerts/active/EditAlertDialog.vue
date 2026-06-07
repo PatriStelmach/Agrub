@@ -10,40 +10,39 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import {Textarea} from "@/components/ui/textarea";
-import {ref, watch, watchEffect} from "vue";
+import {ref, watch} from "vue";
 import {IconX, IconCheck, IconSend2} from "@tabler/icons-vue";
 import DialogLabel from "@/helpers_components/DialogLabel.vue";
 import type { ActiveAlert} from "@/types/types.js";
 import {Badge} from "@/components/ui/badge";
-import ActionsList from "@/helpers_components/ActionsList.vue";
+import ActionsTable from "@/helpers_components/ActionsTable.vue";
 import {useAuthStore} from "@/stores/authStore.ts";
 import SeveritySelect from "@/helpers_components/SeveritySelect.vue";
 import {updateAlertRequest} from "@/helpers_functions/requests.ts";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {toast} from "vue-sonner";
 import {bigNameLabel} from "@/assets/cssFunctions.ts";
-import {useRoute} from "vue-router";
-import router from "@/router";
+import {useRouter} from "vue-router";
 
-const props = defineProps<{
-  alert: ActiveAlert
-}>()
+const router = useRouter();
+
+
+const alert = defineModel<ActiveAlert | null | undefined>("alert")
 
 const authStore = useAuthStore()
-const route = useRoute()
-const newAck = ref<boolean | null>(props.alert.isAcknowledged as boolean)
-const newSeverity = ref(props.alert.severity)
+const newAck = ref<boolean | null>()
+const newSeverity = ref()
 const newMessage = ref("")
 const isDialogOpen = defineModel<boolean>('isDialogOpen')
 
 const sentAction = async () => {
-  if(newAck.value !== props.alert.isAcknowledged || newSeverity.value !== props.alert.severity || newMessage.value) {
+  if(alert.value && (newAck.value !== alert.value.isAcknowledged || newSeverity.value !== alert.value.severity || newMessage.value)) {
     await updateAlertRequest({
-      id: props.alert.id,
+      id: alert.value.id,
       author: authStore.currentUser!.email!,
-      ack: newAck.value === props.alert.isAcknowledged ? null : newAck.value,
+      ack: newAck.value === alert.value.isAcknowledged ? null : newAck.value,
       message: newMessage.value ?? undefined,
-      newSeverity: newSeverity.value === props.alert.severity ? undefined : newSeverity.value,
+      newSeverity: newSeverity.value === alert.value.severity ? undefined : newSeverity.value,
     })
       .catch((err) => toast.error(`Error updating alert: ${err}`))
       .finally(() => onClose())
@@ -51,21 +50,20 @@ const sentAction = async () => {
 }
 
 const onClose = () => {
-  setTimeout(() => {
-    newAck.value = props.alert.isAcknowledged
-    newSeverity.value = props.alert.severity
-    newMessage.value = ""
-  }, 500)
+  if (alert.value) {
+    setTimeout(() => {
+      newMessage.value = ""
+    }, 500)
+  }
 }
 
-watchEffect( () => {
-  if(route.params.alert === String(props.alert.id)) {
-    isDialogOpen.value = true
-  }
-})
-
 watch(isDialogOpen, (newValue, oldValue) => {
-  if (newValue === false && oldValue === true) {
+  if (newValue === true && oldValue === false) {
+    newSeverity.value = alert.value?.severity
+    newAck.value = alert.value?.isAcknowledged
+    newMessage.value = ""
+  }
+  else if (newValue === false && oldValue === true) {
     router.replace({ path: '/active_alerts' })
   }
 })
@@ -99,19 +97,19 @@ watch(isDialogOpen, (newValue, oldValue) => {
                 <div class="grid gap-y-6 *:flex *:space-x-2 *:items-center [&_p]:text-lg [&_p]:text-comment border-b-2 pb-2">
                   <div >
                     <h1 :class="bigNameLabel">Subject: </h1>
-                    <p id="subject"  > {{ props.alert.subject}}</p>
+                    <p id="subject"  > {{ alert?.subject}}</p>
                   </div>
                   <div class="items-start!" >
                     <h1 :class="bigNameLabel">Message: </h1>
-                    <p id="alert-message" > {{ props.alert.message}}</p>
+                    <p id="alert-message" > {{ alert?.message}}</p>
                   </div>
                   <div >
                     <h1 :class="bigNameLabel">Source: </h1>
-                    <Badge variant="source">{{ props.alert.source}}</Badge>
+                    <Badge variant="source">{{ alert?.source}}</Badge>
                   </div>
                   <div >
                     <h1 :class="bigNameLabel">Origin: </h1>
-                    <Badge variant="origin">{{ props.alert.originType}}</Badge>
+                    <Badge variant="origin">{{ alert?.originType}}</Badge>
                   </div>
                 </div>
                 <div class="grid flex-1 gap-y-3 p-2 overflow-scroll ">
@@ -149,11 +147,11 @@ watch(isDialogOpen, (newValue, oldValue) => {
                 <DialogTitle >Actions history</DialogTitle>
                 <DialogDescription>All interactions with alert</DialogDescription>
               </DialogHeader>
-              <ActionsList
+              <ActionsTable
                 :userView="false"
                 max-h="32rem"
                 max-w="65rem"
-                :actions="alert.actions"
+                :actions="alert?.actions"
               />
             </TabsContent>
         </Tabs>

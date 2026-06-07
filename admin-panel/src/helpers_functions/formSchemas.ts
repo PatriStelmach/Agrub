@@ -113,6 +113,13 @@ export const editUserSchema = toTypedSchema(
   })
 )
 
+export const changeForgottenPasswordSchema = toTypedSchema(
+  z.object({
+    token: z.string().min(6 ,'Token is invalid').max(6 ,'Token is invalid'),
+    newPassword: z.string().min(4, 'Password must be at least 4 characters.'),
+  })
+)
+
 export const editCurrentUserSchema = toTypedSchema(
   z.object({
     id: z.number(),
@@ -171,22 +178,22 @@ export const securitySettingSchema = toTypedSchema(  z.object({
       .number()
       .int('Must be a positive integer')
       .min(1, "Cannot be lower than 1 minute"),
-    SECURITY_AD_DOMAIN: z.string().url('Must be a valid URL'),
+    SECURITY_AD_DOMAIN: z.string().min(5, 'Must be a valid URL'),
     SECURITY_AD_URL: z.string().url('Must be a valid URL'),
     SECURITY_LDAP_BASE_DN: z
       .string()
       .trim()
-      .regex(/^(?:[A-Za-z][A-Za-z0-9-]*|(?:0|[1-9][0-9]*)(?:\.(?:0|[1-9][0-9]*))+)=(?:#(?:[0-9A-Fa-f]{2})+|(?:[^,=\+<>#;\\\"]|\\[,=\+<>#;\\\"\ ]|\\[0-9A-Fa-f]{2}|\"[^\"]*\")*(?:(?:[^,=\+<>#;\\\"\  ]|\\[,=\+<>#;\\\"\ ]|\\[0-9A-Fa-f]{2}|\"[^\"]*\")(?:[^,=\+<>#;\\\"]|\\[,=\+<>#;\\\"\ ]|\\[0-9A-Fa-f]{2}|\"[^\"]*\")*)?)(?:\s*[,;+]\s*(?:[A-Za-z][A-Za-z0-9-]*|(?:0|[1-9][0-9]*)(?:\.(?:0|[1-9][0-9]*))+)=(?:#(?:[0-9A-Fa-f]{2})+|(?:[^,=\+<>#;\\\"]|\\[,=\+<>#;\\\"\ ]|\\[0-9A-Fa-f]{2}|\"[^\"]*\")*(?:(?:[^,=\+<>#;\\\"\  ]|\\[,=\+<>#;\\\"\ ]|\\[0-9A-Fa-f]{2}|\"[^\"]*\")(?:[^,=\+<>#;\\\"]|\\[,=\+<>#;\\\"\ ]|\\[0-9A-Fa-f]{2}|\"[^\"]*\")*)?))*$/,
+      .regex(/^(?:[A-Za-z][A-Za-z0-9-]*|(?:0|[1-9][0-9]*)(?:\.(?:0|[1-9][0-9]*))+)=(?:#(?:[0-9A-Fa-f]{2})+|(?:[^,=+<>#;\\"]|\\[,=+<>#;\\" ]|\\[0-9A-Fa-f]{2}|"[^"]*")*(?:(?:[^,=+<>#;\\" ]|\\[,=+<>#;\\" ]|\\[0-9A-Fa-f]{2}|"[^"]*")(?:[^,=+<>#;\\"]|\\[,=+<>#;\\" ]|\\[0-9A-Fa-f]{2}|"[^"]*")*)?)(?:\s*[,;+]\s*(?:[A-Za-z][A-Za-z0-9-]*|(?:0|[1-9][0-9]*)(?:\.(?:0|[1-9][0-9]*))+)=(?:#(?:[0-9A-Fa-f]{2})+|(?:[^,=+<>#;\\"]|\\[,=+<>#;\\" ]|\\[0-9A-Fa-f]{2}|"[^"]*")*(?:(?:[^,=+<>#;\\" ]|\\[,=+<>#;\\" ]|\\[0-9A-Fa-f]{2}|"[^"]*")(?:[^,=+<>#;\\"]|\\[,=+<>#;\\" ]|\\[0-9A-Fa-f]{2}|"[^"]*")*)?))*$/,
         'Invalid LDAP base dn'),
     SECURITY_LDAP_USER_DN_PATTERN: z
       .string()
-      .regex(/^(?:[A-Za-z][A-Za-z0-9-]*|(?:0|[1-9][0-9]*)(?:\.(?:0|[1-9][0-9]*))+)=\{0\}(?:\s*[,;]\s*(?:[A-Za-z][A-Za-z0-9-]*|(?:0|[1-9][0-9]*)(?:\.(?:0|[1-9][0-9]*))+)=(?:#(?:[0-9A-Fa-f]{2})*|(?:[^,=+<>#;\\"]|\\[,=+<>#;\\" ]|\\[0-9A-Fa-f]{2})*))*$/,
+      .regex(/^(?:[A-Za-z][A-Za-z0-9-]*|(?:0|[1-9][0-9]*)(?:\.(?:0|[1-9][0-9]*))+)=\{0}(?:\s*[,;]\s*(?:[A-Za-z][A-Za-z0-9-]*|(?:0|[1-9][0-9]*)(?:\.(?:0|[1-9][0-9]*))+)=(?:#(?:[0-9A-Fa-f]{2})*|(?:[^,=+<>#;\\"]|\\[,=+<>#;\\" ]|\\[0-9A-Fa-f]{2})*))*$/,
         'Invalid LDAP user dn pattern'),
   }))
 
 export const smtpSettingSchema = toTypedSchema(
   z.object({
-    smtp_host: z.string().url('Must be a valid URL'),
+    smtp_host: z.string().min(3, 'Too short smtp host'),
     smtp_port: z.enum(["25", "587", "465", "2525"]),
     smtp_user: z.string().email('Invalid email address'),
     smtp_password_SECRET: z.string(),
@@ -204,3 +211,8 @@ export const alertSettingSchema = toTypedSchema(
       .int('Must be a positive integer')
       .min(1, "Cannot be lower than 1 second"),
   }))
+
+export const resetPasswordSchema = toTypedSchema(
+  z.object({
+    reset_password_email: z.string().email('Invalid email address')
+}))

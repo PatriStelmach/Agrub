@@ -7,6 +7,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import pl.pjatk.alertwip.dto.AlertHistoryFiltersDTO;
+import pl.pjatk.alertwip.dto.GlobalProblemHistoryDTO;
 import pl.pjatk.alertwip.model.GlobalProblem;
 import pl.pjatk.alertwip.repository.GlobalProblemRepository;
 import pl.pjatk.alertwip.repository.GlobalProblemSpecifications;
@@ -22,7 +23,7 @@ public class AlertHistoryService {
         this.repository = repository;
     }
 
-    public Page<GlobalProblem> getAlertHistory(
+    public Page<GlobalProblemHistoryDTO> getAlertHistory(
             int page, int pageSize, String sortKey, String sortOrder, AlertHistoryFiltersDTO filters) {
 
         // Budowa filtrów z DTO (z uwzględnieniem nałożonego z góry statusu "Done")
@@ -37,7 +38,18 @@ public class AlertHistoryService {
 
         Pageable pageable = PageRequest.of(page, pageSize, finalSort);
 
-        return repository.findAll(spec, pageable);
+        return repository.findAll(spec, pageable)
+                .map(problem -> new GlobalProblemHistoryDTO(
+                        problem.getId(),
+                        problem.getSource(),
+                        problem.getMessage(),
+                        problem.getOriginType(),
+                        problem.getSubject(),
+                        problem.getSeverity(),
+                        problem.isAcknowledged(),
+                        problem.getClosedAt(),
+                        problem.getCreatedAt()
+                ));
     }
 
     public List<String> getAllOriginTypes() {
