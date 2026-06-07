@@ -100,7 +100,7 @@ class Alert {
     // Severity mapping to enum
     int sevIndex = asInt(json['severity']);
     if (sevIndex < 0 || sevIndex >= AlertSeverity.values.length) {
-      sevIndex = AlertSeverity.values.length - 1; // Fallback na Extreme
+      sevIndex = AlertSeverity.values.length - 1;
     }
     final sev = AlertSeverity.values[sevIndex];
 
@@ -109,7 +109,7 @@ class Alert {
     AlertStatus stat;
     switch (rawStatus) {
       case 'inprogress':
-      case 'in_progress': // Na wypadek literówek w backendzie
+      case 'in_progress':
         stat = AlertStatus.inProgress;
         break;
       case 'done':
@@ -125,7 +125,7 @@ class Alert {
       subject: json['subject']?.toString() ?? '',
       source: json['source']?.toString() ?? 'System',
       severity: sev,
-      // createdAt z FCM też przyjdzie jako String, DateTime.parse sobie z tym poradzi
+      // Prepared for createdAt from FCM (comes as String), DateTime.parse will handle it
       createdAt:
           DateTime.tryParse(json['createdAt']?.toString() ?? '') ??
           DateTime.now(),

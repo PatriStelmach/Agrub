@@ -23,16 +23,9 @@ class AlertRepository {
       final alerts = await remoteDataSource.fetchActiveAlerts();
       await localDataSource.cacheAlerts(alerts);
 
-      // Zapisujemy do pamięci offline (w przyszłości zrobi to LocalDataSource)
-      final prefs = await SharedPreferences.getInstance();
-      final List<String> cacheList = alerts
-          .map((a) => jsonEncode(a.toJson()))
-          .toList();
-      await prefs.setStringList('offline_alerts_cache', cacheList);
-
       return alerts;
     } catch (e) {
-      debugPrint("REPO ERROR: Nie udało się pobrać alertów: $e");
+      debugPrint("REPO ERROR: Couldn't fetch alerts: $e");
       return await getOfflineAlerts();
     }
   }
@@ -98,7 +91,7 @@ class AlertRepository {
     try {
       await localDataSource.cacheAlerts(alerts);
     } catch (e) {
-      debugPrint("ALERT REPOSITORY ERROR: Prolem with saving offline: $e");
+      debugPrint("ALERT REPOSITORY ERROR: Problem with saving offline: $e");
     }
   }
 

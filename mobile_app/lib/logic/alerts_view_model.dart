@@ -89,7 +89,7 @@ class AlertsViewModel extends ChangeNotifier {
         }
       }
     } catch (e) {
-      debugPrint("VM ERROR: Nie udało się pobrać danych: $e");
+      debugPrint("ALERTS VIEW MODEL ERROR: Couldn't fetch the data: $e");
     } finally {
       _isLoading = false;
       notifyListeners();
