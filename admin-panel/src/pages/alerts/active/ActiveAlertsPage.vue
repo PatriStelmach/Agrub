@@ -12,7 +12,7 @@ import {
 } from "@/assets/cssFunctions.js";
 import TopH1Div from "@/helpers_components/TopH1Div.vue";
 import ActiveAlertsTable from "@/pages/alerts/active/ActiveAlertsTable.vue";
-import MyClientPagination from "@/helpers_components/MyClientPagination.vue";
+import ClientPagination from "@/helpers_components/ClientPagination.vue";
 import DetailsCard from '@/pages/alerts/DetailsCard.vue'
 
 const isLoading = ref(true)
@@ -53,7 +53,7 @@ const {pageSize, filteredData, updateData, currentPage, searchFilter, tableData 
       :tableData="tableData"
       v-model:hoveredAlert="hoveredAlert"
       >
-      <MyClientPagination
+      <ClientPagination
         :total="alertStore.currentAlerts.length"
         :data="filteredData"
         v-model:page-index="currentPage"

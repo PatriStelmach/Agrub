@@ -8,7 +8,7 @@ import type {
 } from "@/types/types.js";
 import {toast} from "vue-sonner";
 import NagiosCard from "@/pages/settings/systems/NagiosCard.vue";
-import {useWrapping} from "@/composables/unwrapping.js";
+import {useWrapping} from "@/composables/useWrapping";
 import WazuhCard from "@/pages/settings/systems/WazuhCard.vue";
 import ZabbixCard from "@/pages/settings/systems/ZabbixCard.vue";
 import {useRoute, useRouter} from "vue-router";

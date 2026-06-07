@@ -12,7 +12,7 @@ import {
 import {onMounted, ref} from "vue";
 import {IconFilterCog} from "@tabler/icons-vue";
 import AlertsHistoryTable from "@/pages/alerts/history/AlertsHistoryTable.vue";
-import MyServerPagination from "@/helpers_components/MyServerPagination.vue";
+import ServerPagination from "@/helpers_components/ServerPagination.vue";
 import ActionsOrAlertsFilters from "@/pages/alerts/history/ActionsOrAlertsFilters.vue";
 import {useServerSearchFilter} from "@/composables/useServerSearchFilter.ts";
 import api from "@/lib/axios.ts";
@@ -106,7 +106,7 @@ const hoveredAlert = ref<AlertDetails | null>(null)
         v-model:sorted-head="sortedHead"
         :alerts="items"
       >
-        <MyServerPagination
+        <ServerPagination
           :total="totalElements"
           v-model:page-index="currentPage"
           v-model:page-size="pageSize"

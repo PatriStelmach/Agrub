@@ -19,7 +19,7 @@ import type {User} from "@/types/types.ts";
 import {useUserStore} from "@/stores/userStore.ts";
 import {useAuthStore} from "@/stores/authStore.ts";
 import {bigNameLabel} from "@/assets/cssFunctions.ts";
-import {dateParser} from "@/composables/dateParser.ts";
+import {dateParser} from "@/helpers_functions/dateParser.js";
 
 const props = defineProps<{
   user: User,

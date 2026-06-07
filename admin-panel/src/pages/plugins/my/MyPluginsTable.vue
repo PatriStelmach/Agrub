@@ -28,7 +28,7 @@ import {
   IconLoader
 } from "@tabler/icons-vue"
 import {computed, ref, watch, watchEffect} from "vue";
-import {useSort} from "@/composables/sorting.ts";
+import {useSort} from "@/helpers_functions/sorting.js";
 import SortableHead from "@/helpers_components/SortableHead.vue";
 import {
   tableCaption,
@@ -37,14 +37,14 @@ import {
   tableDiv, smallNameLabel
 } from "@/assets/cssFunctions.ts";
 import TopH1Div from "@/helpers_components/TopH1Div.vue";
-import {useWrapping} from "@/composables/unwrapping.ts";
+import {useWrapping} from "@/composables/useWrapping.js";
 import {getPluginDetailsRequest, runScriptRequest} from "@/helpers_functions/requests.ts";
 import {Button} from "@/components/ui/button";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
 import {Search} from "lucide-vue-next";
 import {Label} from "@/components/ui/label";
 import {ButtonGroup} from "@/components/ui/button-group";
-import {dateParser} from "@/composables/dateParser.ts";
+import {dateParser} from "@/helpers_functions/dateParser.js";
 import {useMyPluginStore} from "@/stores/myPluginStore.ts";
 import {inputText} from "@/assets/cssFunctions.ts";
 import SeveritySelect from "@/helpers_components/SeveritySelect.vue";

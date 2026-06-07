@@ -24,7 +24,7 @@ import {
 
 import NavUser from "@/pages/globals/navbar/NavUser.vue";
 import {useRoute} from "vue-router";
-import {globals} from "@/composables/globals.ts";
+import {globals} from "@/helpers_functions/globals.js";
 import {onMounted} from "vue";
 import {useAuthStore} from "@/stores/authStore.ts";
 
@@ -52,7 +52,7 @@ const navItems = authStore.isAdmin ? [
     label: 'Team',
     links: [
       { label: 'Team members', to: 'team_members', icon: IconUsers },
-      { label: 'User groups', to: 'groups', icon: IconUsersGroup },
+      { label: 'Users groups', to: 'groups', icon: IconUsersGroup },
     ],
   },
   {

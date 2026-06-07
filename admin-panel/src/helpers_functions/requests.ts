@@ -8,7 +8,7 @@ import type {
   UserGroupStats
 } from "@/types/types.ts";
 import { CalendarDateTime, ZonedDateTime, CalendarDate} from '@internationalized/date'
-import {toApiDate} from "@/composables/dateParser.ts";
+import {toApiDate} from "@/helpers_functions/dateParser.ts";
 
 export const getPluginTagsResponse = async () => {
   try {

@@ -5,7 +5,7 @@ import {IconTrash, IconStatusChange, IconSquareKey, IconClipboardText, IconCalen
 import {Card, CardHeader} from "@/components/ui/card";
 import {Badge} from "@/components/ui/badge";
 import type {ApiKey} from "@/types/types.ts";
-import {dateParser} from "@/composables/dateParser.ts";
+import {dateParser} from "@/helpers_functions/dateParser.js";
 import {Button} from "@/components/ui/button";
 import {useClipboard} from "@vueuse/core";
 import {

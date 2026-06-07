@@ -161,11 +161,11 @@ export interface ActionsOrAlertHistoryFilters {
 }
 
 export interface LibraryPluginFilters {
-  name?: string,
-  language?: Language,
-  creator?: string,
-  tags?: string[],
-  maxWeight?: number,
+  name?: string
+  language?: Language
+  creator?: string
+  tags?: string[]
+  maxWeight?: number
 }
 
 export const undefinedLibraryFilters = {
@@ -175,27 +175,27 @@ export const undefinedLibraryFilters = {
 }
 
 export interface User {
-  id?: number,
-  firstname: string,
-  surname: string,
-  password?: string,
-  oldPassword?: string,
-  newPassword?: string,
-  confirmPassword?: string,
-  active?: boolean,
-  email: string,
+  id?: number
+  firstname: string
+  surname: string
+  password?: string
+  oldPassword?: string
+  newPassword?: string
+  confirmPassword?: string
+  active?: boolean
+  email: string
   role?: "ADMINISTRATOR" | "TECHNICIAN"
-  groups?: UserGroup[],
+  groups?: UserGroup[]
   autoLogoutMinutes?: number
-  lastPasswordChangeDate?: string,
+  lastPasswordChangeDate?: string
 }
 
 export interface EditCurrentUser {
-  id: number,
-  firstname: string,
-  surname: string,
-  email: string,
-  groups: UserGroup[],
+  id: number
+  firstname: string
+  surname: string
+  email: string
+  groups: UserGroup[]
   autoLogoutMinutes?: number
 }
 
@@ -211,67 +211,61 @@ export const blankUser = {
 }
 
 export interface UserGroup {
-  id: number,
-  name: string,
+  id: number
+  name: string
 }
 
 export interface UserGroupStats extends UserGroup {
-  userCount: number,
+  userCount: number
   ruleCount: number
 }
 
 export interface MyPlugin
 {
-  name: string,
+  name: string
   fullName: string
   creator: string,
   language: Language
-  description?: string,
-  code?: string,
-  weight: number,
+  description?: string
+  code?: string
+  weight: number
   tags: string[]
   cronExpression: string
-  updatedAt: Date,
-  active: boolean,
+  updatedAt: Date
+  active: boolean
   severity: 0 | 1 | 2 | 3 | 4 | 5,
 }
 
-export interface MyPluginsFromApi
-{
+export interface MyPluginsFromApi {
   active: boolean
-  creator: string,
-  severity: 0 | 1 | 2 | 3 | 4 | 5,
-  name: string,
-  fileName: string,
-  language: Language,
-  updatedAt: Date,
-  weight: number,
-  tags: string[],
+  creator: string
+  severity: 0 | 1 | 2 | 3 | 4 | 5
+  name: string
+  fileName: string
+  language: Language
+  updatedAt: Date
+  weight: number
+  tags: string[]
   cronExpression: string,
 }
 
-export interface PluginDetails
-{
+export interface PluginDetails {
   description: string,
   code: string,
 }
 
-
-export interface LibraryPlugin
-{
-  id: number,
-  fileName: string,
-  creator: string,
-  language: Language,
-  description?: string,
-  code?: string,
-  weight: number,
-  createdAt: Date,
-  tags: string[],
+export interface LibraryPlugin {
+  id: number
+  fileName: string
+  creator: string
+  language: Language
+  description?: string
+  code?: string
+  weight: number
+  createdAt: Date
+  tags: string[]
 }
 
-
-//to jest moje po mapowaniu
 export interface MonitoringSystemsConfig  {
   name: string
   user?: string
