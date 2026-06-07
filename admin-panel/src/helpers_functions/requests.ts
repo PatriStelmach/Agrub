@@ -51,8 +51,10 @@ export const getGroupsStatsRequest = async () => {
   }
 }
 
-
-export const getPluginDetailsRequest = async (key: string | number, type: 'local-scripts' | 'plugins') => {
+export const getPluginDetailsRequest = async (
+  key: string | number,
+  type: 'local-scripts' | 'plugins'
+) => {
   try {
     const response = await api.get(`/${type}/${key}/details`)
     if (response.status === 200)
