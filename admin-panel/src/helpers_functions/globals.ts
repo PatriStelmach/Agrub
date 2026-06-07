@@ -1,5 +1,5 @@
 import {onUnmounted, ref} from "vue";
-import {dateParser} from "@/composables/dateParser.ts";
+import {dateParser} from "@/helpers_functions/dateParser.ts";
 
 export function globals(timeout?: () => number, onTimeout?: () => void) {
   const date = ref<Date>(new Date())

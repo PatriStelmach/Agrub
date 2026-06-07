@@ -32,7 +32,7 @@ import MyDateRangePicker from "@/helpers_components/MyDateRangePicker.vue";
 import {
   type ActionsOrAlertHistoryFilters, SeverityRecordNoUnknown
 } from "@/types/types.ts";
-import {toApiDate} from "@/composables/dateParser.ts";
+import {toApiDate} from "@/helpers_functions/dateParser.js";
 import MyTagInput from "@/helpers_components/MyTagInput.vue";
 
 defineProps<{

@@ -7,7 +7,7 @@ import {SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
 import {useAuthStore} from "@/stores/authStore.ts";
 import LoginPage from "@/pages/login/LoginPage.vue";
 import {computed, onMounted, watch} from "vue";
-import {globals} from "@/composables/globals.ts";
+import {globals} from "@/helpers_functions/globals.js";
 import {IconMoonStars, IconSunFilled} from "@tabler/icons-vue";
 import {useColorMode} from "@vueuse/core";
 
@@ -45,15 +45,14 @@ const {startLogoutTimer } = globals(
   </div>
   <div v-else >
     <Toaster
-      :duration="60000"
+      :duration="3000"
       theme="system"
       richColors
-      position="bottom-right"
+      position="top-center"
       :expand="false"
-      :close-button="true"
       close-button-position="top-right"
-      :gap="10"
-      :visibleToasts="15"
+      :gap="5"
+      :visibleToasts="18"
     />
     <header class="absolute top-0 right-2 flex w-full h-10 items-center">
         <component stroke="1.5" :is="mode === 'light' ? IconSunFilled : IconMoonStars" @click="mode == 'light' ? mode = 'dark' : mode = 'light' "

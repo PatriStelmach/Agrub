@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import {TableCell} from "@/components/ui/table";
-import {dateParser} from "@/composables/dateParser.ts";
+import {dateParser} from "@/helpers_functions/dateParser.js";
 import {computed} from "vue";
 
 const props = defineProps<{

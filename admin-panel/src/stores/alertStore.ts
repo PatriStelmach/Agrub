@@ -57,13 +57,20 @@ export const useAlertStore = defineStore('alert-store', () => {
 
       const changesText = changes.length > 0 ? changes.join(' | ') : 'Updated action'
 
-      toast.success(`${alert.subject} updated by: ${action.author} --> ${changesText}` , {
+      toast.info(`${alert.subject} updated by: ${action.author} --> ${changesText}` , {
+        duration: 120000,
+        position: "bottom-right",
+        closeButton: true,
         action: {
           label: "Open",
           onClick: async () => {
             await router.push(`/active_alerts/${alert.id}`)
           }
-        }
+        },
+        class: '[&_div]:text-severity-1! bg-background! border-severity-1/50! border-2! ' +
+          '[&_button]:text-severity-1! [&_button]:bg-background! [&_button]:border! ' +
+          '[&_button]:hover:border-severity-1! ' +
+          '[&_button]:hover:bg-severity-1/50! [&_button]:hover:text-primary! ',
       })
     }
   }

@@ -2,7 +2,7 @@
 import {hoverListRow} from "@/assets/cssFunctions.ts";
 import ShowRuleDiv from "@/pages/team/groups/ShowRuleDiv.vue";
 import type {Rule} from "@/types/types.ts";
-import {useWrapping} from "@/composables/unwrapping.ts";
+import {useWrapping} from "@/composables/useWrapping.js";
 import {updateRuleRequest} from "@/helpers_functions/requests.ts";
 import EditRuleDiv from "@/pages/team/groups/EditRuleDiv.vue";
 

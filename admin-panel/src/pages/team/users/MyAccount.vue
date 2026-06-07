@@ -11,7 +11,7 @@ import {
 } from '@tabler/icons-vue'
 import {toast} from "vue-sonner";
 import {bigNameLabel} from "@/assets/cssFunctions.ts";
-import {dateParser} from "@/composables/dateParser.ts";
+import {dateParser} from "@/helpers_functions/dateParser.js";
 import ChangePasswordDialog from "@/pages/team/users/ChangePasswordDialog.vue";
 import {useAuthStore} from "@/stores/authStore.ts";
 import {ButtonGroup} from "@/components/ui/button-group";
@@ -22,7 +22,7 @@ import {
 } from "@/types/types.ts";
 import UserActionsTable from "@/pages/team/users/UserActionsTable.vue";
 import EditMyAccountform from "@/pages/team/users/EditMyAccountform.vue";
-import MyServerPagination from "@/helpers_components/MyServerPagination.vue";
+import ServerPagination from "@/helpers_components/ServerPagination.vue";
 import {useServerSearchFilter} from "@/composables/useServerSearchFilter.ts";
 import api from "@/lib/axios.ts";
 import ActionsOrAlertsFilters from "@/pages/alerts/history/ActionsOrAlertsFilters.vue";
@@ -208,7 +208,7 @@ const {
             <div>
               <IconUsersGroup class="size-5" />
               <div class="flex items-base gap-2 flex-wrap">
-                <h1 :class="bigNameLabel">User groups:</h1>
+                <h1 :class="bigNameLabel">Users groups:</h1>
                 <div v-if="authStore.isAdmin">
                   <RouterLink v-for="g in user.groups" :key="g.id" :to="`/groups/edit_group/${g.id}/${g.name}`">
                     <Badge class="mt-0!" variant="tags">
@@ -252,7 +252,7 @@ const {
               max-w="65vw"
               max-h="80vh"
             >
-              <MyServerPagination
+              <ServerPagination
                 :total="totalElements"
                 v-model:pageSize="pageSize"
                 v-model:pageIndex="currentPage"

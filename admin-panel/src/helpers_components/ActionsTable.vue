@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from '@/components/ui/table'
 import type {ActionResponse} from "@/types/types.js";
-import {dateParser} from "@/composables/dateParser.js";
+import {dateParser} from "@/helpers_functions/dateParser";
 import {dataTable, hoverListRow, tableHeaders} from "@/assets/cssFunctions.js";
 import SeverityDiv from "@/helpers_components/SeverityDiv.vue";
 import {IconCircleCheck, IconCircleX} from "@tabler/icons-vue";
 import SortableHead from "@/helpers_components/SortableHead.vue";
-import {useSort} from "@/composables/sorting.js";
+import {useSort} from "@/helpers_functions/sorting";
 import {type HTMLAttributes, onMounted, ref} from "vue";
 import {useAuthStore} from "@/stores/authStore.ts";
 import {useUserStore} from "@/stores/userStore.ts";
