@@ -14,11 +14,11 @@ import {
 import SortableHead from "@/helpers_components/SortableHead.vue";
 import {tableCaption, dataTable, tableHeaders, hoverListRow} from "@/assets/cssFunctions.js";
 import {Button} from "@/components/ui/button";
-import { IconDownload, IconCode} from "@tabler/icons-vue";
+import { IconDownload, IconSpinner, IconCode} from "@tabler/icons-vue";
 import {ref, watchEffect} from "vue";
 import {dateParser} from "@/helpers_functions/dateParser";
 import LoadingTable from "@/helpers_components/LoadingTable.vue";
-import {downloadPluginRequest, getPluginDetailsRequest} from "@/helpers_functions/requests.ts";
+import {downloadPluginRequest, getPluginDetailsRequest} from "@/helpers_functions/requests/pluginsRequests.ts";
 import {toast} from "vue-sonner";
 import PluginDetailsDialog from "@/pages/plugins/PluginDetailsDialog.vue";
 import {useAuthStore} from "@/stores/authStore.ts";
@@ -31,6 +31,7 @@ const props = defineProps<{
 
 const authStore = useAuthStore();
 const getDetailsLoading = ref<boolean>(false);
+const isDownloading = ref(false);
 
 const sortedHead =  defineModel<{ sortKey: string; sortOrder: string }>('sortedHead')
 const { sortKey, sortOrder, toggleSort } =
@@ -51,6 +52,14 @@ const getDetails = async (plugin: LibraryPlugin) => {
       .catch((err) => toast.error(`Error fetching plugin details: ${err}`))
       .finally(() => getDetailsLoading.value = false)
   }
+}
+
+const downloadPlugin = (plugin: LibraryPlugin) => {
+  isDownloading.value = true
+  downloadPluginRequest(plugin.id)
+    .catch(error => toast.error(`Error downloading plugin: ${error}`))
+    .then(() => toast.success(`Successfully downloaded "${plugin.fileName}"`))
+    .finally(() => isDownloading.value = false)
 }
 
 </script>
@@ -109,11 +118,12 @@ const getDetails = async (plugin: LibraryPlugin) => {
 
                 <Button
                   v-if="authStore.isAdmin"
-                  @click="downloadPluginRequest(plugin)"
+                  @click="downloadPlugin(plugin)"
                   variant="green_outline"
                   class="border-l-2!"
                 >
-                  <IconDownload/>
+                  <IconSpinner v-if="isDownloading" class="animate-spin"/>
+                  <IconDownload v-else/>
                 </Button>
             </TableCell>
           </TableRow>

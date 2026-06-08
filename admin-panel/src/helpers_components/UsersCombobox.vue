@@ -6,7 +6,7 @@ import { useUserStore } from "@/stores/userStore.ts";
 import type { User } from "@/types/types.ts";
 import {IconTool, IconKey, IconUserPlus, IconLoader} from "@tabler/icons-vue";
 import {Button} from "@/components/ui/button";
-import {assignUserToGroupRequest} from "@/helpers_functions/requests.ts";
+import {assignUserToGroupRequest} from "@/helpers_functions/requests/groupsRequests.ts";
 import {computed, ref} from "vue";
 import {toast} from "vue-sonner";
 
@@ -31,7 +31,8 @@ const assignUser = async (user: User) => {
   if(user.id) {
     loadingButtons.value.push(user.id)
     await assignUserToGroupRequest(user.id, props.groupId)
-      .then(() => {
+      .then((res: string) => {
+        toast.success(`Successfully assigned user: ${res} to group!`)
         emit('update:add-user', user)
       })
       .catch((err) => {

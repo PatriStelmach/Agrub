@@ -38,19 +38,28 @@ import {
 } from "@/assets/cssFunctions.ts";
 import TopH1Div from "@/helpers_components/TopH1Div.vue";
 import {useWrapping} from "@/composables/useWrapping.js";
-import {getPluginDetailsRequest, runScriptRequest} from "@/helpers_functions/requests.ts";
+import {getPluginDetailsRequest, runPluginRequest} from "@/helpers_functions/requests/pluginsRequests.ts";
 import {Button} from "@/components/ui/button";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
 import {Search} from "lucide-vue-next";
 import {Label} from "@/components/ui/label";
 import {ButtonGroup} from "@/components/ui/button-group";
 import {dateParser} from "@/helpers_functions/dateParser.js";
-import {useMyPluginStore} from "@/stores/myPluginStore.ts";
 import {inputText} from "@/assets/cssFunctions.ts";
 import SeveritySelect from "@/helpers_components/SeveritySelect.vue";
 import SeverityDiv from "@/helpers_components/SeverityDiv.vue";
 import LoadingTable from "@/helpers_components/LoadingTable.vue";
 import MyTagInput from '@/helpers_components/MyTagInput.vue'
+import PluginDetailsDialog from '@/pages/plugins/PluginDetailsDialog.vue'
+import {toast} from "vue-sonner";
+import {useRoute, useRouter} from "vue-router";
+import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
+import {Input} from "@/components/ui/input";
+import {useAuthStore} from "@/stores/authStore.ts";
+import {
+  changeMyPluginStatusRequest,
+  deleteMyPluginsRequest, editMyPluginRequest
+} from "@/helpers_functions/requests/pluginsRequests.ts";
 
 const props = defineProps<{
   data: MyPlugin[];
@@ -60,15 +69,9 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:search-data': [data:string]
 }>()
+const allMyPlugins = defineModel<MyPlugin[]>('allMyPlugins');
 
 
-import PluginDetailsDialog from '@/pages/plugins/PluginDetailsDialog.vue'
-import {toast} from "vue-sonner";
-import {useRoute, useRouter} from "vue-router";
-import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
-import {Input} from "@/components/ui/input";
-import {useAuthStore} from "@/stores/authStore.ts";
-const myPluginStore = useMyPluginStore()
 const authStore = useAuthStore()
 const { sortedData, sortKey, sortOrder, toggleSort } = useSort<MyPlugin>(() => props.data, 'updatedAt')
 const { isUnwrapped, unwrap, unwrappedItem, save } = useWrapping(sortedData, 'fullName')
@@ -138,19 +141,25 @@ const checkAll = () => {
 
 const changeStatus = () => {
   if(!unwrappedItem.value && authStore.isAdmin) {
-    myPluginStore.changeStatus(checkedPlugins.value)
+    changeMyPluginStatusRequest(checkedPlugins.value)
       .catch(e => toast.error(`Error changing status: ${e}`))
-      .then(()=> toast.success(`Successfully changed status`))
-      .finally(()=> checkedPlugins.value = [])
+      .then(res => {
+        toast.success(`Successfully changed status`)
+        allMyPlugins.value = res
+      })
+      .finally(() => checkedPlugins.value = [])
   }
 }
 
 const deletePlugins = () => {
   if(!unwrappedItem.value && authStore.isAdmin) {
-    myPluginStore.deleteMyPlugins(checkedPlugins.value)
+    deleteMyPluginsRequest(checkedPlugins.value)
       .catch(e => toast.error(`Error deleting plugins: ${e}`))
-      .then(()=> toast.success(`Successfully deleted plugins`))
-      .finally(()=> checkedPlugins.value = [])
+      .then(res => {
+        toast.success(`Successfully deleted plugins`)
+        allMyPlugins.value = res
+      })
+      .finally(() => checkedPlugins.value = [])
   }
 }
 
@@ -180,7 +189,7 @@ const updateDetails = (code: string, description: string) => {
 const triggerScript = async (args: string) => {
   if (checkedPlugins.value.length === 1) {
     loadingTrigger.value = true
-    await runScriptRequest(checkedPlugins.value.find(v => v), args)
+    await runPluginRequest(checkedPlugins.value.find(v => v), args)
       .then((res) => {
         toast.success(`Script triggered: ${res}`)
       })
@@ -193,17 +202,18 @@ const triggerScript = async (args: string) => {
 }
 
 const savePlugin = async () => {
-  isEditLoading.value = true
-  try {
-    if (unwrappedItem.value && authStore.isAdmin) {
-      await save(() => myPluginStore.editMyPlugin(unwrappedItem.value!))
-    }
-  } catch (e) {
-    toast.error(`Editing "${unwrappedItem.value?.name}" failed with error ${e}`);
-  }
-  finally {
-    isEditLoading.value = false
-    onCloseAndSave()
+  if (unwrappedItem.value && authStore.isAdmin) {
+    isEditLoading.value = true
+    await save(() => editMyPluginRequest(unwrappedItem.value!)
+      .catch(e => toast.error(`Editing "${unwrappedItem.value?.name}" failed with error ${e}`))
+      .then(res => {
+        toast.success(`Successfully updated plugin`)
+        allMyPlugins.value = res
+      })
+      .finally(() => {
+        isEditLoading.value = false
+        onCloseAndSave()
+      }))
   }
 }
 

@@ -25,8 +25,8 @@ import {hoverListRow} from "@/assets/cssFunctions.ts";
 import LoadingTable from "@/helpers_components/LoadingTable.vue";
 import {useRoute} from "vue-router";
 import LinkAlertHistoryDialog from "@/pages/alerts/history/LinkAlertHistoryDialog.vue";
-import {getHistoryAlertByIdRequest} from "@/helpers_functions/requests.ts";
 import { toast } from "vue-sonner";
+import api from "@/lib/axios.ts";
 
 const props = defineProps<{
   alerts: HistoryAlert[]
@@ -63,13 +63,18 @@ watch(
   async ([isLoading, route]) => {
     if (isLoading || !route) return;
     isDialogLoading.value = true;
-      await getHistoryAlertByIdRequest(route)
-        .catch(e => toast.error(`Error downloading alert ${route} from history: ${e}`))
-        .then((res) => linkHistoryAlert.value = res)
-        .finally(() => {
-          isDialogLoading.value = false;
-          isLinkDialogOpen.value = true
-        })
+    try {
+      const res = await api.get(`/alerts/${route}`)
+      if (res.status === 200) {
+        linkHistoryAlert.value = res.data
+        isLinkDialogOpen.value = true
+      }
+    } catch (error) {
+      toast.error(`Error downloading alert ${route} from history: ${error}`)
+    }
+    finally {
+      isDialogLoading.value = false
+    }
   },{ immediate: true , deep: true });
 
 

@@ -1,41 +1,46 @@
 <script setup lang="ts" >
 import MyPluginsTable from "@/pages/plugins/my/MyPluginsTable.vue";
 import type { MyPlugin } from "@/types/types.js";
-import {useClientSearchFilter} from "@/composables/useClientSearchFilter.js";
-import {useMyPluginStore} from "@/stores/myPluginStore.js";
+import {useClientSearchFilter} from "@/composables/useClientSearchFilter.ts";
 import ClientPagination from "@/helpers_components/ClientPagination.vue";
 import {onMounted, ref} from "vue";
-import {getPluginTagsResponse} from "@/helpers_functions/requests.js";
+import {
+  getAllMyPluginsRequest,
+  getPluginTagsRequest
+} from "@/helpers_functions/requests/pluginsRequests.ts";
+import { toast } from "vue-sonner";
 
-const myPluginStore = useMyPluginStore()
+const allMyPlugins = ref<MyPlugin[]>([]);
 const isLoading = ref<boolean>(true)
 const tags = ref<string[]>([])
 
 onMounted(async () => {
     await Promise.all([
-      myPluginStore.getAllMyPluginsRequest(),
-      tags.value = await getPluginTagsResponse() || []
+      getAllMyPluginsRequest()
+        .catch(error => toast.error(`Error fetching plugins: ${error}`))
+        .then(res => allMyPlugins.value = res),
+      getPluginTagsRequest()
+        .catch(error => toast.error(`Error fetching plugins tags: ${error}`))
+        .then(res => tags.value = res)
     ]).finally(() => isLoading.value = false)
-
 })
 
 const {filteredData, tableData, updateData, updateSearchData, currentPage, pageSize } =
-  useClientSearchFilter<MyPlugin>(() => myPluginStore.allMyPlugins,(plugin) => plugin.name)
-
-
+  useClientSearchFilter<MyPlugin>(() => allMyPlugins.value,(plugin) => plugin.name)
 
 </script>
 
 <template>
   <div>
     <MyPluginsTable
+      :allMyPlugins="allMyPlugins"
       :isLoading="isLoading"
       :data="tableData"
       :availableTags="tags"
       @update:searchData="updateSearchData"
     >
       <ClientPagination
-        :total="myPluginStore.allMyPlugins.length"
+        :total="allMyPlugins.length"
         :data="filteredData"
         v-model:page-index="currentPage"
         v-model:page-size="pageSize"
