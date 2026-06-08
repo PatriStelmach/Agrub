@@ -20,15 +20,27 @@ import {
   SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu,
   SidebarMenuButton, SidebarMenuItem
 } from "@/components/ui/sidebar";
-
-
 import NavUser from "@/pages/globals/navbar/NavUser.vue";
 import {useRoute} from "vue-router";
-import {globals} from "@/helpers_functions/globals.js";
-import {onMounted} from "vue";
+import {onMounted, ref} from "vue";
 import {useAuthStore} from "@/stores/authStore.ts";
+import {dateParser} from "@/helpers_functions/dateParser.ts";
 
-const { time, dayMonthYear, weekday, changeTime } = globals()
+const date = ref<Date>(new Date())
+const time = ref<string>(dateParser(date.value).fullTime);
+const dayMonthYear  = ref<string>(dateParser(date.value).dayMonthYear)
+const weekday = ref<string | undefined>(dateParser(date.value).weekday())
+
+const changeTime = () => {
+  setInterval(() => {
+    const newDate = new Date()
+    time.value = dateParser(newDate).fullTime
+    if(time.value === '00:00:00') {
+      dayMonthYear.value = dateParser(newDate).dayMonthYear
+      weekday.value = dateParser(newDate).weekday()
+    }
+  }, 1000)
+}
 const route = useRoute()
 const authStore = useAuthStore()
 onMounted(() => changeTime())

@@ -30,7 +30,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
   })
 
-  const authChannel = new BroadcastChannel("auth")
+  const authChannel = new BroadcastChannel("alert-auth")
 
   authChannel.onmessage = (event) => {
     if (event.data.type === 'alert-global-logout') {
@@ -51,7 +51,6 @@ export const useAuthStore = defineStore('auth', () => {
       if (response.status === 200 && response.data.access_token) {
         setToken(response.data.access_token)
         authChannel.postMessage({type: 'alert-global-login', token: response.data.access_token})
-
         return true
       }
 

@@ -34,8 +34,7 @@ export function useClientSearchFilter<T>(data: () => T[], filter: (item: T) => s
   watch(pageSize, () => {
     currentPage.value = 1
   })
-
-
+  
   return {
     searchFilter,
     currentPage,
