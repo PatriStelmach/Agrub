@@ -49,7 +49,7 @@ const getDetails = async (plugin: LibraryPlugin) => {
         plugin.code = res?.code
         plugin.description = res?.description
       })
-      .catch((err) => toast.error(`Error fetching plugin details: ${err}`))
+      .catch((err) => toast.error(`Error fetching plugin details: ${err.message}`))
       .finally(() => getDetailsLoading.value = false)
   }
 }
@@ -58,7 +58,7 @@ const downloadPlugin = (plugin: LibraryPlugin) => {
   isDownloading.value = true
   downloadPluginRequest(plugin.id)
     .then(() => toast.success(`Successfully downloaded "${plugin.fileName}"`))
-    .catch(error => toast.error(`Error downloading plugin: ${error}`))
+    .catch(error => toast.error(`Error downloading plugin: ${error.message}`))
     .finally(() => isDownloading.value = false)
 }
 

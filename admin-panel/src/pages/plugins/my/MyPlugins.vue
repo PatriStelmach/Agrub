@@ -18,10 +18,10 @@ onMounted(async () => {
     await Promise.all([
       getAllMyPluginsRequest()
         .then(res => allMyPlugins.value = res)
-        .catch(error => toast.error(`Error fetching plugins: ${error}`)),
+        .catch(error => toast.error(`Error fetching plugins: ${error.message}`)),
       getPluginTagsRequest()
         .then(res => tags.value = res)
-        .catch(error => toast.error(`Error fetching plugins tags: ${error}`))
+        .catch(error => toast.error(`Error fetching plugins tags: ${error.message}`))
     ]).finally(() => isLoading.value = false)
 })
 

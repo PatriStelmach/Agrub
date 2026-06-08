@@ -37,12 +37,10 @@ onMounted(async () => {
       getUserActionsRequest(),
       userStore.getAllGroupsRequest()
     ])
-      .catch(e => toast.error(`${e}`))
       .finally(() => isLoading.value = false)
   }
   else {
     await getUserActionsRequest()
-      .catch(e => toast.error(`${e}`))
       .finally(() => isLoading.value = false)
   }
 

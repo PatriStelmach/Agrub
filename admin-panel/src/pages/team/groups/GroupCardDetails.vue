@@ -66,7 +66,7 @@ const groupRules = computed({
 onMounted(async () => {
   await getGroupDataRequest(groupId)
     .then(res => groupDetails.value = res as GroupDetails)
-    .catch(e => toast.error(`Error retrieving groups: ${e}`))
+    .catch(e => toast.error(`Error retrieving groups: ${e.message}`))
     .finally(() => isLoading.value = false)
   newName.value = groupDetails.value.name
 })

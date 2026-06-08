@@ -24,7 +24,7 @@ const onEditSave = async (data: Rule) => {
         toast.success('Rule updated successfully!')
         rules.value = rules.value.map(r => r.id === res.id ? res : r)
       })
-      .catch(err => toast.error(`Error updating rule: ${err}`))
+      .catch(err => toast.error(`Error updating rule: ${err.message}`))
   }
   else {
     toast.info('No changes have been made')
