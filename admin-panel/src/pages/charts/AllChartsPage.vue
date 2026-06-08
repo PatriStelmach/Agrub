@@ -9,7 +9,6 @@ import ChartAckOrCloseTime from "@/pages/charts/ChartAckOrCloseTime.vue";
 import { getLocalTimeZone, today, ZonedDateTime, CalendarDateTime, CalendarDate,  } from '@internationalized/date'
 import type {CumulativeData, Granularity} from "@/types/types.ts";
 import ChartAckAndCloseTime from "@/pages/charts/ChartAckAndCloseTime.vue";
-import {getAnalyticsAlertsCountRequest} from "@/helpers_functions/requests.ts";
 import {toast} from "vue-sonner";
 import {Button} from "@/components/ui/button";
 import {ButtonGroup} from "@/components/ui/button-group";
@@ -21,6 +20,8 @@ import {bigNameLabel} from "@/assets/cssFunctions.ts";
 import ChartAllAlerts from "@/pages/charts/ChartAllAlerts.vue";
 import MyTagInput from "@/helpers_components/MyTagInput.vue";
 import {alertOriginType} from "@/data/alertOriginType.ts";
+import {toApiDate} from "@/helpers_functions/dateParser.ts";
+import api from "@/lib/axios.ts";
 
 const locale = navigator.language
 const tz = getLocalTimeZone()
@@ -75,16 +76,71 @@ const onDateRangeChange = async () => {
     currentGranularity.value,
     origin.value
   )
-    .catch((e) => toast.error(`Error retrieving Analytics data: ${e}`))
     .then((res) => {
       rawAnalyticsData.value = res as CumulativeData
       granularityAfterReload.value = currentGranularity.value
       dateRangeAfterReload.value = dateRange.value
     })
+    .catch((e) => toast.error(`Error retrieving Analytics data: ${e}`))
     .finally(() => {
       areChartsLoading.value = false
       isPopoverOpen.value = false
     })
+}
+
+const getAnalyticsAlertsCountRequest = async (
+  start: CalendarDate | CalendarDateTime | ZonedDateTime,
+  end: CalendarDate | CalendarDateTime | ZonedDateTime,
+  granularity: Granularity,
+  origin: string[]
+) => {
+  const params = {
+    start: toApiDate(start),
+    end: toApiDate(end),
+    granularity: granularity,
+    origin: origin,
+  };
+  try {
+    const [severity, alerts, ack, close] = await Promise.all([
+      api.get('/analytics/alerts-severity', {
+          params: params,
+          paramsSerializer: {
+            indexes: null
+          }
+        },
+      ),
+      api.get('/analytics/alerts-count', {
+        params: params,
+        paramsSerializer: {
+          indexes: null
+        }
+      }),
+
+      api.get('/analytics/avg-ack-time', {
+        params: params,
+        paramsSerializer: {
+          indexes: null
+        }
+      }),
+
+      api.get('/analytics/avg-close-time', {
+        params: params,
+        paramsSerializer: {
+          indexes: null
+        }
+      }),
+    ]);
+    if (alerts.status === 200 && ack.status === 200 && close.status === 200) {
+      return {
+        alerts: alerts.data,
+        ack: ack.data,
+        close: close.data,
+        severity: severity.data
+      } as CumulativeData
+    }
+  } catch (error) {
+    throw (error)
+  }
 }
 
 </script>

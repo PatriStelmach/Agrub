@@ -69,6 +69,18 @@ export const useUserStore = defineStore('user-store',() => {
     }
   }
 
+  const changeUserPasswordRequest = async (oldPassword: string, newPassword: string) => {
+    try {
+      const res = await api.patch('users/me/password', { oldPassword: oldPassword, newPassword: newPassword })
+      if (res.status === 200) {
+        toast.success('Password changed successfully!')
+        return true
+      }
+    } catch (error) {
+      throw (error)
+    }
+  }
+
   const avFallback = (user: User) =>  {
     return `${user.firstname.slice(0, 1).toUpperCase()}${user.surname.slice(0,1).toUpperCase()}`
   }
@@ -86,5 +98,6 @@ export const useUserStore = defineStore('user-store',() => {
     editUserRequest,
     getAllGroupsRequest,
     createUserRequest,
+    changeUserPasswordRequest,
   }
 })

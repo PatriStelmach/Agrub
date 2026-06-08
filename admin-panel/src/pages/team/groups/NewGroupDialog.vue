@@ -12,7 +12,7 @@ import {Button} from "@/components/ui/button";
 import {useForm} from "vee-validate";
 import {groupSchema} from "@/helpers_functions/formSchemas.ts";
 import {ref} from "vue";
-import {createGroupRequest} from "@/helpers_functions/requests.ts";
+import {createGroupRequest} from "@/helpers_functions/requests/groupsRequests.ts";
 import {toast} from "vue-sonner";
 import {useRouter} from "vue-router";
 

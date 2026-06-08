@@ -10,14 +10,18 @@ import {computed, onMounted, ref} from "vue";
 import GridCardLoader from "@/helpers_components/loaders/GridCardLoader.vue";
 import GroupCard from "@/pages/team/groups/GroupCard.vue";
 import GridCardTransitionGroup from "@/helpers_components/loaders/GridCardTransitionGroup.vue"
-import {getGroupsStatsRequest} from "@/helpers_functions/requests.ts";
+import {getGroupsStatsRequest} from "@/helpers_functions/requests/groupsRequests.ts";
 import {gridSkeletons} from "@/assets/cssFunctions.ts";
 import NewGroupDialog from "@/pages/team/groups/NewGroupDialog.vue";
+import {toast} from "vue-sonner";
 
 const isLoading = ref(true);
 const groupsStats = ref<UserGroupStats[]>([]);
 onMounted(async () => {
-  groupsStats.value = await getGroupsStatsRequest().finally(() => isLoading.value = false) ?? []
+  await getGroupsStatsRequest()
+    .then((res:UserGroupStats[]) => groupsStats.value = res)
+    .catch(e => toast.error(`Error retrieving stats: ${e}`))
+    .finally(() => isLoading.value = false)
 })
 const searchFilter = ref("")
 

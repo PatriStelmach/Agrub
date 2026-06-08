@@ -13,16 +13,16 @@ import {Textarea} from "@/components/ui/textarea";
 import {ref, watch} from "vue";
 import {IconX, IconCheck, IconSend2} from "@tabler/icons-vue";
 import DialogLabel from "@/helpers_components/DialogLabel.vue";
-import type { ActiveAlert} from "@/types/types.js";
+import type {ActiveAlert} from "@/types/types.js";
 import {Badge} from "@/components/ui/badge";
 import ActionsTable from "@/helpers_components/ActionsTable.vue";
 import {useAuthStore} from "@/stores/authStore.ts";
 import SeveritySelect from "@/helpers_components/SeveritySelect.vue";
-import {updateAlertRequest} from "@/helpers_functions/requests.ts";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {toast} from "vue-sonner";
 import {bigNameLabel} from "@/assets/cssFunctions.ts";
 import {useRouter} from "vue-router";
+import api from "@/lib/axios.ts";
 
 const router = useRouter();
 
@@ -36,16 +36,28 @@ const newMessage = ref("")
 const isDialogOpen = defineModel<boolean>('isDialogOpen')
 
 const sentAction = async () => {
-  if(alert.value && (newAck.value !== alert.value.isAcknowledged || newSeverity.value !== alert.value.severity || newMessage.value)) {
-    await updateAlertRequest({
-      id: alert.value.id,
-      author: authStore.currentUser!.email!,
-      ack: newAck.value === alert.value.isAcknowledged ? null : newAck.value,
-      message: newMessage.value ?? undefined,
-      newSeverity: newSeverity.value === alert.value.severity ? undefined : newSeverity.value,
-    })
-      .catch((err) => toast.error(`Error updating alert: ${err}`))
-      .finally(() => onClose())
+  if(alert.value && (
+      newAck.value !== alert.value.isAcknowledged ||
+      newSeverity.value !== alert.value.severity ||
+      newMessage.value
+  )) {
+    try {
+      const response = await api.post(`/alerts/${alert.value.id}/ack`, {
+        author: authStore.currentUser!.email!,
+        ack: newAck.value === alert.value.isAcknowledged ? null : newAck.value,
+        message: newMessage.value ?? undefined,
+        newSeverity: newSeverity.value === alert.value.severity ? undefined : newSeverity.value,
+      })
+      if(response.status === 200) {
+        return
+      }
+    }
+    catch (error) {
+      toast.error(`Error updating alert: ${error}`)
+    }
+    finally {
+      onClose()
+    }
   }
 }
 
@@ -136,6 +148,7 @@ watch(isDialogOpen, (newValue, oldValue) => {
                   <div class="flex items-end">
                     <DialogLabel for="severity" class="pb-0 " text="Severity:"/>
                     <SeveritySelect
+                      hideUnknown
                       v-model:severity="newSeverity"
                     />
                   </div>

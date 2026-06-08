@@ -10,14 +10,14 @@ import {
   type LibraryPlugin,
   type LibraryPluginFilters, undefinedLibraryFilters
 } from "@/types/types.js"
-import {tableDiv} from "@/assets/cssFunctions.js";
+import {tableDiv} from "@/assets/cssFunctions.ts";
 import TopH1Div from "@/helpers_components/TopH1Div.vue";
 import ServerPagination from "@/helpers_components/ServerPagination.vue";
-import {useServerSearchFilter} from "@/composables/useServerSearchFilter.js";
+import {useServerSearchFilter} from "@/composables/useServerSearchFilter.ts";
 import api from "@/lib/axios.js";
 import PluginFilters from "@/pages/plugins/PluginFilters.vue";
 import {onMounted, ref} from "vue";
-import {getPluginTagsResponse} from "@/helpers_functions/requests.js";
+import {getPluginTagsRequest} from "@/helpers_functions/requests/pluginsRequests.ts";
 
 const tags = ref<string[]>([])
 const getLibraryPluginsRequest = async () => {
@@ -50,7 +50,7 @@ const getLibraryPluginsRequest = async () => {
 onMounted(async () => {
   await Promise.all([
     getLibraryPluginsRequest(),
-    tags.value = await getPluginTagsResponse() || []
+    tags.value = await getPluginTagsRequest() || []
   ]).finally(() => isLoading.value = false)
 })
 

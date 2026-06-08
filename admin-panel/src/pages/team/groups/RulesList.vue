@@ -3,8 +3,9 @@ import {hoverListRow} from "@/assets/cssFunctions.ts";
 import ShowRuleDiv from "@/pages/team/groups/ShowRuleDiv.vue";
 import type {Rule} from "@/types/types.ts";
 import {useWrapping} from "@/composables/useWrapping.js";
-import {updateRuleRequest} from "@/helpers_functions/requests.ts";
+import {updateRuleRequest} from "@/helpers_functions/requests/groupsRequests.ts";
 import EditRuleDiv from "@/pages/team/groups/EditRuleDiv.vue";
+import {toast} from "vue-sonner";
 
 const loadingGroupsDelete = defineModel<number[]>('loadingGroupsDelete', {required: true})
 const rules = defineModel<Rule[]>('rules', {required: true})
@@ -13,11 +14,22 @@ const emit = defineEmits<{
   'delete-rule': [number]
 }>()
 
-const {unwrap, isUnwrapped, wrap, save, unwrappedItem} = useWrapping<Rule>(rules)
+const {hasChanged, unwrap, isUnwrapped, wrap, unwrappedItem} = useWrapping<Rule>(rules)
 
-const onEditSave = (data: Rule) => {
-  Object.assign(unwrappedItem.value!, data)
-  save(async () => await updateRuleRequest(unwrappedItem.value!))
+const onEditSave = async (data: Rule) => {
+  unwrappedItem.value = data
+  if (unwrappedItem.value && hasChanged()) {
+    await updateRuleRequest(data)
+      .then((res: Rule) => {
+        toast.success('Rule updated successfully!')
+        rules.value = rules.value.map(r => r.id === res.id ? res : r)
+      })
+      .catch(err => toast.error(`Error updating rule: ${err}`))
+  }
+  else {
+    toast.info('No changes have been made')
+  }
+  wrap()
 }
 
 </script>
@@ -37,7 +49,6 @@ const onEditSave = (data: Rule) => {
             :class="hoverListRow('cursor-pointer')"
         >
           <EditRuleDiv
-            class=""
             v-if="isUnwrapped(rule.id!)"
             :rule="unwrappedItem!"
             @save="onEditSave"
