@@ -8,14 +8,14 @@ import {
   DialogTrigger
 } from "@/components/ui/dialog";
 import {useForm} from "vee-validate";
-import {changePasswordSchema} from "@/helpers_functions/formSchemas.js";
+import {changePasswordSchema} from "@/helpers_functions/formSchemas.ts";
 import {ref, watch} from "vue";
-import {changeUserPasswordRequest} from "@/helpers_functions/requests.js";
 import FormInput from "@/helpers_components/form/FormInput.vue";
 import {Button} from "@/components/ui/button";
 import {IconSend2, IconLoader, IconX, IconAlertCircle} from "@tabler/icons-vue";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
 import {useAuthStore} from "@/stores/authStore.ts";
+import {useUserStore} from "@/stores/userStore.ts";
 
 const isSending = ref(false);
 const isPasswordWrong = ref(false);
@@ -26,10 +26,11 @@ const { handleSubmit, values } = useForm({
 
 const isOpen = ref(false)
 const authStore = useAuthStore();
+const userStore = useUserStore();
 
 const onSubmit = handleSubmit(async () => {
   isSending.value = true
-  await changeUserPasswordRequest(values.oldPassword!, values.newPassword!)
+  await userStore.changeUserPasswordRequest(values.oldPassword!, values.newPassword!)
     .then(() => isOpen.value = false)
     .catch(() => {
       isPasswordWrong.value = true

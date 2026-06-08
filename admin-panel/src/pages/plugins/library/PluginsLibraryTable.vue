@@ -14,7 +14,7 @@ import {
 import SortableHead from "@/helpers_components/SortableHead.vue";
 import {tableCaption, dataTable, tableHeaders, hoverListRow} from "@/assets/cssFunctions.js";
 import {Button} from "@/components/ui/button";
-import { IconDownload, IconSpinner, IconCode} from "@tabler/icons-vue";
+import { IconDownload, IconLoader, IconCode} from "@tabler/icons-vue";
 import {ref, watchEffect} from "vue";
 import {dateParser} from "@/helpers_functions/dateParser";
 import LoadingTable from "@/helpers_components/LoadingTable.vue";
@@ -57,8 +57,8 @@ const getDetails = async (plugin: LibraryPlugin) => {
 const downloadPlugin = (plugin: LibraryPlugin) => {
   isDownloading.value = true
   downloadPluginRequest(plugin.id)
-    .catch(error => toast.error(`Error downloading plugin: ${error}`))
     .then(() => toast.success(`Successfully downloaded "${plugin.fileName}"`))
+    .catch(error => toast.error(`Error downloading plugin: ${error}`))
     .finally(() => isDownloading.value = false)
 }
 
@@ -122,7 +122,7 @@ const downloadPlugin = (plugin: LibraryPlugin) => {
                   variant="green_outline"
                   class="border-l-2!"
                 >
-                  <IconSpinner v-if="isDownloading" class="animate-spin"/>
+                  <IconLoader v-if="isDownloading" class="animate-spin"/>
                   <IconDownload v-else/>
                 </Button>
             </TableCell>

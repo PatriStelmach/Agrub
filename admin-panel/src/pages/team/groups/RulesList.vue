@@ -14,18 +14,22 @@ const emit = defineEmits<{
   'delete-rule': [number]
 }>()
 
-const {unwrap, isUnwrapped, wrap, save, unwrappedItem} = useWrapping<Rule>(rules)
+const {hasChanged, unwrap, isUnwrapped, wrap, unwrappedItem} = useWrapping<Rule>(rules)
 
-const onEditSave = (data: Rule) => {
-  if (unwrappedItem.value){
-    save(async () => await updateRuleRequest(data)
+const onEditSave = async (data: Rule) => {
+  unwrappedItem.value = data
+  if (unwrappedItem.value && hasChanged()) {
+    await updateRuleRequest(data)
       .then((res: Rule) => {
         toast.success('Rule updated successfully!')
-        Object.assign(unwrappedItem.value!, res)
+        rules.value = rules.value.map(r => r.id === res.id ? res : r)
       })
-      .catch(err => toast.error(`Error updating rule: ${err}`)))
+      .catch(err => toast.error(`Error updating rule: ${err}`))
   }
-
+  else {
+    toast.info('No changes have been made')
+  }
+  wrap()
 }
 
 </script>
@@ -45,7 +49,6 @@ const onEditSave = (data: Rule) => {
             :class="hoverListRow('cursor-pointer')"
         >
           <EditRuleDiv
-            class=""
             v-if="isUnwrapped(rule.id!)"
             :rule="unwrappedItem!"
             @save="onEditSave"

@@ -148,6 +148,7 @@ watch(isDialogOpen, (newValue, oldValue) => {
                   <div class="flex items-end">
                     <DialogLabel for="severity" class="pb-0 " text="Severity:"/>
                     <SeveritySelect
+                      hideUnknown
                       v-model:severity="newSeverity"
                     />
                   </div>

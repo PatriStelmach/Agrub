@@ -19,8 +19,8 @@ const isLoading = ref(true);
 const groupsStats = ref<UserGroupStats[]>([]);
 onMounted(async () => {
   await getGroupsStatsRequest()
-    .catch(e => toast.error(`Error retrieving stats: ${e}`))
     .then((res:UserGroupStats[]) => groupsStats.value = res)
+    .catch(e => toast.error(`Error retrieving stats: ${e}`))
     .finally(() => isLoading.value = false)
 })
 const searchFilter = ref("")

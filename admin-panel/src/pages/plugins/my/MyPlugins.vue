@@ -17,11 +17,11 @@ const tags = ref<string[]>([])
 onMounted(async () => {
     await Promise.all([
       getAllMyPluginsRequest()
-        .catch(error => toast.error(`Error fetching plugins: ${error}`))
-        .then(res => allMyPlugins.value = res),
+        .then(res => allMyPlugins.value = res)
+        .catch(error => toast.error(`Error fetching plugins: ${error}`)),
       getPluginTagsRequest()
-        .catch(error => toast.error(`Error fetching plugins tags: ${error}`))
         .then(res => tags.value = res)
+        .catch(error => toast.error(`Error fetching plugins tags: ${error}`))
     ]).finally(() => isLoading.value = false)
 })
 
@@ -33,7 +33,7 @@ const {filteredData, tableData, updateData, updateSearchData, currentPage, pageS
 <template>
   <div>
     <MyPluginsTable
-      :allMyPlugins="allMyPlugins"
+      v-model:allMyPlugins="allMyPlugins"
       :isLoading="isLoading"
       :data="tableData"
       :availableTags="tags"

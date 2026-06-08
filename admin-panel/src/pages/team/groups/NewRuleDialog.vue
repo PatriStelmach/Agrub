@@ -21,7 +21,7 @@ import {
 import { IconLoader, IconDeviceFloppy} from "@tabler/icons-vue";
 import {initialRule, MatchType, type Rule} from "@/types/types.ts";
 import SeveritySelect from "@/helpers_components/SeveritySelect.vue";
-import {addNewRuleRequest} from "@/helpers_functions/requests.ts";
+import {addNewRuleRequest} from "@/helpers_functions/requests/groupsRequests.ts";
 import {toast} from "vue-sonner";
 import {useRoute} from "vue-router";
 
@@ -50,6 +50,7 @@ const onSubmit = async () => {
     .then((res) => {
       open.value = false
       emits('update:rule', res)
+      toast.success('New rule added successfully!')
     })
     .catch((err) => {
       toast.error(err.message)

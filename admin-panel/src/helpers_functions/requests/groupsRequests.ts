@@ -1,6 +1,5 @@
 import api from "@/lib/axios.ts";
-import type {GroupDetails, Rule, UserGroupStats} from "@/types/types.ts";
-import {toast} from "vue-sonner";
+import type {GroupDetails, Rule} from "@/types/types.ts";
 
 export const getGroupDataRequest = async (id: number) => {
   try {
@@ -74,8 +73,7 @@ export const changeGroupNameRequest = async (groupId: number, name: string) => {
   try {
     const res = await api.put(`/groups/${groupId}/change-name`, {name: name})
     if (res.status === 200) {
-      toast.success(`Successfully updated group name`)
-      return res.data
+      return res.data.name
     }
   } catch (error) {
     throw (error)
@@ -97,7 +95,6 @@ export const addNewRuleRequest = async (rule: Rule) => {
   try {
     const res = await api.post(`/rules`, rule)
     if (res.status === 200) {
-      toast.success('New rule added successfully!')
       return res.data
     }
   } catch (error) {

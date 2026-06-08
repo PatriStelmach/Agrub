@@ -74,7 +74,7 @@ const allMyPlugins = defineModel<MyPlugin[]>('allMyPlugins');
 
 const authStore = useAuthStore()
 const { sortedData, sortKey, sortOrder, toggleSort } = useSort<MyPlugin>(() => props.data, 'updatedAt')
-const { isUnwrapped, unwrap, unwrappedItem, save } = useWrapping(sortedData, 'fullName')
+const { isUnwrapped, unwrap, unwrappedItem, hasChanged, originalItem } = useWrapping(sortedData, 'fullName')
 const router = useRouter()
 const route = useRoute()
 const paramRoute = computed(() => route.params.plugin)
@@ -142,11 +142,11 @@ const checkAll = () => {
 const changeStatus = () => {
   if(!unwrappedItem.value && authStore.isAdmin) {
     changeMyPluginStatusRequest(checkedPlugins.value)
-      .catch(e => toast.error(`Error changing status: ${e}`))
       .then(res => {
         toast.success(`Successfully changed status`)
         allMyPlugins.value = res
       })
+      .catch(e => toast.error(`Error changing status: ${e.message}`))
       .finally(() => checkedPlugins.value = [])
   }
 }
@@ -154,11 +154,11 @@ const changeStatus = () => {
 const deletePlugins = () => {
   if(!unwrappedItem.value && authStore.isAdmin) {
     deleteMyPluginsRequest(checkedPlugins.value)
-      .catch(e => toast.error(`Error deleting plugins: ${e}`))
       .then(res => {
         toast.success(`Successfully deleted plugins`)
         allMyPlugins.value = res
       })
+      .catch(e => toast.error(`Error deleting plugins: ${e}`))
       .finally(() => checkedPlugins.value = [])
   }
 }
@@ -166,9 +166,11 @@ const deletePlugins = () => {
 const getDetails = async (fileName: string) => {
   await getPluginDetailsRequest(fileName, 'local-scripts')
     .then((res) => {
-      if(unwrappedItem.value) {
+      if(unwrappedItem.value && originalItem.value) {
         unwrappedItem.value.code = res?.code
         unwrappedItem.value.description = res?.description
+        originalItem.value.code = res?.code
+        originalItem.value.description = res?.description
       }
     })
     .catch((err) => toast.error(`Error fetching plugin details: ${err}`))
@@ -204,17 +206,19 @@ const triggerScript = async (args: string) => {
 const savePlugin = async () => {
   if (unwrappedItem.value && authStore.isAdmin) {
     isEditLoading.value = true
-    await save(() => editMyPluginRequest(unwrappedItem.value!)
-      .catch(e => toast.error(`Editing "${unwrappedItem.value?.name}" failed with error ${e}`))
-      .then(res => {
-        toast.success(`Successfully updated plugin`)
-        allMyPlugins.value = res
-      })
-      .finally(() => {
-        isEditLoading.value = false
-        onCloseAndSave()
-      }))
+    if(hasChanged()){
+      await editMyPluginRequest(unwrappedItem.value)
+        .then(res => {
+          toast.success(`Successfully updated plugin`)
+          allMyPlugins.value = res
+        })
+        .catch(e => toast.error(`Editing "${unwrappedItem.value?.name}" failed with error ${e}`))
+    }
+    else
+      toast.info('No changes were made')
   }
+  isEditLoading.value = false
+  onCloseAndSave()
 }
 
 watchEffect(async () => {
@@ -222,13 +226,13 @@ watchEffect(async () => {
       const plugin = sortedData.value.find((pl) => pl.name === paramRoute.value)
       if(plugin) {
         unwrap(plugin.fullName)
-      }
-      if(unwrappedItem.value) {
         getDetailsLoading.value = true
-        setTimeout(async () => {
-          await getDetails(unwrappedItem.value!.fullName)
-        },500 )
       }
+        setTimeout(async () => {
+          if(unwrappedItem.value) {
+            await getDetails(unwrappedItem.value!.fullName)
+          }
+        },200 )
     }
     else {
       unwrappedItem.value = null
@@ -433,6 +437,7 @@ const onEdit = (plugin: MyPlugin) => {
 
             <TableCell v-if="isUnwrapped(plugin.fullName) && unwrappedItem && authStore.isAdmin" >
               <SeveritySelect
+                hideUnknown
                 v-model:severity="unwrappedItem.severity"
               />
             </TableCell>
@@ -493,7 +498,8 @@ const onEdit = (plugin: MyPlugin) => {
                   <IconLoader v-if="isEditLoading" class="animate-spin"/>
                   <IconDeviceFloppy v-else class="size-4 xl:size-5"/>
                 </Button>
-              </ButtonGroup></TableCell>
+              </ButtonGroup>
+            </TableCell>
           </TableRow>
         </TableBody>
       </Transition>

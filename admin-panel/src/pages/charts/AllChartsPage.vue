@@ -76,12 +76,12 @@ const onDateRangeChange = async () => {
     currentGranularity.value,
     origin.value
   )
-    .catch((e) => toast.error(`Error retrieving Analytics data: ${e}`))
     .then((res) => {
       rawAnalyticsData.value = res as CumulativeData
       granularityAfterReload.value = currentGranularity.value
       dateRangeAfterReload.value = dateRange.value
     })
+    .catch((e) => toast.error(`Error retrieving Analytics data: ${e}`))
     .finally(() => {
       areChartsLoading.value = false
       isPopoverOpen.value = false

@@ -65,8 +65,8 @@ const groupRules = computed({
 
 onMounted(async () => {
   await getGroupDataRequest(groupId)
-    .catch(e => toast.error(`Error retrieving groups: ${e}`))
     .then(res => groupDetails.value = res as GroupDetails)
+    .catch(e => toast.error(`Error retrieving groups: ${e}`))
     .finally(() => isLoading.value = false)
   newName.value = groupDetails.value.name
 })
@@ -108,7 +108,8 @@ const changeName = async () => {
   if (newName.value) {
     await changeGroupNameRequest(groupId, newName.value)
       .then((res) => {
-        groupDetails.value.name = res.name
+        toast.success(`Successfully updated group name`)
+        groupDetails.value.name = res
       })
       .catch((err) => {
         toast.error(err)
