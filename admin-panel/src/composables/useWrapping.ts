@@ -20,7 +20,7 @@ export function useWrapping<T extends object>(
   }
 
 // Dodajemy async przed definicją funkcji oraz zmieniamy typ requestu na Promise
-  const save = async (request: () => Promise<void> | void) => {
+  const save = async (request: () => Promise<string | number |void> | void) => {
     const hasChanged = JSON.stringify(toRaw(unwrappedItem.value)) !== JSON.stringify(toRaw(originalItem.value))
     if (hasChanged) {
       await request()

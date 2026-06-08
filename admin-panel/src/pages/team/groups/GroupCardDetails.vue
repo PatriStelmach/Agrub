@@ -23,7 +23,7 @@ import {
   deleteRuleFromGroupRequest,
   deleteUserFromGroupRequest,
   getGroupDataRequest
-} from "@/helpers_functions/requests.ts";
+} from "@/helpers_functions/requests/groupsRequests.ts";
 import {hoverListRow} from "@/assets/cssFunctions.ts";
 import {ButtonGroup} from "@/components/ui/button-group";
 import UsersCombobox from "@/helpers_components/UsersCombobox.vue";
@@ -64,7 +64,10 @@ const groupRules = computed({
 })
 
 onMounted(async () => {
-  groupDetails.value = await getGroupDataRequest(groupId).finally(() => isLoading.value = false) ?? initialGroupDetails
+  await getGroupDataRequest(groupId)
+    .catch(e => toast.error(`Error retrieving groups: ${e}`))
+    .then(res => groupDetails.value = res as GroupDetails)
+    .finally(() => isLoading.value = false)
   newName.value = groupDetails.value.name
 })
 
@@ -77,11 +80,12 @@ const assignUser = (data: User) => {
 const deleteUser = async (userId: number) => {
   loadingUserDelete.value.push(userId)
   await deleteUserFromGroupRequest(userId, groupId)
-    .then(() => {
+    .then((res:string) => {
+      toast.success(`Successfully deleted user: ${res} from group`)
       groupUsers.value = groupUsers.value.filter((u) => u.id !== userId)
     })
     .catch((err) => {
-      toast.error(err.message)
+      toast.error(`Error deleting user from group: ${err}`)
     })
     .finally(() => loadingUserDelete.value.pop())
 }
@@ -90,10 +94,11 @@ const deleteRule = async (ruleId: number) => {
   loadingGroupsDelete.value.push(ruleId)
   await deleteRuleFromGroupRequest(ruleId)
     .then(() => {
+      toast.success(`Successfully deleted rule ${ruleId}!`)
       groupRules.value = groupRules.value.filter((r) => r.id !== ruleId)
     })
     .catch((err) => {
-      toast.error(err.message)
+      toast.error(err)
     })
     .finally(() => loadingGroupsDelete.value.pop())
 }
@@ -106,7 +111,7 @@ const changeName = async () => {
         groupDetails.value.name = res.name
       })
       .catch((err) => {
-        toast.error(err.message)
+        toast.error(err)
       })
       .finally(() => {
         newNameLoading.value = false
