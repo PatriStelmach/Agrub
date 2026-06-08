@@ -32,16 +32,6 @@ export const useUserStore = defineStore('user-store',() => {
     }
   }
 
-  const getUserByIdRequest = async (id: number) => {
-    try {
-      const res = await api.get(`/users/${id}`)
-      if (res.status === 200) return res.data
-    }
-    catch (error) {
-      toast.error(`Error retrieving user: ${error}`)
-    }
-  }
-
   const createUserRequest = async (user: User) => {
     try {
       const res = await api.post('/users', user)
@@ -50,7 +40,6 @@ export const useUserStore = defineStore('user-store',() => {
         return res.data.email
       }
     } catch (error) {
-      toast.error(`Error creating user: ${error}`)
       throw error
     }
   }
@@ -92,7 +81,6 @@ export const useUserStore = defineStore('user-store',() => {
     allUsers,
     allGroups,
     getAllUsersRequest,
-    getUserByIdRequest,
     fullName,
     avFallback,
     editUserRequest,

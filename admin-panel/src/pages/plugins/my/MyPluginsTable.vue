@@ -158,7 +158,7 @@ const deletePlugins = () => {
         toast.success(`Successfully deleted plugins`)
         allMyPlugins.value = res
       })
-      .catch(e => toast.error(`Error deleting plugins: ${e}`))
+      .catch(e => toast.error(`Error deleting plugins: ${e.message}`))
       .finally(() => checkedPlugins.value = [])
   }
 }
@@ -173,7 +173,7 @@ const getDetails = async (fileName: string) => {
         originalItem.value.description = res?.description
       }
     })
-    .catch((err) => toast.error(`Error fetching plugin details: ${err}`))
+    .catch((err) => toast.error(`Error fetching plugin details: ${err.message}`))
     .finally(() => getDetailsLoading.value = false)
 }
 
@@ -195,7 +195,7 @@ const triggerScript = async (args: string) => {
       .then((res) => {
         toast.success(`Script triggered: ${res}`)
       })
-      .catch((error) => toast.error(error))
+      .catch((error) => toast.error(error.message))
       .finally(() => loadingTrigger.value = false)
   }
   else {
@@ -212,7 +212,7 @@ const savePlugin = async () => {
           toast.success(`Successfully updated plugin`)
           allMyPlugins.value = res
         })
-        .catch(e => toast.error(`Editing "${unwrappedItem.value?.name}" failed with error ${e}`))
+        .catch(e => toast.error(`Editing "${unwrappedItem.value?.name}" failed with error ${e.message}`))
     }
     else
       toast.info('No changes were made')
