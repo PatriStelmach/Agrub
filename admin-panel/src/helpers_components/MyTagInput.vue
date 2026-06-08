@@ -8,11 +8,10 @@ import {
   TagsInputItemDelete,
   TagsInputItemText
 } from "@/components/ui/tags-input";
-import { useTagsFilter} from "@/composables/useTagsFilter.ts";
 import DialogLabel from "@/helpers_components/DialogLabel.vue";
 import {Button} from "@/components/ui/button";
 import {IconEye, IconEyeOff, IconTrash} from "@tabler/icons-vue";
-import {type HTMLAttributes, onMounted} from "vue";
+import {computed, type HTMLAttributes, onMounted, ref} from "vue";
 
 const props = defineProps<{
   allTags: string[]
@@ -23,22 +22,68 @@ const props = defineProps<{
 }>()
 const tags = defineModel<string[]>('tags')
 
-const {
-  tagListOpen,
-  matchedTags,
-  addTagToList,
-  clearTagsInput,
-  toggleTagListOpen,
-  clearItemTags,
-  handleInputChange,
-  removeTagFromList,
-  addTagFromBadge
-} = useTagsFilter(
-  props.allTags,
-  tags,
-  props.inputId,
-  props.canAddNew
-)
+const tagSearch = ref("")
+const tagListOpen = ref(false)
+const existingTag = computed(() => {
+  return tags.value?.includes(tagSearch.value)
+})
+const availableTags = computed(() => props.allTags )
+
+const matchedTags = computed(() => {
+  return availableTags.value
+    .filter(t => t.toLowerCase().includes(tagSearch.value.toLowerCase()))
+    .filter(t => !tags.value?.includes(t))
+})
+
+const addNonexistingTag = () => {
+  if(!existingTag.value && tagSearch.value && tags.value) {
+    tags.value.push(tagSearch.value)
+  }
+}
+
+const addTagFromList = () => {
+  if(tagSearch.value ) {
+    const matchedBadge = matchedTags.value.find(b => b.toLowerCase() === tagSearch.value.toLowerCase())
+    if(matchedBadge) tags.value?.push(matchedBadge)
+  }
+}
+
+const addTagFromBadge = (tag: string) => {
+  if (!tags.value?.includes(tag)) {
+    tags.value?.push(tag)
+  }
+}
+
+const addTagToList = () => {
+  if(props.canAddNew) addNonexistingTag()
+  else addTagFromList()
+  clearTagsInput()
+}
+
+const removeTagFromList = (tag: string) => {
+  tags.value = tags.value?.filter(t => t !== tag)
+}
+
+const clearItemTags = () => {
+  tags.value = [];
+}
+
+const clearTagsInput = () => {
+  const input = document.getElementById(props.inputId) as HTMLInputElement
+  if (input) input.value = '';
+  tagSearch.value = ''
+}
+
+const toggleTagListOpen = () => {
+  tagListOpen.value = !tagListOpen.value
+  clearTagsInput()
+}
+
+const handleInputChange = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  tagSearch.value = target.value;
+};
+
 defineExpose({ clearTagsInput})
 
 
@@ -82,7 +127,7 @@ onMounted(() => {
           <TagsInputItemText />
           <TagsInputItemDelete class="cursor-pointer hover:text-red-badge" @click.stop.prevent="removeTagFromList(tag)" />
         </TagsInputItem>
-        <TagsInputInput :id="inputId" @input="handleInputChange" @keydown.enter="addTagToList" :placeholder="`${tagsLabel}...`" />
+        <TagsInputInput :id="inputId" @input="handleInputChange" @keydown.enter.prevent="addTagToList" :placeholder="`${tagsLabel}...`" />
       </TagsInput>
     </Transition>
     <Transition name="fade" mode="out-in">

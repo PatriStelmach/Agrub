@@ -7,27 +7,23 @@ import {SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
 import {useAuthStore} from "@/stores/authStore.ts";
 import LoginPage from "@/pages/login/LoginPage.vue";
 import {computed, onMounted, watch} from "vue";
-import {globals} from "@/helpers_functions/globals.js";
+import {autoLogoutTimer} from "@/helpers_functions/autoLogoutTimer";
 import {IconMoonStars, IconSunFilled} from "@tabler/icons-vue";
 import {useColorMode} from "@vueuse/core";
-
 
 const mode = useColorMode()
 const authStore = useAuthStore()
 const sseStore = useSSEstore()
 const logoutTimeout = computed(() => authStore.currentUser?.autoLogoutMinutes)
+
 onMounted(() => {
   if (authStore.isAuthenticated && !sseStore.isConnected) {
     sseStore.connectToSSE()
   }
   startLogoutTimer()
 })
-watch(() => authStore.isAuthenticated,(newValue) => {
-  if (newValue && !sseStore.isConnected ) {
-    sseStore.connectToSSE()
-  }
-})
-const {startLogoutTimer } = globals(
+
+const {startLogoutTimer, stopLogoutTimer} = autoLogoutTimer(
   () => Number(logoutTimeout.value),
   () => {
     if (authStore.isAuthenticated) {
@@ -35,6 +31,19 @@ const {startLogoutTimer } = globals(
     }
   }
 )
+
+watch(() => authStore.isAuthenticated,(newValue) => {
+  if (newValue) {
+    startLogoutTimer()
+    if(!sseStore.isConnected)
+      sseStore.connectToSSE()
+  }
+  else if (!newValue) {
+    stopLogoutTimer()
+  }
+})
+
+
 
 
 </script>

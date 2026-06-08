@@ -59,7 +59,7 @@ const onSubmit = handleSubmit(async (data) => {
       <form class="p-2"  id="alert-login-form" @submit="onSubmit">
         <FieldGroup>
           <FormInput :disabled="showWrongPassword" placeholder="user@example.com..." name="email" type="email" label="E-mail address" orientation="vertical"/>
-          <FormInput :disabled="showWrongPassword" name="password" type="password" label="Password" orientation="vertical"/>
+          <FormInput autocomplete="password" :disabled="showWrongPassword" name="password" type="password" label="Password" orientation="vertical"/>
         </FieldGroup>
       </form>
       <div class="p-2 flex space-x-2 *:text-comment">

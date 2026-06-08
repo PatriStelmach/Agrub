@@ -51,4 +51,3 @@ export function useServerSearchFilter<T, F>(
     updateFilters,
   }
 }
-
