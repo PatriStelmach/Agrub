@@ -1,4 +1,5 @@
 <script setup lang="ts">
+
 import type {HTMLAttributes} from "vue";
 import {SeverityRecord} from "@/types/types.ts";
 

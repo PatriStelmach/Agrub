@@ -25,8 +25,14 @@ onMounted(async () => {
     ]).finally(() => isLoading.value = false)
 })
 
-const {filteredData, tableData, updateData, updateSearchData, currentPage, pageSize } =
-  useClientSearchFilter<MyPlugin>(() => allMyPlugins.value,(plugin) => plugin.name)
+const {
+  filteredData,
+  tableData,
+  updateData,
+  updateSearchData,
+  currentPage,
+  pageSize
+} = useClientSearchFilter<MyPlugin>(() => allMyPlugins.value,(plugin) => plugin.name)
 
 </script>
 

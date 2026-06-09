@@ -28,7 +28,7 @@ import {
   IconLoader
 } from "@tabler/icons-vue"
 import {computed, ref, watch, watchEffect} from "vue";
-import {useSort} from "@/helpers_functions/sorting.js";
+import {useClientSort} from "@/composables/useClientSort";
 import SortableHead from "@/helpers_components/SortableHead.vue";
 import {
   tableCaption,
@@ -73,7 +73,7 @@ const allMyPlugins = defineModel<MyPlugin[]>('allMyPlugins');
 
 
 const authStore = useAuthStore()
-const { sortedData, sortKey, sortOrder, toggleSort } = useSort<MyPlugin>(() => props.data, 'updatedAt')
+const { sortedData, sortKey, sortOrder, toggleSort } = useClientSort<MyPlugin>(() => props.data, 'updatedAt')
 const { isUnwrapped, unwrap, unwrappedItem, hasChanged, originalItem } = useWrapping(sortedData, 'fullName')
 const router = useRouter()
 const route = useRoute()

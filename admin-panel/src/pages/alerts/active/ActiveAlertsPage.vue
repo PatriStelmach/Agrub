@@ -21,10 +21,14 @@ onMounted(async () => {
   await alertStore.getCurrentAlertsRequest().finally(() => isLoading.value = false);
 })
 const hoveredAlert = ref<AlertDetails | null>(null)
-const {pageSize, filteredData, updateData, currentPage, searchFilter, tableData } =
-  useClientSearchFilter<ActiveAlert>(() => alertStore.currentAlerts,(item) => item.subject)
-
-
+const {
+  pageSize,
+  filteredData,
+  updateData,
+  currentPage,
+  searchFilter,
+  tableData
+} = useClientSearchFilter<ActiveAlert>(() => alertStore.currentAlerts,(item) => item.subject)
 
 </script>
 

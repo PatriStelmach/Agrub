@@ -22,7 +22,7 @@ import {downloadPluginRequest, getPluginDetailsRequest} from "@/helpers_function
 import {toast} from "vue-sonner";
 import PluginDetailsDialog from "@/pages/plugins/PluginDetailsDialog.vue";
 import {useAuthStore} from "@/stores/authStore.ts";
-import {useSortRequests} from "@/composables/useSortRequests.ts";
+import {useServerSort} from "@/composables/useServerSort.ts";
 
 const props = defineProps<{
   plugins: LibraryPlugin[]
@@ -35,7 +35,7 @@ const isDownloading = ref(false);
 
 const sortedHead =  defineModel<{ sortKey: string; sortOrder: string }>('sortedHead')
 const { sortKey, sortOrder, toggleSort } =
-  useSortRequests<LibraryPlugin>(() => props.plugins, 'createdAt')
+  useServerSort<LibraryPlugin>('createdAt')
 
 watchEffect(() => {
   sortedHead.value = { sortKey: sortKey.value, sortOrder: sortOrder.value };
