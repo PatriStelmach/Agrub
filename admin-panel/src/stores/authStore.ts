@@ -7,10 +7,14 @@ import {toast} from "vue-sonner";
 
 export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = computed(() => !!accessToken.value)
-  const isAdmin = computed(() => currentUser.value?.role === 'ADMINISTRATOR')
+  const isAdmin = computed(() =>
+    currentUser.value?.role === 'ADMINISTRATOR')
   const accessToken = ref<string|null>()
-  const fullName = computed(() => `${currentUser.value?.firstname} ${currentUser.value?.surname}`)
-  const avFallback = computed(() =>  `${currentUser.value?.firstname.slice(0,1)}${currentUser.value?.surname.slice(0,1)}`)
+  const fullName = computed(() =>
+    `${currentUser.value?.firstname} ${currentUser.value?.surname}`)
+  const avFallback = computed(() =>
+    `${currentUser.value?.firstname
+      .slice(0,1)}${currentUser.value?.surname.slice(0,1)}`)
   const currentUser = computed(() => {
     if (!accessToken.value) return null
     try {
