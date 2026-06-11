@@ -2,15 +2,8 @@ export function autoLogoutTimer(timeout?: () => number, onTimeout?: () => void) 
 
   let lastBroadcast = 0
   const BROADCAST_INTERVAL = 1000
-
   let logoutChannel: BroadcastChannel | null = null
-
-
-  const activityEvents = [
-    'mousedown',
-    'keydown',
-    'scroll'
-  ]
+  const activityEvents = ['mousedown', 'keydown', 'scroll']
   let timer: ReturnType<typeof setTimeout> | null = null
 
   const resetLogoutTimer = () => {
@@ -37,9 +30,7 @@ export function autoLogoutTimer(timeout?: () => number, onTimeout?: () => void) 
   const startLogoutTimer = () => {
     logoutChannel = new BroadcastChannel('alert-logout-timer')
     logoutChannel.onmessage = (event) => {
-      if (event.data === 'reset-logout-timer') {
-        resetLogoutTimer()
-      }
+      if (event.data === 'reset-logout-timer') resetLogoutTimer()
     }
     activityEvents.forEach((event) => {
       window.addEventListener(event, activityHandler, { passive: true })})
@@ -55,8 +46,5 @@ export function autoLogoutTimer(timeout?: () => number, onTimeout?: () => void) 
     logoutChannel = null
   }
 
-  return {
-    startLogoutTimer,
-    stopLogoutTimer
-  }
+  return { startLogoutTimer, stopLogoutTimer }
 }

@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue'
 
-export function useSort<T>(data: () => T[], defaultSort: keyof T) {
+export function useClientSort<T>(data: () => T[], defaultSort: keyof T) {
   const sortKey = ref<keyof T>(defaultSort)
   const sortOrder = ref<'asc' | 'desc'>('desc')
 

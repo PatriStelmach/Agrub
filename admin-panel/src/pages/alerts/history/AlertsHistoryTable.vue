@@ -19,7 +19,7 @@ import {Badge} from "@/components/ui/badge";
 import {IconCircleCheck, IconLoader, IconCircleX, IconHistory} from "@tabler/icons-vue";
 import {Button} from "@/components/ui/button";
 import DateCell from "@/helpers_components/DateCell.vue";
-import {useSortRequests} from "@/composables/useSortRequests.ts";
+import {useServerSort} from "@/composables/useServerSort.js";
 import SeverityDiv from "@/helpers_components/SeverityDiv.vue";
 import {hoverListRow} from "@/assets/cssFunctions.ts";
 import LoadingTable from "@/helpers_components/LoadingTable.vue";
@@ -39,7 +39,7 @@ const isDialogLoading = ref(false)
 const linkAlertRoute = computed(() =>  Number(route.params.alert))
 const isLinkDialogOpen = ref(false)
 const linkHistoryAlert = ref<HistoryAlert | null>(null)
-const { sortKey, sortOrder, toggleSort } = useSortRequests<HistoryAlert>(() => props.alerts, 'createdAt')
+const { sortKey, sortOrder, toggleSort } = useServerSort<HistoryAlert>( 'createdAt')
 
 const hoveredId = ref<number | null>(null);
 

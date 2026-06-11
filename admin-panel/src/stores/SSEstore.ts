@@ -128,7 +128,7 @@ export const useSSEstore = defineStore('SSE', () => {
         disconnectSSE()
       },
       onerror(err) {
-        toast.error(`${err}`)
+        toast.error(`${err.message}`)
       },
     });
   };

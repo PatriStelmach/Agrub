@@ -17,7 +17,7 @@ import {
   IconCircleX
 } from "@tabler/icons-vue";
 import SortableHead from "@/helpers_components/SortableHead.vue";
-import { useSort } from "@/helpers_functions/sorting";
+import { useClientSort } from "@/composables/useClientSort";
 import {type HTMLAttributes, watchEffect} from "vue";
 import LoadingTable from "@/helpers_components/LoadingTable.vue";
 
@@ -31,7 +31,7 @@ const props = defineProps<{
 
 const sortedHead = defineModel<{ sortKey: string; sortOrder: string }>('sortedHead')
 
-const { sortKey, sortOrder, toggleSort } = useSort(
+const { sortKey, sortOrder, toggleSort } = useClientSort(
   () => props.actions,
   'createdAt'
 )

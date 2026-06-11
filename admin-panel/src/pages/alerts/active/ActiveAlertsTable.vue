@@ -16,7 +16,7 @@ import DateCell from "@/helpers_components/DateCell.vue";
 import {Badge} from "@/components/ui/badge";
 import {dataTable, tableHeaders, tableCaption, hoverListRow} from "@/assets/cssFunctions.js";
 import type {ActiveAlert, AlertDetails} from "@/types/types.js";
-import {useSort} from "@/helpers_functions/sorting";
+import {useClientSort} from "@/composables/useClientSort";
 import {computed, ref, watchEffect} from "vue";
 import SeverityDiv from "@/helpers_components/SeverityDiv.vue";
 import {dateParser} from "@/helpers_functions/dateParser.js";
@@ -31,7 +31,7 @@ const props = defineProps<{
 
 const alertStore = useAlertStore();
 const route = useRoute();
-const { sortedData, sortKey, sortOrder, toggleSort } = useSort<ActiveAlert>(() => props.tableData as ActiveAlert[], 'createdAt');
+const { sortedData, sortKey, sortOrder, toggleSort } = useClientSort<ActiveAlert>(() => props.tableData as ActiveAlert[], 'createdAt');
 
 const isDialogOpen = ref(false)
 const hoveredAlert = defineModel<AlertDetails | null>('hoveredAlert');
