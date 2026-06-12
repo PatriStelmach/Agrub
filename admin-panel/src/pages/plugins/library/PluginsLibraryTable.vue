@@ -9,7 +9,7 @@ import {
 import {Badge} from "@/components/ui/badge";
 import LanguageImage from "@/helpers_components/LanguageImage.vue";
 import {
-  type LibraryPlugin
+  type LibraryPlugin, type PluginDetails
 } from "@/types/types.js"
 import SortableHead from "@/helpers_components/SortableHead.vue";
 import {tableCaption, dataTable, tableHeaders, hoverListRow} from "@/assets/cssFunctions.js";
@@ -29,25 +29,28 @@ const props = defineProps<{
   isLoading: boolean;
 }>()
 
-const authStore = useAuthStore();
-const getDetailsLoading = ref<boolean>(false);
-const isDownloading = ref(false);
+const authStore = useAuthStore()
+const getDetailsLoading = ref<boolean>(false)
+const isDownloading = ref(false)
+const isCodeDialogOpen = ref(false)
+const openedPluginDetails = ref<PluginDetails>({ code: '', description: ''})
 
 const sortedHead =  defineModel<{ sortKey: string; sortOrder: string }>('sortedHead')
 const { sortKey, sortOrder, toggleSort } =
   useServerSort<LibraryPlugin>('createdAt')
 
 watchEffect(() => {
-  sortedHead.value = { sortKey: sortKey.value, sortOrder: sortOrder.value };
-});
+  sortedHead.value = { sortKey: sortKey.value, sortOrder: sortOrder.value }
+})
 
 const getDetails = async (plugin: LibraryPlugin) => {
   if(plugin.id) {
+    isCodeDialogOpen.value = true
     getDetailsLoading.value = true
     await getPluginDetailsRequest(plugin.id, 'plugins')
       .then((res) => {
-        plugin.code = res?.code
-        plugin.description = res?.description
+        openedPluginDetails.value.code = res?.code
+        openedPluginDetails.value.description = res?.description
       })
       .catch((err) => toast.error(`Error fetching plugin details: ${err.message}`))
       .finally(() => getDetailsLoading.value = false)
@@ -66,7 +69,15 @@ const downloadPlugin = (plugin: LibraryPlugin) => {
 
 <template>
 
-    <Table id="plugins-library-table" :class="dataTable">
+  <PluginDetailsDialog
+    v-model:isCodeDialogOpen="isCodeDialogOpen"
+    :editable="false"
+    :code="openedPluginDetails.code ?? ''"
+    :description="openedPluginDetails.description ?? ''"
+    :is-loading="getDetailsLoading"
+  />
+
+    <Table id="plugins_library_table" :class="dataTable">
       <TableCaption :class="tableCaption">
         <slot/>
       </TableCaption>
@@ -85,12 +96,13 @@ const downloadPlugin = (plugin: LibraryPlugin) => {
         <LoadingTable :colspan="7" v-if="isLoading"/>
         <TableBody v-else>
           <TableRow
+            :id="`library_plugin_${plugin.id}`"
             :class="hoverListRow('cursor-pointer duration-0')"
             v-for="plugin in plugins"
             :key="plugin.id">
-            <TableCell class="pl-4 whitespace-break-spaces ">{{plugin.fileName}}</TableCell>
-            <TableCell class="whitespace-break-spaces" >{{plugin.creator}}</TableCell>
-            <TableCell class="whitespace-break-spaces">
+            <TableCell :id="`library_plugin_name_${plugin.id}`" class="pl-4 whitespace-break-spaces ">{{plugin.fileName}}</TableCell>
+            <TableCell :id="`library_plugin_creator_${plugin.id}`" class="whitespace-break-spaces" >{{plugin.creator}}</TableCell>
+            <TableCell :id="`library_plugin_tags_${plugin.id}`" class="whitespace-break-spaces">
               <Badge
                 v-for="(tag, index) in plugin.tags"
                 variant="tags"
@@ -102,21 +114,15 @@ const downloadPlugin = (plugin: LibraryPlugin) => {
             <DateCell  :date="dateParser(plugin.createdAt).toDate"></DateCell>
             <TableCell >{{plugin.weight}} Kb</TableCell>
             <TableCell class="flex space-x-2 ">
-                <PluginDetailsDialog
-                  :editable="false"
-                  :code="plugin.code ?? ''"
-                  :description="plugin.description ?? ''"
-                  :is-loading="getDetailsLoading"
-                >
-                  <Button
-                    @click="getDetails(plugin)"
-                    variant="blue_outline"
-                  >
-                    <IconCode/>
-                  </Button>
-                </PluginDetailsDialog>
-
+              <Button
+                :id="`details_library_plugin_${plugin.id}`"
+                @click="getDetails(plugin)"
+                variant="blue_outline"
+              >
+                <IconCode/>
+              </Button>
                 <Button
+                  :id="`download_plugin_${plugin.id}`"
                   v-if="authStore.isAdmin"
                   @click="downloadPlugin(plugin)"
                   variant="green_outline"

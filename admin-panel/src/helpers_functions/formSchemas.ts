@@ -53,10 +53,10 @@ export const zabbixSchema = toTypedSchema(
 
 export const alertLoginSchema = toTypedSchema(
   z.object({
-    email: z
+    alert_email: z
       .string()
       .email('Invalid email address'),
-    password: z
+    alert_password: z
       .string()
       .min(4, 'Password must be at least 4 characters.')
   }),
@@ -64,10 +64,10 @@ export const alertLoginSchema = toTypedSchema(
 
 export const ADLoginSchema = toTypedSchema(
   z.object({
-    email: z
+    ad_login: z
       .string()
       .min(1,'Username is required'),
-    password: z
+    ad_password: z
       .string()
       .min(4, 'Password must be at least 4 characters.')
   }),

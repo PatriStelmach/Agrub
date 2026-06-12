@@ -26,15 +26,18 @@ const authStore = useAuthStore();
 const { handleSubmit } = useForm({
   validationSchema: ADLoginSchema,
   initialValues: {
-    email: '',
-    password: '',
+    ad_login: '',
+    ad_password: '',
   },
 })
 
 const adSubmit = handleSubmit(async (data) => {
   isLoading.value = true
   try {
-    if(!await authStore.ADLogin(data))
+    if(!await authStore.ADLogin({
+      email: data.ad_login,
+      password: data.ad_password
+    }))
       showWrongPassword.value = true
   }
   catch { showWrongPassword.value = true }
@@ -48,7 +51,7 @@ const adSubmit = handleSubmit(async (data) => {
   <Card class="border-blue-badge w-140 border-2 shadow-blue-badge/40 shadow-[0_5px_50px_1px] duration-500 ">
 
     <CardHeader>
-      <CardTitle class="text-xl text-center">Log in</CardTitle>
+      <CardTitle class="text-xl text-center">Sign in</CardTitle>
       <CardDescription class="text-center">
         Use Active Directory credentials
       </CardDescription>
@@ -57,15 +60,15 @@ const adSubmit = handleSubmit(async (data) => {
 
       <form class="p-2"  id="ad-login-form" @submit.prevent="adSubmit">
         <FieldGroup>
-          <FormInput :disabled="showWrongPassword" placeholder="AD email or username..." name="email" type="username" label="Login" orientation="vertical"/>
-          <FormInput autocomplete="password" :disabled="showWrongPassword" name="password" type="password" label="Password" orientation="vertical"/>
+          <FormInput :disabled="showWrongPassword" placeholder="AD email or username..." name="ad_login" type="username" label="Login" orientation="vertical"/>
+          <FormInput autocomplete="password" :disabled="showWrongPassword" name="ad_password" type="password" label="Password" orientation="vertical"/>
         </FieldGroup>
       </form>
     </CardContent>
     <CardFooter>
       <Field orientation="horizontal">
-        <Button :disabled="showWrongPassword" @click="adSubmit" type="button" class="w-full" form="ad-login-form">
-          <span v-if="!isLoading">Log in</span>
+        <Button id="ad_sign_in" :disabled="showWrongPassword" @click="adSubmit" type="button" class="w-full" form="ad-login-form">
+          <span v-if="!isLoading">Sign in</span>
           <IconLoader v-else class="animate-spin duration-75"/>
         </Button>
       </Field>

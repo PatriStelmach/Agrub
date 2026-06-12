@@ -256,7 +256,7 @@ const onEdit = (plugin: MyPlugin) => {
 </script>
 
 <template>
-<TopH1Div h1="Your plugins">
+<TopH1Div h1="My plugins">
   <ButtonGroup >
     <Popover>
       <PopoverTrigger as-child>
@@ -324,7 +324,14 @@ const onEdit = (plugin: MyPlugin) => {
 </TopH1Div>
 
   <div :class="tableDiv ">
-    <Table id="my-plugin-table" :class="dataTable">
+    <PluginDetailsDialog
+      v-model:isCodeDialogOpen="isCodeDialogOpen"
+      :editable="authStore.isAdmin"
+      :code="unwrappedItem?.code ?? ''"
+      :description="unwrappedItem?.description ?? ''"
+      @update:save-changes="updateDetails"
+    />
+    <Table id="my_plugins_table" :class="dataTable">
       <TableCaption :class="tableCaption">
         <slot/>
       </TableCaption>
@@ -353,6 +360,7 @@ const onEdit = (plugin: MyPlugin) => {
         <LoadingTable :colspan="9" v-if="isLoading"/>
         <TableBody v-else>
           <TableRow
+            :id="`my_plugin_${plugin.name}`"
             class="cursor-pointer duration-0 border-radius-0  [&_td]:py-2 [&_td]:pr-4 hover:bg-green-badge/20"
             v-for="plugin in sortedData"
             :key="plugin.fullName"
@@ -371,7 +379,7 @@ const onEdit = (plugin: MyPlugin) => {
                 v-model="checkedPlugins"
               />
             </TableCell>
-            <TableCell v-if="isUnwrapped(plugin.fullName) && unwrappedItem && authStore.isAdmin">
+            <TableCell :id="`my_plugin_name_${plugin.fullName}`" v-if="isUnwrapped(plugin.fullName) && unwrappedItem && authStore.isAdmin">
               <InputGroup
                 class="w-full xl:h-10 2xl:h-12 ">
                 <InputGroupInput
@@ -405,7 +413,8 @@ const onEdit = (plugin: MyPlugin) => {
             <TableCell v-if="isUnwrapped(plugin.fullName) && authStore.isAdmin" class="grid space-y-2">
               <InputGroup class="relative w-full xl:h-10 2xl:h-12 mb-2">
                 <InputGroupInput
-                  class=" text-center input-text"
+                  :id="`my_plugin_cron_input_${plugin.name}`"
+                  class=" text-center"
                   type="text"
                   placeholder="cron expression"
                   v-model="unwrappedItem!.cronExpression"
@@ -416,10 +425,13 @@ const onEdit = (plugin: MyPlugin) => {
                 class="grid gap-y-2 w-full text-center whitespace-break-spaces t"
                 :class="{'text-destructive' : !cronDescription[2]}"
               >
-                  <span>{{ cronDescription[0]}}</span>
-                  <span v-if="cronDescription[2]">
-                    Next run: {{ cronDescription[1]}}</span>
+                <span>
+                  {{ cronDescription[0]}}
                 </span>
+                <span v-if="cronDescription[2]">
+                  Next run: {{ cronDescription[1]}}
+                </span>
+              </span>
             </TableCell>
             <TableCell v-else class="whitespace-break-spaces">
               <span
@@ -429,7 +441,7 @@ const onEdit = (plugin: MyPlugin) => {
                 <span>{{cronWrappedDescription(plugin.cronExpression)[0]}}</span>
                 <span  v-if="cronWrappedDescription(plugin.cronExpression)[2]">Next run: {{nextRun(plugin)}}
                 </span>
-                <span class="text-primary truncate" v-else-if="!cronWrappedDescription(plugin.cronExpression)[0]">
+                <span :id="`my_plugin_cron_value_${plugin.name}`" class="text-primary truncate" v-else-if="!cronWrappedDescription(plugin.cronExpression)[0]">
                   Next run: -------------
                 </span>
               </span>
@@ -469,24 +481,13 @@ const onEdit = (plugin: MyPlugin) => {
                   Cancel<IconCancel class="size-4 xl:size-5"/>
                 </Button>
                 <Button
+                  @click.stop="isCodeDialogOpen = true"
+                  :id="`my_plugin_details_${plugin.name}`"
                   :disabled="getDetailsLoading"
                   variant="blue_outline" class="border-l-2! p-0">
-                  <PluginDetailsDialog
-                    v-model:isCodeDialogOpen="isCodeDialogOpen"
-                    :editable="authStore.isAdmin"
-                    :code="unwrappedItem.code ?? ''"
-                    :description="unwrappedItem.description ?? ''"
-                    @update:save-changes="updateDetails"
-                  >
-                    <Button
-                      @click.stop
-                      class="m-0 rounded-none bg-transparent! hover:scale-100 text-blue-badge hover:text-primary"
-                    >
-                      Code
-                      <IconLoader v-if="getDetailsLoading" class="animate-spin"/>
-                      <IconCode v-else class="size-4 xl:size-5"/>
-                    </Button>
-                  </PluginDetailsDialog>
+                  Code
+                  <IconLoader v-if="getDetailsLoading" class="animate-spin"/>
+                  <IconCode v-else class="size-4 xl:size-5"/>
                 </Button>
                 <Button
                   v-if="authStore.isAdmin"

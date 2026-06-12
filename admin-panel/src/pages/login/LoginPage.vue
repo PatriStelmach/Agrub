@@ -27,7 +27,7 @@ const email = ref("")
       v-if="showWrongPassword" variant="destructive">
       <IconX @click="showWrongPassword = false" class="size-5! absolute top-2 right-2 hover:border cursor-pointer"></IconX>
       <IconAlertCircle class="size-5! mt-2 ml-auto" />
-      <AlertTitle class="text-xl! mt-2 ">Unable to log in!</AlertTitle>
+      <AlertTitle class="text-xl! mt-2 ">Unable to sign in!</AlertTitle>
       <AlertDescription class="mb-2">
 
         <p>Please verify your credentials:</p>
