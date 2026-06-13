@@ -105,5 +105,6 @@
   "navigation_settings": "Ustawienia",
   "navigation_user_profile": "Profil użytkownika",
   "navigation_home": "Ekran główny",
-  "app_title": "AlertVIP"
+  "app_title": "AlertVIP",
+  "theme": "Motyw"
 }

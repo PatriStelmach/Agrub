@@ -736,6 +736,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'AlertVIP'**
   String get app_title;
+
+  /// No description provided for @theme.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get theme;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

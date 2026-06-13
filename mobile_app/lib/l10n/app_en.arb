@@ -106,5 +106,6 @@
   "navigation_settings": "Settings",
   "navigation_user_profile": "User Profile",
   "navigation_home": "Home",
-  "app_title": "AlertVIP"
+  "app_title": "AlertVIP",
+  "theme": "Theme"
 }

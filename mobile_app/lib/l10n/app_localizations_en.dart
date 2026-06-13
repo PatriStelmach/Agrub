@@ -340,4 +340,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get app_title => 'AlertVIP';
+
+  @override
+  String get theme => 'Theme';
 }

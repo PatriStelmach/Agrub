@@ -318,7 +318,7 @@ class _AlertsScreenState extends State<AlertsScreen>
 }
 
 class AckDialog extends StatefulWidget {
-  // Przekazujemy cały obiekt Alert zamiast samego ID
+  // Passing whole Alert object instead of just Id
   final Alert alert;
   final AppLocalizations t;
 

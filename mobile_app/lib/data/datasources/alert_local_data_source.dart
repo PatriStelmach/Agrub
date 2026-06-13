@@ -7,13 +7,12 @@ abstract class AlertLocalDataSource {
   Future<void> cacheAlerts(List<Alert> alertsToCache);
   Future<bool> isAlertAlreadyNotified(int alertId);
   Future<void> markAlertAsNotified(int alertId);
-  Future<void> clearAllData(); // Przydatne przy wylogowaniu
+  Future<void> clearAllData();
 }
 
 class AlertLocalDataSourceImpl implements AlertLocalDataSource {
   final SharedPreferences sharedPreferences;
 
-  // Klucze do pamięci podręcznej
   static const cachedAlertsKey = 'CACHED_ALERTS';
   static const notifiedAlertsKey = 'NOTIFIED_ALERT_IDS';
 
@@ -35,7 +34,7 @@ class AlertLocalDataSourceImpl implements AlertLocalDataSource {
   Future<void> cacheAlerts(List<Alert> alertsToCache) async {
     final List<Map<String, dynamic>> jsonList = alertsToCache
         .map((alert) => alert.toJson())
-        .toList(); // Zakładam, że model Alert ma metodę toJson()
+        .toList();
 
     final jsonString = json.encode(jsonList);
     await sharedPreferences.setString(cachedAlertsKey, jsonString);
