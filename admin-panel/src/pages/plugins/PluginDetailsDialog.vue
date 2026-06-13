@@ -48,7 +48,7 @@ const emits = defineEmits<{
 
 <template>
   <Dialog v-model:open="isCodeDialogOpen">
-    <form>
+    <form id="plugin_details_form">
       <DialogTrigger as-child>
         <slot/>
       </DialogTrigger>
@@ -64,11 +64,11 @@ const emits = defineEmits<{
               <BigLoadingBlock class="h-10" v-if="isLoading" />
               <Input
                 v-else-if="editable && !isLoading" class="m-2 badge-focus max-w-95/100 blue-badge-focus"
-                id="my-plugin-description"
+                id="my_plugin_description"
                 name="description"
                 v-model="newDescription"
                 :default-value="description" />
-              <h1 class="border-b-2 border-accent pl-2 pr-8 w-fit" v-else>{{ description}}</h1>
+              <h1 class="border-b-2 border-accent pl-2 pr-8 w-fit" id="show_plugin_description" v-else>{{ description}}</h1>
             </Transition>
           </div>
           <div class="grid gap-3  h-full">
@@ -77,12 +77,12 @@ const emits = defineEmits<{
               <BigLoadingBlock class="h-100" v-if="isLoading"/>
               <CodeEditor
                 v-else-if="editable && !isLoading"
-                id="my-plugin-code"
+                id="my_plugin_code"
                 name="code"
                 v-model="newCode"
                 :default-value="code" />
               <div v-else class="code-area min-h-96 max-h-[50vh] m-2 w-95/100 !">
-                <code class="">
+                <code id="show_plugin_code">
                   {{ code }}
                 </code>
               </div>
@@ -92,6 +92,7 @@ const emits = defineEmits<{
         <DialogFooter>
           <DialogClose as-child>
             <Button
+              id="close_plugin_details_dialog"
               @click="cancel"
               variant="red_outline">
               {{ editable ? 'Cancel' : 'Exit' }}

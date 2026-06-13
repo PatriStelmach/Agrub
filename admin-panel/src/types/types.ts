@@ -250,8 +250,8 @@ export interface MyPluginsFromApi {
 }
 
 export interface PluginDetails {
-  description: string,
-  code: string,
+  description: string | undefined,
+  code: string | undefined,
 }
 
 export interface LibraryPlugin {
@@ -272,8 +272,8 @@ export interface MonitoringSystemsConfig  {
   passwordOrToken?: string
   url: string
   enabled: boolean
-  wazuh_warning_level?: number
-  wazuh_critical_level?: number
+  wazuh_min_warning_level?: number
+  wazuh_min_critical_level?: number
   wazuh_info_as_alerts?: boolean
 }
 
@@ -283,8 +283,8 @@ export interface AlertSystemSettings {
   wazuh_password_SECRET?: string
   wazuh_url: string
   wazuh_enabled: boolean
-  wazuh_warning_level: number
-  wazuh_critical_level: number
+  wazuh_min_critical_level: number
+  wazuh_min_warning_level: number
   wazuh_info_as_alerts: boolean
 
   nagios_url: string

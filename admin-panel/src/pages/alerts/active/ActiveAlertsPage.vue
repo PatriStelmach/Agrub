@@ -34,7 +34,7 @@ const {
 
 <template>
   <div>
-    <TopH1Div h1="Alerts dashboard">
+    <TopH1Div id="alerts_dashboard" h1="Alerts dashboard">
       <ButtonGroup>
         <InputGroup >
           <InputGroupInput
