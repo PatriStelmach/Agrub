@@ -319,4 +319,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_switch_to_polish => 'Switch to Polish';
+
+  @override
+  String get navigation_history => 'History';
+
+  @override
+  String get navigation_alerts => 'Alerts';
+
+  @override
+  String get navigation_plugins => 'Plugins';
+
+  @override
+  String get navigation_settings => 'Settings';
+
+  @override
+  String get navigation_user_profile => 'User Profile';
+
+  @override
+  String get navigation_home => 'Home';
+
+  @override
+  String get app_title => 'AlertVIP';
 }

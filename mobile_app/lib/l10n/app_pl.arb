@@ -98,5 +98,12 @@
   "sectionAlarmOverlay": "--- ALARM OVERLAY -------------------------------------------------------------------------------------------------------------------------",
   "overlay_extreme_alert": "Alert krytyczny!",
   "overlay_button_stop": "Zatrzymaj",
-  "settings_switch_to_english": "Zmień język na angielski"
+  "settings_switch_to_english": "Zmień język na angielski",
+  "navigation_history": "Historia",
+  "navigation_alerts": "Alerty",
+  "navigation_plugins": "Pluginy",
+  "navigation_settings": "Ustawienia",
+  "navigation_user_profile": "Profil użytkownika",
+  "navigation_home": "Ekran główny",
+  "app_title": "AlertVIP"
 }

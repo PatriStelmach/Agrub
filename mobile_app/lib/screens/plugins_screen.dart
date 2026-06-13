@@ -1,5 +1,4 @@
 import 'package:alert_app/data/models/plugin_model.dart';
-import 'package:alert_app/data/repositories/plugin_repository.dart';
 import 'package:alert_app/logic/plugins_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -150,7 +149,7 @@ class _PluginsScreenState extends State<PluginsScreen> {
                   children: [
                     Text(plugin.language.toString()),
                     Text(
-                      plugin.tags?.toString() ?? t.plugins_tile_unknown_time,
+                      plugin.tags.toString() ?? t.plugins_tile_unknown_time,
                     ),
                   ],
                 ),
@@ -159,7 +158,7 @@ class _PluginsScreenState extends State<PluginsScreen> {
                   children: [
                     Text(plugin.active.toString()),
                     Text(
-                      plugin.updatedAt?.toString() ??
+                      plugin.updatedAt.toString() ??
                           t.plugins_tile_unknown_severity,
                     ),
                   ],

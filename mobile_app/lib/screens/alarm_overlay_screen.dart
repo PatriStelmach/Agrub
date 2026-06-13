@@ -23,7 +23,7 @@ class AlarmOverlayScreen extends StatelessWidget {
               children: [
                 Text(
                   t.overlay_extreme_alert,
-                  style: TextStyle(color: Colors.white, fontSize: 30),
+                  style: const TextStyle(color: Colors.white, fontSize: 30),
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(

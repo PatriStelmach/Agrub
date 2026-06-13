@@ -49,7 +49,7 @@ class Plugin {
   Color activeColor(BuildContext context) {
     return active
         ? Theme.of(context).colorScheme.primary
-        : Colors.grey.withOpacity(0.4);
+        : Colors.grey.withValues(alpha: 0.4);
   }
 
   factory Plugin.fromJson(Map<String, dynamic> json) {

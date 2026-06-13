@@ -6,8 +6,8 @@ import '../data/models/alert_model.dart';
 
 class HomeViewModel extends ChangeNotifier {
   final AlertsViewModel alertsViewModel;
-  void getMyToken() async {
-    String? token = await FirebaseMessaging.instance.getToken();
+  Future<void> getMyToken() async {
+    final String? token = await FirebaseMessaging.instance.getToken();
     //
     debugPrint("Mój FCM Token: $token");
   }
@@ -21,14 +21,14 @@ class HomeViewModel extends ChangeNotifier {
   DateTime? get lastPing => null;
 
   List<Alert> latestAlerts() {
-    List<Alert> allAlerts = List<Alert>.from(alertsViewModel.alertsList);
+    final List<Alert> allAlerts = List<Alert>.from(alertsViewModel.alertsList);
     allAlerts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     return allAlerts.take(3).toList();
   }
 
   List<Alert> latestCriticalAlerts() {
     return alertsViewModel.alertsList
-        .where((alert) => alert.severity == AlertSeverity.extreme)
+        .where((alert) => alert.severity == AlertSeverity.critical)
         .toList();
   }
 

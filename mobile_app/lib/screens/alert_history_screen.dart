@@ -46,15 +46,15 @@ class _AlertHistoryScreenState extends State<AlertHistoryScreen>
     final historyViewModel = context.watch<AlertsHistoryViewModel>();
     final t = AppLocalizations.of(context)!;
 
-    if (historyViewModel.isLoading && historyViewModel.alertsList.isEmpty) {
+    if (historyViewModel.isLoading && historyViewModel.sortedHistory.isEmpty) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    if (historyViewModel.alertsList.isEmpty) {
+    if (historyViewModel.sortedHistory.isEmpty) {
       return Scaffold(body: Center(child: Text(t.alerts_no_alerts_found)));
     }
 
-    final sortedList = historyViewModel.alertsList;
+    final sortedList = historyViewModel.sortedHistory;
 
     return Scaffold(
       appBar: AppBar(
@@ -122,7 +122,7 @@ class _AlertHistoryScreenState extends State<AlertHistoryScreen>
                 child: Text(t.alerts_sort_created_at, style: const TextStyle(fontSize: 20)),
               ),
               DropdownMenuItem(
-                value: 'createdAt',
+                value: 'closedAt',
                 child: Text(t.alerts_sort_closed_at, style: const TextStyle(fontSize: 20)),
               ),
               DropdownMenuItem(
@@ -183,7 +183,7 @@ class _AlertHistoryScreenState extends State<AlertHistoryScreen>
             alert.acknowledged
                 ? t.alerts_status_acknowledged
                 : t.alerts_status_not_acknowledged,
-            style: TextStyle(color: textColor.withOpacity(0.8)),
+            style: TextStyle(color: textColor.withValues(alpha: 0.8)),
           ),
           children: [
             Padding(
@@ -213,9 +213,7 @@ class _AlertHistoryScreenState extends State<AlertHistoryScreen>
               style: TextStyle(color: textColor),
             ),
             Text(
-              alert.createdAt != null
-                  ? DateFormat('dd.MM.yyyy HH:mm:ss').format(alert.createdAt)
-                  : t.alerts_tile_unknown_time,
+              DateFormat('dd.MM.yyyy HH:mm:ss').format(alert.createdAt),
               style: TextStyle(color: textColor),
             ),
           ],
@@ -225,9 +223,7 @@ class _AlertHistoryScreenState extends State<AlertHistoryScreen>
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              alert.closedAt != null
-                  ? DateFormat('dd.MM.yyyy HH:mm:ss').format(alert.closedAt)
-                  : t.alerts_tile_unknown_time,
+              DateFormat('dd.MM.yyyy HH:mm:ss').format(alert.closedAt),
               style: TextStyle(color: textColor),
             ),
           ],
@@ -278,7 +274,7 @@ class _AlertHistoryScreenState extends State<AlertHistoryScreen>
         return ListTile(
           leading: Icon(
             Icons.history_edu,
-            color: theme.iconTheme.color?.withOpacity(0.7) ?? Colors.grey,
+            color: theme.iconTheme.color?.withValues(alpha: 0.7) ?? Colors.grey,
           ),
           title: Text(
             latestAction.message.isNotEmpty
@@ -294,7 +290,7 @@ class _AlertHistoryScreenState extends State<AlertHistoryScreen>
               latestAction.ack ? t.yes : t.no,
             ),
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.textTheme.bodyMedium?.color?.withOpacity(0.7),
+              color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
             ),
           ),
         );

@@ -20,7 +20,7 @@ class UserViewModel extends ChangeNotifier {
   Future<bool> checkAuthStatus() async {
     _setLoading(true);
     try {
-      String? token = await repository.getToken();
+      final String? token = await repository.getToken();
       if (token != null && !JwtDecoder.isExpired(token)) {
         _user = repository.getUserFromToken(token);
         _isLoggedIn = (_user != null);

@@ -24,6 +24,32 @@ class AlertsHistoryViewModel extends ChangeNotifier {
   bool get isAscending => _isAscending;
 
   List<HistoryAlert> get alertsList => _historyAlertsCache.values.toList();
+  List<HistoryAlert> get sortedHistory {
+    final list = List<HistoryAlert>.from(alertsList);
+
+    final Map<String, Comparable Function(HistoryAlert)> getters = {
+      'id': (alert) => alert.id,
+      'title': (alert) => alert.subject,
+      'hostName': (alert) => alert.source,
+      'severity': (alert) => alert.severity.index,
+      'status': (alert) => alert.status.index,
+      'createdAt': (alert) => alert.createdAt,
+      'closedAt': (alert) => alert.closedAt,
+      'description': (alert) => alert.message,
+      'source': (alert) => alert.source,
+    };
+
+    final getter = getters[_currentSortProperty] ?? (alert) => alert.id;
+
+    list.sort((a, b) {
+      final aValue = getter(a);
+      final bValue = getter(b);
+
+      return _isAscending ? aValue.compareTo(bValue) : bValue.compareTo(aValue);
+    });
+
+    return list;
+  }
 
   /// Fetching first data on screen start
   Future<void> fetchInitialHistoryAlerts() async {
@@ -47,10 +73,8 @@ class AlertsHistoryViewModel extends ChangeNotifier {
 
 
   void sortAlertsBy(String property, {bool? ascending}) {
-    // zapytanie z sortowaniem
     _currentSortProperty = property;
     if (ascending != null) _isAscending = ascending;
-
     notifyListeners();
   }
 

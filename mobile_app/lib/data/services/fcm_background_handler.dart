@@ -65,7 +65,7 @@ Future<void> _showNotificationBasedOnSeverity(Alert alert) async {
 
   AndroidNotificationDetails androidDetails;
 
-  if (alert.severity == AlertSeverity.extreme) {
+  if (alert.severity == AlertSeverity.critical) {
     androidDetails = AndroidNotificationDetails(
       'extreme_alerts_channel_v3',
       'Krytyczne Alerty',
@@ -90,7 +90,7 @@ Future<void> _showNotificationBasedOnSeverity(Alert alert) async {
       fullScreenIntent: true,
     );
   } else {
-    androidDetails = AndroidNotificationDetails(
+    androidDetails = const AndroidNotificationDetails(
       'standard_alerts_channel_v1',
       'Zwykłe Alerty (Ciche)',
       channelDescription: 'Mniejsze alerty informacyjne, niekrytyczne.',
@@ -102,7 +102,7 @@ Future<void> _showNotificationBasedOnSeverity(Alert alert) async {
 
   await localNotifications.show(
     id: alert.id,
-    title: alert.severity == AlertSeverity.extreme
+    title: alert.severity == AlertSeverity.critical
         ? "EXTREME ALERT!"
         : "New alert from: ${alert.source}",
     body: alert.subject,

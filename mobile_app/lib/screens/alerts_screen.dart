@@ -189,7 +189,7 @@ class _AlertsScreenState extends State<AlertsScreen>
             alert.acknowledged
                 ? t.alerts_status_acknowledged
                 : t.alerts_status_not_acknowledged,
-            style: TextStyle(color: textColor.withOpacity(0.8)),
+            style: TextStyle(color: textColor.withValues(alpha: 0.8)),
           ),
           children: [
             Padding(
@@ -233,9 +233,7 @@ class _AlertsScreenState extends State<AlertsScreen>
               style: TextStyle(color: textColor),
             ),
             Text(
-              alert.createdAt != null
-                  ? DateFormat('dd.MM.yyyy HH:mm:ss').format(alert.createdAt!)
-                  : t.alerts_tile_unknown_time,
+              DateFormat('dd.MM.yyyy HH:mm:ss').format(alert.createdAt),
               style: TextStyle(color: textColor),
             ),
           ],
@@ -287,7 +285,7 @@ class _AlertsScreenState extends State<AlertsScreen>
         return ListTile(
           leading: Icon(
             Icons.history,
-            color: theme.iconTheme.color?.withOpacity(0.7) ?? Colors.grey,
+            color: theme.iconTheme.color?.withValues(alpha: 0.7) ?? Colors.grey,
           ),
           title: Text(
             latestAction.message.isNotEmpty
@@ -303,7 +301,7 @@ class _AlertsScreenState extends State<AlertsScreen>
               latestAction.ack ? t.yes : t.no,
             ),
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.textTheme.bodyMedium?.color?.withOpacity(0.7),
+              color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
             ),
           ),
         );
@@ -373,7 +371,7 @@ class _AckDialogState extends State<AckDialog> {
             ),
             const SizedBox(height: 5),
             DropdownButtonFormField<int>(
-              value: selectedSeverity,
+              initialValue: selectedSeverity,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 contentPadding: EdgeInsets.symmetric(

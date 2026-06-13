@@ -54,15 +54,19 @@ class AlertRemoteDataSourceImpl implements AlertRemoteDataSource {
   @override
   Future<List<HistoryAlert>> fetchHistoryAlerts() async {
     try {
-      final response = await dio.get('/api/alerts/history/');
-      final List<dynamic> data = response.data;
+      final response = await dio.get('/api/alerts/history',
+      queryParameters: {
+        'severity': [1,2,3,4,5]
+      });
+      final List<dynamic> data = response.data['content'];
+      print(response.data['content']);
 
       return data
           .map((item) => HistoryAlert.fromJson(item as Map<String, dynamic>))
           .toList();
     } catch (e) {
       debugPrint(
-        "ALERT REMOTE DATA SOURCE ERROR: Fetch all alerts error - $e ",
+        "ALERT REMOTE DATA SOURCE ERROR: Fetch history alerts error - $e ",
       );
       rethrow;
     }

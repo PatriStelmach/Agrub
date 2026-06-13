@@ -1,3 +1,4 @@
+import 'package:alert_app/screens/alert_history_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -63,6 +64,7 @@ class _GeneralLayoutState extends State<GeneralLayout> {
       PluginsScreen(),
       UserScreen(),
       SettingsScreen(),
+      AlertHistoryScreen()
     ];
 
     return Scaffold(
@@ -84,17 +86,17 @@ class _GeneralLayoutState extends State<GeneralLayout> {
   String _getAppBarTitle(AppScreen screen, AppLocalizations t) {
     switch (screen) {
       case AppScreen.home:
-        return 'Home';
+        return t.navigation_home;
       case AppScreen.alerts:
-        return 'Alerts';
+        return t.navigation_alerts;
       case AppScreen.plugins:
-        return 'Plugins';
+        return t.navigation_plugins;
       case AppScreen.user:
-        return 'User Profile';
+        return t.navigation_user_profile;
       case AppScreen.settings:
-        return 'Settings';
+        return t.navigation_settings;
       case AppScreen.history:
-        return 'History';
+        return t.navigation_history;
 
     }
   }
@@ -107,6 +109,7 @@ class NavDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final layoutViewModel = context.watch<GeneralLayoutViewModel>();
+    final t = AppLocalizations.of(context)!;
 
     return Drawer(
       child: ListView(
@@ -114,55 +117,55 @@ class NavDrawer extends StatelessWidget {
         children: [
           DrawerHeader(
             decoration: BoxDecoration(color: Theme.of(context).primaryColor),
-            child: const Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Text(
-                  'Alert App',
-                  style: TextStyle(color: Colors.white, fontSize: 24),
+                  t.app_title,
+                  style: const TextStyle(color: Colors.white, fontSize: 24),
                 ),
               ],
             ),
           ),
           _DrawerItemWidget(
             icon: Icons.home,
-            title: 'Home',
+            title: t.navigation_home,
             targetScreen: AppScreen.home,
             currentScreen: layoutViewModel.activeScreen,
             onTap: () => _navigate(context, layoutViewModel, AppScreen.home),
           ),
           _DrawerItemWidget(
             icon: Icons.warning_amber_rounded,
-            title: 'Alerts',
+            title: t.navigation_alerts,
             targetScreen: AppScreen.alerts,
             currentScreen: layoutViewModel.activeScreen,
             onTap: () => _navigate(context, layoutViewModel, AppScreen.alerts),
           ),
           _DrawerItemWidget(
             icon: Icons.history,
-            title: 'History',
-            targetScreen: AppScreen.alerts,
+            title: t.navigation_history,
+            targetScreen: AppScreen.history,
             currentScreen: layoutViewModel.activeScreen,
-            onTap: () => _navigate(context, layoutViewModel, AppScreen.alerts),
+            onTap: () => _navigate(context, layoutViewModel, AppScreen.history),
           ),
           _DrawerItemWidget(
             icon: Icons.extension,
-            title: 'Plugins',
+            title: t.navigation_plugins,
             targetScreen: AppScreen.plugins,
             currentScreen: layoutViewModel.activeScreen,
             onTap: () => _navigate(context, layoutViewModel, AppScreen.plugins),
           ),
           _DrawerItemWidget(
             icon: Icons.person,
-            title: 'User Profile',
+            title: t.navigation_user_profile,
             targetScreen: AppScreen.user,
             currentScreen: layoutViewModel.activeScreen,
             onTap: () => _navigate(context, layoutViewModel, AppScreen.user),
           ),
           _DrawerItemWidget(
             icon: Icons.settings,
-            title: 'Settings',
+            title: t.navigation_settings,
             targetScreen: AppScreen.settings,
             currentScreen: layoutViewModel.activeScreen,
             onTap: () =>
