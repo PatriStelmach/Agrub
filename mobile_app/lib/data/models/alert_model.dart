@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 // Using Enhanced enums to easily print normal strings in views
 enum AlertSeverity {
+  unknown('Unknown'),
   info('Info'),
-  lowest('Lowest'),
   low('Low'),
   medium('Medium'),
   high('High'),
@@ -55,10 +55,10 @@ class Alert {
       case AlertSeverity.low:
         return const Color(0xFFE5FA31);
       // oklch(0.731 0.255 137.694)
-      case AlertSeverity.lowest:
+      case AlertSeverity.info:
         return const Color(0xFF00FA54);
 
-      case AlertSeverity.info:
+      case AlertSeverity.unknown:
       default:
         // Tryb ciemny oklch(0.70 0.14 242) Jasny oklch(0.79 0.14 242)
         return isDark ? const Color(0xFF4DB0FF) : const Color(0xFF8AD2FF);
@@ -105,7 +105,7 @@ class Alert {
     final sev = AlertSeverity.values[sevIndex];
 
     // Status mapping to enum
-    String rawStatus = (json['status'] ?? 'sent').toString().toLowerCase();
+    final String rawStatus = (json['status'] ?? 'sent').toString().toLowerCase();
     AlertStatus stat;
     switch (rawStatus) {
       case 'inprogress':
