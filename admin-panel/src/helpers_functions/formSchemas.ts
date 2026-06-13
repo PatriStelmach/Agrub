@@ -15,12 +15,12 @@ export const wazuhSchema = toTypedSchema(
     wazuh_url: z.string().url('Must be a valid URL'),
     wazuh_user: z.string().min(1, 'User is required'),
     wazuh_password_SECRET: z.string().optional(),
-    wazuh_critical_level: z
+    wazuh_min_critical_level: z
       .number()
       .int('Must be a positive integer')
       .min(0, '0 is minimal critical level')
       .max(15, '15 is maximal critical level'),
-    wazuh_warning_level: z
+    wazuh_min_warning_level: z
       .number()
       .int('Must be a positive integer')
       .min(0, '0 is minimal warning level')
@@ -28,7 +28,7 @@ export const wazuhSchema = toTypedSchema(
     wazuh_info_as_alerts: z.boolean(),
   })
     .superRefine((data, ctx) => {
-      if(data.wazuh_warning_level > data.wazuh_critical_level) {
+      if(data.wazuh_min_warning_level > data.wazuh_min_critical_level) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: 'Critical level must be higher or equeal to warning',
