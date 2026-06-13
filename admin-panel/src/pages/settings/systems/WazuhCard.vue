@@ -229,7 +229,6 @@ const onCancel = () => {
         </div>
         <component :is="system.wazuh_info_as_alerts ? IconCheck : IconX" :class="system.wazuh_info_as_alerts ? 'text-green-badge' : 'text-red-badge'" />
       </div>
-
     </CardDescription>
     <CardFooter class="bottom-4 absolute w-full">
       <Button @click="onEdit" variant="blue_outline" class="w-full *:size-5!">
