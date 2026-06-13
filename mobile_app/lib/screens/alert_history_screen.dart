@@ -1,5 +1,5 @@
 import 'package:alert_app/data/models/problem_action_model.dart';
-import 'package:alert_app/logic/alerts_view_model.dart';
+import 'package:alert_app/logic/history_alerts_view_model.dart';
 import 'package:alert_app/logic/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -22,7 +22,7 @@ class _AlertHistoryScreenState extends State<AlertHistoryScreen>
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        context.read<AlertsViewModel>().fetchAlertHistory();
+        context.read<HistoryAlertViewModel>().fetchAlertHistory();
       }
     });
   }
@@ -37,25 +37,25 @@ class _AlertHistoryScreenState extends State<AlertHistoryScreen>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       debugPrint("Ekran Historii: Aplikacja wybudzona! Synchronizuję dane...");
-      context.read<AlertsViewModel>().fetchAlertHistory();
+      context.read<HistoryAlertViewModel>().fetchAlertHistory();
     }
   }
 
   @override
   Widget build(BuildContext context) {
     debugPrint("--- REBUILD ALERT HISTORY SCREEN ---");
-    final alertsViewModel = context.watch<AlertsViewModel>();
+    final historyViewModel = context.watch<HistoryAlertViewModel>();
     final t = AppLocalizations.of(context)!;
 
-    if (alertsViewModel.isLoading && alertsViewModel.historyList.isEmpty) {
+    if (historyViewModel.isLoading && historyViewModel.historyList.isEmpty) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    if (alertsViewModel.historyList.isEmpty) {
+    if (historyViewModel.historyList.isEmpty) {
       return Scaffold(body: Center(child: Text(t.alerts_no_alerts_found)));
     }
 
-    final sortedList = alertsViewModel.sortedHistory;
+    final sortedList = historyViewModel.sortedHistory;
 
     return Scaffold(
       appBar: AppBar(
@@ -63,13 +63,13 @@ class _AlertHistoryScreenState extends State<AlertHistoryScreen>
       ),
       body: Column(
         children: [
-          _buildSortHeader(context, alertsViewModel, t),
+          _buildSortHeader(context, historyViewModel, t),
           Expanded(
             child: ListView.builder(
               itemCount: sortedList.length,
               itemBuilder: (context, index) {
                 final alert = sortedList[index];
-                return _buildAlertCard(context, alert, alertsViewModel, t);
+                return _buildAlertCard(context, alert, historyViewModel, t);
               },
             ),
           ),
@@ -80,7 +80,7 @@ class _AlertHistoryScreenState extends State<AlertHistoryScreen>
 
   Widget _buildSortHeader(
       BuildContext context,
-      AlertsViewModel viewModel,
+      HistoryAlertViewModel viewModel,
       AppLocalizations t,
       ) {
     final currentSort = viewModel.currentHistorySortProperty;
@@ -146,7 +146,7 @@ class _AlertHistoryScreenState extends State<AlertHistoryScreen>
   Widget _buildAlertCard(
       BuildContext context,
       Alert alert,
-      AlertsViewModel viewModel,
+      HistoryAlertViewModel viewModel,
       AppLocalizations t,
       ) {
     final cardBackgroundColor = alert.severityColor(context);
@@ -248,7 +248,7 @@ class _AlertHistoryScreenState extends State<AlertHistoryScreen>
   Widget _buildActionHistory(
       BuildContext context,
       int alertId,
-      AlertsViewModel viewModel,
+      HistoryAlertViewModel viewModel,
       AppLocalizations t,
       ) {
     return FutureBuilder<ProblemAction?>(
@@ -407,7 +407,7 @@ class _HistoryAckDialogState extends State<HistoryAckDialog> {
             final currentUser = context.read<UserViewModel>().user;
             final currentAuthor = currentUser?.login ?? "Mobile User";
 
-            context.read<AlertsViewModel>().acknowledgeAlert(
+            context.read<HistoryAlertViewModel>().acknowledgeAlert(
               widget.alert.id,
               author: currentAuthor,
               comment: commentValue,
