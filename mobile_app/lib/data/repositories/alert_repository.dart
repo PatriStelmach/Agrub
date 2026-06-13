@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:alert_app/data/datasources/alert_local_data_source.dart';
+import 'package:alert_app/data/models/history_alert_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -27,6 +28,17 @@ class AlertRepository {
     } catch (e) {
       debugPrint("REPO ERROR: Couldn't fetch alerts: $e");
       return await getOfflineAlerts();
+    }
+  }
+
+  Future<List<HistoryAlert>> fetchHistoryAlerts() async {
+    try {
+      final alerts = await remoteDataSource.fetchHistoryAlerts();
+
+      return alerts;
+    } catch (e) {
+      debugPrint("REPO ERROR: Couldn't fetch alerts: $e");
+      return [];
     }
   }
 

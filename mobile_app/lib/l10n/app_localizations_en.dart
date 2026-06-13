@@ -183,6 +183,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get alerts_sort_created_at => 'CreatedAt';
 
   @override
+  String get alerts_sort_closed_at => 'ClosedAt';
+
+  @override
   String get alerts_sort_acknowledged => 'Acknowledged';
 
   @override

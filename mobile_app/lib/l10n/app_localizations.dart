@@ -431,6 +431,12 @@ abstract class AppLocalizations {
   /// **'CreatedAt'**
   String get alerts_sort_created_at;
 
+  /// No description provided for @alerts_sort_closed_at.
+  ///
+  /// In en, this message translates to:
+  /// **'ClosedAt'**
+  String get alerts_sort_closed_at;
+
   /// No description provided for @alerts_sort_acknowledged.
   ///
   /// In en, this message translates to:

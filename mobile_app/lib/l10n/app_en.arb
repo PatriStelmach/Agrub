@@ -56,6 +56,7 @@
   "alerts_sort_id": "ID",
   "alerts_sort_title": "Title",
   "alerts_sort_created_at": "CreatedAt",
+  "alerts_sort_closed_at": "ClosedAt",
   "alerts_sort_acknowledged": "Acknowledged",
   "alerts_sort_severity": "Severity",
   "alerts_tile_no_title": "No Title",

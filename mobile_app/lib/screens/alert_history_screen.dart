@@ -1,11 +1,10 @@
+import 'package:alert_app/data/models/history_alert_model.dart';
 import 'package:alert_app/data/models/problem_action_model.dart';
-import 'package:alert_app/logic/history_alerts_view_model.dart';
-import 'package:alert_app/logic/user_view_model.dart';
+import 'package:alert_app/logic/alert_history_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:alert_app/l10n/app_localizations.dart';
-import 'package:alert_app/data/models/alert_model.dart';
 
 class AlertHistoryScreen extends StatefulWidget {
   const AlertHistoryScreen({super.key});
@@ -22,7 +21,7 @@ class _AlertHistoryScreenState extends State<AlertHistoryScreen>
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        context.read<HistoryAlertViewModel>().fetchAlertHistory();
+        context.read<AlertsHistoryViewModel>().fetchInitialHistoryAlerts();
       }
     });
   }
@@ -37,25 +36,25 @@ class _AlertHistoryScreenState extends State<AlertHistoryScreen>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       debugPrint("Ekran Historii: Aplikacja wybudzona! Synchronizuję dane...");
-      context.read<HistoryAlertViewModel>().fetchAlertHistory();
+      context.read<AlertsHistoryViewModel>().fetchInitialHistoryAlerts();
     }
   }
 
   @override
   Widget build(BuildContext context) {
     debugPrint("--- REBUILD ALERT HISTORY SCREEN ---");
-    final historyViewModel = context.watch<HistoryAlertViewModel>();
+    final historyViewModel = context.watch<AlertsHistoryViewModel>();
     final t = AppLocalizations.of(context)!;
 
-    if (historyViewModel.isLoading && historyViewModel.historyList.isEmpty) {
+    if (historyViewModel.isLoading && historyViewModel.alertsList.isEmpty) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    if (historyViewModel.historyList.isEmpty) {
+    if (historyViewModel.alertsList.isEmpty) {
       return Scaffold(body: Center(child: Text(t.alerts_no_alerts_found)));
     }
 
-    final sortedList = historyViewModel.sortedHistory;
+    final sortedList = historyViewModel.alertsList;
 
     return Scaffold(
       appBar: AppBar(
@@ -80,11 +79,11 @@ class _AlertHistoryScreenState extends State<AlertHistoryScreen>
 
   Widget _buildSortHeader(
       BuildContext context,
-      HistoryAlertViewModel viewModel,
+      AlertsHistoryViewModel viewModel,
       AppLocalizations t,
       ) {
-    final currentSort = viewModel.currentHistorySortProperty;
-    final isAsc = viewModel.isHistoryAscending;
+    final currentSort = viewModel.currentSortProperty;
+    final isAsc = viewModel.isAscending;
 
     return Row(
       children: [
@@ -106,7 +105,7 @@ class _AlertHistoryScreenState extends State<AlertHistoryScreen>
             ),
             onChanged: (String? newValue) {
               if (newValue != null) {
-                viewModel.sortHistoryBy(newValue);
+                viewModel.sortAlertsBy(newValue);
               }
             },
             items: [
@@ -123,6 +122,10 @@ class _AlertHistoryScreenState extends State<AlertHistoryScreen>
                 child: Text(t.alerts_sort_created_at, style: const TextStyle(fontSize: 20)),
               ),
               DropdownMenuItem(
+                value: 'createdAt',
+                child: Text(t.alerts_sort_closed_at, style: const TextStyle(fontSize: 20)),
+              ),
+              DropdownMenuItem(
                 value: 'acknowledged',
                 child: Text(t.alerts_sort_acknowledged, style: const TextStyle(fontSize: 20)),
               ),
@@ -136,7 +139,7 @@ class _AlertHistoryScreenState extends State<AlertHistoryScreen>
         IconButton(
           icon: Icon(isAsc ? Icons.arrow_upward : Icons.arrow_downward),
           onPressed: () {
-            viewModel.sortHistoryBy(currentSort, ascending: !isAsc);
+            viewModel.sortAlertsBy(currentSort, ascending: !isAsc);
           },
         ),
       ],
@@ -145,8 +148,8 @@ class _AlertHistoryScreenState extends State<AlertHistoryScreen>
 
   Widget _buildAlertCard(
       BuildContext context,
-      Alert alert,
-      HistoryAlertViewModel viewModel,
+      HistoryAlert alert,
+      AlertsHistoryViewModel viewModel,
       AppLocalizations t,
       ) {
     final cardBackgroundColor = alert.severityColor(context);
@@ -189,20 +192,6 @@ class _AlertHistoryScreenState extends State<AlertHistoryScreen>
                 children: [
                   _buildAlertDetails(alert, textColor, t),
                   const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: cardBrightness == Brightness.dark
-                            ? Colors.white24
-                            : Colors.black12,
-                        foregroundColor: textColor,
-                        elevation: 0,
-                      ),
-                      onPressed: () => _openAckDialog(context, alert, t),
-                      child: Text(t.alerts_button_actions),
-                    ),
-                  ),
                   _buildActionHistory(context, alert.id, viewModel, t),
                 ],
               ),
@@ -213,7 +202,7 @@ class _AlertHistoryScreenState extends State<AlertHistoryScreen>
     );
   }
 
-  Widget _buildAlertDetails(Alert alert, Color textColor, AppLocalizations t) {
+  Widget _buildAlertDetails(HistoryAlert alert, Color textColor, AppLocalizations t) {
     return Column(
       children: [
         Row(
@@ -225,13 +214,24 @@ class _AlertHistoryScreenState extends State<AlertHistoryScreen>
             ),
             Text(
               alert.createdAt != null
-                  ? DateFormat('dd.MM.yyyy HH:mm:ss').format(alert.createdAt!)
+                  ? DateFormat('dd.MM.yyyy HH:mm:ss').format(alert.createdAt)
                   : t.alerts_tile_unknown_time,
               style: TextStyle(color: textColor),
             ),
           ],
         ),
         const SizedBox(height: 8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              alert.closedAt != null
+                  ? DateFormat('dd.MM.yyyy HH:mm:ss').format(alert.closedAt)
+                  : t.alerts_tile_unknown_time,
+              style: TextStyle(color: textColor),
+            ),
+          ],
+        ),
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
@@ -248,7 +248,7 @@ class _AlertHistoryScreenState extends State<AlertHistoryScreen>
   Widget _buildActionHistory(
       BuildContext context,
       int alertId,
-      HistoryAlertViewModel viewModel,
+      AlertsHistoryViewModel viewModel,
       AppLocalizations t,
       ) {
     return FutureBuilder<ProblemAction?>(
@@ -302,123 +302,4 @@ class _AlertHistoryScreenState extends State<AlertHistoryScreen>
     );
   }
 
-  void _openAckDialog(BuildContext context, Alert alert, AppLocalizations t) {
-    showDialog(
-      context: context,
-      builder: (context) => HistoryAckDialog(alert: alert, t: t),
-    );
-  }
-}
-class HistoryAckDialog extends StatefulWidget {
-  final Alert alert;
-  final AppLocalizations t;
-
-  const HistoryAckDialog({super.key, required this.alert, required this.t});
-
-  @override
-  State<HistoryAckDialog> createState() => _HistoryAckDialogState();
-}
-
-class _HistoryAckDialogState extends State<HistoryAckDialog> {
-  late TextEditingController _controller;
-  late bool isAck;
-  late int selectedSeverity;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = TextEditingController();
-    selectedSeverity = widget.alert.severity.index;
-    isAck = widget.alert.acknowledged;
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final t = widget.t;
-
-    return AlertDialog(
-      title: Text(t.alerts_dialog_title(widget.alert.id.toString())),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _controller,
-              decoration: InputDecoration(
-                labelText: t.alerts_dialog_field_comment,
-              ),
-            ),
-            const SizedBox(height: 15),
-            Text(
-              t.alerts_dialog_section_severity,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 5),
-            DropdownButtonFormField<int>(
-              value: selectedSeverity,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 5,
-                ),
-              ),
-              items: [
-                DropdownMenuItem(value: 0, child: Text(t.alerts_dialog_severity_info)),
-                DropdownMenuItem(value: 1, child: Text(t.alerts_dialog_severity_low)),
-                DropdownMenuItem(value: 2, child: Text(t.alerts_dialog_severity_low)),
-                DropdownMenuItem(value: 3, child: Text(t.alerts_dialog_severity_medium)),
-                DropdownMenuItem(value: 4, child: Text(t.alerts_dialog_severity_high)),
-                DropdownMenuItem(value: 5, child: Text(t.alerts_dialog_severity_extreme)),
-              ],
-              onChanged: (int? newValue) {
-                if (newValue != null) {
-                  setState(() => selectedSeverity = newValue);
-                }
-              },
-            ),
-            CheckboxListTile(
-              title: Text(t.alerts_dialog_check_ack),
-              value: isAck,
-              contentPadding: EdgeInsets.zero,
-              onChanged: (bool? value) {
-                if (value != null) {
-                  setState(() => isAck = value);
-                }
-              },
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text(t.alerts_dialog_button_cancel),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            final commentValue = _controller.text;
-            final currentUser = context.read<UserViewModel>().user;
-            final currentAuthor = currentUser?.login ?? "Mobile User";
-
-            context.read<HistoryAlertViewModel>().acknowledgeAlert(
-              widget.alert.id,
-              author: currentAuthor,
-              comment: commentValue,
-              isAck: isAck,
-            );
-
-            Navigator.pop(context);
-          },
-          child: Text(t.alerts_dialog_button_update),
-        ),
-      ],
-    );
-  }
 }

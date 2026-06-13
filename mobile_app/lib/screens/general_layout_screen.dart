@@ -93,6 +93,9 @@ class _GeneralLayoutState extends State<GeneralLayout> {
         return 'User Profile';
       case AppScreen.settings:
         return 'Settings';
+      case AppScreen.history:
+        return 'History';
+
     }
   }
 }
@@ -132,6 +135,13 @@ class NavDrawer extends StatelessWidget {
           _DrawerItemWidget(
             icon: Icons.warning_amber_rounded,
             title: 'Alerts',
+            targetScreen: AppScreen.alerts,
+            currentScreen: layoutViewModel.activeScreen,
+            onTap: () => _navigate(context, layoutViewModel, AppScreen.alerts),
+          ),
+          _DrawerItemWidget(
+            icon: Icons.history,
+            title: 'History',
             targetScreen: AppScreen.alerts,
             currentScreen: layoutViewModel.activeScreen,
             onTap: () => _navigate(context, layoutViewModel, AppScreen.alerts),

@@ -183,6 +183,9 @@ class AppLocalizationsPl extends AppLocalizations {
   String get alerts_sort_created_at => 'Data utworzenia';
 
   @override
+  String get alerts_sort_closed_at => 'Data zamknięcia';
+
+  @override
   String get alerts_sort_acknowledged => 'Status akceptacji';
 
   @override

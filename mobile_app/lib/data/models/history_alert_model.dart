@@ -15,7 +15,7 @@ enum AlertSeverity {
 
 enum AlertStatus { sent, inProgress, done }
 
-class Alert {
+class HistoryAlert {
   final int id;
   final String subject;
   final String source;
@@ -27,7 +27,7 @@ class Alert {
   final String? author;
   final bool acknowledged;
 
-  Alert({
+  HistoryAlert({
     required this.id,
     required this.subject,
     required this.source,
@@ -67,7 +67,7 @@ class Alert {
     }
   }
 
-  Alert copyWith({
+  HistoryAlert copyWith({
     int? id,
     String? subject,
     String? source,
@@ -79,7 +79,7 @@ class Alert {
     String? author,
     bool? acknowledged,
   }) {
-    return Alert(
+    return HistoryAlert(
       id: id ?? this.id,
       subject: subject ?? this.subject,
       source: source ?? this.source,
@@ -93,7 +93,7 @@ class Alert {
     );
   }
 
-  factory Alert.fromJson(Map<String, dynamic> json) {
+  factory HistoryAlert.fromJson(Map<String, dynamic> json) {
     //Utility function for parsing int ( taking in both int and String types)
     int asInt(dynamic value, {int defaultValue = 0}) {
       if (value == null) return defaultValue;
@@ -124,7 +124,7 @@ class Alert {
     }
 
     // Building object
-    return Alert(
+    return HistoryAlert(
       id: asInt(json['id']),
       subject: json['subject']?.toString() ?? '',
       source: json['source']?.toString() ?? 'System',

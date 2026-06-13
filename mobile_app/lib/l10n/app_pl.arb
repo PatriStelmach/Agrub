@@ -55,6 +55,7 @@
   "alerts_sort_id": "ID",
   "alerts_sort_title": "Tytuł",
   "alerts_sort_created_at": "Data utworzenia",
+  "alerts_sort_closed_at": "Data zamknięcia",
   "alerts_sort_acknowledged": "Status akceptacji",
   "alerts_sort_severity": "Ważność",
   "alerts_tile_no_title": "Brak tytułu",

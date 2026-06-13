@@ -1,3 +1,4 @@
+import 'package:alert_app/data/models/history_alert_model.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_client_sse/constants/sse_request_type_enum.dart';
@@ -8,6 +9,7 @@ import 'package:alert_app/data/models/problem_action_model.dart';
 ///
 abstract class AlertRemoteDataSource {
   Future<List<Alert>> fetchActiveAlerts();
+  Future<List<HistoryAlert>> fetchHistoryAlerts();
 
   Future<void> acknowledgeAlert({
     required int alertId,
@@ -39,6 +41,24 @@ class AlertRemoteDataSourceImpl implements AlertRemoteDataSource {
 
       return data
           .map((item) => Alert.fromJson(item as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      debugPrint(
+        "ALERT REMOTE DATA SOURCE ERROR: Fetch all alerts error - $e ",
+      );
+      rethrow;
+    }
+  }
+
+  /// Fetching all history alerts from backend endpoint and returning them as a map
+  @override
+  Future<List<HistoryAlert>> fetchHistoryAlerts() async {
+    try {
+      final response = await dio.get('/api/alerts/history/');
+      final List<dynamic> data = response.data;
+
+      return data
+          .map((item) => HistoryAlert.fromJson(item as Map<String, dynamic>))
           .toList();
     } catch (e) {
       debugPrint(
