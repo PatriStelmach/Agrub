@@ -533,35 +533,41 @@ abstract class AppLocalizations {
   /// **'Change Severity:'**
   String get alerts_dialog_section_severity;
 
+  /// No description provided for @alerts_dialog_severity_unknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get alerts_dialog_severity_unknown;
+
   /// No description provided for @alerts_dialog_severity_info.
   ///
   /// In en, this message translates to:
-  /// **'0 - Info'**
+  /// **'Info'**
   String get alerts_dialog_severity_info;
 
   /// No description provided for @alerts_dialog_severity_low.
   ///
   /// In en, this message translates to:
-  /// **'1 - Low'**
+  /// **'Low'**
   String get alerts_dialog_severity_low;
 
   /// No description provided for @alerts_dialog_severity_medium.
   ///
   /// In en, this message translates to:
-  /// **'3 - Medium'**
+  /// **'Medium'**
   String get alerts_dialog_severity_medium;
 
   /// No description provided for @alerts_dialog_severity_high.
   ///
   /// In en, this message translates to:
-  /// **'4 - High'**
+  /// **'High'**
   String get alerts_dialog_severity_high;
 
-  /// No description provided for @alerts_dialog_severity_extreme.
+  /// No description provided for @alerts_dialog_severity_critical.
   ///
   /// In en, this message translates to:
-  /// **'5 - Extreme'**
-  String get alerts_dialog_severity_extreme;
+  /// **'Critical'**
+  String get alerts_dialog_severity_critical;
 
   /// No description provided for @alerts_dialog_check_ack.
   ///

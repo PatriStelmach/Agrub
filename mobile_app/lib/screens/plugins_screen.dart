@@ -175,7 +175,7 @@ class _PluginsScreenState extends State<PluginsScreen> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () => _showRunArgsDialog(context, plugin),
-                    child: const Text('Run plugin'),
+                    child: Text(t.plugins_button_run),
                   ),
                 ),
               ],

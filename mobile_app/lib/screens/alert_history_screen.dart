@@ -56,11 +56,7 @@ class _AlertHistoryScreenState extends State<AlertHistoryScreen>
 
     final sortedList = historyViewModel.sortedHistory;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Historia Alertów'),
-      ),
-      body: Column(
+    return Column(
         children: [
           _buildSortHeader(context, historyViewModel, t),
           Expanded(
@@ -73,8 +69,7 @@ class _AlertHistoryScreenState extends State<AlertHistoryScreen>
             ),
           ),
         ],
-      ),
-    );
+      );
   }
 
   Widget _buildSortHeader(

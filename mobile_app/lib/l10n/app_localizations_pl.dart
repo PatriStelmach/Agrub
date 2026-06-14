@@ -240,19 +240,22 @@ class AppLocalizationsPl extends AppLocalizations {
   String get alerts_dialog_section_severity => 'Zmień ważność:';
 
   @override
-  String get alerts_dialog_severity_info => '0 - Info';
+  String get alerts_dialog_severity_unknown => 'Unknown';
 
   @override
-  String get alerts_dialog_severity_low => '1 - Niski';
+  String get alerts_dialog_severity_info => 'Info';
 
   @override
-  String get alerts_dialog_severity_medium => '3 - Średni';
+  String get alerts_dialog_severity_low => 'Niski';
 
   @override
-  String get alerts_dialog_severity_high => '4 - Wysoki';
+  String get alerts_dialog_severity_medium => 'Średni';
 
   @override
-  String get alerts_dialog_severity_extreme => '5 - Ekstremalny';
+  String get alerts_dialog_severity_high => 'Wysoki';
+
+  @override
+  String get alerts_dialog_severity_critical => 'Critical';
 
   @override
   String get alerts_dialog_check_ack => 'Zaakceptuj alert';

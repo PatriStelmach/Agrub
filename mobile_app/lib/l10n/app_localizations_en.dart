@@ -240,19 +240,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get alerts_dialog_section_severity => 'Change Severity:';
 
   @override
-  String get alerts_dialog_severity_info => '0 - Info';
+  String get alerts_dialog_severity_unknown => 'Unknown';
 
   @override
-  String get alerts_dialog_severity_low => '1 - Low';
+  String get alerts_dialog_severity_info => 'Info';
 
   @override
-  String get alerts_dialog_severity_medium => '3 - Medium';
+  String get alerts_dialog_severity_low => 'Low';
 
   @override
-  String get alerts_dialog_severity_high => '4 - High';
+  String get alerts_dialog_severity_medium => 'Medium';
 
   @override
-  String get alerts_dialog_severity_extreme => '5 - Extreme';
+  String get alerts_dialog_severity_high => 'High';
+
+  @override
+  String get alerts_dialog_severity_critical => 'Critical';
 
   @override
   String get alerts_dialog_check_ack => 'Acknowledge alert';
