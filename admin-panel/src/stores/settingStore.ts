@@ -15,8 +15,8 @@ export const useSettingStore = defineStore('setting-store', () => {
       user: systemFullSettings.value.wazuh_user,
       url: systemFullSettings.value.wazuh_url,
       enabled: systemFullSettings.value.wazuh_enabled,
-      wazuh_warning_level: systemFullSettings.value.wazuh_warning_level,
-      wazuh_critical_level: systemFullSettings.value.wazuh_critical_level,
+      wazuh_min_warning_level: systemFullSettings.value.wazuh_min_warning_level,
+      wazuh_min_critical_level: systemFullSettings.value.wazuh_min_critical_level,
       wazuh_info_as_alerts: systemFullSettings.value.wazuh_info_as_alerts,
       name: 'WAZUH',
     }
@@ -61,8 +61,8 @@ export const useSettingStore = defineStore('setting-store', () => {
           zabbix_enabled: res.data.zabbix_enabled === "true",
           smtp_enabled: res.data.smtp_enabled === "true",
           wazuh_info_as_alerts: res.data.wazuh_info_as_alerts === "true",
-          wazuh_warning_level: Number(res.data.wazuh_warning_level),
-          wazuh_critical_level: Number(res.data.wazuh_critical_level),
+          wazuh_min_warning_level: Number(res.data.wazuh_min_warning_level),
+          wazuh_min_critical_level: Number(res.data.wazuh_min_critical_level),
           // Timeouty i timery (number)
           scripts_execution_timeout_seconds: Number(res.data.scripts_execution_timeout_seconds),
           external_system_sync_timer: Number(res.data.external_system_sync_timer),
@@ -89,8 +89,8 @@ export const useSettingStore = defineStore('setting-store', () => {
           zabbix_enabled: res.data.zabbix_enabled === "true",
           smtp_enabled: res.data.smtp_enabled === "true",
           wazuh_info_as_alerts: res.data.wazuh_info_as_alerts === "true",
-          wazuh_warning_level: Number(res.data.wazuh_warning_level),
-          wazuh_critical_level: Number(res.data.wazuh_critical_level),
+          wazuh_min_warning_level: Number(res.data.wazuh_min_warning_level),
+          wazuh_min_critical_level: Number(res.data.wazuh_min_critical_level),
           // Timeouty i timery
           scripts_execution_timeout_seconds: Number(res.data.scripts_execution_timeout_seconds),
           external_system_sync_timer: Number(res.data.external_system_sync_timer),

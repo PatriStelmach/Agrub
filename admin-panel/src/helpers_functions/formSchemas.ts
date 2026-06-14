@@ -32,12 +32,12 @@ export const wazuhSchema = toTypedSchema(
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: 'Critical level must be higher or equeal to warning',
-          path: ["wazuh_critical_level"],
+          path: ["wazuh_min_critical_level"],
         })
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: 'Warning level must be lower or equeal to critical',
-          path: ["wazuh_warning_level"],
+          path: ["wazuh_min_warning_level"],
         })
       }
     })
