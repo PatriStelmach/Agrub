@@ -50,7 +50,7 @@
     pid /tmp/nginx.pid;
     
     events {
-        worker_connections 1024;
+        worker_connections 2048;
     }
     
     http {
