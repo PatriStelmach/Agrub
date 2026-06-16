@@ -19,14 +19,14 @@ import {Badge} from "@/components/ui/badge";
 import {IconCircleCheck, IconLoader, IconCircleX, IconHistory} from "@tabler/icons-vue";
 import {Button} from "@/components/ui/button";
 import DateCell from "@/helpers_components/DateCell.vue";
-import {useSortRequests} from "@/composables/useSortRequests.ts";
+import {useServerSort} from "@/composables/useServerSort.js";
 import SeverityDiv from "@/helpers_components/SeverityDiv.vue";
 import {hoverListRow} from "@/assets/cssFunctions.ts";
 import LoadingTable from "@/helpers_components/LoadingTable.vue";
 import {useRoute} from "vue-router";
 import LinkAlertHistoryDialog from "@/pages/alerts/history/LinkAlertHistoryDialog.vue";
-import {getHistoryAlertByIdRequest} from "@/helpers_functions/requests.ts";
 import { toast } from "vue-sonner";
+import api from "@/lib/axios.ts";
 
 const props = defineProps<{
   alerts: HistoryAlert[]
@@ -39,7 +39,7 @@ const isDialogLoading = ref(false)
 const linkAlertRoute = computed(() =>  Number(route.params.alert))
 const isLinkDialogOpen = ref(false)
 const linkHistoryAlert = ref<HistoryAlert | null>(null)
-const { sortKey, sortOrder, toggleSort } = useSortRequests<HistoryAlert>(() => props.alerts, 'createdAt')
+const { sortKey, sortOrder, toggleSort } = useServerSort<HistoryAlert>( 'createdAt')
 
 const hoveredId = ref<number | null>(null);
 
@@ -63,13 +63,18 @@ watch(
   async ([isLoading, route]) => {
     if (isLoading || !route) return;
     isDialogLoading.value = true;
-      await getHistoryAlertByIdRequest(route)
-        .catch(e => toast.error(`Error downloading alert ${route} from history: ${e}`))
-        .then((res) => linkHistoryAlert.value = res)
-        .finally(() => {
-          isDialogLoading.value = false;
-          isLinkDialogOpen.value = true
-        })
+    try {
+      const res = await api.get(`/alerts/${route}`)
+      if (res.status === 200) {
+        linkHistoryAlert.value = res.data
+        isLinkDialogOpen.value = true
+      }
+    } catch (error) {
+      toast.error(`Error downloading alert ${route} from history: ${error}`)
+    }
+    finally {
+      isDialogLoading.value = false
+    }
   },{ immediate: true , deep: true });
 
 

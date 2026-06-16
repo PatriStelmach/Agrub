@@ -40,13 +40,13 @@ const onSubmit = handleSubmit(async () => {
   if(props.actionType === "edit") {
     await userStore.editUserRequest(updatedUser.value)
       .then((res) => toast.success(`User ${res} updated successfully.`))
-      .catch((error) => toast.error(`Error updating ${updatedUser.value.email}: ${error}`))
+      .catch((error) => toast.error(`Error updating ${updatedUser.value.email}: ${error.message}`))
       .finally(() => isLoading.value = false)
   }
   else {
     await userStore.createUserRequest(updatedUser.value)
       .then((res) => toast.success(`User ${res} created successfully.`))
-      .catch((error) => toast.error(`Error updating ${updatedUser.value.email}: ${error}`))
+      .catch((error) => toast.error(`Error creating ${updatedUser.value.email}: ${error.message}`))
       .finally(() => isLoading.value = false)
   }
 })

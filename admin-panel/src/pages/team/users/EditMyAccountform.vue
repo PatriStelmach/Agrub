@@ -51,7 +51,7 @@ const onSubmit = handleSubmit(async (data) => {
   isSubmitLoading.value = true
   await userStore.editUserRequest({...data, role: props.user.role})
     .then((res) => toast.success(`User ${res} updated successfully.`))
-    .catch((error) => toast.error(`Error updating ${data.email}: ${error}`))
+    .catch((error) => toast.error(`Error updating ${data.email}: ${error.message}`))
     .finally( async () =>{
       await authStore.refreshToken()
         .then(() => {

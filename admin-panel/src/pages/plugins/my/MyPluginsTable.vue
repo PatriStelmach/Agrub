@@ -28,7 +28,7 @@ import {
   IconLoader
 } from "@tabler/icons-vue"
 import {computed, ref, watch, watchEffect} from "vue";
-import {useSort} from "@/helpers_functions/sorting.js";
+import {useClientSort} from "@/composables/useClientSort";
 import SortableHead from "@/helpers_components/SortableHead.vue";
 import {
   tableCaption,
@@ -38,19 +38,28 @@ import {
 } from "@/assets/cssFunctions.ts";
 import TopH1Div from "@/helpers_components/TopH1Div.vue";
 import {useWrapping} from "@/composables/useWrapping.js";
-import {getPluginDetailsRequest, runScriptRequest} from "@/helpers_functions/requests.ts";
+import {getPluginDetailsRequest, runPluginRequest} from "@/helpers_functions/requests/pluginsRequests.ts";
 import {Button} from "@/components/ui/button";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
 import {Search} from "lucide-vue-next";
 import {Label} from "@/components/ui/label";
 import {ButtonGroup} from "@/components/ui/button-group";
 import {dateParser} from "@/helpers_functions/dateParser.js";
-import {useMyPluginStore} from "@/stores/myPluginStore.ts";
 import {inputText} from "@/assets/cssFunctions.ts";
 import SeveritySelect from "@/helpers_components/SeveritySelect.vue";
 import SeverityDiv from "@/helpers_components/SeverityDiv.vue";
 import LoadingTable from "@/helpers_components/LoadingTable.vue";
 import MyTagInput from '@/helpers_components/MyTagInput.vue'
+import PluginDetailsDialog from '@/pages/plugins/PluginDetailsDialog.vue'
+import {toast} from "vue-sonner";
+import {useRoute, useRouter} from "vue-router";
+import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
+import {Input} from "@/components/ui/input";
+import {useAuthStore} from "@/stores/authStore.ts";
+import {
+  changeMyPluginStatusRequest,
+  deleteMyPluginsRequest, editMyPluginRequest
+} from "@/helpers_functions/requests/pluginsRequests.ts";
 
 const props = defineProps<{
   data: MyPlugin[];
@@ -60,18 +69,12 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:search-data': [data:string]
 }>()
+const allMyPlugins = defineModel<MyPlugin[]>('allMyPlugins');
 
 
-import PluginDetailsDialog from '@/pages/plugins/PluginDetailsDialog.vue'
-import {toast} from "vue-sonner";
-import {useRoute, useRouter} from "vue-router";
-import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
-import {Input} from "@/components/ui/input";
-import {useAuthStore} from "@/stores/authStore.ts";
-const myPluginStore = useMyPluginStore()
 const authStore = useAuthStore()
-const { sortedData, sortKey, sortOrder, toggleSort } = useSort<MyPlugin>(() => props.data, 'updatedAt')
-const { isUnwrapped, unwrap, unwrappedItem, save } = useWrapping(sortedData, 'fullName')
+const { sortedData, sortKey, sortOrder, toggleSort } = useClientSort<MyPlugin>(() => props.data, 'updatedAt')
+const { isUnwrapped, unwrap, unwrappedItem, hasChanged, originalItem } = useWrapping(sortedData, 'fullName')
 const router = useRouter()
 const route = useRoute()
 const paramRoute = computed(() => route.params.plugin)
@@ -138,31 +141,39 @@ const checkAll = () => {
 
 const changeStatus = () => {
   if(!unwrappedItem.value && authStore.isAdmin) {
-    myPluginStore.changeStatus(checkedPlugins.value)
-      .catch(e => toast.error(`Error changing status: ${e}`))
-      .then(()=> toast.success(`Successfully changed status`))
-      .finally(()=> checkedPlugins.value = [])
+    changeMyPluginStatusRequest(checkedPlugins.value)
+      .then(res => {
+        toast.success(`Successfully changed status`)
+        allMyPlugins.value = res
+      })
+      .catch(e => toast.error(`Error changing status: ${e.message}`))
+      .finally(() => checkedPlugins.value = [])
   }
 }
 
 const deletePlugins = () => {
   if(!unwrappedItem.value && authStore.isAdmin) {
-    myPluginStore.deleteMyPlugins(checkedPlugins.value)
-      .catch(e => toast.error(`Error deleting plugins: ${e}`))
-      .then(()=> toast.success(`Successfully deleted plugins`))
-      .finally(()=> checkedPlugins.value = [])
+    deleteMyPluginsRequest(checkedPlugins.value)
+      .then(res => {
+        toast.success(`Successfully deleted plugins`)
+        allMyPlugins.value = res
+      })
+      .catch(e => toast.error(`Error deleting plugins: ${e.message}`))
+      .finally(() => checkedPlugins.value = [])
   }
 }
 
 const getDetails = async (fileName: string) => {
   await getPluginDetailsRequest(fileName, 'local-scripts')
     .then((res) => {
-      if(unwrappedItem.value) {
+      if(unwrappedItem.value && originalItem.value) {
         unwrappedItem.value.code = res?.code
         unwrappedItem.value.description = res?.description
+        originalItem.value.code = res?.code
+        originalItem.value.description = res?.description
       }
     })
-    .catch((err) => toast.error(`Error fetching plugin details: ${err}`))
+    .catch((err) => toast.error(`Error fetching plugin details: ${err.message}`))
     .finally(() => getDetailsLoading.value = false)
 }
 
@@ -180,11 +191,11 @@ const updateDetails = (code: string, description: string) => {
 const triggerScript = async (args: string) => {
   if (checkedPlugins.value.length === 1) {
     loadingTrigger.value = true
-    await runScriptRequest(checkedPlugins.value.find(v => v), args)
+    await runPluginRequest(checkedPlugins.value.find(v => v), args)
       .then((res) => {
         toast.success(`Script triggered: ${res}`)
       })
-      .catch((error) => toast.error(error))
+      .catch((error) => toast.error(error.message))
       .finally(() => loadingTrigger.value = false)
   }
   else {
@@ -193,18 +204,21 @@ const triggerScript = async (args: string) => {
 }
 
 const savePlugin = async () => {
-  isEditLoading.value = true
-  try {
-    if (unwrappedItem.value && authStore.isAdmin) {
-      await save(() => myPluginStore.editMyPlugin(unwrappedItem.value!))
+  if (unwrappedItem.value && authStore.isAdmin) {
+    isEditLoading.value = true
+    if(hasChanged()){
+      await editMyPluginRequest(unwrappedItem.value)
+        .then(res => {
+          toast.success(`Successfully updated plugin`)
+          allMyPlugins.value = res
+        })
+        .catch(e => toast.error(`Editing "${unwrappedItem.value?.name}" failed with error ${e.message}`))
     }
-  } catch (e) {
-    toast.error(`Editing "${unwrappedItem.value?.name}" failed with error ${e}`);
+    else
+      toast.info('No changes were made')
   }
-  finally {
-    isEditLoading.value = false
-    onCloseAndSave()
-  }
+  isEditLoading.value = false
+  onCloseAndSave()
 }
 
 watchEffect(async () => {
@@ -212,13 +226,13 @@ watchEffect(async () => {
       const plugin = sortedData.value.find((pl) => pl.name === paramRoute.value)
       if(plugin) {
         unwrap(plugin.fullName)
-      }
-      if(unwrappedItem.value) {
         getDetailsLoading.value = true
-        setTimeout(async () => {
-          await getDetails(unwrappedItem.value!.fullName)
-        },500 )
       }
+        setTimeout(async () => {
+          if(unwrappedItem.value) {
+            await getDetails(unwrappedItem.value!.fullName)
+          }
+        },200 )
     }
     else {
       unwrappedItem.value = null
@@ -242,7 +256,7 @@ const onEdit = (plugin: MyPlugin) => {
 </script>
 
 <template>
-<TopH1Div h1="Your plugins">
+<TopH1Div h1="My plugins">
   <ButtonGroup >
     <Popover>
       <PopoverTrigger as-child>
@@ -310,7 +324,14 @@ const onEdit = (plugin: MyPlugin) => {
 </TopH1Div>
 
   <div :class="tableDiv ">
-    <Table id="my-plugin-table" :class="dataTable">
+    <PluginDetailsDialog
+      v-model:isCodeDialogOpen="isCodeDialogOpen"
+      :editable="authStore.isAdmin"
+      :code="unwrappedItem?.code ?? ''"
+      :description="unwrappedItem?.description ?? ''"
+      @update:save-changes="updateDetails"
+    />
+    <Table id="my_plugins_table" :class="dataTable">
       <TableCaption :class="tableCaption">
         <slot/>
       </TableCaption>
@@ -339,6 +360,7 @@ const onEdit = (plugin: MyPlugin) => {
         <LoadingTable :colspan="9" v-if="isLoading"/>
         <TableBody v-else>
           <TableRow
+            :id="`my_plugin_${plugin.name}`"
             class="cursor-pointer duration-0 border-radius-0  [&_td]:py-2 [&_td]:pr-4 hover:bg-green-badge/20"
             v-for="plugin in sortedData"
             :key="plugin.fullName"
@@ -357,7 +379,7 @@ const onEdit = (plugin: MyPlugin) => {
                 v-model="checkedPlugins"
               />
             </TableCell>
-            <TableCell v-if="isUnwrapped(plugin.fullName) && unwrappedItem && authStore.isAdmin">
+            <TableCell :id="`my_plugin_name_${plugin.fullName}`" v-if="isUnwrapped(plugin.fullName) && unwrappedItem && authStore.isAdmin">
               <InputGroup
                 class="w-full xl:h-10 2xl:h-12 ">
                 <InputGroupInput
@@ -391,7 +413,8 @@ const onEdit = (plugin: MyPlugin) => {
             <TableCell v-if="isUnwrapped(plugin.fullName) && authStore.isAdmin" class="grid space-y-2">
               <InputGroup class="relative w-full xl:h-10 2xl:h-12 mb-2">
                 <InputGroupInput
-                  class=" text-center input-text"
+                  :id="`my_plugin_cron_input_${plugin.name}`"
+                  class=" text-center"
                   type="text"
                   placeholder="cron expression"
                   v-model="unwrappedItem!.cronExpression"
@@ -402,10 +425,13 @@ const onEdit = (plugin: MyPlugin) => {
                 class="grid gap-y-2 w-full text-center whitespace-break-spaces t"
                 :class="{'text-destructive' : !cronDescription[2]}"
               >
-                  <span>{{ cronDescription[0]}}</span>
-                  <span v-if="cronDescription[2]">
-                    Next run: {{ cronDescription[1]}}</span>
+                <span>
+                  {{ cronDescription[0]}}
                 </span>
+                <span v-if="cronDescription[2]">
+                  Next run: {{ cronDescription[1]}}
+                </span>
+              </span>
             </TableCell>
             <TableCell v-else class="whitespace-break-spaces">
               <span
@@ -415,7 +441,7 @@ const onEdit = (plugin: MyPlugin) => {
                 <span>{{cronWrappedDescription(plugin.cronExpression)[0]}}</span>
                 <span  v-if="cronWrappedDescription(plugin.cronExpression)[2]">Next run: {{nextRun(plugin)}}
                 </span>
-                <span class="text-primary truncate" v-else-if="!cronWrappedDescription(plugin.cronExpression)[0]">
+                <span :id="`my_plugin_cron_value_${plugin.name}`" class="text-primary truncate" v-else-if="!cronWrappedDescription(plugin.cronExpression)[0]">
                   Next run: -------------
                 </span>
               </span>
@@ -423,6 +449,7 @@ const onEdit = (plugin: MyPlugin) => {
 
             <TableCell v-if="isUnwrapped(plugin.fullName) && unwrappedItem && authStore.isAdmin" >
               <SeveritySelect
+                hideUnknown
                 v-model:severity="unwrappedItem.severity"
               />
             </TableCell>
@@ -454,24 +481,13 @@ const onEdit = (plugin: MyPlugin) => {
                   Cancel<IconCancel class="size-4 xl:size-5"/>
                 </Button>
                 <Button
+                  @click.stop="isCodeDialogOpen = true"
+                  :id="`my_plugin_details_${plugin.name}`"
                   :disabled="getDetailsLoading"
                   variant="blue_outline" class="border-l-2! p-0">
-                  <PluginDetailsDialog
-                    v-model:isCodeDialogOpen="isCodeDialogOpen"
-                    :editable="authStore.isAdmin"
-                    :code="unwrappedItem.code ?? ''"
-                    :description="unwrappedItem.description ?? ''"
-                    @update:save-changes="updateDetails"
-                  >
-                    <Button
-                      @click.stop
-                      class="m-0 rounded-none bg-transparent! hover:scale-100 text-blue-badge hover:text-primary"
-                    >
-                      Code
-                      <IconLoader v-if="getDetailsLoading" class="animate-spin"/>
-                      <IconCode v-else class="size-4 xl:size-5"/>
-                    </Button>
-                  </PluginDetailsDialog>
+                  Code
+                  <IconLoader v-if="getDetailsLoading" class="animate-spin"/>
+                  <IconCode v-else class="size-4 xl:size-5"/>
                 </Button>
                 <Button
                   v-if="authStore.isAdmin"
@@ -483,7 +499,8 @@ const onEdit = (plugin: MyPlugin) => {
                   <IconLoader v-if="isEditLoading" class="animate-spin"/>
                   <IconDeviceFloppy v-else class="size-4 xl:size-5"/>
                 </Button>
-              </ButtonGroup></TableCell>
+              </ButtonGroup>
+            </TableCell>
           </TableRow>
         </TableBody>
       </Transition>

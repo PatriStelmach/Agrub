@@ -13,6 +13,7 @@ export const useSSEstore = defineStore('SSE', () => {
   const authStore = useAuthStore()
   const router = useRouter()
   const isConnected = ref(false)
+  let controller: AbortController | null = null
 
   const handleSSEMessage = (event: any) => {
     if (!event) return;
@@ -101,6 +102,7 @@ export const useSSEstore = defineStore('SSE', () => {
 
   const connectToSSE = async () => {
 
+    controller = new AbortController()
 
     await fetchEventSource(`${api_url}/alerts/stream`, {
       headers: {
@@ -123,17 +125,24 @@ export const useSSEstore = defineStore('SSE', () => {
       },
 
       onclose() {
-        isConnected.value = false;
+        disconnectSSE()
       },
       onerror(err) {
-        toast.error(`${err}`)
+        toast.error(`${err.message}`)
       },
     });
   };
 
+  const disconnectSSE = () => {
+    controller?.abort()
+    controller = null
+    isConnected.value = false;
+  }
+
 
   return {
     isConnected,
-    connectToSSE
+    connectToSSE,
+    disconnectSSE
   };
 });

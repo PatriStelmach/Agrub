@@ -18,8 +18,9 @@ export function useClientSearchFilter<T>(data: () => T[], filter: (item: T) => s
   const updateFilter = useDebounceFn((filter: string)=> {
     debounceFilter.value = filter
   }, 30)
+
   const updateData = (data:T[]) => {
-    tableData.value = data as T[]
+    tableData.value = data
   }
   const updateSearchData = (data: string) => {
     searchFilter.value = data.trim()
@@ -29,10 +30,11 @@ export function useClientSearchFilter<T>(data: () => T[], filter: (item: T) => s
     currentPage.value = 1
     updateFilter(val)
   })
+
   watch(pageSize, () => {
     currentPage.value = 1
   })
-
+  
   return {
     searchFilter,
     currentPage,

@@ -12,7 +12,7 @@ import {Button} from "@/components/ui/button";
 import {useForm} from "vee-validate";
 import {groupSchema} from "@/helpers_functions/formSchemas.ts";
 import {ref} from "vue";
-import {createGroupRequest} from "@/helpers_functions/requests.ts";
+import {createGroupRequest} from "@/helpers_functions/requests/groupsRequests.ts";
 import {toast} from "vue-sonner";
 import {useRouter} from "vue-router";
 
@@ -27,7 +27,7 @@ const onSubmit = handleSubmit(async (data) => {
   isLoading.value = true
   await createGroupRequest(data.groupName)
     .then((res) => router.push({ path: `/groups/edit_group/${res.id}/${res.name}`}))
-    .catch((e) => toast.error(`Error creating new group: ${e}`))
+    .catch((e) => toast.error(`Error creating new group: ${e.message}`))
     .finally(() => isLoading.value = false)
 })
 

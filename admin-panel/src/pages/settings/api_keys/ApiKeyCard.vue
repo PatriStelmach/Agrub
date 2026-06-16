@@ -32,7 +32,7 @@ const revoke = async(id: number) => {
   setTimeout(async() => {
     await settingsStore.revokeApiKeyRequest(id)
       .then((res) => toast.success(res))
-      .catch((e) => toast.error(`API key could not be revoked: ${e}`))
+      .catch((e) => toast.error(`API key could not be revoked: ${e.message}`))
       .finally(async () => isRevoking.value = false)
   },200)
 }
@@ -42,7 +42,7 @@ const deleteApiKey = async(id: number) => {
   setTimeout(async() => {
     await settingsStore.deleteApiKeyRequest(id)
       .then(() => toast.success('API key deleted successfully.'))
-      .catch((e) => toast.error(`API key could not be deleted: ${e}`))
+      .catch((e) => toast.error(`API key could not be deleted: ${e.message}`))
       .finally(async () => isDeleting.value = false)
   },200)
 }

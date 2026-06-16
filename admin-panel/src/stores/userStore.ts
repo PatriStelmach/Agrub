@@ -32,16 +32,6 @@ export const useUserStore = defineStore('user-store',() => {
     }
   }
 
-  const getUserByIdRequest = async (id: number) => {
-    try {
-      const res = await api.get(`/users/${id}`)
-      if (res.status === 200) return res.data
-    }
-    catch (error) {
-      toast.error(`Error retrieving user: ${error}`)
-    }
-  }
-
   const createUserRequest = async (user: User) => {
     try {
       const res = await api.post('/users', user)
@@ -50,7 +40,6 @@ export const useUserStore = defineStore('user-store',() => {
         return res.data.email
       }
     } catch (error) {
-      toast.error(`Error creating user: ${error}`)
       throw error
     }
   }
@@ -69,6 +58,18 @@ export const useUserStore = defineStore('user-store',() => {
     }
   }
 
+  const changeUserPasswordRequest = async (oldPassword: string, newPassword: string) => {
+    try {
+      const res = await api.patch('users/me/password', { oldPassword: oldPassword, newPassword: newPassword })
+      if (res.status === 200) {
+        toast.success('Password changed successfully!')
+        return true
+      }
+    } catch (error) {
+      throw (error)
+    }
+  }
+
   const avFallback = (user: User) =>  {
     return `${user.firstname.slice(0, 1).toUpperCase()}${user.surname.slice(0,1).toUpperCase()}`
   }
@@ -80,11 +81,11 @@ export const useUserStore = defineStore('user-store',() => {
     allUsers,
     allGroups,
     getAllUsersRequest,
-    getUserByIdRequest,
     fullName,
     avFallback,
     editUserRequest,
     getAllGroupsRequest,
     createUserRequest,
+    changeUserPasswordRequest,
   }
 })

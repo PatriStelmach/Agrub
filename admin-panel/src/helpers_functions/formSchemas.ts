@@ -15,12 +15,12 @@ export const wazuhSchema = toTypedSchema(
     wazuh_url: z.string().url('Must be a valid URL'),
     wazuh_user: z.string().min(1, 'User is required'),
     wazuh_password_SECRET: z.string().optional(),
-    wazuh_critical_level: z
+    wazuh_min_critical_level: z
       .number()
       .int('Must be a positive integer')
       .min(0, '0 is minimal critical level')
       .max(15, '15 is maximal critical level'),
-    wazuh_warning_level: z
+    wazuh_min_warning_level: z
       .number()
       .int('Must be a positive integer')
       .min(0, '0 is minimal warning level')
@@ -28,16 +28,16 @@ export const wazuhSchema = toTypedSchema(
     wazuh_info_as_alerts: z.boolean(),
   })
     .superRefine((data, ctx) => {
-      if(data.wazuh_warning_level > data.wazuh_critical_level) {
+      if(data.wazuh_min_warning_level > data.wazuh_min_critical_level) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: 'Critical level must be higher or equeal to warning',
-          path: ["wazuh_critical_level"],
+          path: ["wazuh_min_critical_level"],
         })
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: 'Warning level must be lower or equeal to critical',
-          path: ["wazuh_warning_level"],
+          path: ["wazuh_min_warning_level"],
         })
       }
     })
@@ -53,10 +53,10 @@ export const zabbixSchema = toTypedSchema(
 
 export const alertLoginSchema = toTypedSchema(
   z.object({
-    email: z
+    alert_email: z
       .string()
       .email('Invalid email address'),
-    password: z
+    alert_password: z
       .string()
       .min(4, 'Password must be at least 4 characters.')
   }),
@@ -64,10 +64,10 @@ export const alertLoginSchema = toTypedSchema(
 
 export const ADLoginSchema = toTypedSchema(
   z.object({
-    email: z
+    ad_login: z
       .string()
       .min(1,'Username is required'),
-    password: z
+    ad_password: z
       .string()
       .min(4, 'Password must be at least 4 characters.')
   }),

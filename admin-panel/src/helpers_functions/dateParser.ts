@@ -1,5 +1,7 @@
-import { getLocalTimeZone, CalendarDateTime, ZonedDateTime, CalendarDate} from '@internationalized/date'
+import { getLocalTimeZone, CalendarDateTime, ZonedDateTime, CalendarDate}
+  from '@internationalized/date'
 
+const tz = getLocalTimeZone()
 export function dateParser(date: Date | string) {
   const d = new Date(date);
   const pad = (n: number) => String(n).padStart(2, '0');
@@ -30,7 +32,7 @@ export function dateParser(date: Date | string) {
   }
 }
 
-export const toApiDate = (date: CalendarDate | CalendarDateTime | ZonedDateTime) => {
-  const tz = getLocalTimeZone()
+export const toApiDate =
+  (date: CalendarDate | CalendarDateTime | ZonedDateTime) => {
   return date ? dateParser(date.toDate(tz)).apiDate : undefined
 }

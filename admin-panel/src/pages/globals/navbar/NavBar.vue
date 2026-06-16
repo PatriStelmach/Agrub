@@ -20,15 +20,27 @@ import {
   SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu,
   SidebarMenuButton, SidebarMenuItem
 } from "@/components/ui/sidebar";
-
-
 import NavUser from "@/pages/globals/navbar/NavUser.vue";
 import {useRoute} from "vue-router";
-import {globals} from "@/helpers_functions/globals.js";
-import {onMounted} from "vue";
+import {onMounted, ref} from "vue";
 import {useAuthStore} from "@/stores/authStore.ts";
+import {dateParser} from "@/helpers_functions/dateParser.ts";
 
-const { time, dayMonthYear, weekday, changeTime } = globals()
+const date = ref<Date>(new Date())
+const time = ref<string>(dateParser(date.value).fullTime);
+const dayMonthYear  = ref<string>(dateParser(date.value).dayMonthYear)
+const weekday = ref<string | undefined>(dateParser(date.value).weekday())
+
+const changeTime = () => {
+  setInterval(() => {
+    const newDate = new Date()
+    time.value = dateParser(newDate).fullTime
+    if(time.value === '00:00:00') {
+      dayMonthYear.value = dateParser(newDate).dayMonthYear
+      weekday.value = dateParser(newDate).weekday()
+    }
+  }, 1000)
+}
 const route = useRoute()
 const authStore = useAuthStore()
 onMounted(() => changeTime())
@@ -114,7 +126,7 @@ const navItems = authStore.isAdmin ? [
                   {{ item.label }}
                 </SidebarGroupLabel>
                   <RouterLink
-                    :class="{'bg-blue-badge/50 border-blue-badge' : route.name?.toString().includes(link.to.toString())}"
+                    :class="{'bg-blue-badge/50 border-blue-badge' : route.name?.toString().includes(link.to.toString()) || route.name?.toString() === 'home' && link.to === 'active_alerts'}"
                     class="flex text-sm items-center xl:text-md ml-3 border-l-4 w-full gap-x-2 p-2 hover:bg-input rounded-[0_0.5rem_0.5rem_0]"
                     v-for="link in item.links" :key="link.to" :to="{ name: link.to}">
                       <component class="size-5  xl:size-6" :is="link.icon"/>

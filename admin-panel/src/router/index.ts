@@ -14,41 +14,10 @@ import AllChartsPage from "@/pages/charts/AllChartsPage.vue";
 import ApiKeysPage from "@/pages/settings/api_keys/ApiKeysPage.vue";
 import {useAuthStore} from "@/stores/authStore.ts";
 import NoPrivileges from "@/pages/NoPrivileges.vue";
-import LoginPage from "@/pages/login/LoginPage.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    {
-      path: '/active_alerts/:alert?',
-      name: 'active_alerts',
-      component: ActiveAlertsPage
-    },
-    {
-      path: '/alerts_history/:alert?',
-      name: 'alerts_history',
-      component: AlertsHistory
-    },
-    {
-      path: '/plugins_library',
-      name: 'plugins_library',
-      component: PluginsLibrary
-    },
-    {
-      path: '/my_plugins/:plugin?',
-      name: 'my_plugins',
-      component: MyPlugins
-    },
-    {
-      path: '/team_members/:id?/:user?',
-      name: 'team_members',
-      component: TeamPage
-    },
-    {
-      path: '/team_members/my_account',
-      name: 'my_account',
-      component: MyAccount
-    },
     {
       path: '/groups',
       name: 'groups',
@@ -56,6 +25,37 @@ const router = createRouter({
         requiresAdmin: true
       },
       component: Groups
+    },
+    {
+      path: '/settings/systems/:system?',
+      name: 'settings/systems',
+      meta: {
+        requiresAdmin: true
+      },
+      component: ExternalSystems
+    },
+    {
+      path: '/active_alerts/:alert?',
+      name: 'active_alerts',
+      component: ActiveAlertsPage
+    },
+    {
+      path: '/charts' ,
+      name: 'charts',
+      meta: {
+        requiresAdmin: true
+      },
+      component: AllChartsPage
+    },
+    {
+      path: '/no_privileges/:prohibited_path/:prohibited_params?/:invalid_data?/:invalid_path?',
+      name: 'no_privileges',
+      component: NoPrivileges
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'home',
+      component: ActiveAlertsPage
     },
     {
       path: '/groups/edit_group/:id/:name',
@@ -89,36 +89,30 @@ const router = createRouter({
       component: ConfigPage
     },
     {
-      path: '/settings/systems/:system?',
-      name: 'settings/systems',
-      meta: {
-        requiresAdmin: true
-      },
-      component: ExternalSystems
+      path: '/alerts_history/:alert?',
+      name: 'alerts_history',
+      component: AlertsHistory
     },
     {
-      path: '/charts' ,
-      name: 'charts',
-      meta: {
-        requiresAdmin: true
-      },
-      component: AllChartsPage
+      path: '/plugins_library',
+      name: 'plugins_library',
+      component: PluginsLibrary
     },
     {
-      path: '/no_privileges/:prohibited_path/:prohibited_params?/:invalid_data?/:invalid_path?',
-      name: 'no_privileges',
-      component: NoPrivileges
+      path: '/my_plugins/:plugin?',
+      name: 'my_plugins',
+      component: MyPlugins
     },
     {
-      path: '/login',
-      name:'login',
-      component: LoginPage
+      path: '/team_members/:id?/:user?',
+      name: 'team_members',
+      component: TeamPage
     },
     {
-      path: '/:pathMatch(.*)*',
-      name: 'home',
-      component: ActiveAlertsPage
-    }
+      path: '/team_members/my_account',
+      name: 'my_account',
+      component: MyAccount
+    },
   ],
 })
 

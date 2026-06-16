@@ -6,7 +6,7 @@ import {dataTable, hoverListRow, tableHeaders} from "@/assets/cssFunctions.js";
 import SeverityDiv from "@/helpers_components/SeverityDiv.vue";
 import {IconCircleCheck, IconCircleX} from "@tabler/icons-vue";
 import SortableHead from "@/helpers_components/SortableHead.vue";
-import {useSort} from "@/helpers_functions/sorting";
+import {useClientSort} from "@/composables/useClientSort";
 import {type HTMLAttributes, onMounted, ref} from "vue";
 import {useAuthStore} from "@/stores/authStore.ts";
 import {useUserStore} from "@/stores/userStore.ts";
@@ -24,7 +24,7 @@ const userStore = useUserStore()
 const areActionsLoading = ref(true);
 
 
-const { sortedData, sortKey, sortOrder, toggleSort } = useSort(
+const { sortedData, sortKey, sortOrder, toggleSort } = useClientSort(
   () => props.actions ?? [],
   'createdAt'
 )

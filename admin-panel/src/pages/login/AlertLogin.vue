@@ -27,15 +27,18 @@ const authStore = useAuthStore();
 const { handleSubmit } = useForm({
   validationSchema: alertLoginSchema,
   initialValues: {
-    email: '',
-    password: '',
+    alert_email: '',
+    alert_password: '',
   },
 })
 
 const onSubmit = handleSubmit(async (data) => {
   isLoading.value = true
   try {
-    if(!await authStore.alertLogin(data))
+    if(!await authStore.alertLogin({
+      email: data.alert_email,
+      password: data.alert_password
+    }))
       showWrongPassword.value = true
   }
   catch { showWrongPassword.value = true }
@@ -49,7 +52,7 @@ const onSubmit = handleSubmit(async (data) => {
        >
 
     <CardHeader>
-      <CardTitle class="text-xl text-center">Log in</CardTitle>
+      <CardTitle class="text-xl text-center">Sign in</CardTitle>
       <CardDescription class="text-center">
         Use Alert credentials
       </CardDescription>
@@ -58,8 +61,8 @@ const onSubmit = handleSubmit(async (data) => {
 
       <form class="p-2"  id="alert-login-form" @submit="onSubmit">
         <FieldGroup>
-          <FormInput :disabled="showWrongPassword" placeholder="user@example.com..." name="email" type="email" label="E-mail address" orientation="vertical"/>
-          <FormInput :disabled="showWrongPassword" name="password" type="password" label="Password" orientation="vertical"/>
+          <FormInput :disabled="showWrongPassword" placeholder="user@example.com..." name="alert_email" type="email" label="E-mail address" orientation="vertical"/>
+          <FormInput autocomplete="password" :disabled="showWrongPassword" name="alert_password" type="password" label="Password" orientation="vertical"/>
         </FieldGroup>
       </form>
       <div class="p-2 flex space-x-2 *:text-comment">
@@ -73,8 +76,8 @@ const onSubmit = handleSubmit(async (data) => {
     </CardContent>
     <CardFooter>
       <Field orientation="horizontal">
-        <Button :disabled="showWrongPassword" type="submit" class="w-full" form="alert-login-form">
-          <span v-if="!isLoading">Log in</span>
+        <Button id="alert_sign_in" :disabled="showWrongPassword" type="submit" class="w-full" form="alert-login-form">
+          <span v-if="!isLoading">Sign in</span>
           <IconLoader v-else class="animate-spin duration-75"/>
         </Button>
       </Field>

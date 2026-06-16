@@ -19,7 +19,7 @@ const settingsStore = useSettingStore()
 onMounted(async () => {
   if(settingsStore.apiKeys.length === 0 || !settingsStore.apiKeys) {
     await settingsStore.getApiKeysRequest()
-      .catch(error => toast.error(`Error retrieving api keys: ${error}`))
+      .catch(error => toast.error(`Error retrieving api keys: ${error.message}`))
       .finally(() =>  isPageLoading.value = false)
   }
   isPageLoading.value = false

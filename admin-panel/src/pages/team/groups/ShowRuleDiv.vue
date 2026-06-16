@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import {IconEdit, IconLoader, IconTrash} from "@tabler/icons-vue";
 import { type Rule } from "@/types/types.ts";
 import {Button} from "@/components/ui/button";
+import SeverityDiv from "@/helpers_components/SeverityDiv.vue";
 
 defineProps<{
   rule: Rule
@@ -47,7 +48,7 @@ defineProps<{
 
         <div class="flex items-center gap-2">
           <span class="text-comment w-34 shrink-0">Min severity:</span>
-          <span class="font-medium">{{ rule.minSeverity }}</span>
+          <SeverityDiv :severity="rule.minSeverity" />
         </div>
 
         <div class="flex items-center gap-2">

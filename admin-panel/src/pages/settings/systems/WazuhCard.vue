@@ -42,8 +42,8 @@ const { handleSubmit, setValues } = useForm({
     wazuh_url: props.system.url,
     wazuh_user: props.system.user,
     wazuh_password_SECRET: '',
-    wazuh_critical_level: props.system.wazuh_critical_level,
-    wazuh_warning_level: props.system.wazuh_warning_level,
+    wazuh_min_critical_level: props.system.wazuh_min_critical_level,
+    wazuh_min_warning_level: props.system.wazuh_min_warning_level,
     wazuh_info_as_alerts: props.system.wazuh_info_as_alerts,
   },
 })
@@ -58,11 +58,11 @@ const onSubmit = handleSubmit(async (data) => {
   if (data.wazuh_user && data.wazuh_user !== props.system.user) {
     changedValues.wazuh_user = data.wazuh_user
   }
-  if (data.wazuh_warning_level !== props.system.wazuh_warning_level) {
-    changedValues.wazuh_warning_level = String(data.wazuh_warning_level)
+  if (data.wazuh_min_warning_level !== props.system.wazuh_min_warning_level) {
+    changedValues.wazuh_min_warning_level = String(data.wazuh_min_warning_level)
   }
-  if (data.wazuh_critical_level !== props.system.wazuh_critical_level) {
-    changedValues.wazuh_critical_level = String(data.wazuh_critical_level)
+  if (data.wazuh_min_critical_level !== props.system.wazuh_min_critical_level) {
+    changedValues.wazuh_min_critical_level = String(data.wazuh_min_critical_level)
   }
   if (!!data.wazuh_password_SECRET) {
     changedValues.wazuh_password_SECRET = data.wazuh_password_SECRET
@@ -89,8 +89,8 @@ const onEdit = () => {
   setValues({
     wazuh_url: props.system.url,
     wazuh_user: props.system.user,
-    wazuh_warning_level: props.system.wazuh_warning_level,
-    wazuh_critical_level: props.system.wazuh_critical_level,
+    wazuh_min_warning_level: props.system.wazuh_min_warning_level,
+    wazuh_min_critical_level: props.system.wazuh_min_critical_level,
     wazuh_password_SECRET: '',
     wazuh_info_as_alerts: props.system.wazuh_info_as_alerts,
   })
@@ -149,12 +149,12 @@ const onCancel = () => {
           </FormInput>
         </div>
         <div>
-          <FormNumberInput orientation="vertical" name="wazuh_warning_level" label="Warning level: ">
+          <FormNumberInput orientation="vertical" name="wazuh_min_warning_level" label="Warning level: ">
             <IconBellExclamation class="size-5"/>
           </FormNumberInput>
         </div>
         <div>
-          <FormNumberInput orientation="vertical" name="wazuh_critical_level" label="Critical level: ">
+          <FormNumberInput orientation="vertical" name="wazuh_min_critical_level" label="Critical level: ">
             <IconAlertTriangle class="size-5"/>
           </FormNumberInput>
         </div>
@@ -213,14 +213,14 @@ const onCancel = () => {
           <IconBellExclamation class="size-5"/>
           <h1 :class="bigNameLabel">Warning level: </h1>
         </div>
-        <p class="text-lg text-comment">{{ system.wazuh_warning_level }}</p>
+        <p class="text-lg text-comment">{{ system.wazuh_min_warning_level }}</p>
       </div>
       <div>
         <div class="flex items-center space-x-2 text-label">
           <IconAlertTriangle class="size-5"/>
           <h1 :class="bigNameLabel">Critical level: </h1>
         </div>
-        <p class="text-lg text-comment">{{ system.wazuh_critical_level }}</p>
+        <p class="text-lg text-comment">{{ system.wazuh_min_critical_level }}</p>
       </div>
       <div>
         <div class="flex items-center space-x-2 text-label">
@@ -229,7 +229,6 @@ const onCancel = () => {
         </div>
         <component :is="system.wazuh_info_as_alerts ? IconCheck : IconX" :class="system.wazuh_info_as_alerts ? 'text-green-badge' : 'text-red-badge'" />
       </div>
-
     </CardDescription>
     <CardFooter class="bottom-4 absolute w-full">
       <Button @click="onEdit" variant="blue_outline" class="w-full *:size-5!">

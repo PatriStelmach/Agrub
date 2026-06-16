@@ -21,16 +21,20 @@ onMounted(async () => {
   await alertStore.getCurrentAlertsRequest().finally(() => isLoading.value = false);
 })
 const hoveredAlert = ref<AlertDetails | null>(null)
-const {pageSize, filteredData, updateData, currentPage, searchFilter, tableData } =
-  useClientSearchFilter<ActiveAlert>(() => alertStore.currentAlerts,(item) => item.subject)
-
-
+const {
+  pageSize,
+  filteredData,
+  updateData,
+  currentPage,
+  searchFilter,
+  tableData
+} = useClientSearchFilter<ActiveAlert>(() => alertStore.currentAlerts,(item) => item.subject)
 
 </script>
 
 <template>
   <div>
-    <TopH1Div h1="Alerts dashboard">
+    <TopH1Div id="alerts_dashboard" h1="Alerts dashboard">
       <ButtonGroup>
         <InputGroup >
           <InputGroupInput

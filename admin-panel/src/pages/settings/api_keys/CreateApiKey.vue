@@ -16,7 +16,7 @@ const onSubmit = async () => {
   isLoading.value = true;
   await settingsStore.generateApiKeyRequest(description.value)
     .then(() => toast.success(`New API key: "${description.value}" has been created successfully.`))
-    .catch((err) => toast.error(`Error generating key: ${err}`))
+    .catch((err) => toast.error(`Error generating key: ${err.message}`))
     .finally(() => {
       description.value = "";
       isLoading.value = false
