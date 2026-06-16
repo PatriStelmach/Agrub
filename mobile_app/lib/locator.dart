@@ -46,13 +46,11 @@ Future<void> setupLocator() async {
   });
 
   locator.registerLazySingleton<AlertLocalDataSource>(
-    () => AlertLocalDataSourceImpl(
-      sharedPreferences: locator<SharedPreferences>(),
-    ),
+    () => AlertLocalDataSource(sharedPreferences: locator<SharedPreferences>()),
   );
 
   locator.registerLazySingleton<AlertRemoteDataSource>(
-    () => AlertRemoteDataSourceImpl(dio: locator<Dio>()),
+    () => AlertRemoteDataSource(dio: locator<Dio>()),
   );
 
   locator.registerLazySingleton<FlutterSecureStorage>(
@@ -73,7 +71,7 @@ Future<void> setupLocator() async {
     () => UserRepository(
       dio: locator<Dio>(),
       authService: locator<AuthService>(),
-      storage: FlutterSecureStorage(),
+      storage: const FlutterSecureStorage(),
     ),
   );
   locator.registerLazySingleton<PluginRepository>(

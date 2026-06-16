@@ -6,10 +6,6 @@ import 'package:dio/dio.dart';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 
-//mock imports
-//import 'dart:convert';
-//import 'package:flutter/services.dart';
-
 class PushNotificationService {
   final Dio dio = locator<Dio>();
   final FirebaseMessaging fcm = FirebaseMessaging.instance;
@@ -19,6 +15,7 @@ class PushNotificationService {
 
   PushNotificationService();
 
+  ///Function handling incoming notification depending on what is the case with app activity
   Future<void> initNotificationHandling() async {
     //Aplication not running at all
     RemoteMessage? initialMessage = await fcm.getInitialMessage();

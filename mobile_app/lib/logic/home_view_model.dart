@@ -8,7 +8,7 @@ class HomeViewModel extends ChangeNotifier {
   final AlertsViewModel alertsViewModel;
   void getMyToken() async {
     String? token = await FirebaseMessaging.instance.getToken();
-    //
+
     debugPrint("Mój FCM Token: $token");
   }
 

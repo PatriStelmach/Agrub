@@ -6,29 +6,11 @@ import 'package:alert_app/data/models/alert_model.dart';
 import 'package:alert_app/data/models/problem_action_model.dart';
 
 ///
-abstract class AlertRemoteDataSource {
-  Future<List<Alert>> fetchActiveAlerts();
 
-  Future<void> acknowledgeAlert({
-    required int alertId,
-    required String author,
-    required String message,
-    required int newSeverity,
-    required bool isAck,
-  });
-
-  Future<ProblemAction?> fetchLatestActionForAlert(int alertId);
-
-  Stream<SSEModel> getAlertsStream({
-    required String userGroup,
-    required String token,
-  });
-}
-
-class AlertRemoteDataSourceImpl implements AlertRemoteDataSource {
+class AlertRemoteDataSource {
   final Dio dio;
 
-  AlertRemoteDataSourceImpl({required this.dio});
+  AlertRemoteDataSource({required this.dio});
 
   /// Fetching all active alerts from backend endpoint and returning them as a map
   @override

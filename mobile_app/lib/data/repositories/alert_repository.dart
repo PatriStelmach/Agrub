@@ -21,6 +21,7 @@ class AlertRepository {
   Future<List<Alert>> fetchAllAlerts() async {
     try {
       final alerts = await remoteDataSource.fetchActiveAlerts();
+
       await localDataSource.cacheAlerts(alerts);
 
       return alerts;
