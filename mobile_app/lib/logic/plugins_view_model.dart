@@ -54,12 +54,12 @@ class PluginsViewModel extends ChangeNotifier {
 
     final Map<String, Comparable Function(Plugin)> pluginGetters = {
       'id': (plugin) => plugin.id,
-      'fileName': (plugin) => plugin.fileName ?? '',
-      'creator': (plugin) => plugin.creator ?? '',
+      'fileName': (plugin) => plugin.fileName,
+      'creator': (plugin) => plugin.creator,
       'language': (plugin) => plugin.language.value,
       'weight': (plugin) => plugin.weight,
-      'updatedAt': (plugin) => plugin.updatedAt ?? '',
-      'cronExpression': (plugin) => plugin.cronExpression ?? '',
+      'updatedAt': (plugin) => plugin.updatedAt,
+      'cronExpression': (plugin) => plugin.cronExpression,
       'active': (plugin) => plugin.active ? 1 : 0,
       'log': (plugin) => plugin.log ? 1 : 0,
     };

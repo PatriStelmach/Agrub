@@ -18,7 +18,7 @@ class PushNotificationService {
   ///Function handling incoming notification depending on what is the case with app activity
   Future<void> initNotificationHandling() async {
     //Aplication not running at all
-    RemoteMessage? initialMessage = await fcm.getInitialMessage();
+    final RemoteMessage? initialMessage = await fcm.getInitialMessage();
     if (initialMessage != null) {
       _handleMessage(initialMessage);
     }
@@ -76,7 +76,7 @@ class PushNotificationService {
   }
 
   Future<void> pingBackend() async {
-    // 10.0.2.2 emulator Androida
+    // 10.0.2.2 Android emulator
     // localhost/127.0.0.1 Windows(Chrome)
 
     try {
@@ -92,9 +92,8 @@ class PushNotificationService {
     }
   }
 
-  // Dodatkowa metoda wywoływana z poziomu main.dart w tle
   void handleBackgroundMessage(RemoteMessage message) {
-    debugPrint("FCM [BACKGROUND]: Serwis przechwycił wiadomość wybudzającą.");
+    debugPrint("FCM [BACKGROUND]: Service received background message");
     _handleMessage(message);
   }
 }

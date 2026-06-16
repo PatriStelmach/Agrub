@@ -1,3 +1,4 @@
+import 'package:alert_app/data/services/auth_service.dart';
 import 'package:alert_app/firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -49,7 +50,7 @@ class AppStateProvider extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        // Serwisy globalne
+        // Global services
         ChangeNotifierProvider(create: (_) => LanguageService()),
         ChangeNotifierProvider(create: (_) => SettingsViewModel()),
         ChangeNotifierProvider(create: (_) => GeneralLayoutViewModel()),
@@ -125,34 +126,7 @@ class MainApp extends StatelessWidget {
   }
 }
 
-class AuthGate extends StatelessWidget {
-  const AuthGate({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<bool>(
-      future: context.read<UserViewModel>().checkAuthStatus(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-
-        final isLoggedIn = snapshot.data ?? false;
-        if (isLoggedIn) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            context.read<GeneralLayoutViewModel>().changePage(AppScreen.home);
-          });
-
-          return const GeneralLayout(); //
-        }
-
-        return const LoginScreen();
-      },
-    );
-  }
-}
   /*
 
 T0D0:

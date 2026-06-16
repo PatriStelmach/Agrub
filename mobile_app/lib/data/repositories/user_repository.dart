@@ -34,7 +34,7 @@ class UserRepository {
   UserModel? getUserFromToken(String token) {
     if (token.isEmpty) return null;
 
-    Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+    final Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
     debugPrint("JWT DECODED: $decodedToken");
 
     return UserModel.fromJwt(decodedToken);

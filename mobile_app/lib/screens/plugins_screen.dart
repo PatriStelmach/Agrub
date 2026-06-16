@@ -1,5 +1,5 @@
 import 'package:alert_app/data/models/plugin_model.dart';
-import 'package:alert_app/data/repositories/plugin_repository.dart';
+
 import 'package:alert_app/logic/plugins_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -134,8 +134,8 @@ class _PluginsScreenState extends State<PluginsScreen> {
     return Card(
       color: plugin.activeColor(context),
       child: ExpansionTile(
-        title: Text(plugin.fileName ?? t.plugins_tile_no_name),
-        subtitle: Text(plugin.creator ?? t.plugins_tile_unknown_creator),
+        title: Text(plugin.fileName),
+        subtitle: Text(plugin.creator),
         leading: Icon(
           plugin.active ? Icons.play_arrow : Icons.pause_circle,
           color: Colors.black,
@@ -149,19 +149,14 @@ class _PluginsScreenState extends State<PluginsScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(plugin.language.toString()),
-                    Text(
-                      plugin.tags?.toString() ?? t.plugins_tile_unknown_time,
-                    ),
+                    Text(plugin.tags.toString()),
                   ],
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(plugin.active.toString()),
-                    Text(
-                      plugin.updatedAt?.toString() ??
-                          t.plugins_tile_unknown_severity,
-                    ),
+                    Text(plugin.updatedAt.toString()),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -235,7 +230,7 @@ class _CronEditDialogState extends State<CronEditDialog> {
     final t = AppLocalizations.of(context)!;
 
     return AlertDialog(
-      title: Text(t.plugins_cron_title(widget.plugin.fileName ?? '')),
+      title: Text(t.plugins_cron_title(widget.plugin.fileName)),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -270,7 +265,6 @@ class _CronEditDialogState extends State<CronEditDialog> {
         ),
         ElevatedButton(
           onPressed: () async {
-            // Logika jest delegowana do ViewModelu!
             final viewModel = context.read<PluginsViewModel>();
 
             final success = await viewModel.saveCronSettings(
@@ -322,7 +316,7 @@ class _RunPluginDialogState extends State<RunPluginDialog> {
     final t = AppLocalizations.of(context)!;
 
     return AlertDialog(
-      title: Text(t.plugins_args_title(widget.plugin.fileName ?? '')),
+      title: Text(t.plugins_args_title(widget.plugin.fileName)),
       content: TextField(
         controller: _argsController,
         decoration: InputDecoration(
@@ -342,7 +336,7 @@ class _RunPluginDialogState extends State<RunPluginDialog> {
 
             final viewModel = context.read<PluginsViewModel>();
             final messenger = ScaffoldMessenger.of(context);
-            final pluginName = widget.plugin.fileName ?? '';
+            final pluginName = widget.plugin.fileName;
 
             Navigator.pop(context);
 

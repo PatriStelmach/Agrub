@@ -13,7 +13,7 @@ class DebugScreen extends StatelessWidget {
     final debugViewModel = DebugViewModel();
     return Column(
       children: [
-        Text("BACKEND DEBUG", style: TextStyle(fontSize: 30)),
+        const Text("BACKEND DEBUG", style: TextStyle(fontSize: 30)),
 
         Row(
           children: [
@@ -24,14 +24,14 @@ class DebugScreen extends StatelessWidget {
                   onPressed: () {
                     context.read<PushNotificationService>().pingBackend();
                   },
-                  child: Text('Ping server'),
+                  child: const Text('Ping server'),
                 ),
               ),
             ),
           ],
         ),
 
-        Text("MOCK DEBUG FUNCTIONS", style: TextStyle(fontSize: 30)),
+        const Text("MOCK DEBUG FUNCTIONS", style: TextStyle(fontSize: 30)),
 
         Row(
           children: [
@@ -42,7 +42,7 @@ class DebugScreen extends StatelessWidget {
                   onPressed: () {
                     debugViewModel.alarmPressed();
                   },
-                  child: Text('Trigger extreme alert alarm'),
+                  child: const Text('Trigger extreme alert alarm'),
                 ),
               ),
             ),
@@ -61,7 +61,7 @@ class DebugScreen extends StatelessWidget {
                       listen: false,
                     ).fetchAllPlugins();
                   },
-                  child: Text(' Push - new plugins'),
+                  child: const Text(' Push - new plugins'),
                 ),
               ),
             ),
@@ -79,7 +79,7 @@ class DebugScreen extends StatelessWidget {
                       listen: false,
                     ).fetchAllAlerts();
                   },
-                  child: Text('Push - new alerts(with extreme)'),
+                  child: const Text('Push - new alerts(with extreme)'),
                 ),
               ),
             ),

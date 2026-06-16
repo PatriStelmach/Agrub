@@ -15,7 +15,6 @@ class SettingsScreen extends StatelessWidget {
     final themeViewModel = context.watch<SettingsViewModel>();
     final isDark = themeViewModel.isDarkMode;
 
-    final isPolish = currentLanguageCode == 'pl';
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(

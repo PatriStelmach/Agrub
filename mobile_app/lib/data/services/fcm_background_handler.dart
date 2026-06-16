@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:alert_app/locator.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -17,7 +19,7 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
   // Inicjalizacja DI (GetIt) dla procesu w tle
   if (!GetIt.instance.isRegistered<AlertRepository>()) {
-    setupLocator();
+    unawaited(setupLocator());
   }
 
   debugPrint("Handling a background message: ${message.messageId}");

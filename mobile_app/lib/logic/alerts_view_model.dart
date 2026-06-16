@@ -141,7 +141,7 @@ class AlertsViewModel extends ChangeNotifier {
       }
 
       _alertsCache[id] = updated;
-      _triggerEmergencyOverlayForNewAlert(updated);
+      unawaited(_triggerEmergencyOverlayForNewAlert(updated));
     } else {
       //Alert update that isn't in the cache, using api. Await to wait for fetch from API
       await fetchInitialAlerts();

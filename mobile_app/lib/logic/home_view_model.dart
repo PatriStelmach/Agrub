@@ -17,11 +17,11 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   int get activeAlertsCount => alertsViewModel.alertsList.length;
-  //T0D0: Null tymczasowo, co zrobić z tym last ping>?
+  //T0D0: To be handled
   DateTime? get lastPing => null;
 
   List<Alert> latestAlerts() {
-    List<Alert> allAlerts = List<Alert>.from(alertsViewModel.alertsList);
+    final List<Alert> allAlerts = List<Alert>.from(alertsViewModel.alertsList);
     allAlerts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     return allAlerts.take(3).toList();
   }
