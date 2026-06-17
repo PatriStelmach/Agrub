@@ -1,7 +1,13 @@
 import 'dart:convert';
+import 'package:alert_app/logic/general_layout_view_model.dart';
+import 'package:alert_app/logic/user_view_model.dart';
+import 'package:alert_app/screens/general_layout_screen.dart';
+import 'package:alert_app/screens/login_screen.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
+import 'package:provider/provider.dart';
 
 class AuthService {
   final Dio _dio = GetIt.instance<Dio>();
@@ -57,9 +63,39 @@ class AuthService {
       await _storage.delete(key: 'jwt_token');
       await _storage.delete(key: 'user_groups');
 
-      print("Użytkownik został pomyślnie wylogowany (wyczyszczono pamięć).");
+      debugPrint("AUTH SERVICE - User logged out, memory wiped");
     } catch (e) {
-      print("Błąd podczas czyszczenia pamięci przy wylogowywaniu: $e");
+      debugPrint("AUTH SERVICE - Error with logout and memory wipe: $e");
     }
+  }
+}
+
+///Checking log in status on app startup
+class AuthGate extends StatelessWidget {
+  const AuthGate({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<bool>(
+      future: context.read<UserViewModel>().checkAuthStatus(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        final isLoggedIn = snapshot.data ?? false;
+        if (isLoggedIn) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            context.read<GeneralLayoutViewModel>().changePage(AppScreen.home);
+          });
+
+          return const GeneralLayout();
+        }
+
+        return const LoginScreen();
+      },
+    );
   }
 }

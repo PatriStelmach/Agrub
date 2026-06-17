@@ -182,14 +182,14 @@ class _AlertsScreenState extends State<AlertsScreen>
           collapsedIconColor: textColor,
           leading: Icon(Icons.warning, color: textColor),
           title: Text(
-            alert.subject ?? t.alerts_tile_no_title,
+            alert.subject,
             style: TextStyle(color: textColor, fontWeight: FontWeight.bold),
           ),
           subtitle: Text(
             alert.acknowledged
                 ? t.alerts_status_acknowledged
                 : t.alerts_status_not_acknowledged,
-            style: TextStyle(color: textColor.withValues(alpha: 0.8)),
+            style: TextStyle(color: textColor.withValues()),
           ),
           children: [
             Padding(
@@ -228,12 +228,10 @@ class _AlertsScreenState extends State<AlertsScreen>
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              alert.source ?? t.alerts_tile_unknown_host,
-              style: TextStyle(color: textColor),
-            ),
+            Text(alert.source, style: TextStyle(color: textColor)),
             Text(
               DateFormat('dd.MM.yyyy HH:mm:ss').format(alert.createdAt),
+
               style: TextStyle(color: textColor),
             ),
           ],
@@ -258,7 +256,7 @@ class _AlertsScreenState extends State<AlertsScreen>
     AlertsViewModel viewModel,
     AppLocalizations t,
   ) {
-    return FutureBuilder<ProblemAction?>(
+    return FutureBuilder<AlertAction?>(
       future: viewModel.getLatestActionForAlert(alertId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -285,7 +283,7 @@ class _AlertsScreenState extends State<AlertsScreen>
         return ListTile(
           leading: Icon(
             Icons.history,
-            color: theme.iconTheme.color?.withValues(alpha: 0.7) ?? Colors.grey,
+            color: theme.iconTheme.color?.withValues() ?? Colors.grey,
           ),
           title: Text(
             latestAction.message.isNotEmpty
@@ -318,7 +316,7 @@ class _AlertsScreenState extends State<AlertsScreen>
 }
 
 class AckDialog extends StatefulWidget {
-  // Passing whole Alert object instead of just Id
+  // Passing full Alert object instead of just id
   final Alert alert;
   final AppLocalizations t;
 

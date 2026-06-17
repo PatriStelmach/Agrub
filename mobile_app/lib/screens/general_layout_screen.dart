@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -32,22 +34,22 @@ class _GeneralLayoutState extends State<GeneralLayout> {
   Future<void> _startBackgroundServices() async {
     if (!mounted) return;
 
-    final userVM = context.read<UserViewModel>();
-    final alertsVM = context.read<AlertsViewModel>();
+    final userViewModel = context.read<UserViewModel>();
+    final alertsViewModel = context.read<AlertsViewModel>();
     final pushService = context.read<PushNotificationService>();
 
-    final token = await userVM.repository.getToken();
-    final user = userVM.user;
+    final token = await userViewModel.repository.getToken();
+    final user = userViewModel.user;
 
     if (token != null && user != null) {
-      alertsVM.initSseConnection(userGroup: user.group, token: token);
-      alertsVM.fetchInitialAlerts();
+      alertsViewModel.initSseConnection(userGroup: user.group, token: token);
+      unawaited(alertsViewModel.fetchInitialAlerts());
 
       try {
-        pushService.registerDevice(token);
+        unawaited(pushService.registerDevice(token));
         debugPrint("LAYOUT DEBUG: FCM Device registered successfully.");
       } catch (e) {
-        debugPrint("LAYOUT DEBUG: Błąd rejestracji FCM: $e");
+        debugPrint("LAYOUT DEBUG: Error with FCM registration: $e");
       }
     }
   }

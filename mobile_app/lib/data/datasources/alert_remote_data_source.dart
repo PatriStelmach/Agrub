@@ -6,32 +6,13 @@ import 'package:alert_app/data/models/alert_model.dart';
 import 'package:alert_app/data/models/problem_action_model.dart';
 
 ///
-abstract class AlertRemoteDataSource {
-  Future<List<Alert>> fetchActiveAlerts();
 
-  Future<void> acknowledgeAlert({
-    required int alertId,
-    required String author,
-    required String message,
-    required int newSeverity,
-    required bool isAck,
-  });
-
-  Future<ProblemAction?> fetchLatestActionForAlert(int alertId);
-
-  Stream<SSEModel> getAlertsStream({
-    required String userGroup,
-    required String token,
-  });
-}
-
-class AlertRemoteDataSourceImpl implements AlertRemoteDataSource {
+class AlertRemoteDataSource {
   final Dio dio;
 
-  AlertRemoteDataSourceImpl({required this.dio});
+  AlertRemoteDataSource({required this.dio});
 
   /// Fetching all active alerts from backend endpoint and returning them as a map
-  @override
   Future<List<Alert>> fetchActiveAlerts() async {
     try {
       final response = await dio.get('/api/alerts/active');
@@ -49,7 +30,7 @@ class AlertRemoteDataSourceImpl implements AlertRemoteDataSource {
   }
 
   /// Sending ACK or comment to particular alert
-  @override
+
   Future<void> acknowledgeAlert({
     required int alertId,
     required String author,
@@ -81,15 +62,14 @@ class AlertRemoteDataSourceImpl implements AlertRemoteDataSource {
   }
 
   /// Fetching newest action or comment for particular alert
-  @override
-  Future<ProblemAction?> fetchLatestActionForAlert(int alertId) async {
+  Future<AlertAction?> fetchLatestActionForAlert(int alertId) async {
     try {
       final response = await dio.get('/api/alerts/$alertId/actions');
 
       if (response.data is List) {
         final List<dynamic> data = response.data as List<dynamic>;
         if (data.isNotEmpty) {
-          return ProblemAction.fromJson(data.first as Map<String, dynamic>);
+          return AlertAction.fromJson(data.first as Map<String, dynamic>);
         }
       }
       return null;
@@ -109,7 +89,6 @@ class AlertRemoteDataSourceImpl implements AlertRemoteDataSource {
 
   /// Connecting to SSE and returning Stream
   /// DataSource isn't a listener to the stream, just pass it to higher layers of the app
-  @override
   Stream<SSEModel> getAlertsStream({
     required String userGroup,
     required String token,
@@ -126,5 +105,24 @@ class AlertRemoteDataSourceImpl implements AlertRemoteDataSource {
         "Authorization": "Bearer $token",
       },
     );
+  }
+
+  Future<bool> isBackendConnected() async {
+    try {
+      final response = await dio.get('/');
+      if (response.statusCode == 200) return true;
+    } on DioException catch (e) {
+      debugPrint(
+        "ALERT REMOTE DATA SOURCE: Dio Error -  ${e.response?.statusCode} - ${e.message}",
+      );
+      rethrow;
+    } catch (e) {
+      debugPrint(
+        "ALERT REMOTE DATA SOURCE ERROR: Acknowledge or comment error - {$e} ",
+      );
+
+      rethrow;
+    }
+    return false;
   }
 }

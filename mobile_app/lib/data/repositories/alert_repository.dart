@@ -20,6 +20,7 @@ class AlertRepository {
   Future<List<Alert>> fetchAllAlerts() async {
     try {
       final alerts = await remoteDataSource.fetchActiveAlerts();
+
       await localDataSource.cacheAlerts(alerts);
 
       return alerts;
@@ -52,7 +53,7 @@ class AlertRepository {
   }
 
   /// Fetch newest action for an alert
-  Future<ProblemAction?> getLatestActionForAlert(int alertId) async {
+  Future<AlertAction?> getLatestActionForAlert(int alertId) async {
     return await remoteDataSource.fetchLatestActionForAlert(alertId);
   }
 
@@ -79,7 +80,7 @@ class AlertRepository {
               return message;
             }
           } catch (e) {
-            debugPrint("REPO SSE ERROR: Błąd parsowania zdarzenia: $e");
+            debugPrint("REPO SSE ERROR: Parsing error: $e");
           }
           return null;
         })
@@ -101,5 +102,9 @@ class AlertRepository {
 
   Future<bool> isAlertAlreadyNotified(int alertId) async {
     return await localDataSource.isAlertAlreadyNotified(alertId);
+  }
+
+  Future<bool> checkBackendConnection() {
+    return remoteDataSource.isBackendConnected();
   }
 }

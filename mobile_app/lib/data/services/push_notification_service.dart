@@ -6,10 +6,6 @@ import 'package:dio/dio.dart';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 
-//mock imports
-//import 'dart:convert';
-//import 'package:flutter/services.dart';
-
 class PushNotificationService {
   final Dio dio = locator<Dio>();
   final FirebaseMessaging fcm = FirebaseMessaging.instance;
@@ -19,6 +15,7 @@ class PushNotificationService {
 
   PushNotificationService();
 
+  ///Function handling incoming notification depending on what is the case with app activity
   Future<void> initNotificationHandling() async {
     //Aplication not running at all
     final RemoteMessage? initialMessage = await fcm.getInitialMessage();
@@ -79,25 +76,24 @@ class PushNotificationService {
   }
 
   Future<void> pingBackend() async {
-    // 10.0.2.2 emulator Androida
+    // 10.0.2.2 Android emulator
     // localhost/127.0.0.1 Windows(Chrome)
 
     try {
       final response = await dio.post('');
 
       if (response.statusCode == 200) {
-        print('Backend working:');
+        debugPrint('Backend working:');
       } else {
-        print('Backend working, but error: ${response.statusCode}');
+        debugPrint('Backend working, but error: ${response.statusCode}');
       }
     } catch (e) {
-      print('No connection: $e');
+      debugPrint('No connection: $e');
     }
   }
 
-  // Dodatkowa metoda wywoływana z poziomu main.dart w tle
   void handleBackgroundMessage(RemoteMessage message) {
-    debugPrint("FCM [BACKGROUND]: Serwis przechwycił wiadomość wybudzającą.");
+    debugPrint("FCM [BACKGROUND]: Service received background message");
     _handleMessage(message);
   }
 }

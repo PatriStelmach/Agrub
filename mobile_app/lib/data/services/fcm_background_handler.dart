@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:alert_app/locator.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -17,7 +19,7 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
   // Inicjalizacja DI (GetIt) dla procesu w tle
   if (!GetIt.instance.isRegistered<AlertRepository>()) {
-    setupLocator();
+    unawaited(setupLocator());
   }
 
   debugPrint("Handling a background message: ${message.messageId}");
@@ -49,7 +51,7 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   }
 }
 
-/// Prywatna funkcja pomocnicza do rysowania natywnych powiadomień Androida
+/// Helper function to render Android native notification
 Future<void> _showNotificationBasedOnSeverity(Alert alert) async {
   final FlutterLocalNotificationsPlugin localNotifications =
       FlutterLocalNotificationsPlugin();
@@ -68,9 +70,8 @@ Future<void> _showNotificationBasedOnSeverity(Alert alert) async {
   if (alert.severity == AlertSeverity.critical) {
     androidDetails = AndroidNotificationDetails(
       'extreme_alerts_channel_v3',
-      'Krytyczne Alerty',
-      channelDescription:
-          'Powiadomienia o awariach krytycznych infrastruktury.',
+      'Critical',
+      channelDescription: 'Critial alerts notification',
       importance: Importance.max,
       priority: Priority.high,
       playSound: true,
@@ -84,7 +85,7 @@ Future<void> _showNotificationBasedOnSeverity(Alert alert) async {
         500,
         1000,
       ]),
-      //W natywnym Androidzie flaga zapętlenia to stała numeryczna FLAG_INSISTENT o wartości 4.
+      //Why 4 in addtionalFlags: in native android loop is FLAG_INSISTENT with value 4.
       additionalFlags: Int32List.fromList([4]),
       category: AndroidNotificationCategory.call,
       fullScreenIntent: true,
@@ -92,8 +93,8 @@ Future<void> _showNotificationBasedOnSeverity(Alert alert) async {
   } else {
     androidDetails = const AndroidNotificationDetails(
       'standard_alerts_channel_v1',
-      'Zwykłe Alerty (Ciche)',
-      channelDescription: 'Mniejsze alerty informacyjne, niekrytyczne.',
+      'Standard alert (Quitet)',
+      channelDescription: 'Less important alerts',
       importance: Importance.low,
       priority: Priority.defaultPriority,
       playSound: true,

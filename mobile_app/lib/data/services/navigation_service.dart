@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:alert_app/screens/alarm_overlay_screen.dart';
 import 'package:alert_app/data/services/alarm_service.dart';
@@ -14,7 +16,7 @@ class NavigationService {
     if (_isOverlayVisible) return;
 
     _isOverlayVisible = true;
-    alarmService.triggerAlarm();
+    unawaited(alarmService.triggerAlarm());
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (navigatorKey.currentState == null) return;

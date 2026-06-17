@@ -46,13 +46,11 @@ Future<void> setupLocator() async {
   });
 
   locator.registerLazySingleton<AlertLocalDataSource>(
-    () => AlertLocalDataSourceImpl(
-      sharedPreferences: locator<SharedPreferences>(),
-    ),
+    () => AlertLocalDataSource(sharedPreferences: locator<SharedPreferences>()),
   );
 
   locator.registerLazySingleton<AlertRemoteDataSource>(
-    () => AlertRemoteDataSourceImpl(dio: locator<Dio>()),
+    () => AlertRemoteDataSource(dio: locator<Dio>()),
   );
 
   locator.registerLazySingleton<FlutterSecureStorage>(

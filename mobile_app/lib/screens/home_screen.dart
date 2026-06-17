@@ -12,10 +12,13 @@ class HomeScreen extends StatelessWidget {
     final t = AppLocalizations.of(context)!;
     final homeViewModel = context.watch<HomeViewModel>();
     //T0D0: implement pinging in alertviewmodel or somewhere
-    final DateTime lastPingTime = DateTime.now();
-    final String shortPingTime =
-        "${lastPingTime.hour}:${lastPingTime.minute.toString().padLeft(2, '0')}:${lastPingTime.second.toString().padLeft(2, '0')}";
+    // final DateTime? lastPingTime = await homeViewModel.pingBackend();
 
+    // late String shortPingTime;
+    // if(lastPingTime != null) {
+    //  shortPingTime =
+    //     "${lastPingTime.hour}:${lastPingTime.minute.toString().padLeft(2, '0')}:${lastPingTime.second.toString().padLeft(2, '0')}";
+    // }
     //current Alert count
     final int activeAlertsCount = homeViewModel.activeAlertsCount;
 
@@ -34,8 +37,10 @@ class HomeScreen extends StatelessWidget {
               children: [
                 _buildStatCard(
                   context,
-                  title: t.statLastPing,
-                  value: shortPingTime,
+                  // title: lastPingTime != null ? t.statLastPing : "ATTENTION",
+                  //value: lastPingTime != null ? shortPingTime : "NO CONNECTION TO SERVER!"
+                  title: "placeholder",
+                  value: "placeholder",
                   icon: Icons.sync,
                   color: Colors.blueGrey,
                 ),
@@ -59,7 +64,9 @@ class HomeScreen extends StatelessWidget {
             if (latestCritical != null)
               Card(
                 elevation: 4,
-                color: latestCritical.severityColor(context).withValues(alpha: 0.9),
+                color: latestCritical
+                    .severityColor(context)
+                    .withValues(alpha: 0.9),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -76,11 +83,7 @@ class HomeScreen extends StatelessWidget {
                       fontSize: 18,
                     ),
                   ),
-                  subtitle: Text(
-                    latestCritical == true
-                        ? t.alertStatusAcknowledged
-                        : t.alertStatusNotAcknowledged,
-                  ),
+                  subtitle: Text(t.alertStatusAcknowledged),
                   isThreeLine: true,
                 ),
               )

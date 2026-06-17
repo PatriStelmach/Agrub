@@ -1,3 +1,4 @@
+import 'package:alert_app/data/services/auth_service.dart';
 import 'package:alert_app/firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -8,8 +9,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:alert_app/locator.dart';
 import 'package:alert_app/l10n/app_localizations.dart';
 import 'package:alert_app/themes/app_theme_default.dart';
-import 'package:alert_app/screens/login_screen.dart';
-import 'package:alert_app/screens/general_layout_screen.dart';
 
 // Services & Repositories
 import 'package:alert_app/data/services/language_service.dart';
@@ -49,7 +48,7 @@ class AppStateProvider extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        // Serwisy globalne
+        // Global services
         ChangeNotifierProvider(create: (_) => LanguageService()),
         ChangeNotifierProvider(create: (_) => SettingsViewModel()),
         ChangeNotifierProvider(create: (_) => GeneralLayoutViewModel()),
@@ -88,6 +87,7 @@ class AppStateProvider extends StatelessWidget {
                       create: (_) => HomeViewModel(
                         alertsViewModel: contextAfterAlerts
                             .read<AlertsViewModel>(),
+                        alertsRepository: locator<AlertRepository>(),
                       )..getMyToken(),
                     ),
                   ],
@@ -125,34 +125,7 @@ class MainApp extends StatelessWidget {
   }
 }
 
-class AuthGate extends StatelessWidget {
-  const AuthGate({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<bool>(
-      future: context.read<UserViewModel>().checkAuthStatus(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-
-        final isLoggedIn = snapshot.data ?? false;
-        if (isLoggedIn) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            context.read<GeneralLayoutViewModel>().changePage(AppScreen.home);
-          });
-
-          return const GeneralLayout(); //
-        }
-
-        return const LoginScreen();
-      },
-    );
-  }
-}
   /*
 
 T0D0:

@@ -1,4 +1,4 @@
-class ProblemAction {
+class AlertAction {
   final int id;
   final String author;
   final String message;
@@ -6,7 +6,7 @@ class ProblemAction {
   final int newSeverity;
   final DateTime createdAt;
 
-  ProblemAction({
+  AlertAction({
     required this.id,
     required this.author,
     required this.message,
@@ -15,8 +15,8 @@ class ProblemAction {
     required this.createdAt,
   });
 
-  factory ProblemAction.fromJson(Map<String, dynamic> json) {
-    return ProblemAction(
+  factory AlertAction.fromJson(Map<String, dynamic> json) {
+    return AlertAction(
       id: json['id'] as int,
       author: json['author'] ?? 'Unknown',
       message: json['message'] ?? '',

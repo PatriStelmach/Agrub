@@ -13,13 +13,10 @@ void main() {
   late AlertRemoteDataSource dataSource;
   late MockDio mockDio;
 
-  // cleaning state before test
   setUp(() {
     mockDio = MockDio();
-    // Injecting mock data to real data
-    dataSource = AlertRemoteDataSourceImpl(dio: mockDio);
+    dataSource = AlertRemoteDataSource(dio: mockDio);
 
-    //Needed to use with any() method
     registerFallbackValue(RequestOptions(path: ''));
   });
 
@@ -61,24 +58,23 @@ void main() {
   });
 
   group('acknowledgeAlert', () {
-    const tAlertId = 338;
-    const tAuthor = 'admin@pjatk.pl';
-    const tMessage = 'test1';
-    const tNewSeverity = 1;
-    const tIsAck = true;
+    const testAlertId = 338;
+    const testAuthor = 'admin@pjatk.pl';
+    const testMessage = 'test1';
+    const testNewSeverity = 1;
+    const testIsAck = true;
 
     final tExpectedRequestBody = {
-      "alertId": tAlertId,
-      "author": tAuthor,
-      "ack": tIsAck,
-      "message": tMessage,
-      "newSeverity": tNewSeverity,
+      "alertId": testAlertId,
+      "author": testAuthor,
+      "ack": testIsAck,
+      "message": testMessage,
+      "newSeverity": testNewSeverity,
     };
 
     test(
       'should send correct POST with correct data for correct endpoint',
       () async {
-        //Arrange
         when(() => mockDio.post(any(), data: any(named: 'data'))).thenAnswer(
           (_) async => Response(
             statusCode: 200,
@@ -86,19 +82,17 @@ void main() {
           ),
         );
 
-        //Act
         await dataSource.acknowledgeAlert(
-          alertId: tAlertId,
-          author: tAuthor,
-          message: tMessage,
-          newSeverity: tNewSeverity,
-          isAck: tIsAck,
+          alertId: testAlertId,
+          author: testAuthor,
+          message: testMessage,
+          newSeverity: testNewSeverity,
+          isAck: testIsAck,
         );
 
-        //Assert
         verify(
           () => mockDio.post(
-            '/api/alerts/$tAlertId/ack',
+            '/api/alerts/$testAlertId/ack',
             data: tExpectedRequestBody,
           ),
         ).called(1);
@@ -112,11 +106,11 @@ void main() {
 
       expect(
         () => dataSource.acknowledgeAlert(
-          alertId: tAlertId,
-          author: tAuthor,
-          message: tMessage,
-          newSeverity: tNewSeverity,
-          isAck: tIsAck,
+          alertId: testAlertId,
+          author: testAuthor,
+          message: testMessage,
+          newSeverity: testNewSeverity,
+          isAck: testIsAck,
         ),
         throwsA(isA<DioException>()),
       );
@@ -124,7 +118,7 @@ void main() {
   });
 
   group('fetchLatestActionForAlert', () {
-    final tAlertId = 123;
+    final testAlertId = 123;
 
     test(
       'should return ProblemAction object, when getting list with something inside',
@@ -141,9 +135,9 @@ void main() {
           ),
         );
 
-        final result = await dataSource.fetchLatestActionForAlert(tAlertId);
+        final result = await dataSource.fetchLatestActionForAlert(testAlertId);
 
-        expect(result, isA<ProblemAction>());
+        expect(result, isA<AlertAction>());
         expect(result?.message, "Comment");
       },
     );
@@ -157,7 +151,7 @@ void main() {
         ),
       );
 
-      final result = await dataSource.fetchLatestActionForAlert(tAlertId);
+      final result = await dataSource.fetchLatestActionForAlert(testAlertId);
 
       expect(result, isNull);
     });
@@ -168,7 +162,7 @@ void main() {
       ).thenThrow(DioException(requestOptions: RequestOptions(path: '')));
 
       expect(
-        () => dataSource.fetchLatestActionForAlert(tAlertId),
+        () => dataSource.fetchLatestActionForAlert(testAlertId),
         throwsA(isA<DioException>()),
       );
     });

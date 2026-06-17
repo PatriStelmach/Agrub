@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:alert_app/logic/general_layout_view_model.dart';
 import 'package:alert_app/screens/general_layout_screen.dart';
 import 'package:flutter/material.dart';
@@ -44,8 +45,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (success) {
       layoutViewModel.changePage(AppScreen.home);
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const GeneralLayout()),
+      unawaited(
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const GeneralLayout()),
+        ),
       );
     } else {
       // Failure snackbar
