@@ -1,0 +1,176 @@
+import 'package:alert_app/data/models/problem_action_model.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:dio/dio.dart';
+import 'package:alert_app/data/datasources/alert_remote_data_source.dart';
+import 'package:alert_app/data/models/alert_model.dart';
+
+///Mock class for Dio
+class MockDio extends Mock implements Dio {}
+
+//NOTE!!! There is no SSE test here - T0D0 as integration test for alert repository
+void main() {
+  late AlertRemoteDataSource dataSource;
+  late MockDio mockDio;
+
+  // cleaning state before test
+  setUp(() {
+    mockDio = MockDio();
+    // Injecting mock data to real data
+    dataSource = AlertRemoteDataSourceImpl(dio: mockDio);
+
+    //Needed to use with any() method
+    registerFallbackValue(RequestOptions(path: ''));
+  });
+
+  group('fetchActiveAlerts', () {
+    test('should return List<Alert>, when getting 200 from server', () async {
+      final mockResponseData = [
+        {"id": 1, "subject": "test alert", "severity": 2, "status": "sent"},
+      ];
+
+      when(() => mockDio.get('/api/alerts/active')).thenAnswer(
+        (_) async => Response(
+          data: mockResponseData,
+          statusCode: 200,
+          requestOptions: RequestOptions(path: '/api/alerts/active'),
+        ),
+      );
+
+      final result = await dataSource.fetchActiveAlerts();
+
+      expect(result, isA<List<Alert>>());
+      expect(result.length, 1);
+      expect(result.first.id, 1);
+      expect(result.first.subject, "test alert");
+    });
+
+    test('should return DioException in case of server error', () async {
+      when(() => mockDio.get(any())).thenThrow(
+        DioException(
+          requestOptions: RequestOptions(path: ''),
+          error: 'Not Found',
+        ),
+      );
+
+      // without await to catch method throwing exeption
+      final call = dataSource.fetchActiveAlerts;
+
+      expect(() => call(), throwsA(isA<DioException>()));
+    });
+  });
+
+  group('acknowledgeAlert', () {
+    const tAlertId = 338;
+    const tAuthor = 'admin@pjatk.pl';
+    const tMessage = 'test1';
+    const tNewSeverity = 1;
+    const tIsAck = true;
+
+    final tExpectedRequestBody = {
+      "alertId": tAlertId,
+      "author": tAuthor,
+      "ack": tIsAck,
+      "message": tMessage,
+      "newSeverity": tNewSeverity,
+    };
+
+    test(
+      'should send correct POST with correct data for correct endpoint',
+      () async {
+        //Arrange
+        when(() => mockDio.post(any(), data: any(named: 'data'))).thenAnswer(
+          (_) async => Response(
+            statusCode: 200,
+            requestOptions: RequestOptions(path: ''),
+          ),
+        );
+
+        //Act
+        await dataSource.acknowledgeAlert(
+          alertId: tAlertId,
+          author: tAuthor,
+          message: tMessage,
+          newSeverity: tNewSeverity,
+          isAck: tIsAck,
+        );
+
+        //Assert
+        verify(
+          () => mockDio.post(
+            '/api/alerts/$tAlertId/ack',
+            data: tExpectedRequestBody,
+          ),
+        ).called(1);
+      },
+    );
+
+    test('should throw exception, when POST fail', () async {
+      when(
+        () => mockDio.post(any(), data: any(named: 'data')),
+      ).thenThrow(DioException(requestOptions: RequestOptions(path: '')));
+
+      expect(
+        () => dataSource.acknowledgeAlert(
+          alertId: tAlertId,
+          author: tAuthor,
+          message: tMessage,
+          newSeverity: tNewSeverity,
+          isAck: tIsAck,
+        ),
+        throwsA(isA<DioException>()),
+      );
+    });
+  });
+
+  group('fetchLatestActionForAlert', () {
+    final tAlertId = 123;
+
+    test(
+      'should return ProblemAction object, when getting list with something inside',
+      () async {
+        final mockResponseData = [
+          {"author": "System", "message": "Comment", "ack": false},
+        ];
+
+        when(() => mockDio.get(any())).thenAnswer(
+          (_) async => Response(
+            data: mockResponseData,
+            statusCode: 200,
+            requestOptions: RequestOptions(path: ''),
+          ),
+        );
+
+        final result = await dataSource.fetchLatestActionForAlert(tAlertId);
+
+        expect(result, isA<ProblemAction>());
+        expect(result?.message, "Comment");
+      },
+    );
+
+    test('should return null, when list is empty', () async {
+      when(() => mockDio.get(any())).thenAnswer(
+        (_) async => Response(
+          data: [],
+          statusCode: 200,
+          requestOptions: RequestOptions(path: ''),
+        ),
+      );
+
+      final result = await dataSource.fetchLatestActionForAlert(tAlertId);
+
+      expect(result, isNull);
+    });
+
+    test('should throw an exception when server fail', () async {
+      when(
+        () => mockDio.get(any()),
+      ).thenThrow(DioException(requestOptions: RequestOptions(path: '')));
+
+      expect(
+        () => dataSource.fetchLatestActionForAlert(tAlertId),
+        throwsA(isA<DioException>()),
+      );
+    });
+  });
+}

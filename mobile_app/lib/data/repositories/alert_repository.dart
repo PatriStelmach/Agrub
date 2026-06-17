@@ -1,232 +1,105 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:alert_app/data/datasources/alert_local_data_source.dart';
+import 'package:flutter/foundation.dart';
+
 import 'package:alert_app/data/models/alert_model.dart';
-import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
-import 'package:alert_app/services/navigation_service.dart';
-import 'package:flutter_client_sse/constants/sse_request_type_enum.dart';
-import 'package:flutter_client_sse/flutter_client_sse.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:alert_app/data/models/problem_action_model.dart';
+import 'package:alert_app/data/datasources/alert_remote_data_source.dart';
 
-class AlertRepository extends ChangeNotifier {
-
-final Dio dio;
-AlertRepository({required this.dio});
-final Map<int, Alert> alertsCache = {};
-//remembering extreme alerts that triggered alert screen
-final Set<int> notifiedAlertIds = {};
-  final _storage = const FlutterSecureStorage();
-
-StreamSubscription? _sseSubscription;
-
-DateTime lastPing = DateTime.now();
-
-AlertSeverity _mapIntToSeverity(int value) {
-  switch (value) {
-    case 5:
-      return AlertSeverity.extreme;
-    case 4:
-      return AlertSeverity.high;
-    case 3:
-      return AlertSeverity.medium;
-    case 2:
-      return AlertSeverity.low;
-    default:
-      return AlertSeverity.info;
-  }
-}
-
-
-
-
-Future<void> initSseConnection() async {
-  const String sseUrl = 'http://10.0.2.2:10000/api/alerts/stream?groups=ADMIN';
-
-  _sseSubscription?.cancel();
-
-  String? token = await _storage.read(key: 'jwt_token');
-
-  if (token == null) {
-    debugPrint("SSE ERROR: No JWT Token.");
-    return;
-  }
-
-// KK:pobranie tokenu
-
-SSEClient.subscribeToSSE(
-      method: SSERequestType.GET,
-      url: sseUrl,
-      header: {
-        "Accept": "text/event-stream",
-        "Cache-Control": "no-cache",
-        "Authorization": "Bearer $token",
-      },
-    ).listen((event) {
-      debugPrint("SSE Raw Event: ${event.data}");
-      if (event.data != null && event.data!.isNotEmpty) {
-        try {
-        // Parsing String -> Map
-        final Map<String, dynamic> decodedData = jsonDecode(event.data!);
-        final String eventType = decodedData['eventType'] ?? '';
-        final dynamic message = decodedData['message'];
-
-        // 2. Logika "Dystrybutora" zdarzeń
-        if (eventType == 'ALERT_UPDATE' || eventType == 'ALERT_UPDATE_ONLY') {
-          handleSingleAlertUpdate(message);
-        } else {
-          debugPrint("Otrzymano inny typ zdarzenia: $eventType");
-        }
-        
-      } catch (e) {
-        debugPrint("DEBUG: SSE prasing error: $e");
-      }
-    }
+///Getting alerts data from remote and local sources and feeding it to Alerts View Model
+class AlertRepository {
+  final AlertRemoteDataSource remoteDataSource;
+  final AlertLocalDataSource localDataSource;
+  AlertRepository({
+    required this.remoteDataSource,
+    required this.localDataSource,
   });
-}
 
-      
-   
+  ///Getting all active alerts via alert data source from the server
+  Future<List<Alert>> fetchAllAlerts() async {
+    try {
+      final alerts = await remoteDataSource.fetchActiveAlerts();
+      await localDataSource.cacheAlerts(alerts);
 
-//MOCK: getting alerts from local JSON
-//FINAL: updating full list via REST when opening the app
-Future<void> updateAllAlerts() async {
-
-
-final response = await dio.get('http://10.0.2.2:10000/api/alerts/active');
-
-
-      final List<dynamic> data = response.data;
-      
-      final List<Alert> parsedAlerts = data.map((item) {
-        return Alert.fromJson(item as Map<String, dynamic>);
-      }).toList();
-
-    _processAlerts(parsedAlerts);
-}
-
-
-void handleSingleAlertUpdate(dynamic message) {
-    debugPrint("SSE Message: $message");
-    if (message is! Map<String, dynamic>) return;
-
-    final int? id = message['alertId'];
-    
-    // Jeśli to pełny obiekt Alert (ma pole subject)
-    if (message.containsKey('subject')) {
-      final alert = Alert.fromJson(message);
-      _processAlerts([alert]);
-      return;
-    }
-
-    // Jeśli to częściowy update i mamy go w cache
-    if (id != null && alertsCache.containsKey(id)) {
-      final existing = alertsCache[id]!;
-      Alert updated = existing;
-
-      // Update Severity
-      if (message.containsKey('newSeverity')) {
-        updated = updated.copyWith(severity: _mapIntToSeverity(message['newSeverity']));
-      }
-
-      // Update ACK status
-      if (message.containsKey('ack')) {
-        updated = updated.copyWith(acknowledged: message['ack']);
-      }
-
-      // Update Komentarza (obsługa comment z endpointu ack)
-      if (message.containsKey('comment') || message.containsKey('message')) {
-        updated = updated.copyWith(
-          message: message['comment'] ?? message['message'], 
-        );
-      }
-
-      alertsCache[id] = updated;
-      notifyListeners();
-    } else if (id != null) {
-      // Nie mamy w cache? Pobieramy listę, by być up-to-date
-      updateAllAlerts();
+      return alerts;
+    } catch (e) {
+      debugPrint("REPO ERROR: Couldn't fetch alerts: $e");
+      return await getOfflineAlerts();
     }
   }
 
+  ///Getting all locally stored alerts
+  Future<List<Alert>> getOfflineAlerts() async {
+    return await localDataSource.getOfflineAlerts();
+  }
 
-void _processAlerts(List<Alert> incomingAlerts) {
-    debugPrint("Repo: Procesuję ${incomingAlerts.length} alertów");
+  /// Send ack/comment and fetch actual list
+  Future<void> acknowledgeAlert({
+    required int alertId,
+    required String author,
+    required String message,
+    required int newSeverity,
+    required bool isAck,
+  }) async {
+    await remoteDataSource.acknowledgeAlert(
+      alertId: alertId,
+      author: author,
+      message: message,
+      newSeverity: newSeverity,
+      isAck: isAck,
+    );
+  }
 
-    bool alarmOverlayTrigger = false;
+  /// Fetch newest action for an alert
+  Future<ProblemAction?> getLatestActionForAlert(int alertId) async {
+    return await remoteDataSource.fetchLatestActionForAlert(alertId);
+  }
 
+  /// Fetch Stream via data source
+  Stream<dynamic> getAlertsUpdateStream({
+    required String userGroup,
+    required String token,
+  }) {
+    return remoteDataSource
+        .getAlertsStream(userGroup: userGroup, token: token)
+        .map((event) {
+          if (event.data == null || event.data!.isEmpty) return null;
 
-    for (var alert in incomingAlerts) {
+          final String rawData = event.data!.trim();
+          if (!rawData.startsWith('{') && !rawData.startsWith('[')) return null;
 
-      alertsCache[alert.id] = alert;
+          try {
+            final Map<String, dynamic> decodedData = jsonDecode(rawData);
+            final String eventType = decodedData['eventType'] ?? '';
+            final dynamic message = decodedData['message'];
 
-      debugPrint("DEBUG: Analysis of Alert ID: ${alert.id}");
-      debugPrint(" DEBUG: Show severity: ${alert.severity}");
-      debugPrint(" DEBUG: Is ID already in notifedAlertIds list>? ${notifiedAlertIds.contains(alert.id)}");
+            if (eventType == 'ALERT_UPDATE' ||
+                eventType == 'ALERT_UPDATE_ONLY') {
+              return message;
+            }
+          } catch (e) {
+            debugPrint("REPO SSE ERROR: Błąd parsowania zdarzenia: $e");
+          }
+          return null;
+        })
+        .where((event) => event != null);
+  }
 
-      if (alert.severity == AlertSeverity.extreme && !notifiedAlertIds.contains(alert.id)) {
-        debugPrint("DEBUG: Alert is new");
-        notifiedAlertIds.add(alert.id);
-        alarmOverlayTrigger = true;
-        
-      } else {
-        debugPrint("DEBUG: Alert is not new");
-      }
-   
-    }
-
-    if(alarmOverlayTrigger) {
-      debugPrint(" DEBUG: Calling showEmergencyOverlay() method");
-      navigationService.showEmergencyOverlay();
-    } else {
-      
-      debugPrint(" DEBUG: No new extreme alerts.");
-        
-        }
-
-  notifyListeners();
-  debugPrint("--- [DEBUG END] ---");
-
-}
-
-Future<void> sendAcknowledge(int alertId, {String? comment, bool isAck = true}) async {
-  
-
-
-final String actionType = isAck ? "ACK" : "COMMENT";
-final String commentText = comment ?? "";
-
-final originalAlert = alertsCache[alertId];
-    if (originalAlert != null) {
-      alertsCache[alertId] = originalAlert.copyWith(
-        acknowledged: isAck,
-        message: commentText.isNotEmpty ? commentText : originalAlert.message,
-      );
-      notifyListeners();
-    }
-
-final Map<String, dynamic> requestBody = {
-    "message": comment ?? "",
-    "actionType": actionType,
-    "author": "Mobile User",
-  };
-
-
-  try {
-      final response = await dio.post(
-        'http://10.0.2.2:10000/api/alerts/$alertId/ack',
-        data: requestBody,
-      );
-
-      if (response.statusCode == 200) {
-        debugPrint('ACK SUCCESS: Alert $alertId acknowledged.');
-      }
-    } on DioException catch (e) {
-  debugPrint('--- [Detailed Error Log] ---');
-  debugPrint('Status Code: ${e.response?.statusCode}');
-  debugPrint('Response Data: ${e.response?.data}'); 
-  debugPrint('Headers: ${e.response?.headers}');
+  Future<void> saveAlertsToOfflineCache(List<Alert> alerts) async {
+    try {
+      await localDataSource.cacheAlerts(alerts);
     } catch (e) {
-      debugPrint('ACK UNKNOWN ERROR: $e');
+      debugPrint("ALERT REPOSITORY ERROR: Problem with saving offline: $e");
     }
+  }
+
+  Future<void> markAlertAsNotified(int alertId) async {
+    await localDataSource.markAlertAsNotified(alertId);
+    debugPrint("Saved $alertId as sounded by LocalDataSource.");
+  }
+
+  Future<bool> isAlertAlreadyNotified(int alertId) async {
+    return await localDataSource.isAlertAlreadyNotified(alertId);
   }
 }

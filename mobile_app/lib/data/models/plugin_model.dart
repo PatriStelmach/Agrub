@@ -20,7 +20,6 @@ enum PluginLanguage {
 }
 
 class Plugin {
-
   final int id;
   final String fileName;
   final String creator;
@@ -28,6 +27,7 @@ class Plugin {
   final int weight;
   final List<String> tags;
   final String cronExpression;
+  final String? arguments;
   final DateTime updatedAt;
   final bool active;
   final bool log;
@@ -40,18 +40,16 @@ class Plugin {
     required this.weight,
     required this.tags,
     required this.cronExpression,
+    this.arguments,
     required this.updatedAt,
     required this.active,
     required this.log,
   });
 
-
-  Color get activeColor {
-    switch (active) {
-      case true: return Colors.blue;
-      case false: return Colors.grey;
-
-    }
+  Color activeColor(BuildContext context) {
+    return active
+        ? Theme.of(context).colorScheme.primary
+        : Colors.grey.withValues(alpha: 0.4);
   }
 
   factory Plugin.fromJson(Map<String, dynamic> json) {
@@ -62,7 +60,9 @@ class Plugin {
       language: PluginLanguage.fromString(json['language'] ?? 'No language'),
       weight: json['weight'] ?? 0,
       tags: List<String>.from(json['tags'] ?? []),
-      updatedAt: DateTime.parse(json['updatedAt'] ?? DateTime.now().toIso8601String()),
+      updatedAt: DateTime.parse(
+        json['updatedAt'] ?? DateTime.now().toIso8601String(),
+      ),
       active: json['active'] ?? false,
       log: json['log'] ?? false,
       cronExpression: json['cronExpression'] ?? ' ',

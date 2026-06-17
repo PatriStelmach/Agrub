@@ -1,19 +1,30 @@
 import 'package:flutter/material.dart';
 
-enum AlertSeverity { info, low, medium, high, extreme }
-enum AlertStatus { sent, inProgress, done}
+// Using Enhanced enums to easily print normal strings in views
+enum AlertSeverity {
+  unknown('UNKNOWN'),
+  info('INFO'),
+  low('LOW'),
+  medium('MEDIUM'),
+  high('HIGH'),
+  critical('CRITICAL');
+
+  final String label;
+  const AlertSeverity(this.label);
+}
+
+enum AlertStatus { sent, inProgress, done }
 
 class Alert {
-final int id;
-  final String subject;       
-  final String source;    
+  final int id;
+  final String subject;
+  final String source;
   final AlertSeverity severity;
   final AlertStatus status;
   final DateTime createdAt;
-  final String message; 
+  final String message;
   final String? author;
   final bool acknowledged;
-  
 
   Alert({
     required this.id,
@@ -27,19 +38,28 @@ final int id;
     required this.acknowledged,
   });
 
+  Color severityColor(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
-  Color get severityColor {
     switch (severity) {
-      case AlertSeverity.extreme: return Colors.redAccent;
-      case AlertSeverity.high: return Colors.orange;
-      case AlertSeverity.medium: return Colors.yellow;
-      case AlertSeverity.low: return Colors.green;
-      default: return Colors.grey;
+      case AlertSeverity.critical:
+        return const Color(0xFFF40031);
+      case AlertSeverity.high:
+        return isDark ? const Color(0xFFFE9A00) : const Color(0xFFE98600);
+      case AlertSeverity.medium:
+        return isDark ? const Color(0xFFFFDF20) : const Color(0xFFD6B900);
+      case AlertSeverity.low:
+        return isDark? const Color(0xFF48CF00) : const Color(0xFF08A800);
+      case AlertSeverity.info:
+        return isDark? const Color(0xFF61C8FF) : const Color(0xFF00A3FF);
+
+      case AlertSeverity.unknown:
+      default:
+        return isDark ? const Color(0xFF314158) : const Color(0xFFE2E8F0);
     }
   }
 
-
-Alert copyWith({
+  Alert copyWith({
     int? id,
     String? subject,
     String? source,
@@ -63,51 +83,65 @@ Alert copyWith({
     );
   }
 
+  factory Alert.fromJson(Map<String, dynamic> json) {
+    //Utility function for parsing int ( taking in both int and String types)
+    int asInt(dynamic value, {int defaultValue = 0}) {
+      if (value == null) return defaultValue;
+      if (value is int) return value;
+      return int.tryParse(value.toString()) ?? defaultValue;
+    }
 
-factory Alert.fromJson(Map<String,dynamic> json) {
+    // Severity mapping to enum
+    int sevIndex = asInt(json['severity']);
+    if (sevIndex < 0 || sevIndex >= AlertSeverity.values.length) {
+      sevIndex = AlertSeverity.values.length - 1;
+    }
+    final sev = AlertSeverity.values[sevIndex];
 
-//Utility function for parsing int ( taking in both int and String types)
-  int asInt(dynamic value, {int defaultValue = 0}) {
-    if (value == null) return defaultValue;
-    if (value is int) return value;
-    return int.tryParse(value.toString()) ?? defaultValue;
+    // Status mapping to enum
+    final String rawStatus = (json['status'] ?? 'sent').toString().toLowerCase();
+    AlertStatus stat;
+    switch (rawStatus) {
+      case 'inprogress':
+      case 'in_progress':
+        stat = AlertStatus.inProgress;
+        break;
+      case 'done':
+        stat = AlertStatus.done;
+        break;
+      default:
+        stat = AlertStatus.sent;
+    }
+
+    // Building object
+    return Alert(
+      id: asInt(json['id']),
+      subject: json['subject']?.toString() ?? '',
+      source: json['source']?.toString() ?? 'System',
+      severity: sev,
+      // Prepared for createdAt from FCM (comes as String), DateTime.parse will handle it
+      createdAt:
+          DateTime.tryParse(json['createdAt']?.toString() ?? '') ??
+          DateTime.now(),
+      status: stat,
+      message: json['message']?.toString() ?? '',
+      acknowledged: json['acknowledged'] is bool
+          ? json['acknowledged']
+          : json['acknowledged']?.toString().toLowerCase() == 'true',
+    );
   }
 
-  // Severity mapping to enum
-  int sevIndex = asInt(json['severity']);
-  if (sevIndex < 0 || sevIndex >= AlertSeverity.values.length) {
-    sevIndex = AlertSeverity.values.length - 1; // Fallback na Extreme
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'subject': subject,
+      'source': source,
+      'severity': AlertSeverity.values.indexOf(severity),
+      'status': status.toString().split('.').last,
+      'createdAt': createdAt.toIso8601String(),
+      'message': message,
+      'author': author,
+      'acknowledged': acknowledged,
+    };
   }
-  final sev = AlertSeverity.values[sevIndex];
-
-  // Status mapping to enum
-  String rawStatus = (json['status'] ?? 'sent').toString().toLowerCase();
-  AlertStatus stat;
-  switch (rawStatus) {
-    case 'inprogress':
-    case 'in_progress': // Na wypadek literówek w backendzie
-      stat = AlertStatus.inProgress;
-      break;
-    case 'done':
-      stat = AlertStatus.done;
-      break;
-    default:
-      stat = AlertStatus.sent;
-  }
-
-
-  // Building object
-  return Alert(
-    id: asInt(json['id']),
-    subject: json['subject']?.toString() ?? '',
-    source: json['source']?.toString() ?? 'System',
-    severity: sev,
-    // createdAt z FCM też przyjdzie jako String, DateTime.parse sobie z tym poradzi
-    createdAt: DateTime.tryParse(json['createdAt']?.toString() ?? '') ?? DateTime.now(),
-    status: stat,
-    message: json['message']?.toString() ?? '',
-    acknowledged: json['acknowledged'] ?? false, 
-  );
-  } 
 }
-

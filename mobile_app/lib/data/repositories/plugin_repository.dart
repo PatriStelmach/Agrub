@@ -2,100 +2,77 @@ import 'package:alert_app/data/models/plugin_model.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 
+///Getting "my plugins" data from remote source
+class PluginRepository extends ChangeNotifier {
+  final Dio dio;
 
-class PluginsRepository extends ChangeNotifier {
+  PluginRepository({required this.dio});
 
+  ///Getting all plugins from backend
+  Future<List<Plugin>> fetchAllPlugins() async {
+    try {
+      final response = await dio.get('/api/local-scripts/list');
+      final List<dynamic> data = response.data as List<dynamic>;
 
-final Map<String, Plugin> pluginsCache = {};
+      return data.map((item) {
+        return Plugin.fromJson(item as Map<String, dynamic>);
+      }).toList();
+    } catch (e) {
+      debugPrint("PLUGIN REPOSITORY DEBUG: Error when connecting to API $e");
+      rethrow;
+    }
+  }
 
-final Dio dio;
-PluginsRepository({required this.dio});
-//MOCK: getting alerts from local JSON
-//FINAL: updating full list via REST when opening the app
-Future<void> updateAllPlugins() async {
+  ///Forcing plugin to run immediately once
+  Future<String> forcePlugin(Plugin plugin, {String? arguments}) async {
+    try {
+      final String fileName = plugin.fileName;
+      final String extension = plugin.language.value;
 
-  try {
-    
-List<Plugin> allPlugins = [];
-    int currentPage = 0;
-    bool hasMorePages = true;
+      final String fullFileName = extension.startsWith('.')
+          ? '$fileName$extension'
+          : '$fileName.$extension';
 
-    while (hasMorePages) {
-      final response = await dio.get(
-        'http://10.0.2.2:10000/api/plugins/library',
-        queryParameters: {
-          'page': currentPage,
-          'size': 20, 
-        },
+      final Map<String, String> payload = {};
+      if (arguments != null && arguments.isNotEmpty) {
+        payload['arguments'] = arguments;
+      }
+
+      final response = await dio.post(
+        '/api/local-scripts/$fullFileName/run',
+        data: payload,
       );
 
-    //mock version:
-    //final String response = await rootBundle.loadString('assets/mocks/plugins.json');
-    //final List<dynamic> decodedData = jsonDecode(response);
-
-//final response = await dio.get('http://10.0.2.2:10000/api/plugins/library');
-final Map<String, dynamic> responseData = response.data as Map<String, dynamic>;
-   
-final List<dynamic> data = responseData['content'] ?? [];
-
-final List<Plugin> pagePlugins = data.map((item) {
-          return Plugin.fromJson(item as Map<String, dynamic>);
-        }).toList();
-        
-        allPlugins.addAll(pagePlugins);
-
-int totalPages = responseData['totalPages'] ?? 0;
-currentPage++;
-
-if (currentPage >= totalPages) {
-          hasMorePages = false;
-        }
-       else {
-        hasMorePages = true; 
-      }
+      return response.data.toString();
+    } catch (e) {
+      debugPrint(
+        "PLUGIN REPOSITORY DEBUG: Error while running ${plugin.fileName}: $e",
+      );
+      return "Run error: $e";
     }
-
-  for (var plugin in allPlugins) {
-      pluginsCache[plugin.fileName] = plugin;
-
-
-    }
-
-  notifyListeners();
-  debugPrint("PLUGIN DEBUG: Loaded ${pluginsCache.length} plugin(s)");
-  }
-  
-  catch (e) {
-    debugPrint("PLUGIN DEBUG: Error when connecting to API $e");
   }
 
+  ///Modifying plugin run options and setting it as active or inactive
+  Future<bool> activatePluginWithCron({
+    required String fileName,
+    required String extension,
+    required String cronExpression,
+    required bool active,
+  }) async {
+    try {
+      final String fullFileName = extension.startsWith('.')
+          ? '$fileName$extension'
+          : '$fileName.$extension';
+
+      final response = await dio.put(
+        '/api/local-scripts/$fullFileName/edit',
+        data: {'cronExpression': cronExpression, 'active': active},
+      );
+
+      return response.statusCode == 200;
+    } catch (e) {
+      debugPrint("PLUGIN REPOSITORY DEBUG: Cron save error: $e");
+      return false;
+    }
+  }
 }
-
-
-
-
-
-// very simple placehold for sending ack
-Future<void> startPlugin(String id) async {
-  
-
-  
- print("Plugin started");
-  
-
-}
-
-Future<void> stopPlugin(String id) async {
-  
-
-  
- print("Plugin stopped");
-  
-
-}
-
-
-
-}
-
-

@@ -1,14 +1,17 @@
 package pl.pjatk.alertwip.service;
 
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.Message;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import pl.pjatk.alertwip.model.GlobalProblem;
 import pl.pjatk.alertwip.dto.AlertUpdateEventDTO;
-
+import pl.pjatk.alertwip.controller.MobileDeviceController;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -66,6 +69,45 @@ public class SseNotifService {
         });
 
         deadEmitters.forEach(userSubscriptions::remove);
+
+
+        //FCM testowanie i kombinowanie
+        try {
+
+            String testUser = "admin@pjatk.pl";
+            Set<String> fcmTokens = MobileDeviceController.getTokenForUser(testUser);
+
+            for (String token : fcmTokens) {
+
+
+                String alertIdStr = String.valueOf(alert.getId());
+
+                String severityIndex = String.valueOf(alert.getSeverity());
+                String statusStr = alert.getStatus() != null ? alert.getStatus().toString().toLowerCase() : "sent";
+                String createdAtStr = alert.getCreatedAt() != null ? alert.getCreatedAt().toString() : java.time.Instant.now().toString();
+
+                Message message = Message.builder()
+                        .putData("title", "Zhakowali nas znowu")
+                        .putData("body", "Szykuj bitcoiny " + alert.getUniqueKey())
+
+                        .putData("id", alertIdStr)
+                        .putData("alertId", alertIdStr) //
+                        .putData("subject", alert.getSubject() != null ? alert.getSubject() : alert.getUniqueKey())
+                        .putData("source", alert.getSource() != null ? alert.getSource() : "System")
+                        .putData("severity", severityIndex)
+                        .putData("status", statusStr)
+                        .putData("createdAt", createdAtStr)
+                        .putData("message", alert.getMessage() != null ? alert.getMessage() : "")
+                        .putData("acknowledged", String.valueOf(alert.isAcknowledged()))
+                        .setToken(token)
+                        .build();
+
+                FirebaseMessaging.getInstance().sendAsync(message);
+                System.out.println("[FCM] Wysłano powiadomienie wybudzające do tokenu: " + token);
+            }
+        } catch (Exception e) {
+            System.err.println("[FCM ERROR] Nie udało się wysłać powiadomienia push: " + e.getMessage());
+        }
     }
 
     // wysyłamy tylko różnice a nie cały

@@ -1,6 +1,9 @@
+import 'package:alert_app/logic/general_layout_view_model.dart';
+import 'package:alert_app/screens/general_layout_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:alert_app/logic/user_view_model.dart';
+import 'package:alert_app/l10n/app_localizations.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,18 +17,41 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
-  void _handleLogin() async {
-    final userVM = context.read<UserViewModel>();
-    
-    bool success = await userVM.signIn(
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleLogin() async {
+    final userViewModel = context.read<UserViewModel>();
+    final layoutViewModel = context.read<GeneralLayoutViewModel>();
+    final t = AppLocalizations.of(context)!;
+
+    final success = await userViewModel.signIn(
       _emailController.text.trim(),
       _passwordController.text,
     );
 
-    if (!success && mounted) {
+    // Safety against using BuildContext if the screen was closed earlier
+    if (!mounted) return;
+
+    if (success) {
+      layoutViewModel.changePage(AppScreen.home);
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const GeneralLayout()),
+      );
+    } else {
+      // Failure snackbar
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Loggin error. Check connection and try again"),
+        SnackBar(
+          content: Text(t.login_error_message),
           backgroundColor: Colors.red,
         ),
       );
@@ -34,7 +60,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isLoading = context.watch<UserViewModel>().isLoading;
+    final t = AppLocalizations.of(context)!;
+    final isLoading = context.select<UserViewModel, bool>(
+      (viewModel) => viewModel.isLoading,
+    );
 
     return Scaffold(
       body: Center(
@@ -45,51 +74,62 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               const Icon(Icons.lock_outline, size: 80, color: Colors.blue),
               const SizedBox(height: 20),
-              const Text(
-                "ALERT APP",
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              Text(
+                t.login_app_title,
+                style: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 40),
-              
-              // Pole Email
+
               TextField(
                 controller: _emailController,
-                decoration: const InputDecoration(
-                  labelText: "E-mail",
-                  prefixIcon: Icon(Icons.email),
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: t.login_field_email,
+                  prefixIcon: const Icon(Icons.email),
+                  border: const OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 20),
-              
-              // Pole Hasło
+
               TextField(
                 controller: _passwordController,
                 obscureText: _obscurePassword,
                 decoration: InputDecoration(
-                  labelText: "Hasło",
+                  labelText: t.login_field_password,
                   prefixIcon: const Icon(Icons.lock),
                   border: const OutlineInputBorder(),
                   suffixIcon: IconButton(
-                    icon: Icon(_obscurePassword ? Icons.visibility : Icons.visibility_off),
-                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                    icon: Icon(
+                      _obscurePassword
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                    ),
+                    onPressed: () =>
+                        setState(() => _obscurePassword = !_obscurePassword),
                   ),
                 ),
               ),
               const SizedBox(height: 30),
-              
+
               SizedBox(
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
                   onPressed: isLoading ? null : _handleLogin,
                   style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
-                  child: isLoading 
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text("LOG IN", style: TextStyle(fontSize: 18)),
+                  child: isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : Text(
+                          t.login_button_submit,
+                          style: const TextStyle(fontSize: 18),
+                        ),
                 ),
               ),
             ],

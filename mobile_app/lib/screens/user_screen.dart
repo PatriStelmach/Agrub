@@ -1,3 +1,4 @@
+import 'package:alert_app/l10n/app_localizations.dart';
 import 'package:alert_app/logic/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -7,60 +8,69 @@ class UserScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // context.watch sprawia, że widget przebuduje się, gdy wywołasz notifyListeners()
     final userViewModel = context.watch<UserViewModel>();
     final user = userViewModel.user;
+    final t = AppLocalizations.of(context)!;
 
-    // 1. Zabezpieczenie na wypadek, gdyby dane jeszcze nie dotarły
-    if (user == null) {
-      return const Center(
+    if (user == null || userViewModel.isLoading) {
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 10),
-            Text("Ładowanie danych użytkownika..."),
+            const CircularProgressIndicator(),
+            const SizedBox(height: 10),
+            Text(t.user_loading_data),
           ],
         ),
       );
     }
 
-    // 2. Jeśli dane są dostępne, renderujemy UI
     return Padding(
       padding: const EdgeInsets.all(18.0),
-      child: SingleChildScrollView( // Dodane na wypadek mniejszych ekranów
+      child: SingleChildScrollView(
         child: Column(
           children: [
             const Icon(Icons.account_circle_rounded, size: 100),
             const SizedBox(height: 20),
-            
-            _buildDataRow('Username', user.login),
-            _buildDataRow('E-mail', user.email),
-            _buildDataRow('Role', user.role),
-            _buildDataRow('Group', user.group),
-            
+
+            UserDataRow(label: t.user_label_username, value: user.login),
+            UserDataRow(label: t.user_label_email, value: user.email),
+            UserDataRow(label: t.user_label_role, value: user.role),
+            UserDataRow(label: t.user_label_group, value: user.group),
+
             const SizedBox(height: 30),
-            
-            // Przycisk wylogowania (opcjonalnie, ale przydatne do testów)
+
             ElevatedButton(
-              onPressed: () {context.read<UserViewModel>().signOut();},
-              child: const Text("Wyloguj się"),
-            )
+              onPressed: () {
+                context.read<UserViewModel>().signOut();
+              },
+              child: Text(t.user_button_logout),
+            ),
           ],
         ),
       ),
     );
   }
+}
 
-  // Helper do budowania wierszy, żeby kod nie był powtarzalny
-  Widget _buildDataRow(String label, String value) {
+class UserDataRow extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const UserDataRow({super.key, required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         children: [
           Text(label, style: const TextStyle(fontSize: 24, color: Colors.grey)),
           const Spacer(),
-          Text(value, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
         ],
       ),
     );
