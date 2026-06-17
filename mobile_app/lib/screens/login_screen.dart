@@ -1,7 +1,4 @@
 import 'dart:async';
-
-import 'package:alert_app/data/services/push_notification_service.dart';
-import 'package:alert_app/logic/alerts_view_model.dart';
 import 'package:alert_app/logic/general_layout_view_model.dart';
 import 'package:alert_app/screens/general_layout_screen.dart';
 import 'package:flutter/material.dart';

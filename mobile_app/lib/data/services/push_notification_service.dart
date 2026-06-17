@@ -47,14 +47,14 @@ class PushNotificationService {
 
   Future<void> registerDevice(String jwtToken) async {
     try {
-      NotificationSettings settings = await fcm.requestPermission(
+      final NotificationSettings settings = await fcm.requestPermission(
         alert: true,
         badge: true,
         sound: true,
       );
 
       if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-        String? fcmToken = await fcm.getToken();
+        final String? fcmToken = await fcm.getToken();
         debugPrint("FCM Token: $fcmToken");
 
         if (fcmToken != null) {
@@ -83,12 +83,12 @@ class PushNotificationService {
       final response = await dio.post('');
 
       if (response.statusCode == 200) {
-        print('Backend working:');
+        debugPrint('Backend working:');
       } else {
-        print('Backend working, but error: ${response.statusCode}');
+        debugPrint('Backend working, but error: ${response.statusCode}');
       }
     } catch (e) {
-      print('No connection: $e');
+      debugPrint('No connection: $e');
     }
   }
 

@@ -256,7 +256,7 @@ class _AlertsScreenState extends State<AlertsScreen>
     AlertsViewModel viewModel,
     AppLocalizations t,
   ) {
-    return FutureBuilder<ProblemAction?>(
+    return FutureBuilder<AlertAction?>(
       future: viewModel.getLatestActionForAlert(alertId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -299,7 +299,7 @@ class _AlertsScreenState extends State<AlertsScreen>
               latestAction.ack ? t.yes : t.no,
             ),
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.textTheme.bodyMedium?.color?.withOpacity(0.7),
+              color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
             ),
           ),
         );
@@ -369,7 +369,7 @@ class _AckDialogState extends State<AckDialog> {
             ),
             const SizedBox(height: 5),
             DropdownButtonFormField<int>(
-              value: selectedSeverity,
+              initialValue: selectedSeverity,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 contentPadding: EdgeInsets.symmetric(

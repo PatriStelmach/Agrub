@@ -108,10 +108,10 @@ class AlertsViewModel extends ChangeNotifier {
   }
 
   ///Processing update from SSE and updating the view
-  void _handleIncomingSseUpdate(dynamic message) async {
+  Future<void> _handleIncomingSseUpdate(dynamic message) async {
     if (message is! Map<String, dynamic>) return;
 
-    int? id = _extractId(message['alertId']);
+    final int? id = _extractId(message['alertId']);
     if (id == null) return;
 
     // If there is a full object
@@ -119,7 +119,6 @@ class AlertsViewModel extends ChangeNotifier {
       final alert = Alert.fromJson(message);
       _alertsCache[alert.id] = alert;
 
-      // unawaited to inform linters etc. and others that this is intentionally without await
       unawaited(_triggerEmergencyOverlayForNewAlert(alert));
     }
     // If the update is partial and alert exist in cache
@@ -128,7 +127,7 @@ class AlertsViewModel extends ChangeNotifier {
       Alert updated = existing;
 
       if (message.containsKey('newSeverity')) {
-        int newSevInt = message['newSeverity'] as int;
+        final int newSevInt = message['newSeverity'] as int;
         updated = updated.copyWith(severity: AlertSeverity.values[newSevInt]);
       }
       if (message.containsKey('ack')) {
@@ -212,11 +211,13 @@ class AlertsViewModel extends ChangeNotifier {
       _alertsCache[alertId] = originalAlert;
 
       notifyListeners();
-      print("ALERT VIEW MODEL ERROR: Error during ACK, reverting changes $e");
+      debugPrint(
+        "ALERT VIEW MODEL ERROR: Error during ACK, reverting changes $e",
+      );
     }
   }
 
-  Future<ProblemAction?> getLatestActionForAlert(int alertId) async {
+  Future<AlertAction?> getLatestActionForAlert(int alertId) async {
     return await alertsRepository.getLatestActionForAlert(alertId);
   }
 

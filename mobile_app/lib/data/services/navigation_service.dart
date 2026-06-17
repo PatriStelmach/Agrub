@@ -24,7 +24,7 @@ class NavigationService {
       await navigatorKey.currentState?.push(
         PageRouteBuilder(
           opaque: false,
-          barrierColor: Colors.black.withOpacity(0.7),
+          barrierColor: Colors.black.withValues(alpha: 0.7),
           pageBuilder: (context, _, _) => const AlarmOverlayScreen(),
           transitionsBuilder: (context, animation, _, child) {
             return FadeTransition(opacity: animation, child: child);

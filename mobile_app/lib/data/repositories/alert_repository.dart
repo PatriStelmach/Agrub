@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:alert_app/data/datasources/alert_local_data_source.dart';
 import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:alert_app/data/models/alert_model.dart';
 import 'package:alert_app/data/models/problem_action_model.dart';
@@ -54,7 +53,7 @@ class AlertRepository {
   }
 
   /// Fetch newest action for an alert
-  Future<ProblemAction?> getLatestActionForAlert(int alertId) async {
+  Future<AlertAction?> getLatestActionForAlert(int alertId) async {
     return await remoteDataSource.fetchLatestActionForAlert(alertId);
   }
 
@@ -81,7 +80,7 @@ class AlertRepository {
               return message;
             }
           } catch (e) {
-            debugPrint("REPO SSE ERROR: Błąd parsowania zdarzenia: $e");
+            debugPrint("REPO SSE ERROR: Parsing error: $e");
           }
           return null;
         })
@@ -103,5 +102,9 @@ class AlertRepository {
 
   Future<bool> isAlertAlreadyNotified(int alertId) async {
     return await localDataSource.isAlertAlreadyNotified(alertId);
+  }
+
+  Future<bool> checkBackendConnection() {
+    return remoteDataSource.isBackendConnected();
   }
 }
