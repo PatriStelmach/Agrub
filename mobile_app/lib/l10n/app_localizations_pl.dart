@@ -183,6 +183,9 @@ class AppLocalizationsPl extends AppLocalizations {
   String get alerts_sort_created_at => 'Data utworzenia';
 
   @override
+  String get alerts_sort_closed_at => 'Data zamknięcia';
+
+  @override
   String get alerts_sort_acknowledged => 'Status akceptacji';
 
   @override
@@ -237,19 +240,22 @@ class AppLocalizationsPl extends AppLocalizations {
   String get alerts_dialog_section_severity => 'Zmień ważność:';
 
   @override
-  String get alerts_dialog_severity_info => '0 - Info';
+  String get alerts_dialog_severity_unknown => 'Unknown';
 
   @override
-  String get alerts_dialog_severity_low => '1 - Niski';
+  String get alerts_dialog_severity_info => 'Info';
 
   @override
-  String get alerts_dialog_severity_medium => '3 - Średni';
+  String get alerts_dialog_severity_low => 'Niski';
 
   @override
-  String get alerts_dialog_severity_high => '4 - Wysoki';
+  String get alerts_dialog_severity_medium => 'Średni';
 
   @override
-  String get alerts_dialog_severity_extreme => '5 - Ekstremalny';
+  String get alerts_dialog_severity_high => 'Wysoki';
+
+  @override
+  String get alerts_dialog_severity_critical => 'Critical';
 
   @override
   String get alerts_dialog_check_ack => 'Zaakceptuj alert';
@@ -316,4 +322,28 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get settings_switch_to_polish => 'Switch to Polish';
+
+  @override
+  String get navigation_history => 'Historia';
+
+  @override
+  String get navigation_alerts => 'Alerty';
+
+  @override
+  String get navigation_plugins => 'Pluginy';
+
+  @override
+  String get navigation_settings => 'Ustawienia';
+
+  @override
+  String get navigation_user_profile => 'Profil użytkownika';
+
+  @override
+  String get navigation_home => 'Ekran główny';
+
+  @override
+  String get app_title => 'AlertVIP';
+
+  @override
+  String get theme => 'Motyw';
 }

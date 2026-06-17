@@ -1,5 +1,4 @@
 import 'package:alert_app/data/models/plugin_model.dart';
-
 import 'package:alert_app/logic/plugins_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -171,7 +170,7 @@ class _PluginsScreenState extends State<PluginsScreen> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () => _showRunArgsDialog(context, plugin),
-                    child: const Text('Run plugin'),
+                    child: const Text(t.plugins_button_run),
                   ),
                 ),
               ],

@@ -20,7 +20,7 @@ class ProblemAction {
       id: json['id'] as int,
       author: json['author'] ?? 'Unknown',
       message: json['message'] ?? '',
-      ack: json['ack'] ?? false,
+      ack: json['ackUpdate'] ?? false,
       newSeverity: json['newSeverity'] ?? 0,
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'].toString())

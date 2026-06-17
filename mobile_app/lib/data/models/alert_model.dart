@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 
 // Using Enhanced enums to easily print normal strings in views
 enum AlertSeverity {
-  info('Info'),
-  lowest('Lowest'),
-  low('Low'),
-  medium('Medium'),
-  high('High'),
-  extreme('Extreme');
+  unknown('UNKNOWN'),
+  info('INFO'),
+  low('LOW'),
+  medium('MEDIUM'),
+  high('HIGH'),
+  critical('CRITICAL');
 
   final String label;
   const AlertSeverity(this.label);
@@ -42,26 +42,20 @@ class Alert {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     switch (severity) {
-      //oklch(0.632 0.254 21.972)
-      case AlertSeverity.extreme:
-        return const Color(0xFFFC2E41);
-      //  oklch(70.5% 0.213 47.604)
+      case AlertSeverity.critical:
+        return const Color(0xFFF40031);
       case AlertSeverity.high:
-        return const Color(0xFFFF7B2E);
-      //  oklch(76.9% 0.290 70.08)
+        return isDark ? const Color(0xFFFE9A00) : const Color(0xFFE98600);
       case AlertSeverity.medium:
-        return const Color(0xFFFFB400);
-      //  oklch(90.5% 0.182 98.111)
+        return isDark ? const Color(0xFFFFDF20) : const Color(0xFFD6B900);
       case AlertSeverity.low:
-        return const Color(0xFFE5FA31);
-      // oklch(0.731 0.255 137.694)
-      case AlertSeverity.lowest:
-        return const Color(0xFF00FA54);
-
+        return isDark? const Color(0xFF48CF00) : const Color(0xFF08A800);
       case AlertSeverity.info:
+        return isDark? const Color(0xFF61C8FF) : const Color(0xFF00A3FF);
+
+      case AlertSeverity.unknown:
       default:
-        // Tryb ciemny oklch(0.70 0.14 242) Jasny oklch(0.79 0.14 242)
-        return isDark ? const Color(0xFF4DB0FF) : const Color(0xFF8AD2FF);
+        return isDark ? const Color(0xFF314158) : const Color(0xFFE2E8F0);
     }
   }
 
@@ -105,7 +99,7 @@ class Alert {
     final sev = AlertSeverity.values[sevIndex];
 
     // Status mapping to enum
-    String rawStatus = (json['status'] ?? 'sent').toString().toLowerCase();
+    final String rawStatus = (json['status'] ?? 'sent').toString().toLowerCase();
     AlertStatus stat;
     switch (rawStatus) {
       case 'inprogress':

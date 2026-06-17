@@ -21,10 +21,13 @@ class SettingsScreen extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Dark Theme',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
+                  t.theme,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
               Expanded(

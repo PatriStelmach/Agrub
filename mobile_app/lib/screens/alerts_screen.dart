@@ -295,11 +295,11 @@ class _AlertsScreenState extends State<AlertsScreen>
           ),
           subtitle: Text(
             t.alerts_history_subtitle(
-              latestAction.author,
               latestAction.ack ? t.yes : t.no,
+              latestAction.author
             ),
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.textTheme.bodyMedium?.color?.withOpacity(0.7),
+              color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
             ),
           ),
         );
@@ -369,7 +369,7 @@ class _AckDialogState extends State<AckDialog> {
             ),
             const SizedBox(height: 5),
             DropdownButtonFormField<int>(
-              value: selectedSeverity,
+              initialValue: selectedSeverity,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 contentPadding: EdgeInsets.symmetric(
@@ -380,11 +380,11 @@ class _AckDialogState extends State<AckDialog> {
               items: [
                 DropdownMenuItem(
                   value: 0,
-                  child: Text(t.alerts_dialog_severity_info),
+                  child: Text(t.alerts_dialog_severity_unknown),
                 ),
                 DropdownMenuItem(
                   value: 1,
-                  child: Text(t.alerts_dialog_severity_low),
+                  child: Text(t.alerts_dialog_severity_info),
                 ),
                 DropdownMenuItem(
                   value: 2,
@@ -400,7 +400,7 @@ class _AckDialogState extends State<AckDialog> {
                 ),
                 DropdownMenuItem(
                   value: 5,
-                  child: Text(t.alerts_dialog_severity_extreme),
+                  child: Text(t.alerts_dialog_severity_critical),
                 ),
               ],
               onChanged: (int? newValue) {

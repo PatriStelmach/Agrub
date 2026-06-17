@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:alert_app/data/datasources/alert_local_data_source.dart';
 import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:alert_app/data/models/alert_model.dart';
 import 'package:alert_app/data/models/problem_action_model.dart';

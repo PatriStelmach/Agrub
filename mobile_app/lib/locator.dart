@@ -32,7 +32,7 @@ Future<void> setupLocator() async {
           final storage = locator<FlutterSecureStorage>();
 
           if (options.path != '/api/auth/login') {
-            String? token = await storage.read(key: 'jwt_token');
+            final String? token = await storage.read(key: 'jwt_token');
             if (token != null) {
               options.headers['Authorization'] = 'Bearer $token';
             }

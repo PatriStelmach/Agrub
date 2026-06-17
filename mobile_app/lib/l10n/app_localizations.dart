@@ -431,6 +431,12 @@ abstract class AppLocalizations {
   /// **'CreatedAt'**
   String get alerts_sort_created_at;
 
+  /// No description provided for @alerts_sort_closed_at.
+  ///
+  /// In en, this message translates to:
+  /// **'ClosedAt'**
+  String get alerts_sort_closed_at;
+
   /// No description provided for @alerts_sort_acknowledged.
   ///
   /// In en, this message translates to:
@@ -527,35 +533,41 @@ abstract class AppLocalizations {
   /// **'Change Severity:'**
   String get alerts_dialog_section_severity;
 
+  /// No description provided for @alerts_dialog_severity_unknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get alerts_dialog_severity_unknown;
+
   /// No description provided for @alerts_dialog_severity_info.
   ///
   /// In en, this message translates to:
-  /// **'0 - Info'**
+  /// **'Info'**
   String get alerts_dialog_severity_info;
 
   /// No description provided for @alerts_dialog_severity_low.
   ///
   /// In en, this message translates to:
-  /// **'1 - Low'**
+  /// **'Low'**
   String get alerts_dialog_severity_low;
 
   /// No description provided for @alerts_dialog_severity_medium.
   ///
   /// In en, this message translates to:
-  /// **'3 - Medium'**
+  /// **'Medium'**
   String get alerts_dialog_severity_medium;
 
   /// No description provided for @alerts_dialog_severity_high.
   ///
   /// In en, this message translates to:
-  /// **'4 - High'**
+  /// **'High'**
   String get alerts_dialog_severity_high;
 
-  /// No description provided for @alerts_dialog_severity_extreme.
+  /// No description provided for @alerts_dialog_severity_critical.
   ///
   /// In en, this message translates to:
-  /// **'5 - Extreme'**
-  String get alerts_dialog_severity_extreme;
+  /// **'Critical'**
+  String get alerts_dialog_severity_critical;
 
   /// No description provided for @alerts_dialog_check_ack.
   ///
@@ -688,6 +700,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Switch to Polish'**
   String get settings_switch_to_polish;
+
+  /// No description provided for @navigation_history.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get navigation_history;
+
+  /// No description provided for @navigation_alerts.
+  ///
+  /// In en, this message translates to:
+  /// **'Alerts'**
+  String get navigation_alerts;
+
+  /// No description provided for @navigation_plugins.
+  ///
+  /// In en, this message translates to:
+  /// **'Plugins'**
+  String get navigation_plugins;
+
+  /// No description provided for @navigation_settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get navigation_settings;
+
+  /// No description provided for @navigation_user_profile.
+  ///
+  /// In en, this message translates to:
+  /// **'User Profile'**
+  String get navigation_user_profile;
+
+  /// No description provided for @navigation_home.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get navigation_home;
+
+  /// No description provided for @app_title.
+  ///
+  /// In en, this message translates to:
+  /// **'AlertVIP'**
+  String get app_title;
+
+  /// No description provided for @theme.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get theme;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

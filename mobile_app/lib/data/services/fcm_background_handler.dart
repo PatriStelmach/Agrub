@@ -67,7 +67,7 @@ Future<void> _showNotificationBasedOnSeverity(Alert alert) async {
 
   AndroidNotificationDetails androidDetails;
 
-  if (alert.severity == AlertSeverity.extreme) {
+  if (alert.severity == AlertSeverity.critical) {
     androidDetails = AndroidNotificationDetails(
       'extreme_alerts_channel_v3',
       'Critical',
@@ -103,7 +103,7 @@ Future<void> _showNotificationBasedOnSeverity(Alert alert) async {
 
   await localNotifications.show(
     id: alert.id,
-    title: alert.severity == AlertSeverity.extreme
+    title: alert.severity == AlertSeverity.critical
         ? "EXTREME ALERT!"
         : "New alert from: ${alert.source}",
     body: alert.subject,
