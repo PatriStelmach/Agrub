@@ -28,8 +28,6 @@ import 'package:alert_app/logic/alerts_view_model.dart';
 import 'package:alert_app/logic/home_view_model.dart';
 import 'package:alert_app/logic/user_view_model.dart';
 
-import 'logic/alert_history_view_model.dart';
-
 Future<void> main() async {
   //checking if flutter engine is ready
   WidgetsFlutterBinding.ensureInitialized();
@@ -73,12 +71,6 @@ class AppStateProvider extends StatelessWidget {
                   alertsRepository: locator<AlertRepository>(),
                   pushNotificationService: contextAfterServices
                       .read<PushNotificationService>(),
-                ),
-              ),
-              ChangeNotifierProvider(
-                lazy: false,
-                create: (_) => AlertsHistoryViewModel(
-                  alertsRepository: locator<AlertRepository>(),
                 ),
               ),
               ChangeNotifierProvider(

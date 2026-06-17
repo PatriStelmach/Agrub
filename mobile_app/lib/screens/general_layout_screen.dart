@@ -1,4 +1,3 @@
-import 'package:alert_app/screens/alert_history_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -63,8 +62,7 @@ class _GeneralLayoutState extends State<GeneralLayout> {
       AlertsScreen(),
       PluginsScreen(),
       UserScreen(),
-      SettingsScreen(),
-      AlertHistoryScreen()
+      SettingsScreen()
     ];
 
     return Scaffold(

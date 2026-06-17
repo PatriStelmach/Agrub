@@ -42,25 +42,19 @@ class Alert {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     switch (severity) {
-    //oklch(0.632 0.254 21.972)
       case AlertSeverity.critical:
         return const Color(0xFFF40031);
-    //  oklch(70.5% 0.213 47.604)
       case AlertSeverity.high:
         return isDark ? const Color(0xFFFE9A00) : const Color(0xFFE98600);
-    //  oklch(76.9% 0.290 70.08)
       case AlertSeverity.medium:
         return isDark ? const Color(0xFFFFDF20) : const Color(0xFFD6B900);
-    //  oklch(90.5% 0.182 98.111)
       case AlertSeverity.low:
         return isDark? const Color(0xFF48CF00) : const Color(0xFF08A800);
-    // oklch(0.731 0.255 137.694)
       case AlertSeverity.info:
         return isDark? const Color(0xFF61C8FF) : const Color(0xFF00A3FF);
 
       case AlertSeverity.unknown:
       default:
-      // Tryb ciemny oklch(0.70 0.14 242) Jasny oklch(0.79 0.14 242)
         return isDark ? const Color(0xFF314158) : const Color(0xFFE2E8F0);
     }
   }
