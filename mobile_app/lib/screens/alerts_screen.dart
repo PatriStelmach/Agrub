@@ -256,7 +256,7 @@ class _AlertsScreenState extends State<AlertsScreen>
     AlertsViewModel viewModel,
     AppLocalizations t,
   ) {
-    return FutureBuilder<ProblemAction?>(
+    return FutureBuilder<AlertAction?>(
       future: viewModel.getLatestActionForAlert(alertId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {

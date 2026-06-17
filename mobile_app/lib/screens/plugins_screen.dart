@@ -272,7 +272,7 @@ class _CronEditDialogState extends State<CronEditDialog> {
               isActive: _isActive,
             );
 
-            if (mounted) {
+            if (context.mounted) {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(

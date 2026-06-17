@@ -119,7 +119,6 @@ class AlertsViewModel extends ChangeNotifier {
       final alert = Alert.fromJson(message);
       _alertsCache[alert.id] = alert;
 
-      // unawaited to inform linters etc. and others that this is intentionally without await
       unawaited(_triggerEmergencyOverlayForNewAlert(alert));
     }
     // If the update is partial and alert exist in cache
@@ -212,11 +211,13 @@ class AlertsViewModel extends ChangeNotifier {
       _alertsCache[alertId] = originalAlert;
 
       notifyListeners();
-      print("ALERT VIEW MODEL ERROR: Error during ACK, reverting changes $e");
+      debugPrint(
+        "ALERT VIEW MODEL ERROR: Error during ACK, reverting changes $e",
+      );
     }
   }
 
-  Future<ProblemAction?> getLatestActionForAlert(int alertId) async {
+  Future<AlertAction?> getLatestActionForAlert(int alertId) async {
     return await alertsRepository.getLatestActionForAlert(alertId);
   }
 

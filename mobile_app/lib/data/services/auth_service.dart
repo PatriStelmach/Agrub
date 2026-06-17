@@ -63,9 +63,9 @@ class AuthService {
       await _storage.delete(key: 'jwt_token');
       await _storage.delete(key: 'user_groups');
 
-      print("AUTH SERVICE - User logged out, memory wiped");
+      debugPrint("AUTH SERVICE - User logged out, memory wiped");
     } catch (e) {
-      print("AUTH SERVICE - Error with logout and memory wipe: $e");
+      debugPrint("AUTH SERVICE - Error with logout and memory wipe: $e");
     }
   }
 }

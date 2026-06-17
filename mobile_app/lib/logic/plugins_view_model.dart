@@ -65,8 +65,7 @@ class PluginsViewModel extends ChangeNotifier {
     };
 
     final pluginGetter =
-        pluginGetters[_currentSortProperty] ??
-        (plugin) => plugin.fileName ?? '';
+        pluginGetters[_currentSortProperty] ?? (plugin) => plugin.fileName;
     final newList = List<Plugin>.from(_plugins);
     newList.sort((a, b) {
       final valA = pluginGetter(a);

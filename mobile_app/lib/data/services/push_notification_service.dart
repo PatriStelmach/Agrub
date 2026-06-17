@@ -83,12 +83,12 @@ class PushNotificationService {
       final response = await dio.post('');
 
       if (response.statusCode == 200) {
-        print('Backend working:');
+        debugPrint('Backend working:');
       } else {
-        print('Backend working, but error: ${response.statusCode}');
+        debugPrint('Backend working, but error: ${response.statusCode}');
       }
     } catch (e) {
-      print('No connection: $e');
+      debugPrint('No connection: $e');
     }
   }
 

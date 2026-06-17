@@ -9,8 +9,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:alert_app/locator.dart';
 import 'package:alert_app/l10n/app_localizations.dart';
 import 'package:alert_app/themes/app_theme_default.dart';
-import 'package:alert_app/screens/login_screen.dart';
-import 'package:alert_app/screens/general_layout_screen.dart';
 
 // Services & Repositories
 import 'package:alert_app/data/services/language_service.dart';
@@ -89,6 +87,7 @@ class AppStateProvider extends StatelessWidget {
                       create: (_) => HomeViewModel(
                         alertsViewModel: contextAfterAlerts
                             .read<AlertsViewModel>(),
+                        alertsRepository: locator<AlertRepository>(),
                       )..getMyToken(),
                     ),
                   ],

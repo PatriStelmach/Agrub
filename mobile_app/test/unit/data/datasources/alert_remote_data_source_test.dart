@@ -137,7 +137,7 @@ void main() {
 
         final result = await dataSource.fetchLatestActionForAlert(testAlertId);
 
-        expect(result, isA<ProblemAction>());
+        expect(result, isA<AlertAction>());
         expect(result?.message, "Comment");
       },
     );

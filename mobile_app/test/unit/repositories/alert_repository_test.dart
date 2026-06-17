@@ -177,7 +177,7 @@ void main() {
 
   group('getLatestActionForAlert', () {
     test('Fetch latest comment or action for an alert', () async {
-      final testLatestAction = ProblemAction(
+      final testLatestAction = AlertAction(
         id: 11,
         author: "Admin",
         message: "Taking over",
@@ -199,7 +199,7 @@ void main() {
     test(
       'Fetch latest comment and pass DioException through to ViewModel',
       () async {
-        final testLatestAction = ProblemAction(
+        final testLatestAction = AlertAction(
           id: 11,
           author: "Admin",
           message: "Taking over",
@@ -228,7 +228,7 @@ void main() {
     test(
       'Fetch latest comment and pass DioException through to ViewModel',
       () async {
-        final testLatestAction = ProblemAction(
+        final testLatestAction = AlertAction(
           id: 11,
           author: "Admin",
           message: "Taking over",
