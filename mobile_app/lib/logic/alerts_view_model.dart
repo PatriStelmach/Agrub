@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:alert_app/data/models/problem_action_model.dart';
+import 'package:alert_app/data/models/alert_action_model.dart';
 import 'package:alert_app/data/services/navigation_service.dart';
 import 'package:alert_app/data/services/push_notification_service.dart';
 import 'package:alert_app/locator.dart';

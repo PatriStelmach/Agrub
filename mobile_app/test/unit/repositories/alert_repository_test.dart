@@ -1,7 +1,7 @@
 import 'package:alert_app/data/datasources/alert_local_data_source.dart';
 import 'package:alert_app/data/datasources/alert_remote_data_source.dart';
 import 'package:alert_app/data/models/alert_model.dart';
-import 'package:alert_app/data/models/problem_action_model.dart';
+import 'package:alert_app/data/models/alert_action_model.dart';
 import 'package:alert_app/data/repositories/alert_repository.dart';
 import 'package:dio/dio.dart';
 import 'package:mocktail/mocktail.dart';

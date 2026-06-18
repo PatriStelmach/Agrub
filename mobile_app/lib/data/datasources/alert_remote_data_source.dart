@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_client_sse/constants/sse_request_type_enum.dart';
 import 'package:flutter_client_sse/flutter_client_sse.dart';
 import 'package:alert_app/data/models/alert_model.dart';
-import 'package:alert_app/data/models/problem_action_model.dart';
+import 'package:alert_app/data/models/alert_action_model.dart';
 
 ///
 

@@ -1,4 +1,4 @@
-import 'package:alert_app/data/models/problem_action_model.dart';
+import 'package:alert_app/data/models/alert_action_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:dio/dio.dart';

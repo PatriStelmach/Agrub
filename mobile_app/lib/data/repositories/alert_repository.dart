@@ -4,7 +4,7 @@ import 'package:alert_app/data/datasources/alert_local_data_source.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:alert_app/data/models/alert_model.dart';
-import 'package:alert_app/data/models/problem_action_model.dart';
+import 'package:alert_app/data/models/alert_action_model.dart';
 import 'package:alert_app/data/datasources/alert_remote_data_source.dart';
 
 ///Getting alerts data from remote and local sources and feeding it to Alerts View Model

@@ -1,4 +1,4 @@
-import 'package:alert_app/data/models/problem_action_model.dart';
+import 'package:alert_app/data/models/alert_action_model.dart';
 import 'package:alert_app/logic/alerts_view_model.dart';
 import 'package:alert_app/logic/user_view_model.dart';
 import 'package:flutter/material.dart';
