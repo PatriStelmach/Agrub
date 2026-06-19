@@ -22,6 +22,7 @@ class AlertRemoteDataSource {
           .map((item) => Alert.fromJson(item as Map<String, dynamic>))
           .toList();
     } catch (e) {
+      
       debugPrint(
         "ALERT REMOTE DATA SOURCE ERROR: Fetch all alerts error - $e ",
       );
@@ -104,6 +105,7 @@ class AlertRemoteDataSource {
         "Cache-Control": "no-cache",
         "Authorization": "Bearer $token",
       },
+      
     );
   }
 
@@ -112,8 +114,8 @@ class AlertRemoteDataSource {
       final response = await dio.get('/');
       if (response.statusCode == 200) return true;
     } on DioException catch (e) {
-return false;
-    } 
+      return false;
+    }
     return false;
   }
 }

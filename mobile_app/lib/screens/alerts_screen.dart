@@ -433,10 +433,13 @@ class _AckDialogState extends State<AckDialog> {
             final currentUser = context.read<UserViewModel>().user;
             final currentAuthor = currentUser?.login ?? "Mobile User";
 
+
             context.read<AlertsViewModel>().acknowledgeAlert(
+
               widget.alert.id,
               author: currentAuthor,
               comment: commentValue,
+              newSeverity: selectedSeverity,
               isAck: isAck,
             );
 

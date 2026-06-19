@@ -176,27 +176,19 @@ class AlertsViewModel extends ChangeNotifier {
 
   ///Sending ack via repository and Optimistic UI change
   Future<void> acknowledgeAlert(
-    int alertId, {
+    int alertId,  {
     required String author,
     String? comment,
     bool isAck = true,
-    int? newSeverity,
+
+    int? newSeverity ,
   }) async {
     final originalAlert = _alertsCache[alertId];
     if (originalAlert == null) {
       return;
     }
 
-    // UI Optimistic update
-    final finalSeverityInt = newSeverity ?? originalAlert.severity.index;
 
-    _alertsCache[alertId] = originalAlert.copyWith(
-      acknowledged: isAck,
-      severity: AlertSeverity.values[finalSeverityInt],
-      message: (comment != null && comment.isNotEmpty)
-          ? comment
-          : originalAlert.message,
-    );
     notifyListeners();
 
     try {
@@ -204,7 +196,7 @@ class AlertsViewModel extends ChangeNotifier {
         alertId: alertId,
         author: author,
         message: comment ?? "",
-        newSeverity: finalSeverityInt,
+        newSeverity: newSeverity ?? 1 ,
         isAck: isAck,
       );
     } catch (e) {

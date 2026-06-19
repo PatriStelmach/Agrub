@@ -9,12 +9,21 @@ class NavigationService {
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   final AlarmService alarmService = AlarmService();
   bool _isOverlayVisible = false;
-  final String _alertMessage = "Generic message";
+  String _alertMessage = "Generic message";
 
   ///Showing the alarm overlay, containing safeguard against overlay spam
   Future<void> showEmergencyOverlay(String alarmType) async {
     // If there is an alarm overlay already, return
     if (_isOverlayVisible) return;
+
+    switch (alarmType){
+      case 'Alert':
+      _alertMessage = "Critical alert!";
+      break;
+      case 'Connection':
+      _alertMessage = "No connection to server!";
+      break;
+    }
 
     _isOverlayVisible = true;
     unawaited(alarmService.triggerAlarm());
