@@ -112,17 +112,8 @@ class AlertRemoteDataSource {
       final response = await dio.get('/');
       if (response.statusCode == 200) return true;
     } on DioException catch (e) {
-      debugPrint(
-        "ALERT REMOTE DATA SOURCE: Dio Error -  ${e.response?.statusCode} - ${e.message}",
-      );
-      rethrow;
-    } catch (e) {
-      debugPrint(
-        "ALERT REMOTE DATA SOURCE ERROR: Acknowledge or comment error - {$e} ",
-      );
-
-      rethrow;
-    }
+return false;
+    } 
     return false;
   }
 }

@@ -21,17 +21,28 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   int get activeAlertsCount => alertsViewModel.alertsList.length;
-  //T0D0: To be handled
-  DateTime? get lastPing => null;
 
-  Future<DateTime?> pingBackend() async {
-    final ping = await alertsRepository.checkBackendConnection();
+
+  bool? lastPing;
+
+  Future<bool> pingBackend() async {
+    final bool ping = await alertsRepository.checkBackendConnection();
     if (ping) {
-      return DateTime.now();
+      return true;
     } else {
-      return null;
+      return false;
     }
   }
+
+ Future<void> triggerPingAndNotify() async {
+    lastPing = await pingBackend();
+    notifyListeners();
+
+  }
+
+
+
+  
 
   List<Alert> latestAlerts() {
     final List<Alert> allAlerts = List<Alert>.from(alertsViewModel.alertsList);

@@ -1,27 +1,33 @@
 import 'package:alert_app/logic/general_layout_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:alert_app/logic/home_view_model.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:alert_app/l10n/app_localizations.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+
+  @override
+  void initState() {
+  super.initState();
+      final homeViewModel = context.read<HomeViewModel>();
+
+      homeViewModel.triggerPingAndNotify();
+
+  }
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context)!;
     final homeViewModel = context.watch<HomeViewModel>();
-    //T0D0: implement pinging in alertviewmodel or somewhere
-    // final DateTime? lastPingTime = await homeViewModel.pingBackend();
 
-    // late String shortPingTime;
-    // if(lastPingTime != null) {
-    //  shortPingTime =
-    //     "${lastPingTime.hour}:${lastPingTime.minute.toString().padLeft(2, '0')}:${lastPingTime.second.toString().padLeft(2, '0')}";
-    // }
-    //current Alert count
     final int activeAlertsCount = homeViewModel.activeAlertsCount;
-
     final criticalAlerts = homeViewModel.latestCriticalAlerts();
     final latestCritical = criticalAlerts.isNotEmpty
         ? criticalAlerts.first
@@ -35,15 +41,16 @@ class HomeScreen extends StatelessWidget {
           children: [
             Row(
               children: [
+                
                 _buildStatCard(
                   context,
-                  // title: lastPingTime != null ? t.statLastPing : "ATTENTION",
-                  //value: lastPingTime != null ? shortPingTime : "NO CONNECTION TO SERVER!"
-                  title: "placeholder",
-                  value: "placeholder",
+
+                  title: homeViewModel.lastPing == false ? "No connection" : "Last ping:",
+                  value: homeViewModel.lastPing ==  false ? "No connection" : DateFormat('dd-MM hh:mm:ss a').format(DateTime.now()),
                   icon: Icons.sync,
-                  color: Colors.blueGrey,
+                  color: homeViewModel.lastPing == false ? Colors.redAccent : Colors.lightGreenAccent
                 ),
+                
                 const SizedBox(width: 12),
                 _buildStatCard(
                   context,
@@ -54,6 +61,8 @@ class HomeScreen extends StatelessWidget {
                 ),
               ],
             ),
+            ElevatedButton(onPressed: () => homeViewModel.triggerPingAndNotify()
+                , child: const Text("Ping!")),
             const SizedBox(height: 24),
 
             Text(
@@ -153,7 +162,6 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, color: color),
             const SizedBox(height: 8),
             Text(
               title,
