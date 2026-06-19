@@ -13,7 +13,7 @@ class SettingsScreen extends StatelessWidget {
     final languageService = context.watch<LanguageService>();
     final currentLanguageCode = languageService.currentLocale.languageCode;
     final themeViewModel = context.watch<SettingsViewModel>();
-    final isDark = themeViewModel.isDarkMode;
+    final isDark = themeViewModel.themeMode == ThemeMode.dark ? true : false ;
 
     return Padding(
       padding: const EdgeInsets.all(16.0),

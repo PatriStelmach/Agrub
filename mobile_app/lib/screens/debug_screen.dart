@@ -2,6 +2,7 @@ import 'package:alert_app/data/repositories/alert_repository.dart';
 import 'package:alert_app/data/repositories/plugin_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:alert_app/logic/debug_view_model.dart';
+import 'package:alert_app/data/services/navigation_service.dart';
 import 'package:provider/provider.dart';
 import 'package:alert_app/data/services/push_notification_service.dart';
 
@@ -10,7 +11,8 @@ class DebugScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final debugViewModel = DebugViewModel();
+    final navigation = NavigationService();
+    final debugViewModel = DebugViewModel(navigationService: navigation);
     return Column(
       children: [
         const Text("BACKEND DEBUG", style: TextStyle(fontSize: 30)),

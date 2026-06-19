@@ -9,9 +9,10 @@ class NavigationService {
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   final AlarmService alarmService = AlarmService();
   bool _isOverlayVisible = false;
+  final String _alertMessage = "Generic message";
 
   ///Showing the alarm overlay, containing safeguard against overlay spam
-  Future<void> showEmergencyOverlay() async {
+  Future<void> showEmergencyOverlay(String alarmType) async {
     // If there is an alarm overlay already, return
     if (_isOverlayVisible) return;
 
@@ -25,7 +26,7 @@ class NavigationService {
         PageRouteBuilder(
           opaque: false,
           barrierColor: Colors.black.withValues(alpha: 0.7),
-          pageBuilder: (context, _, _) => const AlarmOverlayScreen(),
+          pageBuilder: (context, _, _) =>  AlarmOverlayScreen(alertMessage:_alertMessage),
           transitionsBuilder: (context, animation, _, child) {
             return FadeTransition(opacity: animation, child: child);
           },

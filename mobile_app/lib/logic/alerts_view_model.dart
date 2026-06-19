@@ -158,7 +158,7 @@ class AlertsViewModel extends ChangeNotifier {
 
     if (alert.severity == AlertSeverity.critical && !alreadyNotified) {
       try {
-        await locator<NavigationService>().showEmergencyOverlay();
+        await locator<NavigationService>().showEmergencyOverlay("Alert");
         debugPrint("OVERLAY TRIGGERED");
 
         await alertsRepository.markAlertAsNotified(alert.id);

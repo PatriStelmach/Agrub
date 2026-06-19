@@ -17,8 +17,8 @@ class UserRepository {
     required this.storage,
   });
 
-  Future<bool> login(String email, String password) async {
-    final String? token = await authService.login(email, password);
+  Future<bool> login(String email, String password, String serverIp) async {
+    final String? token = await authService.login(email, password, serverIp);
 
     if (token != null) {
       await storage.write(key: 'jwt_token', value: token);
@@ -28,6 +28,11 @@ class UserRepository {
   }
 
   Future<String?> getToken() async => await storage.read(key: 'jwt_token');
+  Future<String?> getLastIp() async => await storage.read(key: 'lastServerIp');
+  
+  void setBaseUrl(String base) {
+   dio.options.baseUrl = base;
+  }
 
   Future<void> logout() async => await storage.delete(key: 'jwt_token');
 

@@ -4,7 +4,9 @@ import 'package:alert_app/data/services/navigation_service.dart';
 import 'package:alert_app/l10n/app_localizations.dart';
 
 class AlarmOverlayScreen extends StatelessWidget {
-  const AlarmOverlayScreen({super.key});
+
+  const AlarmOverlayScreen({super.key, required this.alertMessage});
+final String alertMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +24,7 @@ class AlarmOverlayScreen extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  t.overlay_extreme_alert,
+                  alertMessage,
                   style: const TextStyle(color: Colors.white, fontSize: 30),
                 ),
                 const SizedBox(height: 20),

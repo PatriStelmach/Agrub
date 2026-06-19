@@ -91,9 +91,4 @@ class PushNotificationService {
       debugPrint('No connection: $e');
     }
   }
-
-  void handleBackgroundMessage(RemoteMessage message) {
-    debugPrint("FCM [BACKGROUND]: Service received background message");
-    _handleMessage(message);
-  }
 }

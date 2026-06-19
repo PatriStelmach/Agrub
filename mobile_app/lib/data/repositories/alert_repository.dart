@@ -26,7 +26,7 @@ class AlertRepository {
       return alerts;
     } catch (e) {
       debugPrint("REPO ERROR: Couldn't fetch alerts: $e");
-      return await getOfflineAlerts();
+      return await localDataSource.getOfflineAlerts();
     }
   }
 

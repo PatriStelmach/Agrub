@@ -23,6 +23,8 @@ class GeneralLayout extends StatefulWidget {
 }
 
 class _GeneralLayoutState extends State<GeneralLayout> {
+
+  
   @override
   void initState() {
     super.initState();
@@ -39,6 +41,7 @@ class _GeneralLayoutState extends State<GeneralLayout> {
     final pushService = context.read<PushNotificationService>();
 
     final token = await userViewModel.repository.getToken();
+
     final user = userViewModel.user;
 
     if (token != null && user != null) {

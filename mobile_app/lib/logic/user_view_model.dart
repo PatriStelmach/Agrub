@@ -1,10 +1,17 @@
+import 'dart:async';
+
 import 'package:alert_app/data/models/user_model.dart';
 import 'package:alert_app/data/repositories/user_repository.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:get_it/get_it.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
 class UserViewModel extends ChangeNotifier {
   final UserRepository repository;
+    final FlutterSecureStorage _storage = GetIt.instance<FlutterSecureStorage>();
+final Dio dio;
 
   UserModel? _user;
   bool _isLoggedIn = false;
@@ -14,7 +21,7 @@ class UserViewModel extends ChangeNotifier {
   bool get isLoggedIn => _isLoggedIn;
   bool get isLoading => _isLoading;
 
-  UserViewModel({required this.repository});
+  UserViewModel({required this.repository, required this.dio});
 
   ///Authorization method, returns true when logged in
   Future<bool> checkAuthStatus() async {
@@ -24,6 +31,21 @@ class UserViewModel extends ChangeNotifier {
       if (token != null && !JwtDecoder.isExpired(token)) {
         _user = repository.getUserFromToken(token);
         _isLoggedIn = (_user != null);
+
+        //T0D0 - breaking architecture, place in repo in The Great Rewriting
+        final lastIp =  await repository.getLastIp();
+        if( lastIp != "") {
+       dio.options.baseUrl = ('http://$lastIp');
+        }
+        else {
+          _isLoggedIn = false;
+        }
+        
+
+        
+
+      
+        
       } else {
         _isLoggedIn = false;
       }
@@ -38,12 +60,12 @@ class UserViewModel extends ChangeNotifier {
   }
 
   ///Log in the user
-  Future<bool> signIn(String email, String password) async {
+  Future<bool> signIn(String email, String password, String serverIp) async {
     _setLoading(true);
     bool success = false;
 
     try {
-      success = await repository.login(email, password);
+      success = await repository.login(email, password, serverIp);
       if (success) {
         final token = await repository.getToken();
         if (token != null) {
@@ -71,7 +93,7 @@ class UserViewModel extends ChangeNotifier {
     } finally {
       _user = null;
       _isLoggedIn = false;
-      _setLoading(false);
+    notifyListeners();
     }
   }
 

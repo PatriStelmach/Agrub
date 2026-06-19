@@ -14,12 +14,14 @@ final locator = GetIt.instance;
 
 Future<void> setupLocator() async {
   final sharedPreferences = await SharedPreferences.getInstance();
+
+
   locator.registerSingleton<SharedPreferences>(sharedPreferences);
 
   locator.registerLazySingleton<Dio>(() {
     final dio = Dio(
       BaseOptions(
-        baseUrl: 'http://141.95.41.41',
+        //baseUrl: lastServer,
         connectTimeout: const Duration(seconds: 15),
         receiveTimeout: const Duration(seconds: 15),
         headers: {'Accept': '*/*', 'Content-Type': 'application/json'},
@@ -30,6 +32,7 @@ Future<void> setupLocator() async {
       InterceptorsWrapper(
         onRequest: (options, handler) async {
           final storage = locator<FlutterSecureStorage>();
+  
 
           if (options.path != '/api/auth/login') {
             final String? token = await storage.read(key: 'jwt_token');
@@ -48,6 +51,8 @@ Future<void> setupLocator() async {
   locator.registerLazySingleton<AlertLocalDataSource>(
     () => AlertLocalDataSource(sharedPreferences: locator<SharedPreferences>()),
   );
+    locator.registerLazySingleton<AuthService>(() => AuthService());
+
 
   locator.registerLazySingleton<AlertRemoteDataSource>(
     () => AlertRemoteDataSource(dio: locator<Dio>()),
@@ -57,7 +62,6 @@ Future<void> setupLocator() async {
     () => const FlutterSecureStorage(),
   );
 
-  locator.registerLazySingleton<AuthService>(() => AuthService());
   locator.registerLazySingleton<AlertRepository>(
     () => AlertRepository(
       remoteDataSource: locator<AlertRemoteDataSource>(),
@@ -76,5 +80,8 @@ Future<void> setupLocator() async {
   );
   locator.registerLazySingleton<PluginRepository>(
     () => PluginRepository(dio: locator<Dio>()),
+
   );
+  
+
 }

@@ -21,8 +21,9 @@ class PluginsViewModel extends ChangeNotifier {
     : _repository = pluginsRepository;
 
   Future<void> loadPlugins() async {
-    _setLoading(true);
-    _clearError();
+    _isLoading = true;
+    _errorMessage=null;
+    notifyListeners();
 
     try {
       _plugins = await _repository.fetchAllPlugins();
@@ -31,7 +32,7 @@ class PluginsViewModel extends ChangeNotifier {
       _errorMessage = "Nie udało się załadować wtyczek: $e";
       notifyListeners();
     } finally {
-      _setLoading(false);
+      _isLoading = false;
     }
   }
 
@@ -103,13 +104,4 @@ class PluginsViewModel extends ChangeNotifier {
     return success;
   }
 
-  void _setLoading(bool value) {
-    _isLoading = value;
-    notifyListeners();
-  }
-
-  void _clearError() {
-    _errorMessage = null;
-    notifyListeners();
-  }
 }

@@ -45,8 +45,4 @@ class HomeViewModel extends ChangeNotifier {
         .toList();
   }
 
-  void refresh() {
-    debugPrint("HomeViewModel: Manual refresh");
-    notifyListeners();
-  }
 }

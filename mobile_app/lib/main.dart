@@ -1,5 +1,7 @@
 import 'package:alert_app/data/services/auth_service.dart';
 import 'package:alert_app/firebase_options.dart';
+import 'package:alert_app/logic/debug_view_model.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -62,7 +64,7 @@ class AppStateProvider extends StatelessWidget {
             providers: [
               ChangeNotifierProvider(
                 create: (_) =>
-                    UserViewModel(repository: locator<UserRepository>()),
+                    UserViewModel(repository: locator<UserRepository>(), dio: locator<Dio>()),
               ),
               ChangeNotifierProvider(
                 lazy: false,
@@ -75,6 +77,11 @@ class AppStateProvider extends StatelessWidget {
               ChangeNotifierProvider(
                 create: (_) => PluginsViewModel(
                   pluginsRepository: locator<PluginRepository>(),
+                ),
+              ),
+                  ChangeNotifierProvider(
+                create: (_) => DebugViewModel(
+                  navigationService: locator<NavigationService>(),
                 ),
               ),
             ],
@@ -120,7 +127,7 @@ class MainApp extends StatelessWidget {
       themeMode: settingsViewModel.themeMode,
       navigatorKey: locator<NavigationService>().navigatorKey,
 
-      home: const AuthGate(),
+      home:  AuthGate(),
     );
   }
 }
