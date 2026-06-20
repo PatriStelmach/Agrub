@@ -98,8 +98,7 @@ class _GeneralLayoutState extends State<GeneralLayout> {
         return t.navigation_user_profile;
       case AppScreen.settings:
         return t.navigation_settings;
-      case AppScreen.history:
-        return t.navigation_history;
+      
 
     }
   }
@@ -145,13 +144,7 @@ class NavDrawer extends StatelessWidget {
             currentScreen: layoutViewModel.activeScreen,
             onTap: () => _navigate(context, layoutViewModel, AppScreen.alerts),
           ),
-          _DrawerItemWidget(
-            icon: Icons.history,
-            title: t.navigation_history,
-            targetScreen: AppScreen.history,
-            currentScreen: layoutViewModel.activeScreen,
-            onTap: () => _navigate(context, layoutViewModel, AppScreen.history),
-          ),
+          
           _DrawerItemWidget(
             icon: Icons.extension,
             title: t.navigation_plugins,

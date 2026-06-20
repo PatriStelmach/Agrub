@@ -1,4 +1,6 @@
+import 'package:alert_app/data/services/navigation_service.dart';
 import 'package:dio/dio.dart';
+import 'package:alert_app/locator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_client_sse/constants/sse_request_type_enum.dart';
 import 'package:flutter_client_sse/flutter_client_sse.dart';
@@ -22,7 +24,8 @@ class AlertRemoteDataSource {
           .map((item) => Alert.fromJson(item as Map<String, dynamic>))
           .toList();
     } catch (e) {
-      
+            await locator<NavigationService>().showEmergencyOverlay('Connection');
+
       debugPrint(
         "ALERT REMOTE DATA SOURCE ERROR: Fetch all alerts error - $e ",
       );
@@ -114,6 +117,7 @@ class AlertRemoteDataSource {
       final response = await dio.get('/');
       if (response.statusCode == 200) return true;
     } on DioException catch (e) {
+      await locator<NavigationService>().showEmergencyOverlay('Connection');
       return false;
     }
     return false;

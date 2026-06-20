@@ -1,5 +1,6 @@
 import 'package:alert_app/data/models/user_model.dart';
 import 'package:alert_app/data/services/auth_service.dart';
+import 'package:alert_app/screens/login_screen.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -10,6 +11,8 @@ class UserRepository {
   final Dio dio;
   final AuthService authService;
   final FlutterSecureStorage storage;
+    final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 
   UserRepository({
     required this.dio,
@@ -34,7 +37,24 @@ class UserRepository {
    dio.options.baseUrl = base;
   }
 
-  Future<void> logout() async => await storage.delete(key: 'jwt_token');
+  Future<void> logout() async  {
+    await storage.delete(key: 'jwt_token');
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+
+      await navigatorKey.currentState?.push(
+        PageRouteBuilder(
+          opaque: false,
+          barrierColor: Colors.black.withValues(alpha: 0.7),
+          pageBuilder: (context, _, _) =>  const LoginScreen(),
+          transitionsBuilder: (context, animation, _, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+        ),
+      );
+
+  
+    });
+  }
 
   UserModel? getUserFromToken(String token) {
     if (token.isEmpty) return null;

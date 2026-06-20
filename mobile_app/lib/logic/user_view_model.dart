@@ -93,6 +93,7 @@ final Dio dio;
     } finally {
       _user = null;
       _isLoggedIn = false;
+      _setLoading(false);
     notifyListeners();
     }
   }

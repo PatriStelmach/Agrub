@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum AppScreen { home, alerts, plugins, user, settings, history }
+enum AppScreen { home, alerts, plugins, user, settings}
 
 class GeneralLayoutViewModel extends ChangeNotifier {
   AppScreen _activeScreen = AppScreen.home;

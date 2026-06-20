@@ -75,20 +75,4 @@ class PushNotificationService {
     }
   }
 
-  Future<void> pingBackend() async {
-    // 10.0.2.2 Android emulator
-    // localhost/127.0.0.1 Windows(Chrome)
-
-    try {
-      final response = await dio.post('');
-
-      if (response.statusCode == 200) {
-        debugPrint('Backend working:');
-      } else {
-        debugPrint('Backend working, but error: ${response.statusCode}');
-      }
-    } catch (e) {
-      debugPrint('No connection: $e');
-    }
-  }
 }

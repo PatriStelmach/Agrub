@@ -24,9 +24,8 @@ class DebugScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: ElevatedButton(
                   onPressed: () {
-                    context.read<PushNotificationService>().pingBackend();
                   },
-                  child: const Text('Ping server'),
+                  child: const Text('Former ping, now placeholder'),
                 ),
               ),
             ),

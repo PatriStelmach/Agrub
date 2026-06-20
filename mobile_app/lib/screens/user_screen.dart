@@ -1,5 +1,6 @@
 import 'package:alert_app/l10n/app_localizations.dart';
 import 'package:alert_app/logic/user_view_model.dart';
+import 'package:alert_app/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -43,6 +44,11 @@ class UserScreen extends StatelessWidget {
             ElevatedButton(
               onPressed: () {
                 context.read<UserViewModel>().signOut();
+
+                Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
+      (Route<dynamic> route) => false,
+                );
               },
               child: Text(t.user_button_logout),
             ),

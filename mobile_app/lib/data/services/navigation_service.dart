@@ -21,7 +21,7 @@ class NavigationService {
       _alertMessage = "Critical alert!";
       break;
       case 'Connection':
-      _alertMessage = "No connection to server!";
+      _alertMessage = "No connection to server!Restore connection and ping in Home Screen";
       break;
     }
 

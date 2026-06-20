@@ -56,30 +56,18 @@ class AuthService {
       }
       return null;
     } catch (e) {
-      print("Błąd sieci/API: $e");
       return null;
     }
   }
 
-  Future<void> logout() async {
-    try {
-      await _storage.delete(key: 'jwt_token');
-      await _storage.delete(key: 'user_groups');
-      await _storage.delete(key: 'lastServerIp');
-
-      debugPrint("AUTH SERVICE - User logged out, memory wiped");
-    } catch (e) {
-      debugPrint("AUTH SERVICE - Error with logout and memory wipe: $e");
-    }
-  }
+  
 }
 
 ///Checking log in status on app startup
 class AuthGate extends StatelessWidget {
-   final Dio _dio = GetIt.instance<Dio>();
   final FlutterSecureStorage _storage = GetIt.instance<FlutterSecureStorage>();
 
-  
+  //T0D0 should be universald "guard" listening to login, that way no navigation manipulation would be needed in user screen
   
  AuthGate({super.key});
    
