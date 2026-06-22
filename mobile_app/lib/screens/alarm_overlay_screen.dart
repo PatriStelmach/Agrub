@@ -4,9 +4,8 @@ import 'package:alert_app/data/services/navigation_service.dart';
 import 'package:alert_app/l10n/app_localizations.dart';
 
 class AlarmOverlayScreen extends StatelessWidget {
-
   const AlarmOverlayScreen({super.key, required this.alertMessage});
-final String alertMessage;
+  final String alertMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +29,7 @@ final String alertMessage;
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () =>
-                      locator<NavigationService>().stopAlarmAndDismiss(),
+                      locator<AlarmService>().stopAlarmAndDismiss(),
 
                   child: Text(t.overlay_button_stop),
                 ),

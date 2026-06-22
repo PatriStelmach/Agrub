@@ -43,7 +43,10 @@ class _GeneralLayoutState extends State<GeneralLayout> {
     final user = userViewModel.user;
 
     if (token != null && user != null) {
-      alertsViewModel.initSseConnection(userRole: user.role, token: token);
+      alertsViewModel.initializeSseConnection(
+        userRole: user.role,
+        token: token,
+      );
       unawaited(alertsViewModel.fetchInitialAlerts());
 
       try {

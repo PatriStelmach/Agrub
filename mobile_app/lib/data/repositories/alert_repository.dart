@@ -25,7 +25,9 @@ class AlertRepository {
 
       return alerts;
     } catch (e) {
-      debugPrint("REPO ERROR: Couldn't fetch alerts: $e");
+      debugPrint(
+        "ALERT REPOSITORY -  Couldn't fetch remote alerts, loading local storage. Error message - $e",
+      );
       return await localDataSource.getStoredAlerts();
     }
   }
@@ -88,11 +90,7 @@ class AlertRepository {
   }
 
   Future<void> saveAlertsToOfflineCache(List<Alert> alerts) async {
-    try {
-      await localDataSource.saveAlerts(alerts);
-    } catch (e) {
-      debugPrint("ALERT REPOSITORY ERROR: Problem with saving offline: $e");
-    }
+    await localDataSource.saveAlerts(alerts);
   }
 
   Future<void> markAlertAsNotified(int alertId) async {

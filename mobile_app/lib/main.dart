@@ -13,8 +13,7 @@ import 'package:alert_app/l10n/app_localizations.dart';
 import 'package:alert_app/themes/app_theme_default.dart';
 
 // Services & Repositories
-import 'package:alert_app/data/services/language_service.dart';
-import 'package:alert_app/data/services/navigation_service.dart';
+import 'package:alert_app/data/services/alarm_service.dart';
 import 'package:alert_app/data/services/push_notification_service.dart';
 import 'package:alert_app/data/services/fcm_background_handler.dart';
 import 'package:alert_app/data/repositories/alert_repository.dart';
@@ -51,7 +50,6 @@ class AppStateProvider extends StatelessWidget {
     return MultiProvider(
       providers: [
         // Global services
-        ChangeNotifierProvider(create: (_) => LanguageService()),
         ChangeNotifierProvider(create: (_) => SettingsViewModel()),
         ChangeNotifierProvider(create: (_) => GeneralLayoutViewModel()),
         Provider<PushNotificationService>(
@@ -63,8 +61,10 @@ class AppStateProvider extends StatelessWidget {
           return MultiProvider(
             providers: [
               ChangeNotifierProvider(
-                create: (_) =>
-                    UserViewModel(repository: locator<UserRepository>(), dio: locator<Dio>()),
+                create: (_) => UserViewModel(
+                  repository: locator<UserRepository>(),
+                  dio: locator<Dio>(),
+                ),
               ),
               ChangeNotifierProvider(
                 lazy: false,
@@ -79,10 +79,9 @@ class AppStateProvider extends StatelessWidget {
                   pluginsRepository: locator<PluginRepository>(),
                 ),
               ),
-                  ChangeNotifierProvider(
-                create: (_) => DebugViewModel(
-                  navigationService: locator<NavigationService>(),
-                ),
+              ChangeNotifierProvider(
+                create: (_) =>
+                    DebugViewModel(navigationService: locator<AlarmService>()),
               ),
             ],
             child: Builder(
@@ -114,20 +113,18 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final languageService = context.watch<LanguageService>();
-
     final settingsViewModel = context.watch<SettingsViewModel>();
     return MaterialApp(
-      locale: languageService.currentLocale,
+      locale: settingsViewModel.currentLocale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: settingsViewModel.themeMode,
-      navigatorKey: locator<NavigationService>().navigatorKey,
+      navigatorKey: locator<AlarmService>().navigatorKey,
 
-      home:  AuthGate(),
+      home: AuthGate(),
     );
   }
 }

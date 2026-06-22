@@ -71,7 +71,7 @@ Future<void> setupLocator() async {
     ),
   );
 
-  locator.registerLazySingleton<NavigationService>(() => NavigationService());
+  locator.registerLazySingleton<AlarmService>(() => AlarmService());
 
   locator.registerLazySingleton<UserRepository>(
     () => UserRepository(

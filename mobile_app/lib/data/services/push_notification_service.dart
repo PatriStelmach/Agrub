@@ -73,7 +73,7 @@ class PushNotificationService {
       }
     } catch (e) {
       debugPrint("FCM ERROR: Błąd podczas rejestracji tokenu: $e");
-      await locator<NavigationService>().showEmergencyOverlay('FCM');
+      await locator<AlarmService>().showEmergencyOverlay('FCM');
     }
   }
 }

@@ -11,13 +11,11 @@ import 'package:get_it/get_it.dart';
 import 'package:alert_app/data/models/alert_model.dart';
 import 'package:alert_app/data/repositories/alert_repository.dart';
 
-//Global function, so it can be called in Isolate
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
-  // Inicjalizacja DI (GetIt) dla procesu w tle
   if (!GetIt.instance.isRegistered<AlertRepository>()) {
     unawaited(setupLocator());
   }

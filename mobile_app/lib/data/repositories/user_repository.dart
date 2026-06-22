@@ -29,8 +29,13 @@ class UserRepository {
     return false;
   }
 
-  Future<String?> getToken() async => await storage.read(key: 'jwt_token');
-  Future<String?> getLastIp() async => await storage.read(key: 'lastServerIp');
+  Future<String?> getToken() async {
+    return await storage.read(key: 'jwt_token');
+  }
+
+  Future<String?> getLastIp() async {
+    return await storage.read(key: 'lastServerIp');
+  }
 
   void setBaseUrl(String base) {
     dio.options.baseUrl = base;

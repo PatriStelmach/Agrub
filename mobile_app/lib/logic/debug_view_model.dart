@@ -3,9 +3,9 @@ import 'package:alert_app/data/services/navigation_service.dart';
 import 'package:alert_app/locator.dart';
 
 class DebugViewModel extends ChangeNotifier {
-  final NavigationService navigationService;
+  final AlarmService navigationService;
 
-  DebugViewModel({ required this.navigationService});
+  DebugViewModel({required this.navigationService});
   void alarmPressed() {
     navigationService.showEmergencyOverlay("TEST");
   }

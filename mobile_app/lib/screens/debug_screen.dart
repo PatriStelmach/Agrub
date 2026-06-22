@@ -11,7 +11,7 @@ class DebugScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final navigation = NavigationService();
+    final navigation = AlarmService();
     final debugViewModel = DebugViewModel(navigationService: navigation);
     return Column(
       children: [
@@ -23,8 +23,7 @@ class DebugScreen extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: ElevatedButton(
-                  onPressed: () {
-                  },
+                  onPressed: () {},
                   child: const Text('Former ping, now placeholder'),
                 ),
               ),

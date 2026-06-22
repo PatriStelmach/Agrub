@@ -22,7 +22,7 @@ class AlertRemoteDataSource {
           .map((rawItem) => Alert.fromJson(rawItem as Map<String, dynamic>))
           .toList();
     } catch (e) {
-      await locator<NavigationService>().showEmergencyOverlay('Connection');
+      await locator<AlarmService>().showEmergencyOverlay('Connection');
 
       debugPrint(
         "ALERT REMOTE DATA SOURCE - Connection error - fetchActiveAlerts() failed",
@@ -53,7 +53,7 @@ class AlertRemoteDataSource {
       debugPrint(
         "ALERT REMOTE DATA SOURCE - Connection error - acknowledgeAlert() failed",
       );
-      await locator<NavigationService>().showEmergencyOverlay('Connection');
+      await locator<AlarmService>().showEmergencyOverlay('Connection');
 
       rethrow;
     }
@@ -73,7 +73,7 @@ class AlertRemoteDataSource {
       debugPrint(
         "ALERT REMOTE DATA SOURCE - Connection error - fetchLatestAction() failed",
       );
-      await locator<NavigationService>().showEmergencyOverlay('Connection');
+      await locator<AlarmService>().showEmergencyOverlay('Connection');
     }
     return null;
   }
@@ -84,7 +84,7 @@ class AlertRemoteDataSource {
     required String token,
   }) {
     final String sseUrl =
-        '${dio.options.baseUrl}/api/alerts/stream?groups=ADMINISTRATOR';
+        '${dio.options.baseUrl}/api/alerts/stream?groups=$userRole';
 
     return SSEClient.subscribeToSSE(
       method: SSERequestType.GET,

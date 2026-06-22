@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:alert_app/data/models/alert_action_model.dart';
-import 'package:alert_app/data/services/navigation_service.dart';
+import 'package:alert_app/data/services/alarm_service.dart';
 import 'package:alert_app/data/services/push_notification_service.dart';
 import 'package:alert_app/locator.dart';
 import 'package:flutter/material.dart';
@@ -97,7 +97,10 @@ class AlertsViewModel extends ChangeNotifier {
   }
 
   ///Initializing SSE
-  void initSseConnection({required String userRole, required String token}) {
+  void initializeSseConnection({
+    required String userRole,
+    required String token,
+  }) {
     _sseSubscription?.cancel();
 
     _sseSubscription = alertsRepository
@@ -142,7 +145,6 @@ class AlertsViewModel extends ChangeNotifier {
       _alertsCache[id] = updated;
       unawaited(_triggerEmergencyOverlayForNewAlert(updated));
     } else {
-      //Alert update that isn't in the cache, using api. Await to wait for fetch from API
       await fetchInitialAlerts();
       return;
     }
@@ -157,14 +159,10 @@ class AlertsViewModel extends ChangeNotifier {
     );
 
     if (alert.severity == AlertSeverity.critical && !alreadyNotified) {
-      try {
-        await locator<NavigationService>().showEmergencyOverlay("Alert");
-        debugPrint("OVERLAY TRIGGERED");
+      await locator<AlarmService>().showEmergencyOverlay("Alert");
+      debugPrint("OVERLAY TRIGGERED");
 
-        await alertsRepository.markAlertAsNotified(alert.id);
-      } catch (e) {
-        debugPrint("-> OVERLAY ERROR: $e");
-      }
+      await alertsRepository.markAlertAsNotified(alert.id);
     }
   }
 

@@ -19,7 +19,7 @@ class PluginRemoteDataSource {
           .map((plugin) => Plugin.fromJson(plugin as Map<String, dynamic>))
           .toList();
     } catch (e) {
-      await locator<NavigationService>().showEmergencyOverlay('Connection');
+      await locator<AlarmService>().showEmergencyOverlay('Connection');
       debugPrint(
         "PLUGIN REMOTE DATA SOURCE - Connection error - getAllPlugins() failed",
       );
@@ -41,7 +41,7 @@ class PluginRemoteDataSource {
       );
       return response.data.toString();
     } catch (e) {
-      await locator<NavigationService>().showEmergencyOverlay('Connection');
+      await locator<AlarmService>().showEmergencyOverlay('Connection');
       debugPrint(
         "PLUGIN REMOTE DATA SOURCE - Connection error - runPlugin() failed",
       );
