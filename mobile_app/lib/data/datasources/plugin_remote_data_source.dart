@@ -1,5 +1,5 @@
 import 'package:alert_app/data/models/plugin_model.dart';
-import 'package:alert_app/data/services/navigation_service.dart';
+import 'package:alert_app/data/services/alarm_service.dart';
 import 'package:alert_app/locator.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';

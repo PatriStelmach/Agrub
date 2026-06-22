@@ -1,6 +1,6 @@
 import 'package:alert_app/locator.dart';
 import 'package:flutter/material.dart';
-import 'package:alert_app/data/services/navigation_service.dart';
+import 'package:alert_app/data/services/alarm_service.dart';
 import 'package:alert_app/l10n/app_localizations.dart';
 
 class AlarmOverlayScreen extends StatelessWidget {
