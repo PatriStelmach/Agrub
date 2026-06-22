@@ -1,4 +1,4 @@
-export const api_url = '/api'
+export const api_url = 'http://localhost:10000/api'
 
 export enum Language {
   PYTHON = ".py",
@@ -228,6 +228,7 @@ export interface MyPlugin
   language: Language
   description?: string
   code?: string
+  arguments?: string
   weight: number
   tags: string[]
   cronExpression: string
@@ -246,12 +247,14 @@ export interface MyPluginsFromApi {
   updatedAt: Date
   weight: number
   tags: string[]
-  cronExpression: string,
+  cronExpression: string
+  arguments: string
 }
 
 export interface PluginDetails {
   description: string | undefined,
   code: string | undefined,
+  arguments: string | undefined,
 }
 
 export interface LibraryPlugin {

@@ -27,7 +27,7 @@ import {
   IconPlayerPlay,
   IconLoader
 } from "@tabler/icons-vue"
-import {computed, ref, watch, watchEffect} from "vue";
+import {computed, ref, toRaw, watch, watchEffect} from "vue";
 import {useClientSort} from "@/composables/useClientSort";
 import SortableHead from "@/helpers_components/SortableHead.vue";
 import {
@@ -127,7 +127,7 @@ const cronWrappedDescription = (cron: string) => {
       return [e, false]
     }
   }
-  return [cron, true]
+  return [cron, false]
 }
 
 watch(searchFilter, () => {
@@ -141,6 +141,16 @@ const checkAll = () => {
 
 const changeStatus = () => {
   if(!unwrappedItem.value && authStore.isAdmin) {
+    const invalidCrons:string[] = []
+    checkedPlugins.value.forEach(fullName => {
+        const plugin = allMyPlugins.value?.find(p => p.fullName === fullName)
+        if(plugin && !cronWrappedDescription(plugin.cronExpression)[0])
+          invalidCrons.push(plugin.name)
+      })
+    if(invalidCrons.length) {
+      toast.warning(`Unable to change status: [${invalidCrons?.join(', ').toString()}] have invalid or empty CRON`)
+      return
+    }
     changeMyPluginStatusRequest(checkedPlugins.value)
       .then(res => {
         toast.success(`Successfully changed status`)
@@ -169,8 +179,10 @@ const getDetails = async (fileName: string) => {
       if(unwrappedItem.value && originalItem.value) {
         unwrappedItem.value.code = res?.code
         unwrappedItem.value.description = res?.description
+        unwrappedItem.value.arguments = res?.arguments
         originalItem.value.code = res?.code
         originalItem.value.description = res?.description
+        originalItem.value.arguments = res?.arguments
       }
     })
     .catch((err) => toast.error(`Error fetching plugin details: ${err.message}`))

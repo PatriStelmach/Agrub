@@ -24,7 +24,7 @@ import SeverityDiv from "@/helpers_components/SeverityDiv.vue";
 import {hoverListRow} from "@/assets/cssFunctions.ts";
 import LoadingTable from "@/helpers_components/LoadingTable.vue";
 import {useRoute} from "vue-router";
-import LinkAlertHistoryDialog from "@/pages/alerts/history/LinkAlertHistoryDialog.vue";
+import AlertHistoryDialog from "@/pages/alerts/history/AlertHistoryDialog.vue";
 import { toast } from "vue-sonner";
 import api from "@/lib/axios.ts";
 
@@ -81,7 +81,7 @@ watch(
 </script>
 
 <template>
-  <LinkAlertHistoryDialog
+  <AlertHistoryDialog
     v-model:isDialogOpen="isLinkDialogOpen"
     v-model:alert="linkHistoryAlert"/>
       <Table id="alert-history-table" :class="dataTable">

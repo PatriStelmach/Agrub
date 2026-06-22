@@ -15,10 +15,12 @@ import { Label } from '@/components/ui/label'
 import {ref, watchEffect} from "vue";
 import CodeEditor from "@/helpers_components/CodeEditor.vue";
 import BigLoadingBlock from "@/helpers_components/loaders/BigLoadingBlock.vue";
+import {smallNameLabel} from "@/assets/cssFunctions.ts";
 
 const props = defineProps<{
   description: string,
   code: string
+  arguments: string
   isLoading?: boolean
   editable: boolean
 }>()
@@ -27,21 +29,24 @@ const isCodeDialogOpen = defineModel<boolean>('isCodeDialogOpen')
 
 const newCode = ref<string>(props.code)
 const newDescription = ref<string>(props.description)
+const newArguments = ref<string>(props.arguments)
 
 watchEffect(() => {
-  newCode.value = props.code;
-  newDescription.value = props.description;
+  newCode.value = props.code
+  newDescription.value = props.description
+  newArguments.value = props.arguments
 })
 
 const cancel = () => {
   setTimeout(() => {
-    newCode.value = props.code;
-    newDescription.value = props.description;
+    newCode.value = props.code
+    newDescription.value = props.description
+    newArguments.value = props.arguments
   }, 200)
 }
 
 const emits = defineEmits<{
-  'update:save-changes': [code: string, description: string]
+  'update:save-changes': [code: string, description: string, arguments: string]
 }>()
 
 </script>
@@ -88,6 +93,21 @@ const emits = defineEmits<{
               </div>
             </Transition>
           </div>
+          <div class="grid gap-3 mt-4">
+            <Label class="text-lg" for="my-plugin-arguments">Arguments</Label>
+            <h2 class="text-sm text-comment">Set execute arguments for script
+              Use space between arguments: "arg1 arg2 arg3"
+            </h2>
+            <Transition name="fade" mode="out-in">
+              <BigLoadingBlock class="h-10" v-if="isLoading"/>
+              <Input
+                v-else-if="editable && !isLoading" class="m-2 badge-focus max-w-95/100 blue-badge-focus"
+                id="my_plugin_arguments"
+                name="arguments"
+                v-model="newArguments"
+                :default-value="arguments" />
+            </Transition>
+          </div>
         </div>
         <DialogFooter>
           <DialogClose as-child>
@@ -102,7 +122,7 @@ const emits = defineEmits<{
             <Button
               variant="green_outline"
               type="submit"
-              @click="emits('update:save-changes', newCode, newDescription)"
+              @click="emits('update:save-changes', newCode, newDescription, newArguments)"
             >
               Ok
               <IconCheck />
