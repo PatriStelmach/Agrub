@@ -22,14 +22,15 @@ class PluginsViewModel extends ChangeNotifier {
 
   Future<void> loadPlugins() async {
     _isLoading = true;
-    _errorMessage=null;
+    _errorMessage = null;
     notifyListeners();
 
     try {
       _plugins = await _repository.fetchAllPlugins();
       _applySorting();
     } catch (e) {
-      _errorMessage = "Nie udało się załadować wtyczek: $e";
+      _errorMessage =
+          "Couldn't load plugins, please check the error message: $e";
       notifyListeners();
     } finally {
       _isLoading = false;
@@ -103,5 +104,4 @@ class PluginsViewModel extends ChangeNotifier {
 
     return success;
   }
-
 }

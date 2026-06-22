@@ -13,15 +13,16 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
   @override
   void initState() {
-  super.initState();
-      final homeViewModel = context.read<HomeViewModel>();
+    super.initState();
+    final homeViewModel = context.read<HomeViewModel>();
 
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       homeViewModel.triggerPingAndNotify();
-
+    });
   }
+
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context)!;
@@ -41,16 +42,21 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Row(
               children: [
-                
                 _buildStatCard(
                   context,
 
-                  title: homeViewModel.lastPing == false ? "No connection" : "Last ping:",
-                  value: homeViewModel.lastPing ==  false ? "No connection" : DateFormat('dd-MM hh:mm:ss a').format(DateTime.now()),
+                  title: homeViewModel.lastPing == false
+                      ? "No connection"
+                      : "Last ping:",
+                  value: homeViewModel.lastPing == false
+                      ? "No connection"
+                      : DateFormat('hh:mm:ss a').format(DateTime.now()),
                   icon: Icons.sync,
-                  color: homeViewModel.lastPing == false ? Colors.redAccent : Colors.lightGreenAccent
+                  color: homeViewModel.lastPing == false
+                      ? Colors.redAccent
+                      : Colors.lightGreenAccent,
                 ),
-                
+
                 const SizedBox(width: 12),
                 _buildStatCard(
                   context,
@@ -61,8 +67,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
-            ElevatedButton(onPressed: () => homeViewModel.triggerPingAndNotify()
-                , child: const Text("Ping!")),
+
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => homeViewModel.triggerPingAndNotify(),
+                    child: const Text("Ping!"),
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(height: 24),
 
             Text(

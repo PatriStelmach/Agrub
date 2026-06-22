@@ -11,8 +11,7 @@ class UserRepository {
   final Dio dio;
   final AuthService authService;
   final FlutterSecureStorage storage;
-    final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   UserRepository({
     required this.dio,
@@ -32,27 +31,24 @@ class UserRepository {
 
   Future<String?> getToken() async => await storage.read(key: 'jwt_token');
   Future<String?> getLastIp() async => await storage.read(key: 'lastServerIp');
-  
+
   void setBaseUrl(String base) {
-   dio.options.baseUrl = base;
+    dio.options.baseUrl = base;
   }
 
-  Future<void> logout() async  {
+  Future<void> logout() async {
     await storage.delete(key: 'jwt_token');
-        WidgetsBinding.instance.addPostFrameCallback((_) async {
-
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       await navigatorKey.currentState?.push(
         PageRouteBuilder(
           opaque: false,
           barrierColor: Colors.black.withValues(alpha: 0.7),
-          pageBuilder: (context, _, _) =>  const LoginScreen(),
+          pageBuilder: (context, _, _) => const LoginScreen(),
           transitionsBuilder: (context, animation, _, child) {
             return FadeTransition(opacity: animation, child: child);
           },
         ),
       );
-
-  
     });
   }
 
@@ -65,12 +61,12 @@ class UserRepository {
     return UserModel.fromJwt(decodedToken);
   }
 
-  Future<String> getCurrentUserGroup() async {
+  Future<String> getCurrentUserRole() async {
     final token = await getToken();
     if (token == null || token.isEmpty) return 'None';
 
     final user = getUserFromToken(token);
-    return user?.group ?? 'None';
+    return user?.role ?? 'USER';
   }
 
   Future<UserModel?> getCurrentUser() async {

@@ -23,8 +23,6 @@ class GeneralLayout extends StatefulWidget {
 }
 
 class _GeneralLayoutState extends State<GeneralLayout> {
-
-  
   @override
   void initState() {
     super.initState();
@@ -45,7 +43,7 @@ class _GeneralLayoutState extends State<GeneralLayout> {
     final user = userViewModel.user;
 
     if (token != null && user != null) {
-      alertsViewModel.initSseConnection(userGroup: user.group, token: token);
+      alertsViewModel.initSseConnection(userRole: user.role, token: token);
       unawaited(alertsViewModel.fetchInitialAlerts());
 
       try {
@@ -67,7 +65,7 @@ class _GeneralLayoutState extends State<GeneralLayout> {
       AlertsScreen(),
       PluginsScreen(),
       UserScreen(),
-      SettingsScreen()
+      SettingsScreen(),
     ];
 
     return Scaffold(
@@ -98,8 +96,6 @@ class _GeneralLayoutState extends State<GeneralLayout> {
         return t.navigation_user_profile;
       case AppScreen.settings:
         return t.navigation_settings;
-      
-
     }
   }
 }
@@ -144,7 +140,7 @@ class NavDrawer extends StatelessWidget {
             currentScreen: layoutViewModel.activeScreen,
             onTap: () => _navigate(context, layoutViewModel, AppScreen.alerts),
           ),
-          
+
           _DrawerItemWidget(
             icon: Icons.extension,
             title: t.navigation_plugins,

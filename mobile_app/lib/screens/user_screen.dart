@@ -37,7 +37,10 @@ class UserScreen extends StatelessWidget {
             UserDataRow(label: t.user_label_username, value: user.login),
             UserDataRow(label: t.user_label_email, value: user.email),
             UserDataRow(label: t.user_label_role, value: user.role),
-            UserDataRow(label: t.user_label_group, value: user.group),
+            UserDataRow(
+              label: t.user_label_group,
+              value: user.groups.toString(),
+            ),
 
             const SizedBox(height: 30),
 
@@ -46,8 +49,8 @@ class UserScreen extends StatelessWidget {
                 context.read<UserViewModel>().signOut();
 
                 Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (context) => const LoginScreen()),
-      (Route<dynamic> route) => false,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  (Route<dynamic> route) => false,
                 );
               },
               child: Text(t.user_button_logout),

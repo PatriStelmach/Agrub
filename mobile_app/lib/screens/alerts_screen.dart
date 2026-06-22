@@ -296,7 +296,7 @@ class _AlertsScreenState extends State<AlertsScreen>
           subtitle: Text(
             t.alerts_history_subtitle(
               latestAction.ack ? t.yes : t.no,
-              latestAction.author
+              latestAction.author,
             ),
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
@@ -433,9 +433,7 @@ class _AckDialogState extends State<AckDialog> {
             final currentUser = context.read<UserViewModel>().user;
             final currentAuthor = currentUser?.login ?? "Mobile User";
 
-
             context.read<AlertsViewModel>().acknowledgeAlert(
-
               widget.alert.id,
               author: currentAuthor,
               comment: commentValue,

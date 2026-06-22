@@ -1,13 +1,11 @@
+import 'package:alert_app/data/models/alert_action_model.dart';
+import 'package:alert_app/data/models/alert_model.dart';
 import 'package:alert_app/data/services/navigation_service.dart';
-import 'package:dio/dio.dart';
 import 'package:alert_app/locator.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_client_sse/constants/sse_request_type_enum.dart';
 import 'package:flutter_client_sse/flutter_client_sse.dart';
-import 'package:alert_app/data/models/alert_model.dart';
-import 'package:alert_app/data/models/alert_action_model.dart';
-
-///
 
 class AlertRemoteDataSource {
   final Dio dio;
@@ -18,23 +16,22 @@ class AlertRemoteDataSource {
   Future<List<Alert>> fetchActiveAlerts() async {
     try {
       final response = await dio.get('/api/alerts/active');
-      final List<dynamic> data = response.data;
+      final List<dynamic> rawData = response.data;
 
-      return data
-          .map((item) => Alert.fromJson(item as Map<String, dynamic>))
+      return rawData
+          .map((rawItem) => Alert.fromJson(rawItem as Map<String, dynamic>))
           .toList();
     } catch (e) {
-            await locator<NavigationService>().showEmergencyOverlay('Connection');
+      await locator<NavigationService>().showEmergencyOverlay('Connection');
 
       debugPrint(
-        "ALERT REMOTE DATA SOURCE ERROR: Fetch all alerts error - $e ",
+        "ALERT REMOTE DATA SOURCE - Connection error - fetchActiveAlerts() failed",
       );
       rethrow;
     }
   }
 
-  /// Sending ACK or comment to particular alert
-
+  /// Sending ACK or comment for particular alert
   Future<void> acknowledgeAlert({
     required int alertId,
     required String author,
@@ -42,63 +39,52 @@ class AlertRemoteDataSource {
     required int newSeverity,
     required bool isAck,
   }) async {
-    try {
-      final requestBody = {
-        "alertId": alertId,
-        "author": author,
-        "ack": isAck,
-        "message": message,
-        "newSeverity": newSeverity,
-      };
-      await dio.post('/api/alerts/$alertId/ack', data: requestBody);
-    } on DioException catch (e) {
-      debugPrint(
-        "ALERT REMOTE DATA SOURCE: Dio Error -  ${e.response?.statusCode} - ${e.message}",
-      );
+    final requestBody = {
+      "alertId": alertId,
+      "author": author,
+      "ack": isAck,
+      "message": message,
+      "newSeverity": newSeverity,
+    };
 
-      rethrow;
+    try {
+      await dio.post('/api/alerts/$alertId/ack', data: requestBody);
     } catch (e) {
       debugPrint(
-        "ALERT REMOTE DATA SOURCE ERROR: Acknowledge or comment error - $e ",
+        "ALERT REMOTE DATA SOURCE - Connection error - acknowledgeAlert() failed",
       );
+      await locator<NavigationService>().showEmergencyOverlay('Connection');
+
       rethrow;
     }
   }
 
   /// Fetching newest action or comment for particular alert
-  Future<AlertAction?> fetchLatestActionForAlert(int alertId) async {
+  Future<AlertAction?> fetchLatestAction(int alertId) async {
     try {
       final response = await dio.get('/api/alerts/$alertId/actions');
-
       if (response.data is List) {
-        final List<dynamic> data = response.data as List<dynamic>;
-        if (data.isNotEmpty) {
-          return AlertAction.fromJson(data.first as Map<String, dynamic>);
+        final List<dynamic> rawData = response.data as List<dynamic>;
+        if (rawData.isNotEmpty) {
+          return AlertAction.fromJson(rawData.first as Map<String, dynamic>);
         }
       }
-      return null;
-    } on DioException catch (e) {
-      debugPrint(
-        "ALERT REMOTE DATA SOURCE: Dio Error -  ${e.response?.statusCode} - ${e.message}",
-      );
-
-      rethrow;
     } catch (e) {
       debugPrint(
-        "ALERT REMOTE DATA SOURCE ERROR: Acknowledge or comment error - {$e} ",
+        "ALERT REMOTE DATA SOURCE - Connection error - fetchLatestAction() failed",
       );
-      rethrow;
+      await locator<NavigationService>().showEmergencyOverlay('Connection');
     }
+    return null;
   }
 
   /// Connecting to SSE and returning Stream
-  /// DataSource isn't a listener to the stream, just pass it to higher layers of the app
   Stream<SSEModel> getAlertsStream({
-    required String userGroup,
+    required String userRole,
     required String token,
   }) {
     final String sseUrl =
-        '${dio.options.baseUrl}/api/alerts/stream?groups=$userGroup';
+        '${dio.options.baseUrl}/api/alerts/stream?groups=ADMINISTRATOR';
 
     return SSEClient.subscribeToSSE(
       method: SSERequestType.GET,
@@ -108,18 +94,16 @@ class AlertRemoteDataSource {
         "Cache-Control": "no-cache",
         "Authorization": "Bearer $token",
       },
-      
     );
   }
 
+  ///Ping check for manual pinging
   Future<bool> isBackendConnected() async {
     try {
-      final response = await dio.get('/');
-      if (response.statusCode == 200) return true;
-    } on DioException catch (e) {
-      await locator<NavigationService>().showEmergencyOverlay('Connection');
+      await fetchActiveAlerts();
+      return true;
+    } on DioException catch (_) {
       return false;
     }
-    return false;
   }
 }

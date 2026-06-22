@@ -16,13 +16,18 @@ class NavigationService {
     // If there is an alarm overlay already, return
     if (_isOverlayVisible) return;
 
-    switch (alarmType){
+    switch (alarmType) {
       case 'Alert':
-      _alertMessage = "Critical alert!";
-      break;
+        _alertMessage = "Critical alert!";
+        break;
       case 'Connection':
-      _alertMessage = "No connection to server!Restore connection and ping in Home Screen";
-      break;
+        _alertMessage =
+            "No connection to server! Restore connection and ping in Home Screen";
+        break;
+      case 'FCM':
+        _alertMessage =
+            "FCM Issue! There won't be any updates in the background";
+        break;
     }
 
     _isOverlayVisible = true;
@@ -35,7 +40,8 @@ class NavigationService {
         PageRouteBuilder(
           opaque: false,
           barrierColor: Colors.black.withValues(alpha: 0.7),
-          pageBuilder: (context, _, _) =>  AlarmOverlayScreen(alertMessage:_alertMessage),
+          pageBuilder: (context, _, _) =>
+              AlarmOverlayScreen(alertMessage: _alertMessage),
           transitionsBuilder: (context, animation, _, child) {
             return FadeTransition(opacity: animation, child: child);
           },

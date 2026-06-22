@@ -22,7 +22,6 @@ class HomeViewModel extends ChangeNotifier {
 
   int get activeAlertsCount => alertsViewModel.alertsList.length;
 
-
   bool? lastPing;
 
   Future<bool> pingBackend() async {
@@ -34,15 +33,10 @@ class HomeViewModel extends ChangeNotifier {
     }
   }
 
- Future<void> triggerPingAndNotify() async {
+  Future<void> triggerPingAndNotify() async {
     lastPing = await pingBackend();
     notifyListeners();
-
   }
-
-
-
-  
 
   List<Alert> latestAlerts() {
     final List<Alert> allAlerts = List<Alert>.from(alertsViewModel.alertsList);
@@ -55,5 +49,4 @@ class HomeViewModel extends ChangeNotifier {
         .where((alert) => alert.severity == AlertSeverity.critical)
         .toList();
   }
-
 }

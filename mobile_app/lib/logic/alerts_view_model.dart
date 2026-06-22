@@ -97,11 +97,11 @@ class AlertsViewModel extends ChangeNotifier {
   }
 
   ///Initializing SSE
-  void initSseConnection({required String userGroup, required String token}) {
+  void initSseConnection({required String userRole, required String token}) {
     _sseSubscription?.cancel();
 
     _sseSubscription = alertsRepository
-        .getAlertsUpdateStream(userGroup: userGroup, token: token)
+        .getAlertsUpdateStream(userRole: userRole, token: token)
         .listen((message) {
           _handleIncomingSseUpdate(message);
         });
@@ -176,18 +176,17 @@ class AlertsViewModel extends ChangeNotifier {
 
   ///Sending ack via repository and Optimistic UI change
   Future<void> acknowledgeAlert(
-    int alertId,  {
+    int alertId, {
     required String author,
     String? comment,
     bool isAck = true,
 
-    int? newSeverity ,
+    int? newSeverity,
   }) async {
     final originalAlert = _alertsCache[alertId];
     if (originalAlert == null) {
       return;
     }
-
 
     notifyListeners();
 
@@ -196,7 +195,7 @@ class AlertsViewModel extends ChangeNotifier {
         alertId: alertId,
         author: author,
         message: comment ?? "",
-        newSeverity: newSeverity ?? 1 ,
+        newSeverity: newSeverity ?? 1,
         isAck: isAck,
       );
     } catch (e) {

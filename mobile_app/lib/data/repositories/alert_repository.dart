@@ -21,18 +21,18 @@ class AlertRepository {
     try {
       final alerts = await remoteDataSource.fetchActiveAlerts();
 
-      await localDataSource.cacheAlerts(alerts);
+      await localDataSource.saveAlerts(alerts);
 
       return alerts;
     } catch (e) {
       debugPrint("REPO ERROR: Couldn't fetch alerts: $e");
-      return await localDataSource.getOfflineAlerts();
+      return await localDataSource.getStoredAlerts();
     }
   }
 
-  ///Getting all locally stored alerts
+  ///Getting all locally stored alerts, also exposing method for other layers
   Future<List<Alert>> getOfflineAlerts() async {
-    return await localDataSource.getOfflineAlerts();
+    return await localDataSource.getStoredAlerts();
   }
 
   /// Send ack/comment and fetch actual list
@@ -54,16 +54,16 @@ class AlertRepository {
 
   /// Fetch newest action for an alert
   Future<AlertAction?> getLatestActionForAlert(int alertId) async {
-    return await remoteDataSource.fetchLatestActionForAlert(alertId);
+    return await remoteDataSource.fetchLatestAction(alertId);
   }
 
   /// Fetch Stream via data source
   Stream<dynamic> getAlertsUpdateStream({
-    required String userGroup,
+    required String userRole,
     required String token,
   }) {
     return remoteDataSource
-        .getAlertsStream(userGroup: userGroup, token: token)
+        .getAlertsStream(userRole: userRole, token: token)
         .map((event) {
           if (event.data == null || event.data!.isEmpty) return null;
 
@@ -89,7 +89,7 @@ class AlertRepository {
 
   Future<void> saveAlertsToOfflineCache(List<Alert> alerts) async {
     try {
-      await localDataSource.cacheAlerts(alerts);
+      await localDataSource.saveAlerts(alerts);
     } catch (e) {
       debugPrint("ALERT REPOSITORY ERROR: Problem with saving offline: $e");
     }
@@ -101,7 +101,7 @@ class AlertRepository {
   }
 
   Future<bool> isAlertAlreadyNotified(int alertId) async {
-    return await localDataSource.isAlertAlreadyNotified(alertId);
+    return await localDataSource.wasAlertAlreadyNotified(alertId);
   }
 
   Future<bool> checkBackendConnection() {

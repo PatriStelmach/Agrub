@@ -49,12 +49,11 @@ class Alert {
       case AlertSeverity.medium:
         return isDark ? const Color(0xFFFFDF20) : const Color(0xFFD6B900);
       case AlertSeverity.low:
-        return isDark? const Color(0xFF48CF00) : const Color(0xFF08A800);
+        return isDark ? const Color(0xFF48CF00) : const Color(0xFF08A800);
       case AlertSeverity.info:
-        return isDark? const Color(0xFF61C8FF) : const Color(0xFF00A3FF);
+        return isDark ? const Color(0xFF61C8FF) : const Color(0xFF00A3FF);
 
       case AlertSeverity.unknown:
-      default:
         return isDark ? const Color(0xFF314158) : const Color(0xFFE2E8F0);
     }
   }
@@ -84,46 +83,38 @@ class Alert {
   }
 
   factory Alert.fromJson(Map<String, dynamic> json) {
-    //Utility function for parsing int ( taking in both int and String types)
-    int asInt(dynamic value, {int defaultValue = 0}) {
-      if (value == null) return defaultValue;
-      if (value is int) return value;
-      return int.tryParse(value.toString()) ?? defaultValue;
+    int rawSeverity = json['severity'];
+    if (rawSeverity < 0 || rawSeverity >= AlertSeverity.values.length) {
+      rawSeverity = AlertSeverity.values.length - 1;
     }
+    final decodedSeverity = AlertSeverity.values[rawSeverity];
 
-    // Severity mapping to enum
-    int sevIndex = asInt(json['severity']);
-    if (sevIndex < 0 || sevIndex >= AlertSeverity.values.length) {
-      sevIndex = AlertSeverity.values.length - 1;
-    }
-    final sev = AlertSeverity.values[sevIndex];
-
-    // Status mapping to enum
-    final String rawStatus = (json['status'] ?? 'sent').toString().toLowerCase();
-    AlertStatus stat;
+    final String rawStatus = (json['status'] ?? 'sent')
+        .toString()
+        .toLowerCase();
+    AlertStatus decodedStatus;
     switch (rawStatus) {
       case 'inprogress':
       case 'in_progress':
-        stat = AlertStatus.inProgress;
+        decodedStatus = AlertStatus.inProgress;
         break;
       case 'done':
-        stat = AlertStatus.done;
+        decodedStatus = AlertStatus.done;
         break;
       default:
-        stat = AlertStatus.sent;
+        decodedStatus = AlertStatus.sent;
     }
 
-    // Building object
     return Alert(
-      id: asInt(json['id']),
+      id: json['id'],
       subject: json['subject']?.toString() ?? '',
       source: json['source']?.toString() ?? 'System',
-      severity: sev,
-      // Prepared for createdAt from FCM (comes as String), DateTime.parse will handle it
+      severity: decodedSeverity,
+      //Additional parsing is here because of FCM date formatting
       createdAt:
           DateTime.tryParse(json['createdAt']?.toString() ?? '') ??
           DateTime.now(),
-      status: stat,
+      status: decodedStatus,
       message: json['message']?.toString() ?? '',
       acknowledged: json['acknowledged'] is bool
           ? json['acknowledged']
@@ -137,7 +128,7 @@ class Alert {
       'subject': subject,
       'source': source,
       'severity': AlertSeverity.values.indexOf(severity),
-      'status': status.toString().split('.').last,
+      'status': status.name,
       'createdAt': createdAt.toIso8601String(),
       'message': message,
       'author': author,

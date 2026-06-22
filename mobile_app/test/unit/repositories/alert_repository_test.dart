@@ -46,7 +46,7 @@ void main() {
         () => mockRemoteDataSource.fetchActiveAlerts(),
       ).thenAnswer((_) async => [testAlert]);
       when(
-        () => mockLocalDataSource.cacheAlerts(any()),
+        () => mockLocalDataSource.saveAlerts(any()),
       ).thenAnswer((_) async {});
 
       final List<Alert> testResult = await repository.fetchAllAlerts();
@@ -186,8 +186,7 @@ void main() {
         createdAt: DateTime.parse('2026-06-14 19:43:19.634'),
       );
       when(
-        () =>
-            mockRemoteDataSource.fetchLatestActionForAlert(testLatestAction.id),
+        () => mockRemoteDataSource.fetchLatestAction(testLatestAction.id),
       ).thenAnswer((_) async => testLatestAction);
 
       final problemActionResponse = await repository.getLatestActionForAlert(
@@ -214,9 +213,7 @@ void main() {
         );
 
         when(
-          () => mockRemoteDataSource.fetchLatestActionForAlert(
-            testLatestAction.id,
-          ),
+          () => mockRemoteDataSource.fetchLatestAction(testLatestAction.id),
         ).thenAnswer((_) async => throw testDioException);
 
         expect(
@@ -240,9 +237,7 @@ void main() {
         final testException = Exception("General exception");
 
         when(
-          () => mockRemoteDataSource.fetchLatestActionForAlert(
-            testLatestAction.id,
-          ),
+          () => mockRemoteDataSource.fetchLatestAction(testLatestAction.id),
         ).thenAnswer((_) async => throw testException);
 
         expect(
@@ -344,22 +339,22 @@ void main() {
     ];
     test('Saving alert to local cache', () async {
       when(
-        () => mockLocalDataSource.cacheAlerts(any()),
+        () => mockLocalDataSource.saveAlerts(any()),
       ).thenAnswer((_) async {});
 
       await repository.saveAlertsToOfflineCache(mockAlerts);
 
-      verify(() => mockLocalDataSource.cacheAlerts(mockAlerts)).called(1);
+      verify(() => mockLocalDataSource.saveAlerts(mockAlerts)).called(1);
     });
 
     test('Saving alert to local cache with error', () async {
       final testException = Exception("General exception");
       when(
-        () => mockLocalDataSource.cacheAlerts(any()),
+        () => mockLocalDataSource.saveAlerts(any()),
       ).thenAnswer((_) async => throw testException);
       await repository.saveAlertsToOfflineCache(mockAlerts);
 
-      verify(() => mockLocalDataSource.cacheAlerts(mockAlerts)).called(1);
+      verify(() => mockLocalDataSource.saveAlerts(mockAlerts)).called(1);
     });
   });
   group('markAlertsAsNotified', () {
@@ -376,7 +371,7 @@ void main() {
   group('isAlertAlreadyNotified', () {
     test('Checking if alert is notified', () async {
       when(
-        () => mockLocalDataSource.isAlertAlreadyNotified(any()),
+        () => mockLocalDataSource.wasAlertAlreadyNotified(any()),
       ).thenAnswer((_) async => true);
 
       final alertNotified = await repository.isAlertAlreadyNotified(10);

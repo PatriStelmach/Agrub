@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:alert_app/data/services/navigation_service.dart';
 import 'package:alert_app/locator.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
@@ -72,7 +73,7 @@ class PushNotificationService {
       }
     } catch (e) {
       debugPrint("FCM ERROR: Błąd podczas rejestracji tokenu: $e");
+      await locator<NavigationService>().showEmergencyOverlay('FCM');
     }
   }
-
 }

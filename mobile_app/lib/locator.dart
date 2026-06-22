@@ -1,10 +1,12 @@
 import 'package:alert_app/data/datasources/alert_local_data_source.dart';
 import 'package:alert_app/data/datasources/alert_remote_data_source.dart';
+import 'package:alert_app/data/datasources/plugin_remote_data_source.dart';
 import 'package:alert_app/data/repositories/alert_repository.dart';
 import 'package:alert_app/data/repositories/plugin_repository.dart';
 import 'package:alert_app/data/repositories/user_repository.dart';
 import 'package:alert_app/data/services/auth_service.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:alert_app/data/services/navigation_service.dart';
@@ -14,7 +16,6 @@ final locator = GetIt.instance;
 
 Future<void> setupLocator() async {
   final sharedPreferences = await SharedPreferences.getInstance();
-
 
   locator.registerSingleton<SharedPreferences>(sharedPreferences);
 
@@ -32,7 +33,6 @@ Future<void> setupLocator() async {
       InterceptorsWrapper(
         onRequest: (options, handler) async {
           final storage = locator<FlutterSecureStorage>();
-  
 
           if (options.path != '/api/auth/login') {
             final String? token = await storage.read(key: 'jwt_token');
@@ -44,18 +44,20 @@ Future<void> setupLocator() async {
         },
       ),
     );
-
     return dio;
   });
 
   locator.registerLazySingleton<AlertLocalDataSource>(
     () => AlertLocalDataSource(sharedPreferences: locator<SharedPreferences>()),
   );
-    locator.registerLazySingleton<AuthService>(() => AuthService());
-
+  locator.registerLazySingleton<AuthService>(() => AuthService());
 
   locator.registerLazySingleton<AlertRemoteDataSource>(
     () => AlertRemoteDataSource(dio: locator<Dio>()),
+  );
+
+  locator.registerLazySingleton<PluginRemoteDataSource>(
+    () => PluginRemoteDataSource(dio: locator<Dio>()),
   );
 
   locator.registerLazySingleton<FlutterSecureStorage>(
@@ -79,9 +81,9 @@ Future<void> setupLocator() async {
     ),
   );
   locator.registerLazySingleton<PluginRepository>(
-    () => PluginRepository(dio: locator<Dio>()),
-
+    () => PluginRepository(
+      dio: locator<Dio>(),
+      pluginRemoteDataSource: locator<PluginRemoteDataSource>(),
+    ),
   );
-  
-
 }

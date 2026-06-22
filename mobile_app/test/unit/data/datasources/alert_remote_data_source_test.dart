@@ -135,7 +135,7 @@ void main() {
           ),
         );
 
-        final result = await dataSource.fetchLatestActionForAlert(testAlertId);
+        final result = await dataSource.fetchLatestAction(testAlertId);
 
         expect(result, isA<AlertAction>());
         expect(result?.message, "Comment");
@@ -151,7 +151,7 @@ void main() {
         ),
       );
 
-      final result = await dataSource.fetchLatestActionForAlert(testAlertId);
+      final result = await dataSource.fetchLatestAction(testAlertId);
 
       expect(result, isNull);
     });
@@ -162,7 +162,7 @@ void main() {
       ).thenThrow(DioException(requestOptions: RequestOptions(path: '')));
 
       expect(
-        () => dataSource.fetchLatestActionForAlert(testAlertId),
+        () => dataSource.fetchLatestAction(testAlertId),
         throwsA(isA<DioException>()),
       );
     });
