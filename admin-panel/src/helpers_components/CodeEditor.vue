@@ -133,7 +133,7 @@ function onInput(e: Event) {
 <template>
   <textarea
     ref="textareaRef"
-    class="code-area min-h-96 h-full m-2 w-95/100 blue-badge-focus border-input"
+    class="code-area min-h-96 max-h-[50vh] m-2 w-95/100 blue-badge-focus border-input"
     spellcheck="false"
     autocomplete="off"
     autocapitalize="off"

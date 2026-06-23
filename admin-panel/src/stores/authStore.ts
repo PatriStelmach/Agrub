@@ -109,6 +109,7 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated,
     avFallback,
     isAdmin,
+    setToken,
     alertLogin,
     ADLogin,
     logout,

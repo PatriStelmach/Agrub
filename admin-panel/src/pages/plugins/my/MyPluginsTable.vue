@@ -225,11 +225,13 @@ const savePlugin = async () => {
           allMyPlugins.value = res
         })
         .catch(e => toast.error(`Editing "${unwrappedItem.value?.name}" failed with error ${e.message}`))
+        .finally(() => isEditLoading.value = false)
     }
-    else
+    else {
+      isEditLoading.value = false
       toast.info('No changes were made')
+    }
   }
-  isEditLoading.value = false
   onCloseAndSave()
 }
 
@@ -339,6 +341,7 @@ const onEdit = (plugin: MyPlugin) => {
     <PluginDetailsDialog
       v-model:isCodeDialogOpen="isCodeDialogOpen"
       :editable="authStore.isAdmin"
+      :arguments="unwrappedItem?.arguments ?? ''"
       :code="unwrappedItem?.code ?? ''"
       :description="unwrappedItem?.description ?? ''"
       @update:save-changes="updateDetails"

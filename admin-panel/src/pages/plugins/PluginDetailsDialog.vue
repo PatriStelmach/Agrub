@@ -15,7 +15,6 @@ import { Label } from '@/components/ui/label'
 import {ref, watchEffect} from "vue";
 import CodeEditor from "@/helpers_components/CodeEditor.vue";
 import BigLoadingBlock from "@/helpers_components/loaders/BigLoadingBlock.vue";
-import {smallNameLabel} from "@/assets/cssFunctions.ts";
 
 const props = defineProps<{
   description: string,
@@ -53,29 +52,48 @@ const emits = defineEmits<{
 
 <template>
   <Dialog v-model:open="isCodeDialogOpen">
-    <form id="plugin_details_form">
+    <div>
       <DialogTrigger as-child>
         <slot/>
       </DialogTrigger>
-      <DialogContent :show-close-button="false" class="max-w-[60vw]! min-h-1/4 max-h-4/5">
+      <DialogContent :show-close-button="false" class="max-w-[60vw]! min-h-1/4 max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>Plugin details</DialogTitle>
 
         </DialogHeader>
         <div class="grid gap-4">
-          <div class="grid gap-3">
-            <Label class="text-lg" for="my-plugin-description">Description</Label>
-            <Transition name="fade" mode="out-in">
-              <BigLoadingBlock class="h-10" v-if="isLoading" />
-              <Input
-                v-else-if="editable && !isLoading" class="m-2 badge-focus max-w-95/100 blue-badge-focus"
-                id="my_plugin_description"
-                name="description"
-                v-model="newDescription"
-                :default-value="description" />
-              <h1 class="border-b-2 border-accent pl-2 pr-8 w-fit" id="show_plugin_description" v-else>{{ description}}</h1>
-            </Transition>
+          <div class="grid grid-cols-3">
+            <div class="col-span-1 gap-3">
+              <Label class="text-lg" for="my-plugin-description">Description</Label>
+              <h2 class="text-sm text-comment">Description of your plugin</h2>
+              <Transition name="fade" mode="out-in">
+                <BigLoadingBlock class="h-10" v-if="isLoading" />
+                <Input
+                  v-else-if="editable && !isLoading" class="my-2 text-xs! badge-focus max-w-95/100 blue-badge-focus"
+                  id="my_plugin_description"
+                  name="description"
+                  v-model="newDescription"
+                  :default-value="description" />
+                <h1 class="border-b-2 border-accent pl-2 pr-8 w-fit" id="show_plugin_description" v-else>{{ description}}</h1>
+              </Transition>
+            </div>
+            <div class="col-span-2 gap-3">
+              <Label class="text-lg" for="my_plugin_arguments">Arguments</Label>
+              <h2 class="text-sm text-comment">Set execute arguments for script
+                Use space between arguments: "arg1 arg2 arg3"
+              </h2>
+              <Transition name="fade" mode="out-in">
+                <BigLoadingBlock class="h-10" v-if="isLoading"/>
+                <Input
+                  v-else-if="editable && !isLoading" class="my-2 text-xs! badge-focus max-w-95/100 blue-badge-focus"
+                  id="my_plugin_arguments"
+                  name="arguments"
+                  v-model="newArguments"
+                  :default-value="arguments" />
+              </Transition>
+            </div>
           </div>
+
           <div class="grid gap-3  h-full">
             <Label class="text-lg" for="my-plugin-code">Code</Label>
             <Transition name="fade" mode="out-in">
@@ -86,28 +104,14 @@ const emits = defineEmits<{
                 name="code"
                 v-model="newCode"
                 :default-value="code" />
-              <div v-else class="code-area min-h-96 max-h-[50vh] m-2 w-95/100 !">
+              <div v-else class="code-area min-h-96 max-h-[50vh] my-2 w-95/100 !">
                 <code id="show_plugin_code">
                   {{ code }}
                 </code>
               </div>
             </Transition>
           </div>
-          <div class="grid gap-3 mt-4">
-            <Label class="text-lg" for="my-plugin-arguments">Arguments</Label>
-            <h2 class="text-sm text-comment">Set execute arguments for script
-              Use space between arguments: "arg1 arg2 arg3"
-            </h2>
-            <Transition name="fade" mode="out-in">
-              <BigLoadingBlock class="h-10" v-if="isLoading"/>
-              <Input
-                v-else-if="editable && !isLoading" class="m-2 badge-focus max-w-95/100 blue-badge-focus"
-                id="my_plugin_arguments"
-                name="arguments"
-                v-model="newArguments"
-                :default-value="arguments" />
-            </Transition>
-          </div>
+
         </div>
         <DialogFooter>
           <DialogClose as-child>
@@ -131,6 +135,6 @@ const emits = defineEmits<{
 
         </DialogFooter>
       </DialogContent>
-    </form>
+    </div>
   </Dialog>
 </template>
