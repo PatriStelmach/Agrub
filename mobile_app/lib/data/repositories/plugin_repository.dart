@@ -15,7 +15,7 @@ class PluginRepository extends ChangeNotifier {
     return pluginRemoteDataSource.getAllPlugins();
   }
 
-  ///Forcing plugin to run immediately once
+  ///Forcing plugin to run immediately once with optional arguments
   Future<String> forcePlugin(Plugin plugin, {String? arguments}) async {
     final String fileName = plugin.fileName;
     final String extension = plugin.language.value;
@@ -34,7 +34,9 @@ class PluginRepository extends ChangeNotifier {
       );
       return response;
     } catch (e) {
-      debugPrint('PLUGIN REPOSITORY - Error caught');
+      debugPrint(
+        'PLUGIN REPOSITORY - Error while forcing plungin, error message: $e',
+      );
       return '';
     }
   }
@@ -46,9 +48,7 @@ class PluginRepository extends ChangeNotifier {
     required String cronExpression,
     required bool active,
   }) async {
-    final String fullFileName = extension.startsWith('.')
-        ? '$fileName$extension'
-        : '$fileName.$extension';
+    final String fullFileName = '$fileName$extension';
 
     final response = await pluginRemoteDataSource.activatePluginWithCron(
       fullFileName,

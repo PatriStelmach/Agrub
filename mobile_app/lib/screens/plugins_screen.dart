@@ -17,38 +17,33 @@ class _PluginsScreenState extends State<PluginsScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        context.read<PluginsViewModel>().loadPlugins();
+        context.read<PluginsViewModel>().fetchPlugins();
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    debugPrint("--- REBUILD PLUGINS SCREEN ---");
+    final pluginsViewModel = context.watch<PluginsViewModel>();
     final t = AppLocalizations.of(context)!;
-    final viewModel = context.watch<PluginsViewModel>();
 
-    if (viewModel.isLoading) {
+    if (pluginsViewModel.isLoading && pluginsViewModel.pluginsList.isEmpty) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    if (viewModel.errorMessage != null) {
-      return Scaffold(
-        body: Center(
-          child: Text(
-            viewModel.errorMessage!,
-            style: const TextStyle(color: Colors.red),
-          ),
-        ),
-      );
+    if (pluginsViewModel.pluginsList.isEmpty) {
+      return Scaffold(body: Center(child: Text(t.alerts_no_alerts_found)));
     }
-    final sortedList = viewModel.sortedPlugins;
-    if (sortedList.isEmpty) {
-      return Scaffold(body: Center(child: Text(t.plugins_no_plugins_found)));
-    }
+
+    final sortedList = pluginsViewModel.sortPlugins(
+      pluginsViewModel.currentSortProperty,
+      pluginsViewModel.isAscending,
+    );
 
     return Column(
       children: [
-        _buildSortHeader(context, viewModel, t),
+        _buildSortHeader(context, pluginsViewModel, t),
         Expanded(
           child: ListView.builder(
             itemCount: sortedList.length,
@@ -65,16 +60,18 @@ class _PluginsScreenState extends State<PluginsScreen> {
 
   Widget _buildSortHeader(
     BuildContext context,
-    PluginsViewModel viewModel,
+    PluginsViewModel pluginsViewModel,
     AppLocalizations t,
   ) {
+    final currentSort = pluginsViewModel.currentSortProperty;
+    final isAsc = pluginsViewModel.isAscending;
     return Row(
       children: [
         Text(t.plugins_sort_by, style: const TextStyle(fontSize: 25)),
         DropdownButton<String>(
           padding: const EdgeInsets.all(6),
           borderRadius: const BorderRadius.all(Radius.circular(16)),
-          value: viewModel.currentSortProperty,
+          value: currentSort,
           icon: const Icon(Icons.menu),
           style: TextStyle(
             color: Theme.of(context).textTheme.bodyLarge?.color,
@@ -83,7 +80,7 @@ class _PluginsScreenState extends State<PluginsScreen> {
           ),
           onChanged: (String? newValue) {
             if (newValue != null) {
-              viewModel.sortPluginsBy(newValue);
+              pluginsViewModel.sortPluginsBy(newValue, isAsc);
             }
           },
           items: [
@@ -111,14 +108,9 @@ class _PluginsScreenState extends State<PluginsScreen> {
           ],
         ),
         IconButton(
-          icon: Icon(
-            viewModel.isAscending ? Icons.arrow_upward : Icons.arrow_downward,
-          ),
+          icon: Icon(isAsc ? Icons.arrow_upward : Icons.arrow_downward),
           onPressed: () {
-            viewModel.sortPluginsBy(
-              viewModel.currentSortProperty,
-              ascending: !viewModel.isAscending,
-            );
+            pluginsViewModel.sortPluginsBy(currentSort, !isAsc);
           },
         ),
       ],

@@ -1,17 +1,13 @@
 import 'dart:async';
-
 import 'package:alert_app/data/models/user_model.dart';
 import 'package:alert_app/data/repositories/user_repository.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:get_it/get_it.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
 class UserViewModel extends ChangeNotifier {
-  final UserRepository repository;
-    final FlutterSecureStorage _storage = GetIt.instance<FlutterSecureStorage>();
-final Dio dio;
+  final UserRepository userRepository;
+  final Dio dio;
 
   UserModel? _user;
   bool _isLoggedIn = false;
@@ -21,85 +17,69 @@ final Dio dio;
   bool get isLoggedIn => _isLoggedIn;
   bool get isLoading => _isLoading;
 
-  UserViewModel({required this.repository, required this.dio});
+  UserViewModel({required this.userRepository, required this.dio});
 
-  ///Authorization method, returns true when logged in
-  Future<bool> checkAuthStatus() async {
-    _setLoading(true);
-    try {
-      final String? token = await repository.getToken();
-      if (token != null && !JwtDecoder.isExpired(token)) {
-        _user = repository.getUserFromToken(token);
-        _isLoggedIn = (_user != null);
-
-        //T0D0 - breaking architecture, place in repo in The Great Rewriting
-        final lastIp =  await repository.getLastIp();
-        if( lastIp != "") {
-       dio.options.baseUrl = ('http://$lastIp');
-        }
-        else {
-          _isLoggedIn = false;
-        }
-        
-
-        
-
-      
-        
-      } else {
-        _isLoggedIn = false;
-      }
-    } catch (e) {
-      debugPrint("USER VIEW MODEL - checkAuthStatus ERROR: $e");
-      _isLoggedIn = false;
-      _user = null;
-    } finally {
-      _setLoading(false);
-    }
-    return _isLoggedIn;
-  }
-
-  ///Log in the user
+  ///Logging in the user
   Future<bool> signIn(String email, String password, String serverIp) async {
-    _setLoading(true);
+    _isLoading = true;
+    notifyListeners();
     bool success = false;
 
     try {
-      success = await repository.login(email, password, serverIp);
+      success = await userRepository.login(email, password, serverIp);
       if (success) {
-        final token = await repository.getToken();
+        final token = await userRepository.getToken();
         if (token != null) {
-          _user = repository.getUserFromToken(token);
+          _user = userRepository.getUserFromToken(token);
           _isLoggedIn = true;
         }
       }
     } catch (e) {
-      debugPrint("USER VIEW MODEL - signIn ERROR: $e");
+      debugPrint("USER VIEW MODEL - signIn issue, error message: $e");
       success = false;
       _isLoggedIn = false;
     } finally {
-      _setLoading(false);
+      _isLoading = false;
+      notifyListeners();
     }
     return success;
   }
 
+  /// Log out function exposed for user screen
   Future<void> signOut() async {
-    _setLoading(true);
-
-    try {
-      await repository.logout();
-    } catch (e) {
-      debugPrint("USER VIEW MODEL ERROR: $e");
-    } finally {
-      _user = null;
-      _isLoggedIn = false;
-      _setLoading(false);
+    _isLoading = true;
     notifyListeners();
-    }
+
+    await userRepository.logout();
+
+    _user = null;
+    _isLoggedIn = false;
+    _isLoading = false;
+    notifyListeners();
   }
 
-  void _setLoading(bool value) {
-    _isLoading = value;
+  ///Authorization method, returns true when logged in
+  Future<bool> checkAuthorizationStatus() async {
+    _isLoading = true;
     notifyListeners();
+
+    final String? token = await userRepository.getToken();
+    if (token != null && !JwtDecoder.isExpired(token)) {
+      _user = userRepository.getUserFromToken(token);
+      _isLoggedIn = true;
+
+      final lastIp = await userRepository.checkLastIp();
+      if (!lastIp) {
+        _isLoggedIn = false;
+      }
+    } else {
+      _isLoggedIn = false;
+      _user = null;
+    }
+
+    _isLoading = false;
+
+    notifyListeners();
+    return _isLoggedIn;
   }
 }

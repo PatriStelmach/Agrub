@@ -61,7 +61,7 @@ class PluginRemoteDataSource {
         data: {'cronExpression': cronExpression, 'active': active},
       );
 
-      return response.data;
+      return response.statusCode == 200 ? true : false;
     } catch (e) {
       debugPrint(
         "PLUGIN REMOTE DATA SOURCE - Connection error - activatePluginWithCrone() failed",

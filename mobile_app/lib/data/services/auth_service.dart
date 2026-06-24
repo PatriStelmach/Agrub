@@ -24,7 +24,7 @@ class AuthService {
 
       if (response.statusCode == 200) {
         final token = response.data['access_token'];
-        await _storage.write(key: 'jwt_token', value: token);
+        await _storage.write(key: 'JWT_TOKEN', value: token);
 
         try {
           final settingsResponse = await _dio.get(
@@ -46,7 +46,7 @@ class AuthService {
               );
             }
           }
-          await _storage.write(key: 'lastServerIp', value: serverIp);
+          await _storage.write(key: 'LAST_SERVER_IP', value: serverIp);
         } catch (e) {
           debugPrint("LOGIN DEBUG:Cannot aquire groups from /me/settings: $e");
         }
@@ -74,7 +74,10 @@ class _AuthGateState extends State<AuthGate> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<UserViewModel>(context, listen: false).checkAuthStatus();
+      Provider.of<UserViewModel>(
+        context,
+        listen: false,
+      ).checkAuthorizationStatus();
     });
   }
 
@@ -97,6 +100,6 @@ class _AuthGateState extends State<AuthGate> {
   }
 
   Future<String?> getLastIp() async {
-    return await _storage.read(key: 'lastServerIp');
+    return await _storage.read(key: 'LAST_SERVER_IP');
   }
 }

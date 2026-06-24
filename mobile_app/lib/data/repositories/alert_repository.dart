@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:alert_app/data/datasources/alert_local_data_source.dart';
 import 'package:flutter/foundation.dart';
-
 import 'package:alert_app/data/models/alert_model.dart';
 import 'package:alert_app/data/models/alert_action_model.dart';
 import 'package:alert_app/data/datasources/alert_remote_data_source.dart';
@@ -16,7 +15,7 @@ class AlertRepository {
     required this.localDataSource,
   });
 
-  ///Getting all active alerts via alert data source from the server
+  ///Getting all active alerts via alert data source from the server or falling back to stored alerts in case of connection issue
   Future<List<Alert>> fetchAllAlerts() async {
     try {
       final alerts = await remoteDataSource.fetchActiveAlerts();
@@ -37,7 +36,7 @@ class AlertRepository {
     return await localDataSource.getStoredAlerts();
   }
 
-  /// Send ack/comment and fetch actual list
+  /// Send ack/comment and fetch actual list, exposing method to view model
   Future<void> acknowledgeAlert({
     required int alertId,
     required String author,
@@ -59,7 +58,7 @@ class AlertRepository {
     return await remoteDataSource.fetchLatestAction(alertId);
   }
 
-  /// Fetch Stream via data source
+  /// Fetch Stream via data source, gates prepared in case of empty or broken messages
   Stream<dynamic> getAlertsUpdateStream({
     required String userRole,
     required String token,
@@ -82,26 +81,34 @@ class AlertRepository {
               return message;
             }
           } catch (e) {
-            debugPrint("REPO SSE ERROR: Parsing error: $e");
+            debugPrint(
+              "ALERT REPOSITORY - Error while trying to parse incoming SSE update, error message - $e",
+            );
           }
           return null;
         })
         .where((event) => event != null);
   }
 
+  ///Exposing save alerts method for other layers
   Future<void> saveAlertsToOfflineCache(List<Alert> alerts) async {
     await localDataSource.saveAlerts(alerts);
   }
 
+  ///Marking alert as notified, exposing method for view model
   Future<void> markAlertAsNotified(int alertId) async {
     await localDataSource.markAlertAsNotified(alertId);
-    debugPrint("Saved $alertId as sounded by LocalDataSource.");
+    debugPrint(
+      "ALERT REPOSITORY - Saved $alertId as notified by LocalDataSource.",
+    );
   }
 
+  /// Checking notification status, exposing method for view model
   Future<bool> isAlertAlreadyNotified(int alertId) async {
     return await localDataSource.wasAlertAlreadyNotified(alertId);
   }
 
+  ///Ping method
   Future<bool> checkBackendConnection() {
     return remoteDataSource.isBackendConnected();
   }

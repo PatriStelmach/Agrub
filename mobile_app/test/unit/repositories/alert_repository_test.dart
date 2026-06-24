@@ -268,13 +268,13 @@ void main() {
       () async {
         when(
           () => mockRemoteDataSource.getAlertsStream(
-            userGroup: any(named: 'userGroup'),
+            userRole: any(named: 'userGroup'),
             token: any(named: 'token'),
           ),
         ).thenAnswer((_) => Stream.fromIterable(mockEventsStream));
 
         final stream = repository.getAlertsUpdateStream(
-          userGroup: 'Admin',
+          userRole: 'Admin',
           token: '123',
         );
         await expectLater(
@@ -303,13 +303,13 @@ void main() {
       ];
       when(
         () => mockRemoteDataSource.getAlertsStream(
-          userGroup: any(named: 'userGroup'),
+          userRole: any(named: 'userGroup'),
           token: any(named: 'token'),
         ),
       ).thenAnswer((_) => Stream.fromIterable(mockEventsWithBrokenJson));
 
       final stream = repository.getAlertsUpdateStream(
-        userGroup: 'Admin',
+        userRole: 'Admin',
         token: '123',
       );
       await expectLater(

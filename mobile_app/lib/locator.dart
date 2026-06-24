@@ -21,7 +21,6 @@ Future<void> setupLocator() async {
   locator.registerLazySingleton<Dio>(() {
     final dio = Dio(
       BaseOptions(
-        //baseUrl: lastServer,
         connectTimeout: const Duration(seconds: 15),
         receiveTimeout: const Duration(seconds: 15),
         headers: {'Accept': '*/*', 'Content-Type': 'application/json'},
@@ -34,7 +33,7 @@ Future<void> setupLocator() async {
           final storage = locator<FlutterSecureStorage>();
 
           if (options.path != '/api/auth/login') {
-            final String? token = await storage.read(key: 'jwt_token');
+            final String? token = await storage.read(key: 'JWT_TOKEN');
             if (token != null) {
               options.headers['Authorization'] = 'Bearer $token';
             }

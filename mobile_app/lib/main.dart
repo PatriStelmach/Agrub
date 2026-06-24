@@ -51,7 +51,6 @@ class AppStateProvider extends StatelessWidget {
       providers: [
         // Global services
         ChangeNotifierProvider(create: (_) => SettingsViewModel()),
-        ChangeNotifierProvider(create: (_) => GeneralLayoutViewModel()),
         Provider<PushNotificationService>(
           create: (_) => PushNotificationService()..initNotificationHandling(),
         ),
@@ -62,7 +61,7 @@ class AppStateProvider extends StatelessWidget {
             providers: [
               ChangeNotifierProvider(
                 create: (_) => UserViewModel(
-                  repository: locator<UserRepository>(),
+                  userRepository: locator<UserRepository>(),
                   dio: locator<Dio>(),
                 ),
               ),
@@ -74,6 +73,7 @@ class AppStateProvider extends StatelessWidget {
                       .read<PushNotificationService>(),
                 ),
               ),
+
               ChangeNotifierProvider(
                 create: (_) => PluginsViewModel(
                   pluginsRepository: locator<PluginRepository>(),
@@ -81,13 +81,22 @@ class AppStateProvider extends StatelessWidget {
               ),
               ChangeNotifierProvider(
                 create: (_) =>
-                    DebugViewModel(navigationService: locator<AlarmService>()),
+                    DebugViewModel(alarmService: locator<AlarmService>()),
               ),
             ],
             child: Builder(
               builder: (contextAfterAlerts) {
                 return MultiProvider(
                   providers: [
+                    ChangeNotifierProvider(
+                      create: (_) => GeneralLayoutViewModel(
+                        userViewModel: contextAfterAlerts.read<UserViewModel>(),
+                        alertsViewModel: contextAfterAlerts
+                            .read<AlertsViewModel>(),
+                        pushNotificationService: contextAfterAlerts
+                            .read<PushNotificationService>(),
+                      ),
+                    ),
                     ChangeNotifierProvider(
                       lazy: false,
                       create: (_) => HomeViewModel(
@@ -124,7 +133,7 @@ class MainApp extends StatelessWidget {
       themeMode: settingsViewModel.themeMode,
       navigatorKey: locator<AlarmService>().navigatorKey,
 
-      home: AuthGate(),
+      home: const AuthGate(),
     );
   }
 }

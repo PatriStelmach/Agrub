@@ -2,7 +2,7 @@ class UserModel {
   final String login;
   final String email;
   final String role;
-  final List<String> groups;
+  final List<dynamic> groups;
 
   UserModel({
     required this.login,

@@ -11,7 +11,7 @@ class DebugScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final navigation = AlarmService();
-    final debugViewModel = DebugViewModel(navigationService: navigation);
+    final debugViewModel = DebugViewModel(alarmService: navigation);
     return Column(
       children: [
         const Text("BACKEND DEBUG", style: TextStyle(fontSize: 30)),

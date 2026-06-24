@@ -55,8 +55,10 @@ class _AlertsScreenState extends State<AlertsScreen>
       return Scaffold(body: Center(child: Text(t.alerts_no_alerts_found)));
     }
 
-    final sortedList = alertsViewModel.sortedAlerts;
-
+    final sortedList = alertsViewModel.sortAlerts(
+      alertsViewModel.currentSortProperty,
+      alertsViewModel.isAscending,
+    );
     return Column(
       children: [
         _buildSortHeader(context, alertsViewModel, t),
@@ -75,11 +77,11 @@ class _AlertsScreenState extends State<AlertsScreen>
 
   Widget _buildSortHeader(
     BuildContext context,
-    AlertsViewModel viewModel,
+    AlertsViewModel alertsViewModel,
     AppLocalizations t,
   ) {
-    final currentSort = viewModel.currentSortProperty;
-    final isAsc = viewModel.isAscending;
+    final currentSort = alertsViewModel.currentSortProperty;
+    final isAsc = alertsViewModel.isAscending;
 
     return Row(
       children: [
@@ -98,7 +100,7 @@ class _AlertsScreenState extends State<AlertsScreen>
             ),
             onChanged: (String? newValue) {
               if (newValue != null) {
-                viewModel.sortAlertsBy(newValue);
+                alertsViewModel.sortAlertsBy(newValue, isAsc);
               }
             },
             items: [
@@ -127,14 +129,14 @@ class _AlertsScreenState extends State<AlertsScreen>
                 value: 'acknowledged',
                 child: Text(
                   t.alerts_sort_acknowledged,
-                  style: const TextStyle(fontSize: 30),
+                  style: const TextStyle(fontSize: 25),
                 ),
               ),
               DropdownMenuItem(
                 value: 'severity',
                 child: Text(
                   t.alerts_sort_severity,
-                  style: const TextStyle(fontSize: 30),
+                  style: const TextStyle(fontSize: 25),
                 ),
               ),
             ],
@@ -143,7 +145,7 @@ class _AlertsScreenState extends State<AlertsScreen>
         IconButton(
           icon: Icon(isAsc ? Icons.arrow_upward : Icons.arrow_downward),
           onPressed: () {
-            viewModel.sortAlertsBy(currentSort, ascending: !isAsc);
+            alertsViewModel.sortAlertsBy(currentSort, !isAsc);
           },
         ),
       ],

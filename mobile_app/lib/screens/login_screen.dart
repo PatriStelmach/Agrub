@@ -28,7 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
-  _serverController.dispose();
+    _serverController.dispose();
     super.dispose();
   }
 
@@ -89,12 +89,12 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 40),
 
-TextField(
+              TextField(
                 controller: _serverController,
                 decoration: const InputDecoration(
                   labelText: "Server addres",
-                  prefixIcon:  Icon(Icons.email),
-                  border:  OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.email),
+                  border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.text,
               ),
