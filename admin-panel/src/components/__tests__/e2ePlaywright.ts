@@ -58,7 +58,6 @@ test("Download a plugin from library and check if it's code matches in my plugin
 test('Check if new user can see alerts with rules after adding to a group.', async  ({ page}) => {
   await page.goto('http://localhost:5173/');
   await page.goto('http://localhost:5173/alerts_history');
-  await page.goto('http://localhost:5173/plugins_library');
   await page.goto('http://localhost:5173/my_plugins');
   await page.goto('http://localhost:5173/charts');
   await page.goto('http://localhost:5173/');
