@@ -18,7 +18,6 @@ export enum MatchType {
 
 export interface ActiveAlert {
   id: number
-  externalEventId: string
   subject: string
   message: string
   source: string
