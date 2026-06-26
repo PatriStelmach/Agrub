@@ -137,17 +137,3 @@ class MainApp extends StatelessWidget {
     );
   }
 }
-
-
-  /*
-
-T0D0:
-
-- severity change
-- komentarze porządne
-- testy
-- AlertRemoteDataSourceTest - There is no SSE test here - T0D0 as integration test for alert repository
-- refactoring, (FCM, pozostałe drobiazgi)
-- CONSIDER: refactoring, wywalenie wszystkich helper widget na rzecz class widget
-
-  */

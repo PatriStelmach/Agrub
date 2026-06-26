@@ -33,13 +33,69 @@ class UserScreen extends StatelessWidget {
           children: [
             const Icon(Icons.account_circle_rounded, size: 100),
             const SizedBox(height: 20),
-
-            UserDataRow(label: t.user_label_username, value: user.login),
-            UserDataRow(label: t.user_label_email, value: user.email),
-            UserDataRow(label: t.user_label_role, value: user.role),
-            UserDataRow(
-              label: t.user_label_group,
-              value: user.groups.toString(),
+            Row(
+              children: [
+                Text(
+                  t.user_label_username,
+                  style: const TextStyle(fontSize: 24, color: Colors.grey),
+                ),
+                const Spacer(),
+                Text(
+                  user.login,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                Text(
+                  t.user_label_email,
+                  style: const TextStyle(fontSize: 24, color: Colors.grey),
+                ),
+                const Spacer(),
+                Text(
+                  user.email,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                Text(
+                  t.user_label_role,
+                  style: const TextStyle(fontSize: 24, color: Colors.grey),
+                ),
+                const Spacer(),
+                Text(
+                  user.role,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                Text(
+                  t.user_label_group,
+                  style: const TextStyle(fontSize: 24, color: Colors.grey),
+                ),
+                const Spacer(),
+                Text(
+                  user.groups.toString(),
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
             ),
 
             const SizedBox(height: 30),
@@ -57,30 +113,6 @@ class UserScreen extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class UserDataRow extends StatelessWidget {
-  final String label;
-  final String value;
-
-  const UserDataRow({super.key, required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          Text(label, style: const TextStyle(fontSize: 24, color: Colors.grey)),
-          const Spacer(),
-          Text(
-            value,
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-        ],
       ),
     );
   }

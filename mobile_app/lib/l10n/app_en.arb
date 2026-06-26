@@ -23,7 +23,7 @@
   "login_field_password": "Password",
   "login_button_submit": "LOG IN",
   "sectionPluginsScreen": "--- PLUGINS SCREEN ------------------------------------------------------------------------------------------------",
-  "plugins_no_plugins_found": "No plugins found. Consider checking the button in Debug Screen!",
+  "plugins_no_plugins_found": "No plugins found.",
   "plugins_sort_by": "Sort by - ",
   "plugins_sort_filename": "File Name",
   "plugins_sort_creator": "Creator",

@@ -40,10 +40,9 @@ class _LoginScreenState extends State<LoginScreen> {
     final success = await userViewModel.signIn(
       _emailController.text.trim(),
       _passwordController.text,
-      _serverController.text,
+      _serverController.text.trim(),
     );
 
-    // Safety against using BuildContext if the screen was closed earlier
     if (!mounted) return;
 
     if (success) {
@@ -54,7 +53,6 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       );
     } else {
-      // Failure snackbar
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(t.login_error_message),
@@ -93,7 +91,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 controller: _serverController,
                 decoration: const InputDecoration(
                   labelText: "Server addres",
-                  prefixIcon: Icon(Icons.email),
+                  prefixIcon: Icon(Icons.cast_connected),
                   border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.text,

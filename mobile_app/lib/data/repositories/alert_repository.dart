@@ -54,7 +54,7 @@ class AlertRepository {
   }
 
   /// Fetch newest action for an alert
-  Future<AlertAction?> getLatestActionForAlert(int alertId) async {
+  Future<AlertAction?> getLatestAction(int alertId) async {
     return await remoteDataSource.fetchLatestAction(alertId);
   }
 

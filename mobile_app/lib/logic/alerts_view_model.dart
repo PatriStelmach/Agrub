@@ -200,6 +200,14 @@ class AlertsViewModel extends ChangeNotifier {
 
   ///Getting latest action so Screen can display it in alert card
   Future<AlertAction?> getLatestActionForAlert(int alertId) async {
-    return await alertsRepository.getLatestActionForAlert(alertId);
+    return await alertsRepository.getLatestAction(alertId);
   }
+
+  @visibleForTesting
+  Future<void> handleIncomingSseUpdate(dynamic message) =>
+      _handleIncomingSseUpdate(message);
+
+  @visibleForTesting
+  Future<void> checkingForEmergency(Alert alert) =>
+      _checkingForEmergency(alert);
 }

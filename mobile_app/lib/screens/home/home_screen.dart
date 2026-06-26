@@ -1,4 +1,6 @@
 import 'package:alert_app/logic/general_layout_view_model.dart';
+import 'package:alert_app/screens/home/nav_tile.dart';
+import 'package:alert_app/screens/home/stat_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:alert_app/logic/home_view_model.dart';
 import 'package:intl/intl.dart';
@@ -42,15 +44,13 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Row(
               children: [
-                _buildStatCard(
-                  context,
-
+                StatCard(
                   title: homeViewModel.lastPing == false
                       ? "No connection"
                       : "Last ping:",
                   value: homeViewModel.lastPing == false
                       ? "No connection"
-                      : DateFormat('hh:mm:ss a').format(DateTime.now()),
+                      : DateFormat('HH:mm:ss a').format(DateTime.now()),
                   icon: Icons.sync,
                   color: homeViewModel.lastPing == false
                       ? Colors.redAccent
@@ -58,8 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
 
                 const SizedBox(width: 12),
-                _buildStatCard(
-                  context,
+                StatCard(
                   title: t.statActiveAlerts,
                   value: activeAlertsCount.toString(),
                   icon: Icons.notifications_active,
@@ -128,8 +127,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 12),
             Row(
               children: [
-                _buildNavTile(
-                  context,
+                NavTile(
                   label: t.navAllAlerts,
                   icon: Icons.list_alt,
                   color: Colors.indigo,
@@ -140,8 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                 ),
                 const SizedBox(width: 12),
-                _buildNavTile(
-                  context,
+                NavTile(
                   label: t.navPlugins,
                   icon: Icons.extension,
                   color: Colors.teal,
@@ -154,83 +151,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStatCard(
-    BuildContext context, {
-    required String title,
-    required String value,
-    required IconData icon,
-    required Color color,
-  }) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withValues(alpha: 0.5)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 8),
-            Text(
-              title,
-              style: TextStyle(color: color, fontWeight: FontWeight.w600),
-            ),
-            Text(
-              value,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavTile(
-    BuildContext context, {
-    required String label,
-    required IconData icon,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return Expanded(
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          height: 120,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: color.withValues(alpha: 0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, color: Colors.white, size: 40),
-              const SizedBox(height: 8),
-              Text(
-                label,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );

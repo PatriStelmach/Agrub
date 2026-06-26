@@ -5,6 +5,7 @@ import 'package:alert_app/logic/debug_view_model.dart';
 import 'package:alert_app/data/services/alarm_service.dart';
 import 'package:provider/provider.dart';
 
+///Debug Screen left in the app for potential future needs, not visible via the navigation drawer
 class DebugScreen extends StatelessWidget {
   const DebugScreen({super.key});
 

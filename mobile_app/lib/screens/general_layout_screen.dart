@@ -3,8 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:alert_app/l10n/app_localizations.dart';
 import 'package:alert_app/logic/general_layout_view_model.dart';
 import 'package:alert_app/screens/home_screen.dart';
-import 'package:alert_app/screens/alerts_screen.dart';
-import 'package:alert_app/screens/plugins_screen.dart';
+import 'package:alert_app/screens/alert/alerts_screen.dart';
+import 'package:alert_app/screens/plugin/plugins_screen.dart';
 import 'package:alert_app/screens/user_screen.dart';
 import 'package:alert_app/screens/settings_screen.dart';
 
@@ -53,7 +53,7 @@ class _GeneralLayoutState extends State<GeneralLayout> {
     );
   }
 
-  /// Showing correct title in app bar
+  /// Helper function for getting correct app bar title
   String _getAppBarTitle(AppScreen screen, AppLocalizations t) {
     switch (screen) {
       case AppScreen.home:

@@ -74,6 +74,7 @@ class AlertRemoteDataSource {
         "ALERT REMOTE DATA SOURCE - Connection error - fetchLatestAction() failed",
       );
       await locator<AlarmService>().showEmergencyOverlay('Connection');
+      rethrow;
     }
     return null;
   }

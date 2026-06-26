@@ -1,11 +1,15 @@
 import 'dart:async';
 import 'dart:io';
-
+import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:alert_app/screens/alarm_overlay_screen.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:sound_mode/sound_mode.dart';
 import 'package:vibration/vibration.dart';
+import 'package:sound_mode/utils/ringer_mode_statuses.dart';
 
 class AlarmService {
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -59,7 +63,19 @@ class AlarmService {
   ///Here should've been iOS alarm trigger, but for time being it is postponed due to constraints mentioned in
   ///our thesis. I've left conditional statement for potential future implementation
   Future<void> triggerAlarm() async {
+    String ringerStatus = SoundMode.ringerModeStatus.toString();
+    debugPrint(ringerStatus);
+
+    final bool isGranted = await Permission.accessNotificationPolicy.isGranted;
+    if (!isGranted) {
+      await Permission.accessNotificationPolicy.request();
+      return;
+    }
+
+    await SoundMode.setSoundMode(RingerModeStatus.normal);
+
     if (Platform.isAndroid) {
+      await FlutterVolumeController.setVolume(1.0);
       await player.setReleaseMode(ReleaseMode.loop);
       await player.play(AssetSource('audio/alarm.mp3'));
 
