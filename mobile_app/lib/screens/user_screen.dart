@@ -33,6 +33,43 @@ class UserScreen extends StatelessWidget {
           children: [
             const Icon(Icons.account_circle_rounded, size: 100),
             const SizedBox(height: 20),
+
+            Row(
+              children: [
+                const Text(
+                  'Name',
+                  style: TextStyle(fontSize: 24, color: Colors.grey),
+                ),
+                const Spacer(),
+
+                Text(
+                  user.name,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+
+            Row(
+              children: [
+                const Text(
+                  'Surname',
+                  style: TextStyle(fontSize: 24, color: Colors.grey),
+                ),
+                const Spacer(),
+                Text(
+                  user.surname,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    color: Colors.grey,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+
             Row(
               children: [
                 Text(
@@ -40,6 +77,7 @@ class UserScreen extends StatelessWidget {
                   style: const TextStyle(fontSize: 24, color: Colors.grey),
                 ),
                 const Spacer(),
+
                 Text(
                   user.login,
                   style: const TextStyle(

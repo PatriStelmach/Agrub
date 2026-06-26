@@ -1,10 +1,15 @@
 class UserModel {
+  final String name;
+  final String surname;
   final String login;
   final String email;
   final String role;
   final List<dynamic> groups;
 
   UserModel({
+    required this.name,
+    required this.surname,
+
     required this.login,
     required this.email,
     required this.role,
@@ -20,8 +25,10 @@ class UserModel {
     }).toList();
 
     return UserModel(
+      name: decodedToken['firstname'] ?? 'Unknown',
+      surname: decodedToken['surname'] ?? 'Unknown',
       login: decodedToken['sub'] ?? 'Unknown',
-      email: decodedToken['email'] ?? '',
+      email: decodedToken['email'] ?? ' Unknown',
       role: decodedToken['role'] ?? 'USER',
       groups: groupNames,
     );
