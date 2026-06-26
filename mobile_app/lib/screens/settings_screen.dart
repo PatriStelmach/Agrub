@@ -1,4 +1,3 @@
-import 'package:alert_app/data/services/language_service.dart';
 import 'package:alert_app/l10n/app_localizations.dart';
 import 'package:alert_app/logic/settings_view_model.dart';
 import 'package:flutter/material.dart';
@@ -10,10 +9,10 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context)!;
-    final languageService = context.watch<LanguageService>();
-    final currentLanguageCode = languageService.currentLocale.languageCode;
-    final themeViewModel = context.watch<SettingsViewModel>();
-    final isDark = themeViewModel.isDarkMode;
+    final settingsViewModel = context.watch<SettingsViewModel>();
+    final currentLanguageCode = settingsViewModel.currentLocale.languageCode;
+
+    final isDark = settingsViewModel.themeMode == ThemeMode.dark ? true : false;
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -40,7 +39,7 @@ class SettingsScreen extends StatelessWidget {
                       color: isDark ? Colors.amber : Colors.blueGrey,
                     ),
                     onPressed: () {
-                      themeViewModel.toggleTheme();
+                      settingsViewModel.toggleTheme();
                     },
                   ),
                 ),
@@ -76,9 +75,7 @@ class SettingsScreen extends StatelessWidget {
 
                     onChanged: (String? newLanguageCode) {
                       if (newLanguageCode != null) {
-                        context.read<LanguageService>().changeLanguage(
-                          newLanguageCode,
-                        );
+                        settingsViewModel.changeLanguage(newLanguageCode);
                       }
                     },
 

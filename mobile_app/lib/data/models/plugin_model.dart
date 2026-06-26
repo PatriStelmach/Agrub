@@ -11,9 +11,9 @@ enum PluginLanguage {
   final String value;
   const PluginLanguage(this.value);
 
-  static PluginLanguage fromString(String val) {
+  static PluginLanguage fromString(String extension) {
     return PluginLanguage.values.firstWhere(
-      (e) => e.value == val,
+      (e) => e.value == extension,
       orElse: () => PluginLanguage.unknown,
     );
   }

@@ -2,9 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:alert_app/data/datasources/alert_local_data_source.dart';
 import 'package:flutter/foundation.dart';
-
 import 'package:alert_app/data/models/alert_model.dart';
-import 'package:alert_app/data/models/problem_action_model.dart';
+import 'package:alert_app/data/models/alert_action_model.dart';
 import 'package:alert_app/data/datasources/alert_remote_data_source.dart';
 
 ///Getting alerts data from remote and local sources and feeding it to Alerts View Model
@@ -16,26 +15,28 @@ class AlertRepository {
     required this.localDataSource,
   });
 
-  ///Getting all active alerts via alert data source from the server
+  ///Getting all active alerts via alert data source from the server or falling back to stored alerts in case of connection issue
   Future<List<Alert>> fetchAllAlerts() async {
     try {
       final alerts = await remoteDataSource.fetchActiveAlerts();
 
-      await localDataSource.cacheAlerts(alerts);
+      await localDataSource.saveAlerts(alerts);
 
       return alerts;
     } catch (e) {
-      debugPrint("REPO ERROR: Couldn't fetch alerts: $e");
-      return await getOfflineAlerts();
+      debugPrint(
+        "ALERT REPOSITORY -  Couldn't fetch remote alerts, loading local storage. Error message - $e",
+      );
+      return await localDataSource.getStoredAlerts();
     }
   }
 
-  ///Getting all locally stored alerts
+  ///Getting all locally stored alerts, also exposing method for other layers
   Future<List<Alert>> getOfflineAlerts() async {
-    return await localDataSource.getOfflineAlerts();
+    return await localDataSource.getStoredAlerts();
   }
 
-  /// Send ack/comment and fetch actual list
+  /// Send ack/comment and fetch actual list, exposing method to view model
   Future<void> acknowledgeAlert({
     required int alertId,
     required String author,
@@ -53,17 +54,17 @@ class AlertRepository {
   }
 
   /// Fetch newest action for an alert
-  Future<AlertAction?> getLatestActionForAlert(int alertId) async {
-    return await remoteDataSource.fetchLatestActionForAlert(alertId);
+  Future<AlertAction?> getLatestAction(int alertId) async {
+    return await remoteDataSource.fetchLatestAction(alertId);
   }
 
-  /// Fetch Stream via data source
+  /// Fetch Stream via data source, gates prepared in case of empty or broken messages
   Stream<dynamic> getAlertsUpdateStream({
-    required String userGroup,
+    required String userRole,
     required String token,
   }) {
     return remoteDataSource
-        .getAlertsStream(userGroup: userGroup, token: token)
+        .getAlertsStream(userRole: userRole, token: token)
         .map((event) {
           if (event.data == null || event.data!.isEmpty) return null;
 
@@ -80,30 +81,34 @@ class AlertRepository {
               return message;
             }
           } catch (e) {
-            debugPrint("REPO SSE ERROR: Parsing error: $e");
+            debugPrint(
+              "ALERT REPOSITORY - Error while trying to parse incoming SSE update, error message - $e",
+            );
           }
           return null;
         })
         .where((event) => event != null);
   }
 
+  ///Exposing save alerts method for other layers
   Future<void> saveAlertsToOfflineCache(List<Alert> alerts) async {
-    try {
-      await localDataSource.cacheAlerts(alerts);
-    } catch (e) {
-      debugPrint("ALERT REPOSITORY ERROR: Problem with saving offline: $e");
-    }
+    await localDataSource.saveAlerts(alerts);
   }
 
+  ///Marking alert as notified, exposing method for view model
   Future<void> markAlertAsNotified(int alertId) async {
     await localDataSource.markAlertAsNotified(alertId);
-    debugPrint("Saved $alertId as sounded by LocalDataSource.");
+    debugPrint(
+      "ALERT REPOSITORY - Saved $alertId as notified by LocalDataSource.",
+    );
   }
 
+  /// Checking notification status, exposing method for view model
   Future<bool> isAlertAlreadyNotified(int alertId) async {
-    return await localDataSource.isAlertAlreadyNotified(alertId);
+    return await localDataSource.wasAlertAlreadyNotified(alertId);
   }
 
+  ///Ping method
   Future<bool> checkBackendConnection() {
     return remoteDataSource.isBackendConnected();
   }

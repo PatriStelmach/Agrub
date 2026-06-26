@@ -2,48 +2,56 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:alert_app/data/models/alert_model.dart';
 
+/// Data source governing local storage of the mobile device, using Shared Preferences
 class AlertLocalDataSource {
   final SharedPreferences sharedPreferences;
 
-  // Keys to local memory storage
-  static const cachedAlertsKey = 'CACHED_ALERTS';
-  static const notifiedAlertsKey = 'NOTIFIED_ALERT_IDS';
+  static const _storedAlertsKey = 'ALERTS_STORAGE';
+  static const _storedNotifiedAlertsKey = 'ALERTS_NOTIFIED_STORAGE';
 
   AlertLocalDataSource({required this.sharedPreferences});
 
-  Future<List<Alert>> getOfflineAlerts() async {
-    final jsonString = sharedPreferences.getString(cachedAlertsKey);
+  ///Reading stored alerts from Shared Preferences, if such stored record exists, otherwise returning empty List
+  Future<List<Alert>> getStoredAlerts() async {
+    final readAlerts = sharedPreferences.getString(_storedAlertsKey);
 
-    if (jsonString != null) {
-      final List<dynamic> decodedJson = json.decode(jsonString);
-      return decodedJson.map((jsonMap) => Alert.fromJson(jsonMap)).toList();
+    if (readAlerts != null) {
+      final List<dynamic> decodedAlerts = jsonDecode(readAlerts);
+
+      return decodedAlerts.map((jsonMap) => Alert.fromJson(jsonMap)).toList();
     } else {
       return [];
     }
   }
 
-  Future<void> cacheAlerts(List<Alert> alertsToCache) async {
-    final List<Map<String, dynamic>> jsonList = alertsToCache
+  ///Saving Alerts to local storage in SharedPreferences
+  Future<void> saveAlerts(List<Alert> alertsToSave) async {
+    final List<Map<String, dynamic>> preparedData = alertsToSave
         .map((alert) => alert.toJson())
         .toList();
 
-    final jsonString = json.encode(jsonList);
-    await sharedPreferences.setString(cachedAlertsKey, jsonString);
+    final preparedJson = json.encode(preparedData);
+    await sharedPreferences.setString(_storedAlertsKey, preparedJson);
   }
 
-  Future<bool> isAlertAlreadyNotified(int alertId) async {
-    final List<String> notifiedIds =
-        sharedPreferences.getStringList(notifiedAlertsKey) ?? [];
-    return notifiedIds.contains(alertId.toString());
+  ///Boolean method to check if alarm was played for a critical alert, prepared for no stored data
+  Future<bool> wasAlertAlreadyNotified(int alertId) async {
+    final List<String> notifiedAlertsIds =
+        sharedPreferences.getStringList(_storedNotifiedAlertsKey) ?? [];
+    return notifiedAlertsIds.contains(alertId.toString());
   }
 
+  ///Marking notified alert
   Future<void> markAlertAsNotified(int alertId) async {
-    final List<String> notifiedIds =
-        sharedPreferences.getStringList(notifiedAlertsKey) ?? [];
+    final List<String> notifiedAlertsIds =
+        sharedPreferences.getStringList(_storedNotifiedAlertsKey) ?? [];
 
-    if (!notifiedIds.contains(alertId.toString())) {
-      notifiedIds.add(alertId.toString());
-      await sharedPreferences.setStringList(notifiedAlertsKey, notifiedIds);
+    if (!notifiedAlertsIds.contains(alertId.toString())) {
+      notifiedAlertsIds.add(alertId.toString());
     }
+    await sharedPreferences.setStringList(
+      _storedNotifiedAlertsKey,
+      notifiedAlertsIds,
+    );
   }
 }

@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:alert_app/logic/general_layout_view_model.dart';
 import 'package:alert_app/logic/user_view_model.dart';
 import 'package:alert_app/screens/general_layout_screen.dart';
 import 'package:alert_app/screens/login_screen.dart';
@@ -13,10 +12,11 @@ class AuthService {
   final Dio _dio = GetIt.instance<Dio>();
   final FlutterSecureStorage _storage = GetIt.instance<FlutterSecureStorage>();
 
-  AuthService();
+  //AuthService();
 
-  Future<String?> login(String email, String password) async {
+  Future<String?> login(String email, String password, String serverIp) async {
     try {
+      _dio.options.baseUrl = 'http://$serverIp';
       final response = await _dio.post(
         '/api/auth/login',
         data: {'email': email, 'password': password},
@@ -24,7 +24,7 @@ class AuthService {
 
       if (response.statusCode == 200) {
         final token = response.data['access_token'];
-        await _storage.write(key: 'jwt_token', value: token);
+        await _storage.write(key: 'JWT_TOKEN', value: token);
 
         try {
           final settingsResponse = await _dio.get(
@@ -41,61 +41,65 @@ class AuthService {
                 key: 'user_groups',
                 value: json.encode(stringGroups),
               );
-
-              print("LOGIN DEBUG: Succesfully got the groups: $stringGroups");
+              debugPrint(
+                "LOGIN DEBUG: Succesfully got the groups: $stringGroups",
+              );
             }
           }
+          await _storage.write(key: 'LAST_SERVER_IP', value: serverIp);
         } catch (e) {
-          print("LOGIN DEBUG:Cannot aquire groups from /me/settings: $e");
+          debugPrint("LOGIN DEBUG:Cannot aquire groups from /me/settings: $e");
         }
 
         return token;
       }
       return null;
     } catch (e) {
-      print("Błąd sieci/API: $e");
       return null;
-    }
-  }
-
-  Future<void> logout() async {
-    try {
-      await _storage.delete(key: 'jwt_token');
-      await _storage.delete(key: 'user_groups');
-
-      debugPrint("AUTH SERVICE - User logged out, memory wiped");
-    } catch (e) {
-      debugPrint("AUTH SERVICE - Error with logout and memory wipe: $e");
     }
   }
 }
 
 ///Checking log in status on app startup
-class AuthGate extends StatelessWidget {
+class AuthGate extends StatefulWidget {
   const AuthGate({super.key});
 
   @override
+  State<AuthGate> createState() => _AuthGateState();
+}
+
+class _AuthGateState extends State<AuthGate> {
+  final FlutterSecureStorage _storage = GetIt.instance<FlutterSecureStorage>();
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<UserViewModel>(
+        context,
+        listen: false,
+      ).checkAuthorizationStatus();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return FutureBuilder<bool>(
-      future: context.read<UserViewModel>().checkAuthStatus(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+    return Consumer<UserViewModel>(
+      builder: (context, userViewModel, child) {
+        if (userViewModel.isLoading) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );
         }
-
-        final isLoggedIn = snapshot.data ?? false;
-        if (isLoggedIn) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            context.read<GeneralLayoutViewModel>().changePage(AppScreen.home);
-          });
-
+        if (userViewModel.isLoggedIn) {
           return const GeneralLayout();
         }
 
         return const LoginScreen();
       },
     );
+  }
+
+  Future<String?> getLastIp() async {
+    return await _storage.read(key: 'LAST_SERVER_IP');
   }
 }

@@ -1,3 +1,4 @@
+import 'package:alert_app/data/datasources/plugin_remote_data_source.dart';
 import 'package:alert_app/data/models/plugin_model.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
@@ -5,50 +6,38 @@ import 'package:dio/dio.dart';
 ///Getting "my plugins" data from remote source
 class PluginRepository extends ChangeNotifier {
   final Dio dio;
+  final PluginRemoteDataSource pluginRemoteDataSource;
 
-  PluginRepository({required this.dio});
+  PluginRepository({required this.dio, required this.pluginRemoteDataSource});
 
-  ///Getting all plugins from backend
+  ///Getting all plugins from backend and exposing the method to higher layers
   Future<List<Plugin>> fetchAllPlugins() async {
-    try {
-      final response = await dio.get('/api/local-scripts/list');
-      final List<dynamic> data = response.data as List<dynamic>;
-
-      return data.map((item) {
-        return Plugin.fromJson(item as Map<String, dynamic>);
-      }).toList();
-    } catch (e) {
-      debugPrint("PLUGIN REPOSITORY DEBUG: Error when connecting to API $e");
-      rethrow;
-    }
+    return pluginRemoteDataSource.getAllPlugins();
   }
 
-  ///Forcing plugin to run immediately once
+  ///Forcing plugin to run immediately once with optional arguments
   Future<String> forcePlugin(Plugin plugin, {String? arguments}) async {
+    final String fileName = plugin.fileName;
+    final String extension = plugin.language.value;
+
+    final String fullFileName = '$fileName$extension';
+
+    final Map<String, String> payload = {};
+    if (arguments != null && arguments.isNotEmpty) {
+      payload['arguments'] = arguments;
+    }
+
     try {
-      final String fileName = plugin.fileName;
-      final String extension = plugin.language.value;
-
-      final String fullFileName = extension.startsWith('.')
-          ? '$fileName$extension'
-          : '$fileName.$extension';
-
-      final Map<String, String> payload = {};
-      if (arguments != null && arguments.isNotEmpty) {
-        payload['arguments'] = arguments;
-      }
-
-      final response = await dio.post(
-        '/api/local-scripts/$fullFileName/run',
-        data: payload,
+      final response = await pluginRemoteDataSource.runPlugin(
+        fullFileName,
+        payload: payload,
       );
-
-      return response.data.toString();
+      return response;
     } catch (e) {
       debugPrint(
-        "PLUGIN REPOSITORY DEBUG: Error while running ${plugin.fileName}: $e",
+        'PLUGIN REPOSITORY - Error while forcing plungin, error message: $e',
       );
-      return "Run error: $e";
+      return '';
     }
   }
 
@@ -59,19 +48,18 @@ class PluginRepository extends ChangeNotifier {
     required String cronExpression,
     required bool active,
   }) async {
-    try {
-      final String fullFileName = extension.startsWith('.')
-          ? '$fileName$extension'
-          : '$fileName.$extension';
+    final String fullFileName = '$fileName$extension';
 
-      final response = await dio.put(
-        '/api/local-scripts/$fullFileName/edit',
-        data: {'cronExpression': cronExpression, 'active': active},
-      );
+    final response = await pluginRemoteDataSource.activatePluginWithCron(
+      fullFileName,
+      cronExpression,
+      active,
+    );
 
-      return response.statusCode == 200;
-    } catch (e) {
-      debugPrint("PLUGIN REPOSITORY DEBUG: Cron save error: $e");
+    if (response) {
+      return true;
+    } else {
+      debugPrint('PLUGIN REPOSITORY - Activating plugin with Cron failed');
       return false;
     }
   }

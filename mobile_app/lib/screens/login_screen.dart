@@ -16,6 +16,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _serverController = TextEditingController();
   bool _obscurePassword = true;
 
   @override
@@ -27,6 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _serverController.dispose();
     super.dispose();
   }
 
@@ -38,9 +40,9 @@ class _LoginScreenState extends State<LoginScreen> {
     final success = await userViewModel.signIn(
       _emailController.text.trim(),
       _passwordController.text,
+      _serverController.text.trim(),
     );
 
-    // Safety against using BuildContext if the screen was closed earlier
     if (!mounted) return;
 
     if (success) {
@@ -51,7 +53,6 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       );
     } else {
-      // Failure snackbar
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(t.login_error_message),
@@ -86,6 +87,16 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 40),
 
+              TextField(
+                controller: _serverController,
+                decoration: const InputDecoration(
+                  labelText: "Server addres",
+                  prefixIcon: Icon(Icons.cast_connected),
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.text,
+              ),
+              const SizedBox(height: 20),
               TextField(
                 controller: _emailController,
                 decoration: InputDecoration(

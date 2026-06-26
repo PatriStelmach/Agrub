@@ -3,84 +3,76 @@ import 'package:flutter/material.dart';
 import 'package:alert_app/data/repositories/plugin_repository.dart';
 
 class PluginsViewModel extends ChangeNotifier {
-  final PluginRepository _repository;
+  final PluginRepository pluginsRepository;
 
-  List<Plugin> _plugins = [];
-  List<Plugin> _sortedPlugins = [];
+  final Map<int, Plugin> _pluginsCache = {};
+
   bool _isLoading = false;
-  String? _errorMessage;
   String _currentSortProperty = 'fileName';
   bool _isAscending = true;
 
-  List<Plugin> get sortedPlugins => _sortedPlugins;
   bool get isLoading => _isLoading;
-  String? get errorMessage => _errorMessage;
   String get currentSortProperty => _currentSortProperty;
   bool get isAscending => _isAscending;
-  PluginsViewModel({required PluginRepository pluginsRepository})
-    : _repository = pluginsRepository;
+  List<Plugin> get pluginsList => _pluginsCache.values.toList();
 
-  Future<void> loadPlugins() async {
-    _setLoading(true);
-    _clearError();
+  PluginsViewModel({required this.pluginsRepository});
 
-    try {
-      _plugins = await _repository.fetchAllPlugins();
-      _applySorting();
-    } catch (e) {
-      _errorMessage = "Nie udało się załadować wtyczek: $e";
-      notifyListeners();
-    } finally {
-      _setLoading(false);
+  ///Fetching plugins from remote source
+  Future<void> fetchPlugins() async {
+    _isLoading = true;
+    notifyListeners();
+
+    final plugins = await pluginsRepository.fetchAllPlugins();
+
+    _pluginsCache.clear();
+    for (var plugin in plugins) {
+      _pluginsCache[plugin.id] = plugin;
     }
+
+    _isLoading = false;
+    notifyListeners();
   }
 
   ///Sorting method using a sorting factor
-  void sortPluginsBy(String property, {bool? ascending}) {
+  void sortPluginsBy(String property, bool ascending) {
     _currentSortProperty = property;
-    if (ascending != null) {
-      _isAscending = ascending;
-    }
-    _applySorting();
+    _isAscending = ascending;
+    sortPlugins(property, ascending);
+    notifyListeners();
   }
 
-  /// Private method for sorting
-  void _applySorting() {
-    if (_plugins.isEmpty) {
-      _sortedPlugins = [];
-      notifyListeners();
-      return;
-    }
+  ///Method sorting plugins by certain fields, ascending and descending change using compareTo() result values
+  List<Plugin> sortPlugins(String sortProperty, bool ascending) {
+    final List<Plugin> sortedList = _pluginsCache.values.toList();
 
-    final Map<String, Comparable Function(Plugin)> pluginGetters = {
-      'id': (plugin) => plugin.id,
-      'fileName': (plugin) => plugin.fileName,
-      'creator': (plugin) => plugin.creator,
-      'language': (plugin) => plugin.language.value,
-      'weight': (plugin) => plugin.weight,
-      'updatedAt': (plugin) => plugin.updatedAt,
-      'cronExpression': (plugin) => plugin.cronExpression,
-      'active': (plugin) => plugin.active ? 1 : 0,
-      'log': (plugin) => plugin.log ? 1 : 0,
-    };
+    sortedList.sort((a, b) {
+      int compareToValue;
+      switch (sortProperty) {
+        case 'fileName':
+          compareToValue = a.fileName.compareTo(b.fileName);
+        case 'creator':
+          compareToValue = a.language.index.compareTo(b.language.index);
+        case 'language':
+          compareToValue = a.language.index.compareTo(b.language.index);
+        case 'active':
+          final valueA = a.active ? 1 : 0;
+          final valueB = b.active ? 1 : 0;
+          compareToValue = valueA.compareTo(valueB);
 
-    final pluginGetter =
-        pluginGetters[_currentSortProperty] ?? (plugin) => plugin.fileName;
-    final newList = List<Plugin>.from(_plugins);
-    newList.sort((a, b) {
-      final valA = pluginGetter(a);
-      final valB = pluginGetter(b);
+        default:
+          compareToValue = a.id.compareTo(b.id);
+      }
 
-      return _isAscending ? valA.compareTo(valB) : valB.compareTo(valA);
+      return ascending ? compareToValue : -compareToValue;
     });
 
-    _sortedPlugins = newList;
-    notifyListeners();
+    return sortedList;
   }
 
   ///Calling force plugin method
   Future<void> startPlugin(Plugin plugin, {String? arguments}) async {
-    await _repository.forcePlugin(plugin, arguments: arguments);
+    await pluginsRepository.forcePlugin(plugin, arguments: arguments);
   }
 
   ///Method saving Cron settings
@@ -89,7 +81,7 @@ class PluginsViewModel extends ChangeNotifier {
     required String cronExpression,
     required bool isActive,
   }) async {
-    final success = await _repository.activatePluginWithCron(
+    final success = await pluginsRepository.activatePluginWithCron(
       fileName: plugin.fileName,
       extension: plugin.language.value,
       cronExpression: cronExpression,
@@ -97,19 +89,9 @@ class PluginsViewModel extends ChangeNotifier {
     );
 
     if (success) {
-      await loadPlugins();
+      await fetchPlugins();
     }
 
     return success;
-  }
-
-  void _setLoading(bool value) {
-    _isLoading = value;
-    notifyListeners();
-  }
-
-  void _clearError() {
-    _errorMessage = null;
-    notifyListeners();
   }
 }

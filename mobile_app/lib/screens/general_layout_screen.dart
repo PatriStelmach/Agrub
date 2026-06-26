@@ -1,17 +1,10 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import 'package:alert_app/l10n/app_localizations.dart';
 import 'package:alert_app/logic/general_layout_view_model.dart';
-import 'package:alert_app/logic/user_view_model.dart';
-import 'package:alert_app/logic/alerts_view_model.dart';
-import 'package:alert_app/data/services/push_notification_service.dart';
-
-import 'package:alert_app/screens/home_screen.dart';
-import 'package:alert_app/screens/alerts_screen.dart';
-import 'package:alert_app/screens/plugins_screen.dart';
+import 'package:alert_app/screens/home/home_screen.dart';
+import 'package:alert_app/screens/alert/alerts_screen.dart';
+import 'package:alert_app/screens/plugin/plugins_screen.dart';
 import 'package:alert_app/screens/user_screen.dart';
 import 'package:alert_app/screens/settings_screen.dart';
 
@@ -27,31 +20,9 @@ class _GeneralLayoutState extends State<GeneralLayout> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _startBackgroundServices();
+      final generalLayoutViewModel = context.read<GeneralLayoutViewModel>();
+      generalLayoutViewModel.startBackgroundServices();
     });
-  }
-
-  Future<void> _startBackgroundServices() async {
-    if (!mounted) return;
-
-    final userViewModel = context.read<UserViewModel>();
-    final alertsViewModel = context.read<AlertsViewModel>();
-    final pushService = context.read<PushNotificationService>();
-
-    final token = await userViewModel.repository.getToken();
-    final user = userViewModel.user;
-
-    if (token != null && user != null) {
-      alertsViewModel.initSseConnection(userGroup: user.group, token: token);
-      unawaited(alertsViewModel.fetchInitialAlerts());
-
-      try {
-        unawaited(pushService.registerDevice(token));
-        debugPrint("LAYOUT DEBUG: FCM Device registered successfully.");
-      } catch (e) {
-        debugPrint("LAYOUT DEBUG: Error with FCM registration: $e");
-      }
-    }
   }
 
   @override
@@ -64,7 +35,7 @@ class _GeneralLayoutState extends State<GeneralLayout> {
       AlertsScreen(),
       PluginsScreen(),
       UserScreen(),
-      SettingsScreen()
+      SettingsScreen(),
     ];
 
     return Scaffold(
@@ -82,7 +53,7 @@ class _GeneralLayoutState extends State<GeneralLayout> {
     );
   }
 
-  /// Showing correct title in app bar
+  /// Helper function for getting correct app bar title
   String _getAppBarTitle(AppScreen screen, AppLocalizations t) {
     switch (screen) {
       case AppScreen.home:
@@ -95,9 +66,6 @@ class _GeneralLayoutState extends State<GeneralLayout> {
         return t.navigation_user_profile;
       case AppScreen.settings:
         return t.navigation_settings;
-      case AppScreen.history:
-        return t.navigation_history;
-
     }
   }
 }
@@ -142,13 +110,7 @@ class NavDrawer extends StatelessWidget {
             currentScreen: layoutViewModel.activeScreen,
             onTap: () => _navigate(context, layoutViewModel, AppScreen.alerts),
           ),
-          _DrawerItemWidget(
-            icon: Icons.history,
-            title: t.navigation_history,
-            targetScreen: AppScreen.history,
-            currentScreen: layoutViewModel.activeScreen,
-            onTap: () => _navigate(context, layoutViewModel, AppScreen.history),
-          ),
+
           _DrawerItemWidget(
             icon: Icons.extension,
             title: t.navigation_plugins,
@@ -176,7 +138,7 @@ class NavDrawer extends StatelessWidget {
     );
   }
 
-  /// Drawer navigation
+  /// Drawer navigation, closing the drawer and setting newPage via ViewModel
   void _navigate(
     BuildContext context,
     GeneralLayoutViewModel layoutViewModel,

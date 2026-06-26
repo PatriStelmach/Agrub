@@ -11,13 +11,11 @@ import 'package:get_it/get_it.dart';
 import 'package:alert_app/data/models/alert_model.dart';
 import 'package:alert_app/data/repositories/alert_repository.dart';
 
-//Global function, so it can be called in Isolate
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
-  // Inicjalizacja DI (GetIt) dla procesu w tle
   if (!GetIt.instance.isRegistered<AlertRepository>()) {
     unawaited(setupLocator());
   }
@@ -27,8 +25,6 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   try {
     final rawData = message.data;
     if (rawData.isNotEmpty) {
-      debugPrint("FCM [BACKGROUND]: Przetwarzanie surowych danych...");
-
       final Alert alert = Alert.fromJson(rawData);
 
       final alertRepo = GetIt.instance<AlertRepository>();
@@ -104,7 +100,7 @@ Future<void> _showNotificationBasedOnSeverity(Alert alert) async {
   await localNotifications.show(
     id: alert.id,
     title: alert.severity == AlertSeverity.critical
-        ? "EXTREME ALERT!"
+        ? "CRITICAL ALERT!"
         : "New alert from: ${alert.source}",
     body: alert.subject,
     notificationDetails: NotificationDetails(android: androidDetails),

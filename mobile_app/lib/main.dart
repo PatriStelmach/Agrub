@@ -1,5 +1,7 @@
 import 'package:alert_app/data/services/auth_service.dart';
 import 'package:alert_app/firebase_options.dart';
+import 'package:alert_app/logic/debug_view_model.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -11,8 +13,7 @@ import 'package:alert_app/l10n/app_localizations.dart';
 import 'package:alert_app/themes/app_theme_default.dart';
 
 // Services & Repositories
-import 'package:alert_app/data/services/language_service.dart';
-import 'package:alert_app/data/services/navigation_service.dart';
+import 'package:alert_app/data/services/alarm_service.dart';
 import 'package:alert_app/data/services/push_notification_service.dart';
 import 'package:alert_app/data/services/fcm_background_handler.dart';
 import 'package:alert_app/data/repositories/alert_repository.dart';
@@ -49,9 +50,7 @@ class AppStateProvider extends StatelessWidget {
     return MultiProvider(
       providers: [
         // Global services
-        ChangeNotifierProvider(create: (_) => LanguageService()),
         ChangeNotifierProvider(create: (_) => SettingsViewModel()),
-        ChangeNotifierProvider(create: (_) => GeneralLayoutViewModel()),
         Provider<PushNotificationService>(
           create: (_) => PushNotificationService()..initNotificationHandling(),
         ),
@@ -61,8 +60,10 @@ class AppStateProvider extends StatelessWidget {
           return MultiProvider(
             providers: [
               ChangeNotifierProvider(
-                create: (_) =>
-                    UserViewModel(repository: locator<UserRepository>()),
+                create: (_) => UserViewModel(
+                  userRepository: locator<UserRepository>(),
+                  dio: locator<Dio>(),
+                ),
               ),
               ChangeNotifierProvider(
                 lazy: false,
@@ -72,16 +73,30 @@ class AppStateProvider extends StatelessWidget {
                       .read<PushNotificationService>(),
                 ),
               ),
+
               ChangeNotifierProvider(
                 create: (_) => PluginsViewModel(
                   pluginsRepository: locator<PluginRepository>(),
                 ),
+              ),
+              ChangeNotifierProvider(
+                create: (_) =>
+                    DebugViewModel(alarmService: locator<AlarmService>()),
               ),
             ],
             child: Builder(
               builder: (contextAfterAlerts) {
                 return MultiProvider(
                   providers: [
+                    ChangeNotifierProvider(
+                      create: (_) => GeneralLayoutViewModel(
+                        userViewModel: contextAfterAlerts.read<UserViewModel>(),
+                        alertsViewModel: contextAfterAlerts
+                            .read<AlertsViewModel>(),
+                        pushNotificationService: contextAfterAlerts
+                            .read<PushNotificationService>(),
+                      ),
+                    ),
                     ChangeNotifierProvider(
                       lazy: false,
                       create: (_) => HomeViewModel(
@@ -107,34 +122,18 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final languageService = context.watch<LanguageService>();
-
     final settingsViewModel = context.watch<SettingsViewModel>();
     return MaterialApp(
-      locale: languageService.currentLocale,
+      locale: settingsViewModel.currentLocale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: settingsViewModel.themeMode,
-      navigatorKey: locator<NavigationService>().navigatorKey,
+      navigatorKey: locator<AlarmService>().navigatorKey,
 
       home: const AuthGate(),
     );
   }
 }
-
-
-  /*
-
-T0D0:
-
-- severity change
-- komentarze porządne
-- testy
-- AlertRemoteDataSourceTest - There is no SSE test here - T0D0 as integration test for alert repository
-- refactoring, (FCM, pozostałe drobiazgi)
-- CONSIDER: refactoring, wywalenie wszystkich helper widget na rzecz class widget
-
-  */

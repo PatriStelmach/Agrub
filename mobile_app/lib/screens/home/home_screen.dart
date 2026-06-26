@@ -1,27 +1,36 @@
 import 'package:alert_app/logic/general_layout_view_model.dart';
+import 'package:alert_app/screens/home/nav_tile.dart';
+import 'package:alert_app/screens/home/stat_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:alert_app/logic/home_view_model.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:alert_app/l10n/app_localizations.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    final homeViewModel = context.read<HomeViewModel>();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      homeViewModel.triggerPingAndNotify();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context)!;
     final homeViewModel = context.watch<HomeViewModel>();
-    //T0D0: implement pinging in alertviewmodel or somewhere
-    // final DateTime? lastPingTime = await homeViewModel.pingBackend();
 
-    // late String shortPingTime;
-    // if(lastPingTime != null) {
-    //  shortPingTime =
-    //     "${lastPingTime.hour}:${lastPingTime.minute.toString().padLeft(2, '0')}:${lastPingTime.second.toString().padLeft(2, '0')}";
-    // }
-    //current Alert count
     final int activeAlertsCount = homeViewModel.activeAlertsCount;
-
     final criticalAlerts = homeViewModel.latestCriticalAlerts();
     final latestCritical = criticalAlerts.isNotEmpty
         ? criticalAlerts.first
@@ -35,22 +44,36 @@ class HomeScreen extends StatelessWidget {
           children: [
             Row(
               children: [
-                _buildStatCard(
-                  context,
-                  // title: lastPingTime != null ? t.statLastPing : "ATTENTION",
-                  //value: lastPingTime != null ? shortPingTime : "NO CONNECTION TO SERVER!"
-                  title: "placeholder",
-                  value: "placeholder",
+                StatCard(
+                  title: homeViewModel.lastPing == false
+                      ? "No connection"
+                      : "Last ping:",
+                  value: homeViewModel.lastPing == false
+                      ? "No connection"
+                      : DateFormat('HH:mm:ss a').format(DateTime.now()),
                   icon: Icons.sync,
-                  color: Colors.blueGrey,
+                  color: homeViewModel.lastPing == false
+                      ? Colors.redAccent
+                      : Colors.lightGreenAccent,
                 ),
+
                 const SizedBox(width: 12),
-                _buildStatCard(
-                  context,
+                StatCard(
                   title: t.statActiveAlerts,
                   value: activeAlertsCount.toString(),
                   icon: Icons.notifications_active,
                   color: activeAlertsCount > 0 ? Colors.orange : Colors.green,
+                ),
+              ],
+            ),
+
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => homeViewModel.triggerPingAndNotify(),
+                    child: const Text("Ping!"),
+                  ),
                 ),
               ],
             ),
@@ -104,8 +127,7 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(height: 12),
             Row(
               children: [
-                _buildNavTile(
-                  context,
+                NavTile(
                   label: t.navAllAlerts,
                   icon: Icons.list_alt,
                   color: Colors.indigo,
@@ -116,8 +138,7 @@ class HomeScreen extends StatelessWidget {
                   },
                 ),
                 const SizedBox(width: 12),
-                _buildNavTile(
-                  context,
+                NavTile(
                   label: t.navPlugins,
                   icon: Icons.extension,
                   color: Colors.teal,
@@ -130,84 +151,6 @@ class HomeScreen extends StatelessWidget {
               ],
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStatCard(
-    BuildContext context, {
-    required String title,
-    required String value,
-    required IconData icon,
-    required Color color,
-  }) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withValues(alpha: 0.5)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(icon, color: color),
-            const SizedBox(height: 8),
-            Text(
-              title,
-              style: TextStyle(color: color, fontWeight: FontWeight.w600),
-            ),
-            Text(
-              value,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavTile(
-    BuildContext context, {
-    required String label,
-    required IconData icon,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return Expanded(
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          height: 120,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: color.withValues(alpha: 0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, color: Colors.white, size: 40),
-              const SizedBox(height: 8),
-              Text(
-                label,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );

@@ -1,18 +1,26 @@
 import 'package:flutter/material.dart';
 
 class SettingsViewModel extends ChangeNotifier {
+  Locale _currentLocale = const Locale('en');
+
   ThemeMode _themeMode = ThemeMode.dark;
+
+  Locale get currentLocale => _currentLocale;
 
   ThemeMode get themeMode => _themeMode;
 
-  bool get isDarkMode => _themeMode == ThemeMode.dark;
-
+  ///Toggling between themes
   void toggleTheme() {
-    if (_themeMode == ThemeMode.light) {
-      _themeMode = ThemeMode.dark;
-    } else {
-      _themeMode = ThemeMode.light;
-    }
+    _themeMode == ThemeMode.light
+        ? _themeMode = ThemeMode.dark
+        : _themeMode = ThemeMode.light;
+
+    notifyListeners();
+  }
+
+  ///Changing global language
+  void changeLanguage(String languageCode) {
+    _currentLocale = Locale(languageCode);
     notifyListeners();
   }
 }

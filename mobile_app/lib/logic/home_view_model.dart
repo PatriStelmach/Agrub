@@ -8,11 +8,10 @@ import '../data/models/alert_model.dart';
 class HomeViewModel extends ChangeNotifier {
   final AlertsViewModel alertsViewModel;
   final AlertRepository alertsRepository;
-  Future<void> getMyToken() async {
-    final String? token = await FirebaseMessaging.instance.getToken();
-    debugPrint("My FCM Token: $token");
-  }
+  int get activeAlertsCount => alertsViewModel.alertsList.length;
 
+  bool? _lastPing;
+  bool? get lastPing => _lastPing;
   HomeViewModel({
     required this.alertsViewModel,
     required this.alertsRepository,
@@ -20,33 +19,32 @@ class HomeViewModel extends ChangeNotifier {
     alertsViewModel.addListener(notifyListeners);
   }
 
-  int get activeAlertsCount => alertsViewModel.alertsList.length;
-  //T0D0: To be handled
-  DateTime? get lastPing => null;
+  /// Getting FCM token
+  Future<void> getMyToken() async {
+    final String? token = await FirebaseMessaging.instance.getToken();
+    debugPrint("My FCM Token: $token");
+  }
 
-  Future<DateTime?> pingBackend() async {
-    final ping = await alertsRepository.checkBackendConnection();
+  ///Method to ping backend via repository method
+  Future<bool> pingBackend() async {
+    final bool ping = await alertsRepository.checkBackendConnection();
     if (ping) {
-      return DateTime.now();
+      return true;
     } else {
-      return null;
+      return false;
     }
   }
 
-  List<Alert> latestAlerts() {
-    final List<Alert> allAlerts = List<Alert>.from(alertsViewModel.alertsList);
-    allAlerts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-    return allAlerts.take(3).toList();
+  ///Method to call update variable and update screens
+  Future<void> triggerPingAndNotify() async {
+    _lastPing = await pingBackend();
+    notifyListeners();
   }
 
+  ///Getting latest critical alerts for display
   List<Alert> latestCriticalAlerts() {
     return alertsViewModel.alertsList
         .where((alert) => alert.severity == AlertSeverity.critical)
         .toList();
-  }
-
-  void refresh() {
-    debugPrint("HomeViewModel: Manual refresh");
-    notifyListeners();
   }
 }
