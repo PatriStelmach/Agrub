@@ -25,8 +25,6 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   try {
     final rawData = message.data;
     if (rawData.isNotEmpty) {
-      debugPrint("FCM [BACKGROUND]: Przetwarzanie surowych danych...");
-
       final Alert alert = Alert.fromJson(rawData);
 
       final alertRepo = GetIt.instance<AlertRepository>();
@@ -102,7 +100,7 @@ Future<void> _showNotificationBasedOnSeverity(Alert alert) async {
   await localNotifications.show(
     id: alert.id,
     title: alert.severity == AlertSeverity.critical
-        ? "EXTREME ALERT!"
+        ? "CRITICAL ALERT!"
         : "New alert from: ${alert.source}",
     body: alert.subject,
     notificationDetails: NotificationDetails(android: androidDetails),

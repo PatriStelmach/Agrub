@@ -102,6 +102,7 @@ class AlertsViewModel extends ChangeNotifier {
         .getAlertsUpdateStream(userRole: userRole, token: token)
         .listen((message) {
           _handleIncomingSseUpdate(message);
+          notifyListeners();
         });
   }
 
@@ -125,7 +126,7 @@ class AlertsViewModel extends ChangeNotifier {
 
       if (message.containsKey('newSeverity')) {
         updated = updated.copyWith(
-          severity: AlertSeverity.values[message['severity']],
+          severity: AlertSeverity.values[message['newSeverity']],
         );
       }
       if (message.containsKey('ack')) {
@@ -141,6 +142,7 @@ class AlertsViewModel extends ChangeNotifier {
       unawaited(_checkingForEmergency(updated));
     }
     await alertsRepository.saveAlertsToOfflineCache(alertsList);
+    await fetchInitialAlerts();
 
     notifyListeners();
   }
@@ -163,7 +165,6 @@ class AlertsViewModel extends ChangeNotifier {
   void sortAlertsBy(String property, bool ascending) {
     _currentSortProperty = property;
     _isAscending = ascending;
-    sortAlerts(property, ascending);
     notifyListeners();
   }
 

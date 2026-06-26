@@ -55,34 +55,6 @@ void main() {
       expect(testResult.length, 1);
       expect(testResult.first, testAlert);
     });
-
-    //T0D0 - need to finish this test and add another for 35-36 to get 100% coverage
-    test(
-      'Should return alerts stored locally when remote data source throws exception',
-      () async {
-        final testException = Exception('General exception');
-
-        final localAlerts = [
-          Alert(
-            id: 10,
-            subject: "Mock Alert",
-            source: "Mock Server",
-            severity: AlertSeverity.medium,
-            status: AlertStatus.sent,
-            createdAt: DateTime.parse("2026-06-14 19:43:19.634"),
-            message: "Test alert for unit testing",
-            author: " Tester",
-            acknowledged: false,
-          ),
-        ];
-        // when(
-        //   () => mockRemoteDataSource.fetchActiveAlerts(),
-        // ).thenAnswer((_) async => throw testException);
-        // when(
-        //   () => mockLocalDataSource.fetch(),
-        // ).thenAnswer((_) async => throw testException);
-      },
-    );
   });
 
   group('acknowledgeAlert', () {

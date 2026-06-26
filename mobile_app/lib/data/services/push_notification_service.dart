@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:alert_app/data/services/alarm_service.dart';
 import 'package:alert_app/locator.dart';
 import 'package:flutter/material.dart';
@@ -17,33 +16,32 @@ class PushNotificationService {
   PushNotificationService();
 
   ///Function handling incoming notification depending on what is the case with app activity
+  ///Three paths: app not running at all, app minimized, app open
   Future<void> initNotificationHandling() async {
-    //Aplication not running at all
     final RemoteMessage? initialMessage = await fcm.getInitialMessage();
     if (initialMessage != null) {
-      _handleMessage(initialMessage);
+      final rawData = initialMessage.data;
+
+      if (rawData.isNotEmpty) {
+        _messageController.add(rawData);
+      }
     }
 
-    //Application minimized
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      _handleMessage(message);
+      final rawData = message.data;
+
+      if (rawData.isNotEmpty) {
+        _messageController.add(rawData);
+      }
     });
 
-    // Application open
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      debugPrint("FCM: Otrzymano powiadomienie w trybie Foreground");
-      _handleMessage(message);
+      final rawData = message.data;
+
+      if (rawData.isNotEmpty) {
+        _messageController.add(rawData);
+      }
     });
-  }
-
-  void _handleMessage(RemoteMessage message) {
-    final rawData = message.data;
-
-    if (rawData.isNotEmpty) {
-      debugPrint("FCM: Przekazywanie surowych danych do AlertRepository...");
-
-      _messageController.add(rawData);
-    }
   }
 
   Future<void> registerDevice(String jwtToken) async {
@@ -65,14 +63,14 @@ class PushNotificationService {
           );
 
           if (response.statusCode == 200 || response.statusCode == 201) {
-            debugPrint("FCM: Token pomyślnie zarejestrowany na backendzie.");
+            debugPrint("FCM - Token registered succesfully.");
           }
         }
       } else {
-        debugPrint("FCM: Użytkownik odmówił uprawnień do powiadomień.");
+        debugPrint("FCM - User declined notification approval.");
       }
     } catch (e) {
-      debugPrint("FCM ERROR: Błąd podczas rejestracji tokenu: $e");
+      debugPrint("FCM - Error while registering the token - $e");
       await locator<AlarmService>().showEmergencyOverlay('FCM');
     }
   }

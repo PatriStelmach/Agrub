@@ -1,5 +1,4 @@
 import 'package:alert_app/data/models/alert_model.dart';
-import 'package:alert_app/data/services/alarm_service.dart';
 import 'package:alert_app/data/services/auth_service.dart';
 import 'package:alert_app/l10n/app_localizations.dart';
 import 'package:alert_app/locator.dart';
@@ -9,8 +8,6 @@ import 'package:alert_app/logic/home_view_model.dart';
 import 'package:alert_app/logic/plugins_view_model.dart';
 import 'package:alert_app/logic/settings_view_model.dart';
 import 'package:alert_app/logic/user_view_model.dart';
-import 'package:alert_app/main.dart';
-import 'package:alert_app/screens/home_screen.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';

@@ -12,7 +12,7 @@ class AuthService {
   final Dio _dio = GetIt.instance<Dio>();
   final FlutterSecureStorage _storage = GetIt.instance<FlutterSecureStorage>();
 
-  AuthService();
+  //AuthService();
 
   Future<String?> login(String email, String password, String serverIp) async {
     try {

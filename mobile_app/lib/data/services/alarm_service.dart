@@ -5,7 +5,6 @@ import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:alert_app/screens/alarm_overlay_screen.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:sound_mode/sound_mode.dart';
 import 'package:vibration/vibration.dart';
@@ -20,7 +19,6 @@ class AlarmService {
   ///Showing the alarm overlay, containing safeguard against overlay spam.
   ///Allows calling different messages to be shown
   Future<void> showEmergencyOverlay(String alarmType) async {
-    // If there is an alarm overlay already, return
     if (_isOverlayVisible) return;
 
     switch (alarmType) {
@@ -63,7 +61,7 @@ class AlarmService {
   ///Here should've been iOS alarm trigger, but for time being it is postponed due to constraints mentioned in
   ///our thesis. I've left conditional statement for potential future implementation
   Future<void> triggerAlarm() async {
-    String ringerStatus = SoundMode.ringerModeStatus.toString();
+    final String ringerStatus = SoundMode.ringerModeStatus.toString();
     debugPrint(ringerStatus);
 
     final bool isGranted = await Permission.accessNotificationPolicy.isGranted;

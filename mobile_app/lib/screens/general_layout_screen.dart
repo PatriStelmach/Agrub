@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:alert_app/l10n/app_localizations.dart';
 import 'package:alert_app/logic/general_layout_view_model.dart';
-import 'package:alert_app/screens/home_screen.dart';
+import 'package:alert_app/screens/home/home_screen.dart';
 import 'package:alert_app/screens/alert/alerts_screen.dart';
 import 'package:alert_app/screens/plugin/plugins_screen.dart';
 import 'package:alert_app/screens/user_screen.dart';

@@ -112,28 +112,28 @@ class _AlertsScreenState extends State<AlertsScreen>
                 value: 'title',
                 child: Text(
                   t.alerts_sort_title,
-                  style: const TextStyle(fontSize: 25),
+                  style: const TextStyle(fontSize: 20),
                 ),
               ),
               DropdownMenuItem(
                 value: 'createdAt',
                 child: Text(
                   t.alerts_sort_created_at,
-                  style: const TextStyle(fontSize: 25),
+                  style: const TextStyle(fontSize: 20),
                 ),
               ),
               DropdownMenuItem(
                 value: 'acknowledged',
                 child: Text(
                   t.alerts_sort_acknowledged,
-                  style: const TextStyle(fontSize: 25),
+                  style: const TextStyle(fontSize: 20),
                 ),
               ),
               DropdownMenuItem(
                 value: 'severity',
                 child: Text(
                   t.alerts_sort_severity,
-                  style: const TextStyle(fontSize: 25),
+                  style: const TextStyle(fontSize: 20),
                 ),
               ),
             ],
