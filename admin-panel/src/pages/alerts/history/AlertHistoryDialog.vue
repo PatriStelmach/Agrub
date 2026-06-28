@@ -11,32 +11,15 @@ import {Badge} from "@/components/ui/badge";
 import ActionsTable from "@/helpers_components/ActionsTable.vue";
 import {Button} from "@/components/ui/button";
 import {IconCheck, IconX} from "@tabler/icons-vue";
-import type {ActionResponse, HistoryAlert} from "@/types/types.ts";
-import {ref, watch, watchEffect} from "vue";
+import type {HistoryAlert} from "@/types/types.ts";
+import {watch} from "vue";
 import SeverityDiv from "@/helpers_components/SeverityDiv.vue";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {bigNameLabel} from "@/assets/cssFunctions.ts";
-import {useRoute} from "vue-router";
 import router from "@/router";
 
-const props = defineProps<{
-  alert: HistoryAlert
-}>()
-const route = useRoute()
-const isLoading = ref(true);
+const alert = defineModel<HistoryAlert | null>('alert');
 const isDialogOpen = defineModel<boolean>('isDialogOpen')
-
-const actions = ref<ActionResponse[]>([])
-const getActions = async () => {
-  actions.value = props.alert.actions
-  isLoading.value = false
-}
-
-watchEffect( () => {
-  if(route.params.alert === String(props.alert.id)) {
-    isDialogOpen.value = true
-  }
-})
 
 watch(isDialogOpen, (newValue, oldValue) => {
   if (newValue === false && oldValue === true) {
@@ -48,10 +31,11 @@ watch(isDialogOpen, (newValue, oldValue) => {
 
 <template>
   <Dialog v-model:open="isDialogOpen">
-    <DialogTrigger as-child @click="getActions">
+    <DialogTrigger as-child>
       <slot />
     </DialogTrigger>
     <DialogContent
+      v-if="alert"
       :show-close-button="false"
       :class=" 'max-w-280! h-140!' +
         ` border-2 shadow-[0_0_1rem_2px] shadow-severity-${alert.severity}/70 border-severity-${alert.severity}/70 duration-500`">
@@ -71,45 +55,53 @@ watch(isDialogOpen, (newValue, oldValue) => {
               Review alert details
             </DialogDescription>
           </DialogHeader>
-            <div class="grid gap-y-4  *:flex *:space-x-2 *:items-center [&_p]:text-lg! [&_p]:text-comment  pb-2">
-              <div >
-                <h1 :class="bigNameLabel">Subject: </h1>
-                <p id="subject"  > {{ props.alert.subject}}</p>
+          <div class="grid gap-y-4  *:flex *:space-x-2 *:items-center [&_p]:text-lg! [&_p]:text-comment  pb-2">
+            <div >
+              <h1 :class="bigNameLabel">Subject: </h1>
+              <p id="subject"  > {{ alert.subject}}</p>
+            </div>
+            <div class="items-start!" >
+              <h1 :class="bigNameLabel">Message: </h1>
+              <p id="alert-message" > {{ alert.message}}</p>
+            </div>
+            <div >
+              <h1 :class="bigNameLabel">Source: </h1>
+              <Badge variant="source">{{ alert.source}}</Badge>
+            </div>
+            <div >
+              <h1 :class="bigNameLabel">Origin: </h1>
+              <RouterLink
+                :to="(alert.originType === 'ZABBIX' || alert.originType === 'WAZUH' || alert.originType === 'NAGIOS') ?
+               `/settings/systems/${alert.originType}` :
+                `/my_plugins/${alert.source}`">
+                <Badge
+                  class="whitespace-break-spaces"
+                  variant="origin"
+                >{{alert.originType}}</Badge>
+              </RouterLink>
+            </div>
+            <div class="flex items-end">
+              <h1 :class="bigNameLabel">ACK: </h1>
+              <div class="flex items-end space-x-2">
+                <Button variant="outline" class="size-7 cursor-default">
+                  <IconCheck
+                    v-if="alert.isAcknowledged"
+                    class="size-5 text-green-badge "/>
+                  <IconX
+                    v-else
+                    class="size-5  text-red-badge "/>
+                </Button>
+                <span class="text-comment text-lg">{{ alert.isAcknowledged ? 'Acknowledged' : 'Unacknowledged'  }}</span>
               </div>
-              <div class="items-start!" >
-                <h1 :class="bigNameLabel">Message: </h1>
-                <p id="alert-message" > {{ props.alert.message}}</p>
-              </div>
-              <div >
-                <h1 :class="bigNameLabel">Source: </h1>
-                <Badge variant="source">{{ props.alert.source}}</Badge>
-              </div>
-              <div >
-                <h1 :class="bigNameLabel">Origin: </h1>
-                <Badge variant="origin">{{ props.alert.originType}}</Badge>
-              </div>
-              <div class="flex items-end">
-                <h1 :class="bigNameLabel">ACK: </h1>
-                <div class="flex items-end space-x-2">
-                  <Button variant="outline" class="size-7 cursor-default">
-                    <IconCheck
-                      v-if="alert.isAcknowledged"
-                      class="size-5 text-green-badge "/>
-                    <IconX
-                      v-else
-                      class="size-5  text-red-badge "/>
-                  </Button>
-                  <span class="text-comment text-lg">{{ alert.isAcknowledged ? 'Acknowledged' : 'Unacknowledged'  }}</span>
-                </div>
 
-              </div>
-              <div>
-                <h1 :class="bigNameLabel">Severity: </h1>
-                <SeverityDiv
-                  :severity="alert.severity"
-                />
-              </div>
-             </div>
+            </div>
+            <div>
+              <h1 :class="bigNameLabel">Severity: </h1>
+              <SeverityDiv
+                :severity="alert.severity"
+              />
+            </div>
+          </div>
         </TabsContent>
 
         <TabsContent value="history">

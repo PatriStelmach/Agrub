@@ -18,7 +18,6 @@ export enum MatchType {
 
 export interface ActiveAlert {
   id: number
-  externalEventId: string
   subject: string
   message: string
   source: string
@@ -228,6 +227,7 @@ export interface MyPlugin
   language: Language
   description?: string
   code?: string
+  arguments?: string
   weight: number
   tags: string[]
   cronExpression: string
@@ -246,12 +246,14 @@ export interface MyPluginsFromApi {
   updatedAt: Date
   weight: number
   tags: string[]
-  cronExpression: string,
+  cronExpression: string
+  arguments: string
 }
 
 export interface PluginDetails {
   description: string | undefined,
   code: string | undefined,
+  arguments: string | undefined,
 }
 
 export interface LibraryPlugin {

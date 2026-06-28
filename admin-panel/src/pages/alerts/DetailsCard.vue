@@ -25,9 +25,9 @@ const descriptionBox = computed(() => {
 <template>
   <Card
     :style="descriptionBox"
-    class="z-9999 max-w-120 border-2 border-secondary">
-    <CardHeader><Label class=" font-extrabold ">Subject: </Label> {{ data?.subject }}</CardHeader>
-    <CardContent class="max-w-full wrap-break-word"><Label class="pb-2 grid font-extrabold">Message:</Label> {{ data?.message}}</CardContent>
+    class="z-9999 min-w-80 max-w-120 border-2 border-primary/50">
+    <CardHeader><Label class=" font-extrabold max-w-full ">Subject: </Label> <span class="text-label">{{ data?.subject }}</span></CardHeader>
+    <CardContent class="max-w-full wrap-break-word"><Label class="pb-2 grid font-extrabold">Message:</Label><span class="text-label">{{ data?.message}}</span></CardContent>
   </Card>
 
 </template>

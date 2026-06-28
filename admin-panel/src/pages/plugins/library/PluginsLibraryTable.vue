@@ -24,7 +24,7 @@ import PluginDetailsDialog from "@/pages/plugins/PluginDetailsDialog.vue";
 import {useAuthStore} from "@/stores/authStore.ts";
 import {useServerSort} from "@/composables/useServerSort.ts";
 
-const props = defineProps<{
+defineProps<{
   plugins: LibraryPlugin[]
   isLoading: boolean;
 }>()

@@ -2,7 +2,7 @@
 
 import TopH1Div from "@/helpers_components/TopH1Div.vue";
 import ChartAlertsCountBySeverity from "@/pages/charts/ChartAlertsCountBySeverity.vue";
-import { IconCalendarQuestion, IconSend2, IconLoader} from "@tabler/icons-vue";
+import { IconChartBarOff, IconHistory, IconCalendarQuestion, IconSend2, IconLoader} from "@tabler/icons-vue";
 import {computed, onMounted, type Ref, ref} from "vue";
 import type {DateRange} from "reka-ui";
 import ChartAckOrCloseTime from "@/pages/charts/ChartAckOrCloseTime.vue";
@@ -22,6 +22,14 @@ import MyTagInput from "@/helpers_components/MyTagInput.vue";
 import {alertOriginType} from "@/data/alertOriginType.ts";
 import {toApiDate} from "@/helpers_functions/dateParser.ts";
 import api from "@/lib/axios.ts";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle
+} from "@/components/ui/empty";
 
 const locale = navigator.language
 const tz = getLocalTimeZone()
@@ -151,8 +159,7 @@ const getAnalyticsAlertsCountRequest = async (
       <ButtonGroup>
         <Popover v-model:open="isPopoverOpen">
           <PopoverTrigger as-child>
-            <Button variant="green_outline"> Charts configuration<IconCalendarQuestion/>
-            </Button>
+            <Button variant="green_outline"> Charts configuration<IconCalendarQuestion/></Button>
           </PopoverTrigger>
           <PopoverContent class="w-fit p-5 shadow-xl bg-background">
             <RangeCalendar
@@ -230,16 +237,47 @@ const getAnalyticsAlertsCountRequest = async (
 
     </TopH1Div>
       <Transition
-        class="max-h-[90vh] px-6 overflow-auto grid grid-cols-1 gap-y-30 *:h-[60vh]"
+        class="max-h-[90vh] px-6 overflow-auto grid grid-cols-1 gap-y-30 *:h-[60vh] relative"
         tag="div"
         name="fade">
         <div v-if="areChartsLoading">
           <BigLoadingBlock
-            v-for=" i in [1,2,3,5]"
+            v-for=" i in [1,2,3,4]"
             :key="i"
             class="h-140"
           />
         </div>
+        <Empty
+          class="top-1/5 w-full my-auto mx-auto"
+          v-else-if="rawAnalyticsData?.alerts.length === 0 || !rawAnalyticsData"
+        >
+          <EmptyHeader class="mx-auto">
+            <EmptyMedia>
+              <IconChartBarOff class="text-red-badge" size="48"/>
+            </EmptyMedia>
+            <EmptyTitle>
+              No data to display
+            </EmptyTitle>
+            <EmptyDescription class="flex flex-col gap-2">
+              <p>Invalid charts configuration.</p>
+              <p>Change data range or origins and try again.</p>
+            </EmptyDescription>
+            <EmptyContent>
+              <div class="flex gap-4 my-2">
+                <Button
+                  @click="isPopoverOpen = true"
+                  variant="green_outline">
+                  Charts configuration <IconCalendarQuestion/>
+                </Button>
+                <RouterLink to="alerts_history">
+                  <Button variant="blue_outline">
+                    Alerts history <IconHistory/>
+                  </Button>
+                </RouterLink>
+              </div>
+            </EmptyContent>
+          </EmptyHeader>
+        </Empty>
         <div v-else>
           <ChartAllAlerts
             :locale="locale"
