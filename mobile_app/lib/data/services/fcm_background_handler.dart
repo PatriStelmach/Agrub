@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:alert_app/locator.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -7,20 +6,22 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get_it/get_it.dart';
-
 import 'package:alert_app/data/models/alert_model.dart';
 import 'package:alert_app/data/repositories/alert_repository.dart';
 
+///Service handling FCM in the background, working in it's own Isolate
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
   if (!GetIt.instance.isRegistered<AlertRepository>()) {
-    unawaited(setupLocator());
+    await setupLocator();
   }
 
-  debugPrint("Handling a background message: ${message.messageId}");
+  debugPrint(
+    "FCM BACKGROUND HANDLER - Handling a background message: ${message.messageId}",
+  );
 
   try {
     final rawData = message.data;
@@ -38,17 +39,19 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
       }
 
       await alertRepo.saveAlertsToOfflineCache(offlineAlerts);
-      await _showNotificationBasedOnSeverity(alert);
+      await _notificationHandling(alert);
 
-      debugPrint("!!! BACKGROUND SYSTEM ALARM PROCESSED SUCCESSFULLY !!!");
+      debugPrint(
+        "FCM BACKGROUND HANDLER - Background message handled succesfully",
+      );
     }
   } catch (e) {
-    debugPrint("FCM [BACKGROUND] ERROR: Błąd przetwarzania w tle: $e");
+    debugPrint("FCM BACKGROUND HANDLER - Encountered error $e");
   }
 }
 
 /// Helper function to render Android native notification
-Future<void> _showNotificationBasedOnSeverity(Alert alert) async {
+Future<void> _notificationHandling(Alert alert) async {
   final FlutterLocalNotificationsPlugin localNotifications =
       FlutterLocalNotificationsPlugin();
 

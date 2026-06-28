@@ -43,17 +43,7 @@ class GeneralLayoutViewModel extends ChangeNotifier {
         token: token,
       );
       unawaited(alertsViewModel.fetchInitialAlerts());
-
-      try {
-        unawaited(pushNotificationService.registerDevice(token));
-        debugPrint(
-          "GENERAL LAYOUT VIEW MODEL - FCM Device registered successfully.",
-        );
-      } catch (e) {
-        debugPrint(
-          "GENERAL LAYOUT VIEW MODEL -  Error with FCM registration: $e",
-        );
-      }
+      await pushNotificationService.registerDevice(token);
     }
   }
 }

@@ -3,9 +3,9 @@ import 'package:alert_app/data/services/alarm_service.dart';
 import 'package:alert_app/locator.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-
 import 'package:firebase_messaging/firebase_messaging.dart';
 
+/// Handling notifications from FCM and getting them inside the app
 class PushNotificationService {
   final Dio dio = locator<Dio>();
   final FirebaseMessaging fcm = FirebaseMessaging.instance;
@@ -17,7 +17,7 @@ class PushNotificationService {
 
   ///Function handling incoming notification depending on what is the case with app activity
   ///Three paths: app not running at all, app minimized, app open
-  Future<void> initNotificationHandling() async {
+  Future<void> initializeNotificationHandling() async {
     final RemoteMessage? initialMessage = await fcm.getInitialMessage();
     if (initialMessage != null) {
       final rawData = initialMessage.data;
@@ -44,6 +44,7 @@ class PushNotificationService {
     });
   }
 
+  ///Registering device in backend for Firebase messaging
   Future<void> registerDevice(String jwtToken) async {
     try {
       final NotificationSettings settings = await fcm.requestPermission(
@@ -60,6 +61,7 @@ class PushNotificationService {
           final response = await dio.post(
             '/api/devices/token',
             options: Options(headers: {'Authorization': 'Bearer $jwtToken'}),
+            data: {'token': fcmToken},
           );
 
           if (response.statusCode == 200 || response.statusCode == 201) {

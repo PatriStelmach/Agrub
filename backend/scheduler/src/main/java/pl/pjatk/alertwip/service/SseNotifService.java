@@ -83,7 +83,7 @@ public class SseNotifService {
                 String alertIdStr = String.valueOf(alert.getId());
 
                 String severityIndex = String.valueOf(alert.getSeverity());
-                String statusStr = alert.getStatus() != null ? alert.getStatus().toString().toLowerCase() : "sent";
+                String statusStr = alert.getStatus() != null ? alert.getStatus().toLowerCase() : "sent";
                 String createdAtStr = alert.getCreatedAt() != null ? alert.getCreatedAt().toString() : java.time.Instant.now().toString();
 
                 Message message = Message.builder()
@@ -102,7 +102,7 @@ public class SseNotifService {
                         .setToken(token)
                         .build();
 
-                FirebaseMessaging.getInstance().sendAsync(message);
+                FirebaseMessaging.getInstance().send(message);
                 System.out.println("[FCM] Wysłano powiadomienie wybudzające do tokenu: " + token);
             }
         } catch (Exception e) {
