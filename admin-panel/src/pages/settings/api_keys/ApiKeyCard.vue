@@ -7,7 +7,6 @@ import {Badge} from "@/components/ui/badge";
 import type {ApiKey} from "@/types/types.ts";
 import {dateParser} from "@/helpers_functions/dateParser.js";
 import {Button} from "@/components/ui/button";
-import {useClipboard} from "@vueuse/core";
 import {
   Tooltip,
   TooltipContent,
@@ -23,7 +22,7 @@ const props = defineProps<{
 }>()
 const settingsStore = useSettingStore()
 const apiKey = ref<ApiKey>(props.propsAPiKey)
-const { copy } = useClipboard()
+// const { copy } = useClipboard()
 const isRevoking = ref<boolean>(false)
 const isDeleting = ref<boolean>(false)
 
@@ -35,6 +34,13 @@ const revoke = async(id: number) => {
       .catch((e) => toast.error(`API key could not be revoked: ${e.message}`))
       .finally(async () => isRevoking.value = false)
   },200)
+}
+
+const copy = (text: string) => {
+  navigator.clipboard
+    .writeText(text)
+    .then(() => toast.message(`Copied to clipboard`))
+    .catch((err) => toast.error(`Failed to copy: ${err}`))
 }
 
 const deleteApiKey = async(id: number) => {
@@ -92,12 +98,12 @@ const deleteApiKey = async(id: number) => {
         <IconSquareKey class="size-5"/>
         <h1 :class="bigNameLabel">Token:</h1>
         <div class="flex ">
-          <p class="wrap-break-word w-66" >{{ apiKey.token }}</p>
+          <p class="wrap-break-word w-60 lg:w-66" >{{ apiKey.token }}</p>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
                 <IconCopy
-                  @click="copy(apiKey.token!); toast.message(`Copied to clipboard`)"
+                  @click="copy(apiKey.token!)"
                   class="ml-2 mb-6 size-5 cursor-pointer hover:scale-115 text-label"/>
               </TooltipTrigger>
               <TooltipContent>
