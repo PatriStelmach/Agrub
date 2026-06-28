@@ -30,6 +30,7 @@ const isOpen = defineModel<boolean>('open', { default: false })
         <SheetDescription>{{ actionType === "create" ? 'Create new user account' : 'Change privileges and user data' }}</SheetDescription>
       </SheetHeader>
       <EditUserForm
+        v-model:isOpen="isOpen"
         :action-type="props.actionType"
         v-if="isOpen"
         :user="user" />

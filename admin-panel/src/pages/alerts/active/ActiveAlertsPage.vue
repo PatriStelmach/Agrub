@@ -14,6 +14,7 @@ import TopH1Div from "@/helpers_components/TopH1Div.vue";
 import ActiveAlertsTable from "@/pages/alerts/active/ActiveAlertsTable.vue";
 import ClientPagination from "@/helpers_components/ClientPagination.vue";
 import DetailsCard from '@/pages/alerts/DetailsCard.vue'
+import {useClientSort} from "@/composables/useClientSort.ts";
 
 const isLoading = ref(true)
 const alertStore = useAlertStore();
@@ -29,6 +30,12 @@ const {
   searchFilter,
   tableData
 } = useClientSearchFilter<ActiveAlert>(() => alertStore.currentAlerts,(item) => item.subject)
+const {
+  sortedData,
+  sortKey,
+  sortOrder,
+  toggleSort
+} = useClientSort<ActiveAlert>(() => filteredData.value as ActiveAlert[], 'createdAt');
 
 </script>
 
@@ -54,12 +61,15 @@ const {
       />
       <ActiveAlertsTable
       :isLoading="isLoading"
-      :tableData="tableData"
+      :sortedData="tableData"
+      :sortKey="sortKey"
+      :sortOrder="sortOrder"
       v-model:hoveredAlert="hoveredAlert"
+      @update:toggle-sort="toggleSort"
       >
       <ClientPagination
         :total="alertStore.currentAlerts.length"
-        :data="filteredData"
+        :data="sortedData"
         v-model:page-index="currentPage"
         v-model:page-size="pageSize"
         @update:paginatedData="updateData"
