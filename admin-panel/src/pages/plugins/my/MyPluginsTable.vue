@@ -27,7 +27,7 @@ import {
   IconPlayerPlay,
   IconLoader
 } from "@tabler/icons-vue"
-import {computed, ref, toRaw, watch, watchEffect} from "vue";
+import {computed, ref, watch, watchEffect} from "vue";
 import {useClientSort} from "@/composables/useClientSort";
 import SortableHead from "@/helpers_components/SortableHead.vue";
 import {
@@ -193,10 +193,11 @@ const nextRun = (plugin: MyPlugin) => {
   return plugin.cronExpression ?  dateParser(cronParser.parse(plugin.cronExpression).next().toDate()).fullDate.toString() : ''
 }
 
-const updateDetails = (code: string, description: string) => {
+const updateDetails = (code: string, description: string, args: string) => {
   if(unwrappedItem.value) {
     unwrappedItem.value.code = code
     unwrappedItem.value.description = description
+    unwrappedItem.value.arguments = args
   }
 }
 
