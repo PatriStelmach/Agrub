@@ -70,7 +70,15 @@ watch(isDialogOpen, (newValue, oldValue) => {
             </div>
             <div >
               <h1 :class="bigNameLabel">Origin: </h1>
-              <Badge variant="origin">{{ alert.originType}}</Badge>
+              <RouterLink
+                :to="(alert.originType === 'ZABBIX' || alert.originType === 'WAZUH' || alert.originType === 'NAGIOS') ?
+               `/settings/systems/${alert.originType}` :
+                `/my_plugins/${alert.source}`">
+                <Badge
+                  class="whitespace-break-spaces"
+                  variant="origin"
+                >{{alert.originType}}</Badge>
+              </RouterLink>
             </div>
             <div class="flex items-end">
               <h1 :class="bigNameLabel">ACK: </h1>

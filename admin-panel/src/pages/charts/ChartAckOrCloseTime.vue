@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { VisAxis, VisXYContainer, VisLine } from '@unovis/vue'
 import { ChartContainer, ChartCrosshair, ChartLegendContent, ChartTooltip, ChartTooltipContent, componentToString } from '@/components/ui/chart'
-import {bigNameLabel, smallNameLabel} from "@/assets/cssFunctions.ts"
+import {bigNameLabel} from "@/assets/cssFunctions.ts"
 import { computed} from "vue"
 import { type Granularity, type XYAnalytics } from "@/types/types.ts"
 import { fromDate } from '@internationalized/date'
@@ -70,7 +70,7 @@ const yAxisTickFormat = (value: number) => {
 
 const time = computed(()=> ({
   y : {
-    label: props.type === 'avg-close-time' ? "Average close time in minutes:" : "Average acknowledge in minutes: ",
+    label: props.type === 'avg-close-time' ? "Average closing time in minutes:" : "Average acknowledge in minutes: ",
     color: props.type === 'avg-close-time' ? '#F40031FF' : mode.value === 'light' ? '#48CF00FF' : '#08A800FF',
     text: averageValueFormatted.value
   },
@@ -126,11 +126,6 @@ const time = computed(()=> ({
           :color="time['y'].color"
         />
       </VisXYContainer>
-      <div
-        class="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 border-b-3 border-red-badge"
-        v-else>
-        <h1 :class="smallNameLabel">No data to show</h1>
-      </div>
       <ChartLegendContent/>
     </ChartContainer>
   </div>

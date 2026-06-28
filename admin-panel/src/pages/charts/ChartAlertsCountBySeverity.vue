@@ -10,7 +10,7 @@ import {
   ChartTooltipContent,
   componentToString
 } from '@/components/ui/chart'
-import {bigNameLabel, smallNameLabel} from "@/assets/cssFunctions.ts";
+import {bigNameLabel} from "@/assets/cssFunctions.ts";
 import {computed} from "vue";
 import {
   type AlertSeverityAnalitycs,
@@ -240,11 +240,7 @@ const totalChartLegendContent = computed(() => ({
           ]"
         />
       </VisXYContainer>
-      <div
-        class="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 border-b-3 border-red-badge"
-        v-else>
-        <h1 :class="smallNameLabel">No data to show</h1>
-      </div>
+
       <ChartLegendContent
         :alertsRawData="totalChartLegendContent as ChartConfig"
         :label1="`On average per ${currentGranularity.toLowerCase()}:`"

@@ -4,7 +4,7 @@ import { cva } from "class-variance-authority"
 export { default as Badge } from "./Badge.vue"
 
 export const badgeVariants = cva(
-  "hover:shadow-md text-xs transition-all! duration-150! lg:text-sm  2xl:text-lg  inline-flex items-center justify-center rounded-full border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden",
+  "hover:shadow-md text-xs transition-all! duration-150! lg:text-sm md:pt-1 lg:pt-0.5 lg:border-3 2xl:text-md  inline-flex items-center justify-center rounded-full border px-2 py-0.5 font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden",
   {
     variants: {
       variant: {
@@ -25,8 +25,8 @@ export const badgeVariants = cva(
           "border-transparent  border text-primary bg-input  " +
           " ",
         origin:
-          "border-blue-badge border-2  bg-blue-badge/10 hover:bg-transparent cursor-pointer " +
-          " hover:shadow-blue-badge  text-blue-badge hover:scale-102",
+          "border-blue-badge border-2  bg-blue-badge/20 hover:bg-transparent cursor-pointer " +
+          " hover:shadow-blue-badge  text-blue-badge hover:scale-102 font-semibold",
         ack_type:"border-green-badge/50 border-2  text-green-badge  bg-green-badge/20  text-xs",
         number:
         " items-start  bg-green-badge/70 h-5 min-w-5 px-1 rounded-full lg:text-xs! f tabular-nums text-primary"

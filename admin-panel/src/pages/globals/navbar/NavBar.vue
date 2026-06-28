@@ -13,7 +13,7 @@ import {
   IconLockCode,
   IconCode,
   IconHelp,
-  IconChartBar,
+  IconChartHistogram,
 } from "@tabler/icons-vue";
 import {
   Sidebar, SidebarContent,
@@ -78,7 +78,7 @@ const navItems = authStore.isAdmin ? [
   {
     label: 'Analytics',
     links: [
-      { label: 'Charts', to: 'charts', icon: IconChartBar },
+      { label: 'Charts', to: 'charts', icon: IconChartHistogram },
     ]
   },
 ] :
