@@ -61,6 +61,7 @@ class PushNotificationService {
           final response = await dio.post(
             '/api/devices/token',
             options: Options(headers: {'Authorization': 'Bearer $jwtToken'}),
+            data: {'token': fcmToken},
           );
 
           if (response.statusCode == 200 || response.statusCode == 201) {
