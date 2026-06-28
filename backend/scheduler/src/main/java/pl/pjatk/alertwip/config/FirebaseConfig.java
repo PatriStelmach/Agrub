@@ -17,7 +17,7 @@ public class FirebaseConfig {
             // Ładowanie pliku z resources
             InputStream serviceAccount = getClass()
                     .getClassLoader()
-                    .getResourceAsStream("alertAppServiceAccountKey.json");
+                    .getResourceAsStream("firebase_config.json");
 
             if (serviceAccount == null) {
                 System.err.println("FCM: Service account key file not found");

@@ -75,10 +75,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get login_button_submit => 'LOG IN';
 
   @override
+  String get ping_no_connection => 'No connection';
+
+  @override
+  String get ping_last_ping => 'Last ping:';
+
+  @override
   String get sectionPluginsScreen => '--- PLUGINS SCREEN ------------------------------------------------------------------------------------------------';
 
   @override
-  String get plugins_no_plugins_found => 'No plugins found. Consider checking the button in Debug Screen!';
+  String get plugins_no_plugins_found => 'No plugins found.';
 
   @override
   String get plugins_sort_by => 'Sort by - ';
@@ -271,6 +277,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get user_loading_data => 'Loading user data...';
+
+  @override
+  String get user_name => 'Name';
+
+  @override
+  String get user_surname => 'Surname';
 
   @override
   String get user_label_username => 'Username';

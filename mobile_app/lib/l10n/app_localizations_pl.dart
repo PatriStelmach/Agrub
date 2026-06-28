@@ -75,6 +75,12 @@ class AppLocalizationsPl extends AppLocalizations {
   String get login_button_submit => 'ZALOGUJ SIĘ';
 
   @override
+  String get ping_no_connection => 'Brak połączenia';
+
+  @override
+  String get ping_last_ping => 'Ostatni ping:';
+
+  @override
   String get sectionPluginsScreen => '--- PLUGINS SCREEN ------------------------------------------------------------------------------------------------';
 
   @override
@@ -271,6 +277,12 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get user_loading_data => 'Ładowanie danych użytkownika...';
+
+  @override
+  String get user_name => 'Imię';
+
+  @override
+  String get user_surname => 'Nazwisko';
 
   @override
   String get user_label_username => 'Nazwa użytkownika';

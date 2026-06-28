@@ -3,6 +3,7 @@ import 'package:alert_app/l10n/app_localizations.dart';
 import 'package:alert_app/screens/plugin/card_elements/cron_edit_dialog.dart';
 import 'package:alert_app/screens/plugin/card_elements/plugin_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class PluginCard extends StatelessWidget {
   final Plugin plugin;
@@ -28,15 +29,27 @@ class PluginCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(plugin.language.toString()),
-                    Text(plugin.tags.toString()),
+                    Text(plugin.active ? "Plugin active" : "Not active"),
                   ],
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(plugin.active.toString()),
-                    Text(plugin.updatedAt.toString()),
+                    Text(plugin.language.name),
+                    Text(plugin.tags.toString()),
+                  ],
+                ),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('Updated at: '),
+                    const Spacer(),
+                    Text(
+                      DateFormat(
+                        'dd.MM.yyyy HH:mm:ss',
+                      ).format(plugin.updatedAt),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 16),

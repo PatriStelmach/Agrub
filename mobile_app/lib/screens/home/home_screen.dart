@@ -46,10 +46,10 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 StatCard(
                   title: homeViewModel.lastPing == false
-                      ? "No connection"
-                      : "Last ping:",
+                      ? t.ping_no_connection
+                      : t.ping_last_ping,
                   value: homeViewModel.lastPing == false
-                      ? "No connection"
+                      ? t.ping_no_connection
                       : DateFormat('HH:mm:ss a').format(DateTime.now()),
                   icon: Icons.sync,
                   color: homeViewModel.lastPing == false

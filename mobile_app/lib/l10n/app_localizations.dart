@@ -227,6 +227,18 @@ abstract class AppLocalizations {
   /// **'LOG IN'**
   String get login_button_submit;
 
+  /// No description provided for @ping_no_connection.
+  ///
+  /// In en, this message translates to:
+  /// **'No connection'**
+  String get ping_no_connection;
+
+  /// No description provided for @ping_last_ping.
+  ///
+  /// In en, this message translates to:
+  /// **'Last ping:'**
+  String get ping_last_ping;
+
   /// No description provided for @sectionPluginsScreen.
   ///
   /// In en, this message translates to:
@@ -236,7 +248,7 @@ abstract class AppLocalizations {
   /// No description provided for @plugins_no_plugins_found.
   ///
   /// In en, this message translates to:
-  /// **'No plugins found. Consider checking the button in Debug Screen!'**
+  /// **'No plugins found.'**
   String get plugins_no_plugins_found;
 
   /// No description provided for @plugins_sort_by.
@@ -598,6 +610,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Loading user data...'**
   String get user_loading_data;
+
+  /// No description provided for @user_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get user_name;
+
+  /// No description provided for @user_surname.
+  ///
+  /// In en, this message translates to:
+  /// **'Surname'**
+  String get user_surname;
 
   /// No description provided for @user_label_username.
   ///
