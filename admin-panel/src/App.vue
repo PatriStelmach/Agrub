@@ -56,7 +56,7 @@ watch(() => authStore.isAuthenticated,(newValue) => {
       :expand="false"
       close-button-position="top-right"
       :gap="5"
-      :visibleToasts="16"
+      :visibleToasts="12"
     />
     <header class="absolute top-0 right-2 flex w-full h-10 items-center">
         <component

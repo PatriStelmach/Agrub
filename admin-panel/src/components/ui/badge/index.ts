@@ -29,7 +29,7 @@ export const badgeVariants = cva(
           " hover:shadow-blue-badge  text-blue-badge hover:scale-102 font-semibold",
         ack_type:"border-green-badge/50 border-2  text-green-badge  bg-green-badge/20  text-xs",
         number:
-        " items-start  bg-green-badge/70 h-5 min-w-5 px-1 rounded-full lg:text-xs! f tabular-nums text-primary"
+        " items-start  bg-green-badge/70 h-5 min-w-5 px-1 py-0.5! lg:py-0! rounded-full lg:text-xs! f tabular-nums text-primary"
       },
     },
     defaultVariants: {
