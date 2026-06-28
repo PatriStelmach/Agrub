@@ -12,8 +12,6 @@ class AuthService {
   final Dio _dio = GetIt.instance<Dio>();
   final FlutterSecureStorage _storage = GetIt.instance<FlutterSecureStorage>();
 
-  //AuthService();
-
   Future<String?> login(String email, String password, String serverIp) async {
     try {
       _dio.options.baseUrl = 'http://$serverIp';
@@ -42,13 +40,15 @@ class AuthService {
                 value: json.encode(stringGroups),
               );
               debugPrint(
-                "LOGIN DEBUG: Succesfully got the groups: $stringGroups",
+                "LOGIN SERVICE - Succesfully got the groups: $stringGroups",
               );
             }
           }
           await _storage.write(key: 'LAST_SERVER_IP', value: serverIp);
         } catch (e) {
-          debugPrint("LOGIN DEBUG:Cannot aquire groups from /me/settings: $e");
+          debugPrint(
+            "LOGIN SERVICE - Cannot aquire groups from /me/settings: $e",
+          );
         }
 
         return token;
@@ -61,6 +61,8 @@ class AuthService {
 }
 
 ///Checking log in status on app startup
+///Technically it is a widget, not a pure service, but it is a global login gate
+///That's why I(KK s18951) decided to keep it in service file
 class AuthGate extends StatefulWidget {
   const AuthGate({super.key});
 
@@ -69,7 +71,6 @@ class AuthGate extends StatefulWidget {
 }
 
 class _AuthGateState extends State<AuthGate> {
-  final FlutterSecureStorage _storage = GetIt.instance<FlutterSecureStorage>();
   @override
   void initState() {
     super.initState();
@@ -97,9 +98,5 @@ class _AuthGateState extends State<AuthGate> {
         return const LoginScreen();
       },
     );
-  }
-
-  Future<String?> getLastIp() async {
-    return await _storage.read(key: 'LAST_SERVER_IP');
   }
 }

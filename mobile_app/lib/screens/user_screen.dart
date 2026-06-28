@@ -36,9 +36,9 @@ class UserScreen extends StatelessWidget {
 
             Row(
               children: [
-                const Text(
-                  'Name',
-                  style: TextStyle(fontSize: 24, color: Colors.grey),
+                Text(
+                  t.user_name,
+                  style: const TextStyle(fontSize: 24, color: Colors.grey),
                 ),
                 const Spacer(),
 
@@ -54,9 +54,9 @@ class UserScreen extends StatelessWidget {
 
             Row(
               children: [
-                const Text(
-                  'Surname',
-                  style: TextStyle(fontSize: 24, color: Colors.grey),
+                Text(
+                  t.user_surname,
+                  style: const TextStyle(fontSize: 24, color: Colors.grey),
                 ),
                 const Spacer(),
                 Text(
