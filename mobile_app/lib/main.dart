@@ -29,10 +29,8 @@ import 'package:alert_app/logic/home_view_model.dart';
 import 'package:alert_app/logic/user_view_model.dart';
 
 Future<void> main() async {
-  //checking if flutter engine is ready
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Firebase initialization
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   await setupLocator();
@@ -52,7 +50,8 @@ class AppStateProvider extends StatelessWidget {
         // Global services
         ChangeNotifierProvider(create: (_) => SettingsViewModel()),
         Provider<PushNotificationService>(
-          create: (_) => PushNotificationService()..initNotificationHandling(),
+          create: (_) =>
+              PushNotificationService()..initializeNotificationHandling(),
         ),
       ],
       child: Builder(
