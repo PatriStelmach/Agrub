@@ -127,7 +127,7 @@ const cronWrappedDescription = (cron: string) => {
       return [e, false]
     }
   }
-  return [cron, true]
+  return [cron, false]
 }
 
 watch(searchFilter, () => {
@@ -141,6 +141,16 @@ const checkAll = () => {
 
 const changeStatus = () => {
   if(!unwrappedItem.value && authStore.isAdmin) {
+    const invalidCrons:string[] = []
+    checkedPlugins.value.forEach(fullName => {
+        const plugin = allMyPlugins.value?.find(p => p.fullName === fullName)
+        if(plugin && !cronWrappedDescription(plugin.cronExpression)[0])
+          invalidCrons.push(plugin.name)
+      })
+    if(invalidCrons.length) {
+      toast.warning(`Unable to change status: [${invalidCrons?.join(', ').toString()}] have invalid or empty CRON`)
+      return
+    }
     changeMyPluginStatusRequest(checkedPlugins.value)
       .then(res => {
         toast.success(`Successfully changed status`)
@@ -169,8 +179,10 @@ const getDetails = async (fileName: string) => {
       if(unwrappedItem.value && originalItem.value) {
         unwrappedItem.value.code = res?.code
         unwrappedItem.value.description = res?.description
+        unwrappedItem.value.arguments = res?.arguments
         originalItem.value.code = res?.code
         originalItem.value.description = res?.description
+        originalItem.value.arguments = res?.arguments
       }
     })
     .catch((err) => toast.error(`Error fetching plugin details: ${err.message}`))
@@ -181,10 +193,11 @@ const nextRun = (plugin: MyPlugin) => {
   return plugin.cronExpression ?  dateParser(cronParser.parse(plugin.cronExpression).next().toDate()).fullDate.toString() : ''
 }
 
-const updateDetails = (code: string, description: string) => {
+const updateDetails = (code: string, description: string, args: string) => {
   if(unwrappedItem.value) {
     unwrappedItem.value.code = code
     unwrappedItem.value.description = description
+    unwrappedItem.value.arguments = args
   }
 }
 
@@ -213,11 +226,13 @@ const savePlugin = async () => {
           allMyPlugins.value = res
         })
         .catch(e => toast.error(`Editing "${unwrappedItem.value?.name}" failed with error ${e.message}`))
+        .finally(() => isEditLoading.value = false)
     }
-    else
+    else {
+      isEditLoading.value = false
       toast.info('No changes were made')
+    }
   }
-  isEditLoading.value = false
   onCloseAndSave()
 }
 
@@ -327,6 +342,7 @@ const onEdit = (plugin: MyPlugin) => {
     <PluginDetailsDialog
       v-model:isCodeDialogOpen="isCodeDialogOpen"
       :editable="authStore.isAdmin"
+      :arguments="unwrappedItem?.arguments ?? ''"
       :code="unwrappedItem?.code ?? ''"
       :description="unwrappedItem?.description ?? ''"
       @update:save-changes="updateDetails"

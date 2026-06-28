@@ -8,6 +8,7 @@ export const editMyPluginRequest = async (plugin: MyPlugin) => {
       code: plugin.code,
       description: plugin.description,
       severity: plugin.severity,
+      arguments: plugin.arguments,
       cronExpression: plugin.cronExpression,
       tags: plugin.tags,
       active: plugin.active

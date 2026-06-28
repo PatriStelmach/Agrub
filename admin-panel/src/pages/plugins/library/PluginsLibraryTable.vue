@@ -24,7 +24,7 @@ import PluginDetailsDialog from "@/pages/plugins/PluginDetailsDialog.vue";
 import {useAuthStore} from "@/stores/authStore.ts";
 import {useServerSort} from "@/composables/useServerSort.ts";
 
-const props = defineProps<{
+defineProps<{
   plugins: LibraryPlugin[]
   isLoading: boolean;
 }>()
@@ -33,7 +33,7 @@ const authStore = useAuthStore()
 const getDetailsLoading = ref<boolean>(false)
 const isDownloading = ref(false)
 const isCodeDialogOpen = ref(false)
-const openedPluginDetails = ref<PluginDetails>({ code: '', description: ''})
+const openedPluginDetails = ref<PluginDetails>({ code: '', description: '', arguments: ''})
 
 const sortedHead =  defineModel<{ sortKey: string; sortOrder: string }>('sortedHead')
 const { sortKey, sortOrder, toggleSort } =
@@ -74,6 +74,7 @@ const downloadPlugin = (plugin: LibraryPlugin) => {
     :editable="false"
     :code="openedPluginDetails.code ?? ''"
     :description="openedPluginDetails.description ?? ''"
+    :arguments="openedPluginDetails.arguments ?? ''"
     :is-loading="getDetailsLoading"
   />
 

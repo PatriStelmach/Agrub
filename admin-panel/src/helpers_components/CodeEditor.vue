@@ -20,7 +20,7 @@ const indentUnit = () => (props.tabSize > 0 ? ' '.repeat(props.tabSize) : '\t')
 
 function setValue(newValue: string, selStart: number, selEnd: number) {
   emit('update:modelValue', newValue)
-  // przywróć zaznaczenie po aktualizacji modelu
+  // przywraca zaznaczenie po aktualizacji modelu
   requestAnimationFrame(() => {
     const el = textareaRef.value
     if (!el) return
@@ -54,7 +54,7 @@ function handleKeydown(e: KeyboardEvent) {
       let firstLineDelta = 0
 
       if (e.shiftKey) {
-        // usuń wcięcie z początku każdej linii (jeśli jest)
+        // usuwa wcięcie z początku każdej linii (jeśli jest)
         newBlock = block
           .split('\n')
           .map((line, i) => {
@@ -74,7 +74,7 @@ function handleKeydown(e: KeyboardEvent) {
           })
           .join('\n')
       } else {
-        // dodaj wcięcie na początku każdej linii
+        // dodaje wcięcie na początku każdej linii
         const lines = block.split('\n')
         newBlock = lines.map((line) => indent + line).join('\n')
         firstLineDelta = indent.length
@@ -87,7 +87,7 @@ function handleKeydown(e: KeyboardEvent) {
 
     // pojedyncza linia / brak zaznaczenia
     if (e.shiftKey) {
-      // usuń wcięcie z początku bieżącej linii
+      // usuwa wcięcie z początku bieżącej linii
       const lineStart = value.lastIndexOf('\n', start - 1) + 1
       const lineHead = value.slice(lineStart, lineStart + indent.length)
       if (lineHead === indent) {
@@ -110,7 +110,7 @@ function handleKeydown(e: KeyboardEvent) {
     const match = currentLine.match(/^[ \t]*/)
     const leading = match ? match[0] : ''
 
-    // bonus: jeśli linia kończy się na { [ ( — dorzuć dodatkowe wcięcie
+    // jeśli linia kończy się na { [ ( — dorzuć dodatkowe wcięcie
     const trimmed = value.slice(lineStart, start).trimEnd()
     const extra = /[{[(]$/.test(trimmed) ? indent : ''
 
@@ -133,7 +133,7 @@ function onInput(e: Event) {
 <template>
   <textarea
     ref="textareaRef"
-    class="code-area min-h-96 h-full m-2 w-95/100 blue-badge-focus border-input"
+    class="code-area min-h-96 max-h-[50vh] m-2 w-95/100 blue-badge-focus border-input"
     spellcheck="false"
     autocomplete="off"
     autocapitalize="off"
