@@ -119,7 +119,7 @@ export const useSSEstore = defineStore('SSE', () => {
         }
       },
       onmessage(event) {
-        if(event.event !== 'INIT') {
+        if(isConnected.value && event.event !== 'INIT') {
           handleSSEMessage(JSON.parse(event.data));
         }
       },
