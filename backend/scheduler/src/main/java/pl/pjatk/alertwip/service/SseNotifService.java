@@ -73,18 +73,22 @@ public class SseNotifService {
 
         //FCM testowanie i kombinowanie
         try {
-
             String testUser = "admin@pjatk.pl";
             Set<String> fcmTokens = MobileDeviceController.getTokenForUser(testUser);
+            System.out.printf("mamy listę: %s", fcmTokens);
 
             for (String token : fcmTokens) {
-
+                System.out.printf("token: %s", token);
 
                 String alertIdStr = String.valueOf(alert.getId());
+                System.out.printf("alertIdStri: %s", alertIdStr);
 
                 String severityIndex = String.valueOf(alert.getSeverity());
+                System.out.printf("severityIndex: %s", severityIndex);
                 String statusStr = alert.getStatus() != null ? alert.getStatus().toLowerCase() : "sent";
+                System.out.printf("statusStr: %s", statusStr);
                 String createdAtStr = alert.getCreatedAt() != null ? alert.getCreatedAt().toString() : java.time.Instant.now().toString();
+                System.out.printf("createdAtStr: %s", createdAtStr);
 
                 Message message = Message.builder()
                         .putData("title", "Zhakowali nas znowu")
@@ -101,6 +105,8 @@ public class SseNotifService {
                         .putData("acknowledged", String.valueOf(alert.isAcknowledged()))
                         .setToken(token)
                         .build();
+
+                System.out.println("message: %s".formatted(message.toString()));
 
                 FirebaseMessaging.getInstance().send(message);
                 System.out.println("[FCM] Wysłano powiadomienie wybudzające do tokenu: " + token);
