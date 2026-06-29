@@ -77,7 +77,8 @@ class AlertRepository {
             final dynamic message = decodedData['message'];
 
             if (eventType == 'ALERT_UPDATE' ||
-                eventType == 'ALERT_UPDATE_ONLY') {
+                eventType == 'ALERT_UPDATE_ONLY' ||
+                eventType == 'ALERT_RESOLVED') {
               return message;
             }
           } catch (e) {
