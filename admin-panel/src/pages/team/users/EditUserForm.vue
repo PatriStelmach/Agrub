@@ -22,6 +22,7 @@ const props = defineProps<{
   actionType: "create" | "edit"
 }>()
 
+const isOpen = defineModel<boolean>('isOpen')
 const userStore = useUserStore()
 const updatedUser = ref<User>({ ...props.user })
 const isLoading = ref(false)
@@ -39,13 +40,19 @@ const onSubmit = handleSubmit(async () => {
   isLoading.value = true
   if(props.actionType === "edit") {
     await userStore.editUserRequest(updatedUser.value)
-      .then((res) => toast.success(`User ${res} updated successfully.`))
+      .then((res) => {
+        toast.success(`User ${res} updated successfully.`)
+        isOpen.value = false
+      })
       .catch((error) => toast.error(`Error updating ${updatedUser.value.email}: ${error.message}`))
       .finally(() => isLoading.value = false)
   }
   else {
     await userStore.createUserRequest(updatedUser.value)
-      .then((res) => toast.success(`User ${res} created successfully.`))
+      .then((res) => {
+        toast.success(`User ${res} created successfully.`)
+        isOpen.value = false
+      })
       .catch((error) => toast.error(`Error creating ${updatedUser.value.email}: ${error.message}`))
       .finally(() => isLoading.value = false)
   }
