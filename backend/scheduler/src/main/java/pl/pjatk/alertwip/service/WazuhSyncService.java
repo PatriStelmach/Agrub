@@ -71,7 +71,11 @@ public class WazuhSyncService implements SchedulingConfigurer {
     // WYŁĄCZONE TUTAJ
     @Transactional
     public void sync() {
-        if (!settingService.getBoolean("wazuh_enabled", false) && false) {
+
+        return;
+
+        /*
+        if (!settingService.getBoolean("wazuh_enabled", false)) {
             return;
         }
 
@@ -175,6 +179,7 @@ public class WazuhSyncService implements SchedulingConfigurer {
             System.err.println("[WAZUH SYNC] Błąd parsowania: " + e.getMessage());
             e.printStackTrace();
         }
+         */
     }
 
     // ==========================================
