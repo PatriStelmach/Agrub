@@ -20,13 +20,14 @@ export default defineConfigWithVueTs(
 
   pluginVue.configs['flat/essential'],
   vueTsConfigs.recommended,
-  
+
   {
     plugins: {
       'unused-imports': pluginUnusedImports,
     },
     rules: {
       'no-unused-vars': 'off',
+      'vitest/valid-expect' : 'off',
       '@typescript-eslint/no-unused-vars': 'off',
       'unused-imports/no-unused-imports': 'error',
       'unused-imports/no-unused-vars': [
@@ -40,7 +41,7 @@ export default defineConfigWithVueTs(
     ...pluginVitest.configs.recommended,
     files: ['src/**/__tests__/*'],
   },
-  
+
   {
     ...pluginPlaywright.configs['flat/recommended'],
     files: ['e2e/**/*.{test,spec}.{js,ts,jsx,tsx}'],
