@@ -83,7 +83,22 @@ class Alert {
   }
 
   factory Alert.fromJson(Map<String, dynamic> json) {
-    int rawSeverity = json['severity'];
+    final Object? incomingId = json['id'];
+    int decodedId = 0;
+    if (incomingId is int) {
+      decodedId = incomingId;
+    } else if (incomingId is String) {
+      decodedId = int.tryParse(incomingId) ?? 0;
+    }
+
+    final Object? incomingSeverity = json['severity'];
+    int rawSeverity = 0;
+    if (incomingSeverity is int) {
+      rawSeverity = incomingSeverity;
+    } else if (incomingSeverity is String) {
+      rawSeverity = int.tryParse(incomingSeverity) ?? 0;
+    }
+
     if (rawSeverity < 0 || rawSeverity >= AlertSeverity.values.length) {
       rawSeverity = AlertSeverity.values.length - 1;
     }
@@ -106,7 +121,7 @@ class Alert {
     }
 
     return Alert(
-      id: json['id'],
+      id: decodedId,
       subject: json['subject']?.toString() ?? '',
       source: json['source']?.toString() ?? 'System',
       severity: decodedSeverity,
