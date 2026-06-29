@@ -107,7 +107,7 @@ public class SseNotifService {
 
                 System.out.println("message: %s".formatted(message.toString()));
 
-                FirebaseMessaging.getInstance().send(message);
+                System.out.println(FirebaseMessaging.getInstance().send(message));
                 System.out.println("[FCM] Wysłano powiadomienie wybudzające do tokenu: " + token);
             }
         } catch (Exception e) {
