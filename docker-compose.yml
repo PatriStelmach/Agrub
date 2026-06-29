@@ -22,11 +22,13 @@ services:
       - APP_SCRIPTS_PATH=/app/scripts
       - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=DEBUG
       - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB=DEBUG
+      - APP_COOKIE_SECURE=true
     depends_on:
       - mysql-app
       - redis-cache
     networks:
       - monitor_net
+      - npm_network
 
   mysql-app:
     image: mysql:8.0
@@ -150,10 +152,11 @@ services:
     depends_on:
       - alert-backend
 
-
 networks:
   monitor_net:
     driver: bridge
+  npm_network:
+    external: true
 
 volumes:
   zabbix-db-data:
