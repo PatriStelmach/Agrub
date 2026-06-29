@@ -53,6 +53,8 @@ flutter run
 - Błażej Majchrzak
 
 
+# Instrukcja integracji systemu Alert z zewnętrznymi systemami
+
 # Przygotowanie kluczy autoryzacyjnych
 
 - Do poprawnej komunikacji systemów zewnętrznych z systemem Alert, wymagane jest utworzenie kluczy API.
