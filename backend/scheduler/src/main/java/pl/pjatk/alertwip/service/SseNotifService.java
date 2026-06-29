@@ -81,7 +81,6 @@ public class SseNotifService {
                 System.out.printf("token: %s", token);
 
                 String alertIdStr = String.valueOf(alert.getId());
-                System.out.printf("alertIdStri: %s", alertIdStr);
 
                 String severityIndex = String.valueOf(alert.getSeverity());
                 System.out.printf("severityIndex: %s", severityIndex);
