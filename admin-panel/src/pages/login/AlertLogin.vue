@@ -54,7 +54,7 @@ const onSubmit = handleSubmit(async (data) => {
     <CardHeader>
       <CardTitle class="text-xl text-center">Sign in</CardTitle>
       <CardDescription class="text-center">
-        Use Alert credentials
+        Use Agrub credentials
       </CardDescription>
     </CardHeader>
     <CardContent>

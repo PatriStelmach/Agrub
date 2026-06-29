@@ -59,11 +59,11 @@ watch(() => authStore.isAuthenticated,(newValue) => {
       :visibleToasts="12"
     />
     <header class="absolute top-0 right-2 flex w-full h-10 items-center">
-        <component
-          stroke="1.5" :is="mode === 'light' ? IconSunFilled : IconMoonStars"
-          @click="mode == 'light' ? mode = 'dark' : mode = 'light' "
-          class="cursor-pointer absolute right-2 size-6 rounded-full  hover:scale-115 duration-100"
-        />
+      <component
+        stroke="1.5" :is="mode === 'light' ? IconSunFilled : IconMoonStars"
+        @click="mode == 'light' ? mode = 'dark' : mode = 'light' "
+        class="cursor-pointer absolute right-2 size-6 rounded-full  hover:scale-115 duration-100"
+      />
     </header>
     <SidebarProvider>
       <NavBar  class=" border-none bg-card"/>

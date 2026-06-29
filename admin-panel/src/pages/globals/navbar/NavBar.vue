@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+  IconCancel,
   IconAlertTriangle,
   IconDatabase,
   IconHistory,
@@ -25,6 +26,7 @@ import {useRoute} from "vue-router";
 import {onMounted, ref} from "vue";
 import {useAuthStore} from "@/stores/authStore.ts";
 import {dateParser} from "@/helpers_functions/dateParser.ts";
+import {toast} from "vue-sonner";
 
 const date = ref<Date>(new Date())
 const time = ref<string>(dateParser(date.value).fullTime);
@@ -112,7 +114,7 @@ const navItems = authStore.isAdmin ? [
   <Sidebar>
     <SidebarHeader>
       <div class="text-xl space-x-2 flex pt-4"><IconPhoneRinging/>
-        <span>Alert</span>
+        <span>Agrub</span>
       </div>
 
     </SidebarHeader>
@@ -132,6 +134,22 @@ const navItems = authStore.isAdmin ? [
                       <component class="size-5  xl:size-6" :is="link.icon"/>
                     <span>{{link.label}}</span>
                   </RouterLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton as-child>
+                <SidebarGroupLabel class="hover:bg-transparent pl-1 flex items-center text-center">
+                  Notifications
+                </SidebarGroupLabel>
+
+                <span
+                  @click="toast.dismiss()"
+                  class="flex text-sm items-center xl:text-md ml-3 border-l-4 w-full gap-x-2 p-2 hover:bg-input rounded-[0_0.5rem_0.5rem_0] cursor-pointer">
+                  <IconCancel class="size-5  xl:size-6"/>
+                  <span>
+                    Dismiss all
+                  </span>
+                </span>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
