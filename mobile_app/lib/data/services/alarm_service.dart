@@ -79,7 +79,7 @@ class AlarmService {
 
       // Vibrations (if possible)
       if (await Vibration.hasVibrator()) {
-        await Vibration.vibrate(duration: 2000, amplitude: 255);
+        await Vibration.vibrate(duration: 10000, amplitude: 255);
       }
     }
   }
