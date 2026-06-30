@@ -35,7 +35,7 @@ class PluginCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(plugin.language.name),
+                    Text(_showLanguageName(plugin)),
                     Text(plugin.tags.toString()),
                   ],
                 ),
@@ -88,4 +88,17 @@ void _showRunArgsDialog(BuildContext context, Plugin plugin) {
     context: context,
     builder: (_) => PluginDialog(plugin: plugin),
   );
+}
+
+String _showLanguageName(Plugin plugin) {
+  switch (plugin.language.name) {
+    case 'py':
+      return 'Python';
+    case 'sh':
+      return 'Bash';
+    case 'ps1':
+      return 'Powershell';
+    default:
+      return 'Unknown';
+  }
 }
