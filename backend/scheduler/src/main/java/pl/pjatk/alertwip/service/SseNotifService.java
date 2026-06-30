@@ -71,18 +71,20 @@ public class SseNotifService {
         deadEmitters.forEach(userSubscriptions::remove);
 
 
-        //FCM 
+        //FCM
+
+        Set<String> fcmTokens = new HashSet<>(Set.of());
+        for (String user: MobileDeviceController.tokenStorage.keySet()) {
+            fcmTokens.addAll(MobileDeviceController.getTokenForUser(user));
+        }
+
+        Set<String> tokensToRemove = new HashSet<>();
+        for (String token : fcmTokens) {
+
+            try {
+                String alertIdStr = String.valueOf(alert.getId());
 
 
-            String testUser = "admin@pjatk.pl";
-            Set<String> fcmTokens = MobileDeviceController.getTokenForUser(testUser);
-            Set<String> tokensToRemove = new HashSet<>();
-            for (String token : fcmTokens) {
-
-                try {
-                    String alertIdStr = String.valueOf(alert.getId());
-
-                   
                 String severityIndex = String.valueOf(alert.getSeverity());
                 System.out.printf("severityIndex: %s", severityIndex);
                 String statusStr = alert.getStatus() != null ? alert.getStatus().toLowerCase() : "sent";
@@ -90,39 +92,39 @@ public class SseNotifService {
                 String createdAtStr = alert.getCreatedAt() != null ? alert.getCreatedAt().toString() : java.time.Instant.now().toString();
                 System.out.printf("createdAtStr: %s", createdAtStr);
 
-                    Message message = Message.builder()
-                            .putData("title", "Zhakowali nas znowu")
-                            .putData("body", "Szykuj bitcoiny " + alert.getUniqueKey())
+                Message message = Message.builder()
+                        .putData("title", "Zhakowali nas znowu")
+                        .putData("body", "Szykuj bitcoiny " + alert.getUniqueKey())
 
-                            .putData("id", alertIdStr)
-                            .putData("alertId", alertIdStr) //
-                            .putData("subject", alert.getSubject() != null ? alert.getSubject() : alert.getUniqueKey())
-                            .putData("source", alert.getSource() != null ? alert.getSource() : "System")
-                            .putData("severity", severityIndex)
-                            .putData("status", statusStr)
-                            .putData("createdAt", createdAtStr)
-                            .putData("message", alert.getMessage() != null ? alert.getMessage() : "")
-                            .putData("acknowledged", String.valueOf(alert.isAcknowledged()))
-                            .setToken(token)
-                            .build();
+                        .putData("id", alertIdStr)
+                        .putData("alertId", alertIdStr) //
+                        .putData("subject", alert.getSubject() != null ? alert.getSubject() : alert.getUniqueKey())
+                        .putData("source", alert.getSource() != null ? alert.getSource() : "System")
+                        .putData("severity", severityIndex)
+                        .putData("status", statusStr)
+                        .putData("createdAt", createdAtStr)
+                        .putData("message", alert.getMessage() != null ? alert.getMessage() : "")
+                        .putData("acknowledged", String.valueOf(alert.isAcknowledged()))
+                        .setToken(token)
+                        .build();
 
-                    FirebaseMessaging.getInstance().send(message);
-                    System.out.println("[FCM] Wysłano powiadomienie wybudzające do tokenu: " + token);
+                FirebaseMessaging.getInstance().send(message);
+                System.out.println("[FCM] Wysłano powiadomienie wybudzające do tokenu: " + token);
 
-                } catch (FirebaseMessagingException e) {
-                    MessagingErrorCode errorCode = e.getMessagingErrorCode();
+            } catch (FirebaseMessagingException e) {
+                MessagingErrorCode errorCode = e.getMessagingErrorCode();
 
-                    if (errorCode == MessagingErrorCode.UNREGISTERED ||
-                            errorCode == MessagingErrorCode.INVALID_ARGUMENT) {
+                if (errorCode == MessagingErrorCode.UNREGISTERED ||
+                        errorCode == MessagingErrorCode.INVALID_ARGUMENT) {
 
-                        System.err.println("[FCM CLEANUP] Nieaktywny token dodany do usunięcia: " + token);
-                        tokensToRemove.add(token);
+                    System.err.println("[FCM CLEANUP] Nieaktywny token dodany do usunięcia: " + token);
+                    tokensToRemove.add(token);
                 }
 
-                } catch (Exception e) {
-                    System.err.println("[FCM ERROR] Nie udało się wysłać powiadomienia push: " + e.getMessage());
-                }
-                }
+            } catch (Exception e) {
+                System.err.println("[FCM ERROR] Nie udało się wysłać powiadomienia push: " + e.getMessage());
+            }
+        }
         System.err.println("[FCM CLEANUP] Usuwam nieaktywny tokeny: ");
         tokensToRemove.forEach(MobileDeviceController::removeToken);
 
