@@ -44,7 +44,8 @@ public class MobileDeviceController {
         return tokenStorage.getOrDefault(username, Set.of());
     }
     public static void removeToken(String token) {
-        tokenStorage.remove(token);
+        tokenStorage.forEach((username, tokens) -> tokens.remove(token));
+        tokenStorage.values().removeIf(Set::isEmpty);
     }
 
 }
