@@ -9,7 +9,7 @@ class AppLocalizationsPl extends AppLocalizations {
   AppLocalizationsPl([String locale = 'pl']) : super(locale);
 
   @override
-  String get appTitle => 'Alert App';
+  String get appTitle => 'Agrub';
 
   @override
   String get settings_language_label => 'Język';
@@ -63,7 +63,10 @@ class AppLocalizationsPl extends AppLocalizations {
   String get login_error_message => 'Błąd logowania. Sprawdź połączenie i spróbuj ponownie';
 
   @override
-  String get login_app_title => 'ALERT APP';
+  String get login_app_title => 'AGRUB APP';
+
+  @override
+  String get login_field_server => 'Serwer';
 
   @override
   String get login_field_email => 'E-mail';
@@ -354,7 +357,7 @@ class AppLocalizationsPl extends AppLocalizations {
   String get navigation_home => 'Ekran główny';
 
   @override
-  String get app_title => 'AlertVIP';
+  String get app_title => 'Agrub';
 
   @override
   String get theme => 'Motyw';

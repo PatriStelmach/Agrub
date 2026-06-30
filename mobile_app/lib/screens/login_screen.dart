@@ -89,10 +89,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
               TextField(
                 controller: _serverController,
-                decoration: const InputDecoration(
-                  labelText: "Server addres",
-                  prefixIcon: Icon(Icons.cast_connected),
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: t.login_field_server,
+                  prefixIcon: const Icon(Icons.cast_connected),
+                  border: const OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.text,
               ),

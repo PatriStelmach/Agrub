@@ -40,7 +40,7 @@ class UserRepository {
   Future<bool> checkLastIp() async {
     final readIp = await storage.read(key: 'LAST_SERVER_IP');
     if (readIp != null) {
-      dio.options.baseUrl = ('http://$readIp');
+      dio.options.baseUrl = 'https://$readIp';
       return true;
     } else {
       return false;

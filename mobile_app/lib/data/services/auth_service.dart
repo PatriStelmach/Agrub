@@ -14,7 +14,10 @@ class AuthService {
 
   Future<String?> login(String email, String password, String serverIp) async {
     try {
-      _dio.options.baseUrl = 'https://$serverIp';
+      _dio.options.baseUrl = 'https://$serverIp'.trim();
+      if (_dio.options.baseUrl.endsWith('/')) {
+        _dio.options.baseUrl.length - 1;
+      }
       final response = await _dio.post(
         '/api/auth/login',
         data: {'email': email, 'password': password},
