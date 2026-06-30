@@ -98,7 +98,7 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
-  /// **'Alert System'**
+  /// **'Agrub System'**
   String get appTitle;
 
   /// No description provided for @settings_language_label.
@@ -206,8 +206,14 @@ abstract class AppLocalizations {
   /// No description provided for @login_app_title.
   ///
   /// In en, this message translates to:
-  /// **'ALERT APP'**
+  /// **'AGRUB APP'**
   String get login_app_title;
+
+  /// No description provided for @login_field_server.
+  ///
+  /// In en, this message translates to:
+  /// **'Server'**
+  String get login_field_server;
 
   /// No description provided for @login_field_email.
   ///
@@ -764,7 +770,7 @@ abstract class AppLocalizations {
   /// No description provided for @app_title.
   ///
   /// In en, this message translates to:
-  /// **'AlertVIP'**
+  /// **'Agrub'**
   String get app_title;
 
   /// No description provided for @theme.

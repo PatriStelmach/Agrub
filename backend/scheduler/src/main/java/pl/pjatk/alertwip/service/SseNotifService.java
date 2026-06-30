@@ -1,17 +1,17 @@
 package pl.pjatk.alertwip.service;
 
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.MessagingErrorCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import pl.pjatk.alertwip.model.GlobalProblem;
 import pl.pjatk.alertwip.dto.AlertUpdateEventDTO;
 import pl.pjatk.alertwip.controller.MobileDeviceController;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -71,43 +71,57 @@ public class SseNotifService {
         deadEmitters.forEach(userSubscriptions::remove);
 
 
-        //FCM testowanie i kombinowanie
-        try {
+        //FCM 
+
 
             String testUser = "admin@pjatk.pl";
             Set<String> fcmTokens = MobileDeviceController.getTokenForUser(testUser);
-
+            Set<String> tokensToRemove = new HashSet<>();
             for (String token : fcmTokens) {
 
+                try {
+                    String alertIdStr = String.valueOf(alert.getId());
 
-                String alertIdStr = String.valueOf(alert.getId());
+                    String severityIndex = String.valueOf(alert.getSeverity());
+                    String statusStr = alert.getStatus() != null ? alert.getStatus().toLowerCase() : "sent";
+                    String createdAtStr = alert.getCreatedAt() != null ? alert.getCreatedAt().toString() : java.time.Instant.now().toString();
 
-                String severityIndex = String.valueOf(alert.getSeverity());
-                String statusStr = alert.getStatus() != null ? alert.getStatus().toLowerCase() : "sent";
-                String createdAtStr = alert.getCreatedAt() != null ? alert.getCreatedAt().toString() : java.time.Instant.now().toString();
+                    Message message = Message.builder()
+                            .putData("title", "Zhakowali nas znowu")
+                            .putData("body", "Szykuj bitcoiny " + alert.getUniqueKey())
 
-                Message message = Message.builder()
-                        .putData("title", "Zhakowali nas znowu")
-                        .putData("body", "Szykuj bitcoiny " + alert.getUniqueKey())
+                            .putData("id", alertIdStr)
+                            .putData("alertId", alertIdStr) //
+                            .putData("subject", alert.getSubject() != null ? alert.getSubject() : alert.getUniqueKey())
+                            .putData("source", alert.getSource() != null ? alert.getSource() : "System")
+                            .putData("severity", severityIndex)
+                            .putData("status", statusStr)
+                            .putData("createdAt", createdAtStr)
+                            .putData("message", alert.getMessage() != null ? alert.getMessage() : "")
+                            .putData("acknowledged", String.valueOf(alert.isAcknowledged()))
+                            .setToken(token)
+                            .build();
 
-                        .putData("id", alertIdStr)
-                        .putData("alertId", alertIdStr) //
-                        .putData("subject", alert.getSubject() != null ? alert.getSubject() : alert.getUniqueKey())
-                        .putData("source", alert.getSource() != null ? alert.getSource() : "System")
-                        .putData("severity", severityIndex)
-                        .putData("status", statusStr)
-                        .putData("createdAt", createdAtStr)
-                        .putData("message", alert.getMessage() != null ? alert.getMessage() : "")
-                        .putData("acknowledged", String.valueOf(alert.isAcknowledged()))
-                        .setToken(token)
-                        .build();
+                    FirebaseMessaging.getInstance().send(message);
+                    System.out.println("[FCM] Wysłano powiadomienie wybudzające do tokenu: " + token);
 
-                FirebaseMessaging.getInstance().send(message);
-                System.out.println("[FCM] Wysłano powiadomienie wybudzające do tokenu: " + token);
-            }
-        } catch (Exception e) {
-            System.err.println("[FCM ERROR] Nie udało się wysłać powiadomienia push: " + e.getMessage());
-        }
+                } catch (FirebaseMessagingException e) {
+                    MessagingErrorCode errorCode = e.getMessagingErrorCode();
+
+                    if (errorCode == MessagingErrorCode.UNREGISTERED ||
+                            errorCode == MessagingErrorCode.INVALID_ARGUMENT) {
+
+                        System.err.println("[FCM CLEANUP] Nieaktywny token dodany do usunięcia: " + token);
+                        tokensToRemove.add(token);
+                }
+
+                } catch (Exception e) {
+                    System.err.println("[FCM ERROR] Nie udało się wysłać powiadomienia push: " + e.getMessage());
+                }
+                }
+        System.err.println("[FCM CLEANUP] Usuwam nieaktywny tokeny: ");
+        tokensToRemove.forEach(MobileDeviceController::removeToken);
+
     }
 
     // wysyłamy tylko różnice a nie cały

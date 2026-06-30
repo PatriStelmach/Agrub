@@ -125,7 +125,6 @@ class Alert {
       subject: json['subject']?.toString() ?? '',
       source: json['source']?.toString() ?? 'System',
       severity: decodedSeverity,
-      //Additional parsing is here because of FCM date formatting
       createdAt:
           DateTime.tryParse(json['createdAt']?.toString() ?? '') ??
           DateTime.now(),

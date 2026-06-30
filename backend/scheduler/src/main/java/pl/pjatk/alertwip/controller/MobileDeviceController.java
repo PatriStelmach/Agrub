@@ -17,6 +17,8 @@ public class MobileDeviceController {
 
     private static final Map<String, Set<String>> tokenStorage = new ConcurrentHashMap<>();
 
+
+
     @PostMapping("/token")
     public ResponseEntity<Void> registerDeviceToken(
             @RequestBody MobileDeviceTokenDTO dto,
@@ -41,6 +43,9 @@ public class MobileDeviceController {
 
     public static Set<String> getTokenForUser(String username) {
         return tokenStorage.getOrDefault(username, Set.of());
+    }
+    public static void removeToken(String token) {
+        tokenStorage.remove(token);
     }
 
 }

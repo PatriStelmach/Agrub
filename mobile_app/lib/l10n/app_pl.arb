@@ -1,6 +1,6 @@
 {
   "@@locale": "pl",
-  "appTitle": "Alert App",
+  "appTitle": "Agrub",
   "settings_language_label": "Język",
   "settings_lang_pl": "Polski",
   "settings_lang_en": "Angielski",
@@ -18,7 +18,8 @@
   "navPlugins": "WTYCZKI",
   "sectionLoginScreen": "--- HOME SCREEN ------------------------------------------------------------------------------------------------",
   "login_error_message": "Błąd logowania. Sprawdź połączenie i spróbuj ponownie",
-  "login_app_title": "ALERT APP",
+  "login_app_title": "AGRUB APP",
+  "login_field_server": "Serwer",
   "login_field_email": "E-mail",
   "login_field_password": "Hasło",
   "login_button_submit": "ZALOGUJ SIĘ",
@@ -110,6 +111,6 @@
   "navigation_settings": "Ustawienia",
   "navigation_user_profile": "Profil użytkownika",
   "navigation_home": "Ekran główny",
-  "app_title": "AlertVIP",
+  "app_title": "Agrub",
   "theme": "Motyw"
 }
