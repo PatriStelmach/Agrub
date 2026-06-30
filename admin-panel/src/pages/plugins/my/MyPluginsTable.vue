@@ -480,12 +480,12 @@ const onEdit = (plugin: MyPlugin) => {
             <DateCell class="" v-if="plugin.updatedAt" :date="plugin.updatedAt"></DateCell>
             <TableCell v-if="isUnwrapped(plugin.fullName) && unwrappedItem && authStore.isAdmin" >
               <div class="flex items-center gap-x-2">
-                <input v-model="unwrappedItem.active" type="radio" class="size-4 cursor-pointer lg:size-5 xl:size-6 2xl:size-8" id=radio-on :value="true" />
-                <Label class="cursor-pointer text-green-badge"  for="radio-on">On</Label>
+                <input v-model="unwrappedItem.active" type="radio" class="size-4 cursor-pointer lg:size-5 xl:size-6 2xl:size-8" id=radio-plugin-on :value="true" />
+                <Label class="cursor-pointer text-green-badge"  for="radio-plugin-on">On</Label>
               </div>
               <div class="flex items-center gap-x-2">
-                <input v-model="unwrappedItem.active" type="radio" class="size-4 cursor-pointer lg:size-5 xl:size-6 2xl:size-8" id="radio-off" :value="false" />
-                <Label class="cursor-pointer text-destructive" for="radio-off">Off</Label>
+                <input v-model="unwrappedItem.active" type="radio" class="size-4 cursor-pointer lg:size-5 xl:size-6 2xl:size-8" id="radio-plugin-off" :value="false" />
+                <Label class="cursor-pointer text-destructive" for="radio-plugin-off">Off</Label>
               </div>
             </TableCell>
             <TableCell v-else class=" text-green-badge" :class="{'text-destructive' : !plugin.active}">{{ plugin.active ? 'On' : 'Off'}}</TableCell>
@@ -506,6 +506,7 @@ const onEdit = (plugin: MyPlugin) => {
                   <IconCode v-else class="size-4 xl:size-5"/>
                 </Button>
                 <Button
+                  id="save_plugin_"
                   v-if="authStore.isAdmin"
                   :disabled="!cronDescription[2]"
                   class="border-l-2!"

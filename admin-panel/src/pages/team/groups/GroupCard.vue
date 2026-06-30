@@ -13,6 +13,7 @@ defineProps<{
 <template>
   <RouterLink :to="`/groups/edit_group/${group.id}/${group.name}`">
     <Card
+      :id="`group_${group.name}_card`"
       class="cursor-pointer"
       :class="gridCard"
     >

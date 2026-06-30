@@ -86,7 +86,7 @@ watch(isDialogOpen, (newValue, oldValue) => {
               <p id="created-at">{{ dateParser(alert?.createdAt!).fullDate }}</p>
             </div>
             <div>
-              <h1 :class="bigNameLabel">Created at: </h1>
+              <h1 :class="bigNameLabel">Closed at: </h1>
               <p id="closed-at">{{ dateParser(alert?.closedAt!).fullDate }}</p>
             </div>
             <div class="flex items-end">

@@ -9,13 +9,15 @@ import {useClientSort} from '../composables/useClientSort.js'
 import {useClientSearchFilter} from '../composables/useClientSearchFilter.js'
 import {ActiveAlert, MyPlugin} from '../types/types.js'
 import {useWrapping} from "../composables/useWrapping.js";
-import {computed, ref} from "vue";
+import {computed, createApp, ref} from "vue";
+import {fromDate, getLocalTimeZone} from "@internationalized/date"
 import {securitySettingSchema, createUserSchema} from '../helpers_functions/formSchemas.js'
-import {dateParser} from '../helpers_functions/dateParser.js'
+import {dateParser, toApiDate} from '../helpers_functions/dateParser.js'
 import {
-  adminUser, techUser, now, later, earlier, mockPlugin, mockAlert,
-  earlierAlert, editedMockAlert, mockGroup, mockSecondGroup, fullJWT, mock
+  mockPlugin, mockAlert, earlierAlert, editedMockAlert, mockGroup, mockSecondGroup, fullJWT, mock
 } from './testVariables.js'
+import App from "../App.vue";
+import router from '../router/index.js'
 
 beforeEach(() => {
   setActivePinia(createPinia())
@@ -193,7 +195,6 @@ describe('Wrapping', () => {
       hasChanged,
       unwrap,
       unwrappedItem,
-      isUnwrapped,
       originalItem
     } = useWrapping(plugins, 'fullName')
 
@@ -280,16 +281,34 @@ describe('Create user form', () => {
 
 describe('Api date parsing', () => {
   it('Formats date correctly for API requests', async () => {
-    const fromApi = '2026-01-01T00:00:00.000000'
+    const fromApi = '2026-01-01T00:00:00'
+    const zonedDateTime = fromDate(new Date(fromApi), getLocalTimeZone())
     expect(dateParser(fromApi).toDate).toEqual(new Date(fromApi))
     expect(dateParser(fromApi).fullDate).toEqual('01/01/2026 - 00:00:00')
-    //expect(dateParser(fromApi).apiDate)
+    expect(toApiDate(zonedDateTime)).toEqual(fromApi)
   })
 })
 
 describe('Router before each', () => {
   it('Checks resource access based on user role', async () => {
-    vi.useRealTimers()
-    await new Promise(resolve => setTimeout(resolve, 20))
+    const app = createApp(App)
+    app.use(router)
+    await router.isReady()
+
+    const authStore = useAuthStore()
+    authStore.accessToken = fullJWT(false)
+
+    await router.push('/active_alerts')
+    expect(router.currentRoute.value.path).toEqual('/active_alerts')
+
+    await router.push('/charts')
+    expect(router.currentRoute.value.path).toContain('/no_privileges')
+
+    authStore.accessToken = fullJWT(true)
+    await router.push('/active_alerts')
+    expect(router.currentRoute.value.path).toEqual('/active_alerts')
+
+    await router.push('/charts')
+    expect(router.currentRoute.value.path).toEqual('/charts')
   })
 })
