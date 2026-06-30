@@ -60,12 +60,21 @@ class _AlertsScreenState extends State<AlertsScreen>
       children: [
         _buildSortHeader(context, alertsViewModel, t),
         Expanded(
-          child: ListView.builder(
-            itemCount: sortedList.length,
-            itemBuilder: (context, index) {
-              final alert = sortedList[index];
-              return AlertCard(alert: alert, viewModel: alertsViewModel, t: t);
+          child: RefreshIndicator(
+            onRefresh: () async {
+              await alertsViewModel.fetchInitialAlerts();
             },
+            child: ListView.builder(
+              itemCount: sortedList.length,
+              itemBuilder: (context, index) {
+                final alert = sortedList[index];
+                return AlertCard(
+                  alert: alert,
+                  viewModel: alertsViewModel,
+                  t: t,
+                );
+              },
+            ),
           ),
         ),
       ],
