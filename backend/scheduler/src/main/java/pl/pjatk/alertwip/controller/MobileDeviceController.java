@@ -14,8 +14,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 @RequestMapping("/api/devices")
 public class MobileDeviceController {
 
-
-    private static final Map<String, Set<String>> tokenStorage = new ConcurrentHashMap<>();
+    public static final Map<String, Set<String>> tokenStorage = new ConcurrentHashMap<>();
 
 
 
