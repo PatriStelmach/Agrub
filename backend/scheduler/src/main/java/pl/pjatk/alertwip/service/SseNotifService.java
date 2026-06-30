@@ -71,18 +71,23 @@ public class SseNotifService {
         deadEmitters.forEach(userSubscriptions::remove);
 
 
-        //FCM 
+        //FCM
 
+        //         Set<String> fcmTokens = new HashSet<>(Set.of());
+        //        for (String user: MobileDeviceController.tokenStorage.keySet()) {
+        //            fcmTokens.addAll(MobileDeviceController.getTokenForUser(user));
+        //        }
 
-            String testUser = "admin@pjatk.pl";
-            Set<String> fcmTokens = MobileDeviceController.getTokenForUser(testUser);
+        String testUser = "admin@pjatk.pl";
+        Set<String> fcmTokens = MobileDeviceController.getTokenForUser(testUser);
+
             Set<String> tokensToRemove = new HashSet<>();
             for (String token : fcmTokens) {
 
                 try {
                     String alertIdStr = String.valueOf(alert.getId());
 
-                   
+
                 String severityIndex = String.valueOf(alert.getSeverity());
                 System.out.printf("severityIndex: %s", severityIndex);
                 String statusStr = alert.getStatus() != null ? alert.getStatus().toLowerCase() : "sent";
