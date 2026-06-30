@@ -40,6 +40,7 @@ export function useClientSearchFilter<T>(data: () => T[], filter: (item: T) => s
     currentPage,
     tableData,
     filteredData,
+    debounceFilter,
     updateData,
     updateSearchData,
     pageSize,

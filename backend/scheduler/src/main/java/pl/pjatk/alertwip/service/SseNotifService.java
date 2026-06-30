@@ -82,9 +82,13 @@ public class SseNotifService {
                 try {
                     String alertIdStr = String.valueOf(alert.getId());
 
-                    String severityIndex = String.valueOf(alert.getSeverity());
-                    String statusStr = alert.getStatus() != null ? alert.getStatus().toLowerCase() : "sent";
-                    String createdAtStr = alert.getCreatedAt() != null ? alert.getCreatedAt().toString() : java.time.Instant.now().toString();
+                   
+                String severityIndex = String.valueOf(alert.getSeverity());
+                System.out.printf("severityIndex: %s", severityIndex);
+                String statusStr = alert.getStatus() != null ? alert.getStatus().toLowerCase() : "sent";
+                System.out.printf("statusStr: %s", statusStr);
+                String createdAtStr = alert.getCreatedAt() != null ? alert.getCreatedAt().toString() : java.time.Instant.now().toString();
+                System.out.printf("createdAtStr: %s", createdAtStr);
 
                     Message message = Message.builder()
                             .putData("title", "Zhakowali nas znowu")
