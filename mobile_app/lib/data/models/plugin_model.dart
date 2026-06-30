@@ -47,9 +47,13 @@ class Plugin {
   });
 
   Color activeColor(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return active
-        ? Theme.of(context).colorScheme.primary
-        : Colors.grey.withValues(alpha: 0.4);
+        ? (isDark
+              ? const Color.fromARGB(166, 76, 218, 0)
+              : const Color(0xFF08A800))
+        : const Color(0xFFF40031);
   }
 
   factory Plugin.fromJson(Map<String, dynamic> json) {

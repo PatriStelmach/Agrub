@@ -120,7 +120,7 @@ class _AckDialogState extends State<AckDialog> {
           onPressed: () {
             final commentValue = _controller.text;
             final currentUser = context.read<UserViewModel>().user;
-            final currentAuthor = currentUser?.login ?? "Mobile User";
+            final currentAuthor = currentUser?.email ?? "Mobile User";
 
             context.read<AlertsViewModel>().acknowledgeAlert(
               widget.alert.id,

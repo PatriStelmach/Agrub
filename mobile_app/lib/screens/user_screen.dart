@@ -73,23 +73,6 @@ class UserScreen extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  t.user_label_username,
-                  style: const TextStyle(fontSize: 24, color: Colors.grey),
-                ),
-                const Spacer(),
-
-                Text(
-                  user.login,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Text(
                   t.user_label_email,
                   style: const TextStyle(fontSize: 24, color: Colors.grey),
                 ),
