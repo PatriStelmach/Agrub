@@ -136,7 +136,9 @@ const changeName = async () => {
           v-model:open="isDialogOpen"
         >
           <Button
-            @click="isDialogOpen = true" variant="green_outline" >
+            id="add_new_rule_button"
+            @click="isDialogOpen = true"
+            variant="green_outline" >
             Add rules
             <IconFilterPlus/>
           </Button>

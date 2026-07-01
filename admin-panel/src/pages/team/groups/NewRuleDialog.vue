@@ -148,7 +148,11 @@ const onSubmit = async () => {
         <Button variant="red_outline" type="button" @click="open = false">
           Cancel
         </Button>
-        <Button variant="green_outline" form="rule-form" type="submit">
+        <Button
+          id="submit_rule_form_button"
+          variant="green_outline"
+          form="rule-form"
+          type="submit">
           <IconLoader v-if="isLoading" class="animate-spin" />
           <span class="gap-x-2 flex items-center" v-else>Save <IconDeviceFloppy /></span>
         </Button>

@@ -17,6 +17,7 @@ import SeverityDiv from "@/helpers_components/SeverityDiv.vue";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {bigNameLabel} from "@/assets/cssFunctions.ts";
 import router from "@/router";
+import {dateParser} from "@/helpers_functions/dateParser.ts";
 
 const alert = defineModel<HistoryAlert | null>('alert');
 const isDialogOpen = defineModel<boolean>('isDialogOpen')
@@ -70,7 +71,23 @@ watch(isDialogOpen, (newValue, oldValue) => {
             </div>
             <div >
               <h1 :class="bigNameLabel">Origin: </h1>
-              <Badge variant="origin">{{ alert.originType}}</Badge>
+              <RouterLink
+                :to="(alert.originType === 'ZABBIX' || alert.originType === 'WAZUH' || alert.originType === 'NAGIOS') ?
+               `/settings/systems/${alert.originType}` :
+                `/my_plugins/${alert.source}`">
+                <Badge
+                  class="whitespace-break-spaces"
+                  variant="origin"
+                >{{alert.originType}}</Badge>
+              </RouterLink>
+            </div>
+            <div>
+              <h1 :class="bigNameLabel">Created at: </h1>
+              <p id="created-at">{{ dateParser(alert?.createdAt!).fullDate }}</p>
+            </div>
+            <div>
+              <h1 :class="bigNameLabel">Closed at: </h1>
+              <p id="closed-at">{{ dateParser(alert?.closedAt!).fullDate }}</p>
             </div>
             <div class="flex items-end">
               <h1 :class="bigNameLabel">ACK: </h1>

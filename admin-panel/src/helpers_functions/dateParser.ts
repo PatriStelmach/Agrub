@@ -14,7 +14,7 @@ export function dateParser(date: Date | string) {
     return weekDayString[d.getDay()]
   }
   const month = pad(d.getMonth() + 1);
-  const year = d.getUTCFullYear();
+  const year = d.getFullYear();
 
   return {
     hours,
@@ -27,7 +27,7 @@ export function dateParser(date: Date | string) {
     dayMonthYear: `${day}/${month}/${year}`,
     fullTime: `${hours}:${minutes}:${seconds}`,
     fullDate: `${day}/${month}/${year} - ${hours}:${minutes}:${seconds}`,
-    apiDate: `${year}-${month}-${day}T${hours}:${minutes}:${seconds}Z`,
+    apiDate: `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`,
     toDate: d,
   }
 }

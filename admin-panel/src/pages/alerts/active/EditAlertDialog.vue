@@ -23,6 +23,7 @@ import {toast} from "vue-sonner";
 import {bigNameLabel} from "@/assets/cssFunctions.ts";
 import {useRouter} from "vue-router";
 import api from "@/lib/axios.ts";
+import {dateParser} from "@/helpers_functions/dateParser.ts";
 
 const router = useRouter();
 
@@ -107,7 +108,7 @@ watch(isDialogOpen, (newValue, oldValue) => {
               </DialogHeader>
               <div class="flex flex-col ">
                 <div class="grid gap-y-6 *:flex *:space-x-2 *:items-center [&_p]:text-lg [&_p]:text-comment border-b-2 pb-2">
-                  <div >
+                  <div>
                     <h1 :class="bigNameLabel">Subject: </h1>
                     <p id="subject"  > {{ alert?.subject}}</p>
                   </div>
@@ -115,13 +116,25 @@ watch(isDialogOpen, (newValue, oldValue) => {
                     <h1 :class="bigNameLabel">Message: </h1>
                     <p id="alert-message" > {{ alert?.message}}</p>
                   </div>
-                  <div >
+                  <div>
                     <h1 :class="bigNameLabel">Source: </h1>
                     <Badge variant="source">{{ alert?.source}}</Badge>
                   </div>
-                  <div >
+                  <div>
                     <h1 :class="bigNameLabel">Origin: </h1>
-                    <Badge variant="origin">{{ alert?.originType}}</Badge>
+                    <RouterLink
+                      :to="(alert?.originType === 'ZABBIX' || alert?.originType === 'WAZUH' || alert?.originType === 'NAGIOS') ?
+               `/settings/systems/${alert?.originType}` :
+                `/my_plugins/${alert?.source}`">
+                      <Badge
+                        class="whitespace-break-spaces"
+                        variant="origin"
+                      >{{alert?.originType}}</Badge>
+                    </RouterLink>
+                  </div>
+                  <div>
+                    <h1 :class="bigNameLabel">Created at: </h1>
+                    <p id="created-at">{{ dateParser(alert?.createdAt!).fullDate }}</p>
                   </div>
                 </div>
                 <div class="grid flex-1 gap-y-3 p-2 overflow-scroll ">

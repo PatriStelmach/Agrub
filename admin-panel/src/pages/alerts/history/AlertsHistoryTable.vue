@@ -91,9 +91,9 @@ watch(
         <TableHeader class="h-10">
           <TableRow :class="tableHeaders">
             <SortableHead keyName="subject" label="Alert" :sort-key="sortKey" class="w-fit *:pl-2" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-            <SortableHead keyName="severity" label="Severity" :sort-key="sortKey" class="max-md:w-1/8 max-lg:w-9/100 w-6/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="severity" label="Severity" :sort-key="sortKey" class="max-md:w-1/7 max-lg:w-1/10 w-7/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
             <SortableHead keyName="message" label="Message" :sort-key="sortKey" class="w-fit md:min-w-1 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
-            <SortableHead keyName="source" label="Source" :sort-key="sortKey" class="w-fit " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
+            <SortableHead keyName="source" label="Source" :sort-key="sortKey" class="w-1/8" :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
             <SortableHead keyName="originType" label="Origin" :sort-key="sortKey" class="w-1/10 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
             <SortableHead keyName="isAcknowledged" label="ACK" :sort-key="sortKey" class="w-6/100 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
             <SortableHead keyName="createdAt" label="Created at" :sort-key="sortKey" class="w-fit md:w-13/100 lg:w-1/10 " :sort-order="sortOrder" @update:toggle-sort="toggleSort"/>
@@ -106,7 +106,7 @@ watch(
           <TableBody v-else>
             <TableRow
               :id="`${alert.id}_row`"
-              :class="hoverListRow('relative cursor-pointer duration-0')"
+              :class="hoverListRow('relative')"
               v-for="alert in alerts"
               :key="alert.id">
 

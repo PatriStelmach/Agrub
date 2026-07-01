@@ -7,8 +7,8 @@ const props = defineProps<{
   keyName: string,
   label: string,
   class?: HTMLAttributes["class"],
-  sortKey: string,
-  sortOrder: string
+  sortKey?: string,
+  sortOrder?: string
 }>()
 
 

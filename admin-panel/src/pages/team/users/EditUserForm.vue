@@ -22,6 +22,7 @@ const props = defineProps<{
   actionType: "create" | "edit"
 }>()
 
+const isOpen = defineModel<boolean>('isOpen')
 const userStore = useUserStore()
 const updatedUser = ref<User>({ ...props.user })
 const isLoading = ref(false)
@@ -39,13 +40,19 @@ const onSubmit = handleSubmit(async () => {
   isLoading.value = true
   if(props.actionType === "edit") {
     await userStore.editUserRequest(updatedUser.value)
-      .then((res) => toast.success(`User ${res} updated successfully.`))
+      .then((res) => {
+        toast.success(`User ${res} updated successfully.`)
+        isOpen.value = false
+      })
       .catch((error) => toast.error(`Error updating ${updatedUser.value.email}: ${error.message}`))
       .finally(() => isLoading.value = false)
   }
   else {
     await userStore.createUserRequest(updatedUser.value)
-      .then((res) => toast.success(`User ${res} created successfully.`))
+      .then((res) => {
+        toast.success(`User ${res} created successfully.`)
+        isOpen.value = false
+      })
       .catch((error) => toast.error(`Error creating ${updatedUser.value.email}: ${error.message}`))
       .finally(() => isLoading.value = false)
   }
@@ -83,7 +90,7 @@ watch(values, (newValues) => {
       <FormInput v-if="actionType === 'create'" autocomplete="password" type="password" name="password" label="Password" orientation="vertical">
         <IconLock class="size-4"/>
       </FormInput>
-      <FormInput v-if="actionType === 'create'" autocomplete="new-password" type="password" name="confirmPassword" label="Confirm password" orientation="vertical">
+      <FormInput v-if="actionType === 'create'" autocomplete="confirm-password" type="password" name="confirmPassword" label="Confirm password" orientation="vertical">
         <IconLock class="size-4"/>
       </FormInput>
 
@@ -112,7 +119,12 @@ watch(values, (newValues) => {
   </form>
 
   <SheetFooter>
-      <Button  type="submit" form="edit-user-form" variant="green_outline" class="flex items-center">
+      <Button
+        id="submit_user_form"
+        type="submit"
+        form="edit-user-form"
+        variant="green_outline"
+        class="flex items-center">
         Save <IconDeviceFloppy v-if="!isLoading" />
         <IconLoader v-else class="animate-spin" />
       </Button>

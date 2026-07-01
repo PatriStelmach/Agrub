@@ -27,7 +27,7 @@ import {
   IconPlayerPlay,
   IconLoader
 } from "@tabler/icons-vue"
-import {computed, ref, toRaw, watch, watchEffect} from "vue";
+import {computed, ref, watch, watchEffect} from "vue";
 import {useClientSort} from "@/composables/useClientSort";
 import SortableHead from "@/helpers_components/SortableHead.vue";
 import {
@@ -193,10 +193,11 @@ const nextRun = (plugin: MyPlugin) => {
   return plugin.cronExpression ?  dateParser(cronParser.parse(plugin.cronExpression).next().toDate()).fullDate.toString() : ''
 }
 
-const updateDetails = (code: string, description: string) => {
+const updateDetails = (code: string, description: string, args: string) => {
   if(unwrappedItem.value) {
     unwrappedItem.value.code = code
     unwrappedItem.value.description = description
+    unwrappedItem.value.arguments = args
   }
 }
 
@@ -479,12 +480,12 @@ const onEdit = (plugin: MyPlugin) => {
             <DateCell class="" v-if="plugin.updatedAt" :date="plugin.updatedAt"></DateCell>
             <TableCell v-if="isUnwrapped(plugin.fullName) && unwrappedItem && authStore.isAdmin" >
               <div class="flex items-center gap-x-2">
-                <input v-model="unwrappedItem.active" type="radio" class="size-4 cursor-pointer lg:size-5 xl:size-6 2xl:size-8" id=radio-on :value="true" />
-                <Label class="cursor-pointer text-green-badge"  for="radio-on">On</Label>
+                <input v-model="unwrappedItem.active" type="radio" class="size-4 cursor-pointer lg:size-5 xl:size-6 2xl:size-8" id=radio-plugin-on :value="true" />
+                <Label class="cursor-pointer text-green-badge"  for="radio-plugin-on">On</Label>
               </div>
               <div class="flex items-center gap-x-2">
-                <input v-model="unwrappedItem.active" type="radio" class="size-4 cursor-pointer lg:size-5 xl:size-6 2xl:size-8" id="radio-off" :value="false" />
-                <Label class="cursor-pointer text-destructive" for="radio-off">Off</Label>
+                <input v-model="unwrappedItem.active" type="radio" class="size-4 cursor-pointer lg:size-5 xl:size-6 2xl:size-8" id="radio-plugin-off" :value="false" />
+                <Label class="cursor-pointer text-destructive" for="radio-plugin-off">Off</Label>
               </div>
             </TableCell>
             <TableCell v-else class=" text-green-badge" :class="{'text-destructive' : !plugin.active}">{{ plugin.active ? 'On' : 'Off'}}</TableCell>
@@ -505,6 +506,7 @@ const onEdit = (plugin: MyPlugin) => {
                   <IconCode v-else class="size-4 xl:size-5"/>
                 </Button>
                 <Button
+                  id="save_plugin_"
                   v-if="authStore.isAdmin"
                   :disabled="!cronDescription[2]"
                   class="border-l-2!"

@@ -49,6 +49,7 @@ onMounted(async () => {
         :user="blankUser as User"
       >
         <Button
+          id="add_user_button"
           variant="green_outline">
           Add new user
           <IconUserPlus/>
