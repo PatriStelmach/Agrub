@@ -11,7 +11,7 @@
 
     
     <application
-        android:label="alert_app"
+        android:label="Agrub"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon"
         android:usesCleartextTraffic="true">
