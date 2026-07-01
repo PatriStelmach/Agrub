@@ -99,6 +99,7 @@ onMounted(() => {
 
       <DialogLabel :text="tagsLabel" :for="inputId" />
       <Button
+        id="open_tag_list_button"
         type="button"
         @click="toggleTagListOpen" :variant="tagListOpen ? 'red_outline' : 'green_outline'" size="icon-sm">
         <component :is="tagListOpen ? IconEyeOff : IconEye" />
@@ -133,6 +134,7 @@ onMounted(() => {
     <Transition name="fade" mode="out-in">
       <div v-if="tagListOpen && matchedTags.length > 0" :class="tagsContainer">
         <Badge
+          :id="`tag_${tag}`"
           variant="tags" class="mr-1 my-1"
           @click="addTagFromBadge(tag)"
           v-for="(tag, index) in matchedTags" :key="index">

@@ -90,7 +90,7 @@ watch(values, (newValues) => {
       <FormInput v-if="actionType === 'create'" autocomplete="password" type="password" name="password" label="Password" orientation="vertical">
         <IconLock class="size-4"/>
       </FormInput>
-      <FormInput v-if="actionType === 'create'" autocomplete="new-password" type="password" name="confirmPassword" label="Confirm password" orientation="vertical">
+      <FormInput v-if="actionType === 'create'" autocomplete="confirm-password" type="password" name="confirmPassword" label="Confirm password" orientation="vertical">
         <IconLock class="size-4"/>
       </FormInput>
 
@@ -119,7 +119,12 @@ watch(values, (newValues) => {
   </form>
 
   <SheetFooter>
-      <Button  type="submit" form="edit-user-form" variant="green_outline" class="flex items-center">
+      <Button
+        id="submit_user_form"
+        type="submit"
+        form="edit-user-form"
+        variant="green_outline"
+        class="flex items-center">
         Save <IconDeviceFloppy v-if="!isLoading" />
         <IconLoader v-else class="animate-spin" />
       </Button>

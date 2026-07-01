@@ -124,6 +124,7 @@ const emits = defineEmits<{
           </DialogClose>
           <DialogClose as-child v-if="editable">
             <Button
+              id="save_plugin_details"
               variant="green_outline"
               type="submit"
               @click="emits('update:save-changes', newCode, newDescription, newArguments)"
