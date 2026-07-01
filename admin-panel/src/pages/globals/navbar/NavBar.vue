@@ -4,7 +4,6 @@ import {
   IconAlertTriangle,
   IconDatabase,
   IconHistory,
-  IconPhoneRinging,
   IconDeviceDesktopAnalytics,
   IconClock,
   IconCalendar,
@@ -16,6 +15,9 @@ import {
   IconHelp,
   IconChartHistogram,
 } from "@tabler/icons-vue";
+import agrub_logo_dark from "/icons/agrub_logo_dark.png"
+import agrub_logo_light from "/icons/agrub_logo_light.png"
+
 import {
   Sidebar, SidebarContent,
   SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu,
@@ -27,7 +29,9 @@ import {onMounted, ref} from "vue";
 import {useAuthStore} from "@/stores/authStore.ts";
 import {dateParser} from "@/helpers_functions/dateParser.ts";
 import {toast} from "vue-sonner";
+import {useColorMode} from "@vueuse/core";
 
+const mode = useColorMode()
 const date = ref<Date>(new Date())
 const time = ref<string>(dateParser(date.value).fullTime);
 const dayMonthYear  = ref<string>(dateParser(date.value).dayMonthYear)
@@ -113,8 +117,12 @@ const navItems = authStore.isAdmin ? [
 
   <Sidebar>
     <SidebarHeader>
-      <div class="text-xl space-x-2 flex pt-4"><IconPhoneRinging/>
-        <span>Agrub</span>
+      <div class="text-3xl items-center space-x-2 flex pt-4">
+        <img
+          :src="mode === 'light' ? agrub_logo_light : agrub_logo_dark"
+          class="size-13"
+          alt="agrub_logo"/>
+        <p class="text-blue-badge ">AGRUB</p>
       </div>
 
     </SidebarHeader>

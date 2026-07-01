@@ -1,57 +1,109 @@
-# AlertWIP
+# Agrub
 
-## Overview
+Agrub to zintegrowany system monitorowania i zarządzania incydentami bezpieczeństwa oraz awariami infrastruktury IT. Projekt składa się z aplikacji webowej (panelu administracyjnego) oraz powiązanej aplikacji mobilnej, które umożliwiają agregację alertów, zarządzanie nimi w czasie rzeczywistym oraz automatyzację reakcji na zdarzenia z poziomu jednego, spójnego interfejsu.
 
-AlertVIP for mobile is an application built in flutter for the purpose of monitoring and notifying about active server events for use with the AlertVIP server agent.
+## Wymagania systemowe
 
-## Getting Started
+Przed uruchomieniem projektu upewnij się, że w systemie zainstalowane są następujące narzędzia:
 
-### Prerequisites
+- Git
+- Docker z Docker Compose
 
-- flutter
-- dart
+## Stos technologiczny
 
-### Setup project
+System został zaprojektowany i zaimplementowany przy użyciu technologii:
 
-- Clone this repository using `git clone https://github.com/PatriStelmach/AlertVIP`
-- cd into mobile_app
-- `flutter pub` get to get all the dependencies
-- Generate files using Builder Runner (required)
+- Backend: Java ze wsparciem frameworka Spring Boot (zarządzanie procesami, harmonogramowanie zadań i obsługa webhooków).
+- Frontend webowy: JavaScript / TypeScript w oparciu o bibliotekę React (dynamiczny panel administratora z obsługą strumieniowania zdarzeń w czasie rzeczywistym).
+- Baza danych i pamięć podręczna: MySQL 8.0 jako główny relacyjny magazyn danych oraz Redis jako baza klucz-wartość do obsługi szybkiego cache'owania i sesji.
+- Konteneryzacja: Docker oraz Docker Compose do zapewnienia pełnej izolacji, powtarzalności i łatwości wdrożenia całego środowiska.
+
+## Struktura środowiska (Docker Compose)
+
+Cały stos aplikacyjny uruchamiany jest automatycznie w ramach zdefiniowanej struktury kontenerów, podzielonych na warstwy:
+
+### Warstwa aplikacji
+
+- alert-backend: Główny kontener aplikacji Spring Boot odpowiedzialny za logikę biznesową, autoryzację i odbiór alertów.
+- alert-frontend: Serwer Nginx serwujący aplikację kliencką React.
+- mysql-app: Relacyjna baza danych MySQL przechowująca konfigurację użytkowników, grup i historię incydentów.
+- redis-cache: Szybka pamięć podręczna Redis optymalizująca zapytania i działanie backendu.
+
+## Instalacja i uruchomienie
+
+1. Sklonuj repozytorium projektu:
+
+```bash
+git clone https://github.com/PatriStelmach/Agrub.git
+cd Agrub
 ```
-flutter pub run build_runner build
-```
-Make sure you have a connected Android/iOS device/simulator and run the following command to build and run the app in debug mode.
 
-```
-flutter run
+2. Uruchom kontenery:
+```bash
+ docker compose up -d
 ```
 
-## Features:
 
-### Alerts:
-- Active alert monitoring
-- Alert History viewing with sorting
-- ACKing and commenting alerts
-- Sound notifying on highest alert levels
+## Opis funkcjonalności
+### 1. Elastyczne uwierzytelnianie
 
-### Scripts:
-- Manual script running
-- Modifying scheduled scripts
+System umożliwia logowanie użytkowników na dwa niezależne sposoby:
+- Klasyczna autoryzacja na podstawie lokalnej bazy danych MySQL systemu Agrub.
+- Integracja z usługami katalogowymi Active Directory / LDAP (mapowanie użytkowników domenowych).
 
-### Profiles:
-- Viewing your profile 
+### 2. Wsparcie dla systemów zewnętrznych (Wazuh, Zabbix, Nagios)
 
-### Multi language support:
-- Polish 
-- English
+Agrub działa jako centralny punkt agregacji dla wiodących platform monitoringu i bezpieczeństwa. Z poziomu panelu możliwe jest:
+- Wazuh: Odbieranie alertów bezpieczeństwa (SIEM) oraz weryfikacja logów operacyjnych z agentów.
+- Zabbix & Nagios: Monitorowanie statusu infrastruktury, automatyczna synchronizacja problemów oraz możliwość bezpośredniego zatwierdzania incydentów (ACK) lub zamykania zgłoszeń bez konieczności przechodzenia do paneli źródłowych tych systemów.
+### 3. Własne wtyczki
 
+Możliwość rozszerzania możliwości systemu poprzez uruchamianie własnych skryptów i pluginów reagujących na incydenty lub wykonujących cykliczne zadania. System wspiera języki:
+- Bash
+- Python
+- PowerShell
 
-## Contributors
+### 4. Kontrola dostępu i zarządzanie uprawnieniami
 
+- Grupy użytkowników: Możliwość tworzenia struktur grupowych w celu precyzyjnego regulowania poziomów uprawnień oraz widoczności alertów dla poszczególnych zespołów (np. SOC, Network, DevOps).
+- Klucze API: Generowanie dedykowanych tokenów uwierzytelniających umożliwiających integrację zewnętrznych systemów za pomocą mechanizmu webhooków.
+
+### 5. Zaawansowane wykresy i analityka
+
+Panel udostępnia zestaw metryk ułatwiających analizę efektywności pracy zespołu:
+- Całkowita liczba zarejestrowanych alertów.
+- Całkowita liczba alertów z ostatnich 7 dni z podziałem na stopnie ważności.
+- Średni czas potrzebny na podjęcie (zatwierdzenie) alertu w ciągu ostatnich 7 dni.
+- Średni czas potrzebny na całkowite rozwiązanie i zamknięcie zgłoszenia w ciągu ostatnich 7 dni.
+- Porównawcze zestawienie czasu reakcji do czasu pełnego rozwiązania incydentu w ciągu ostatnich 7 dni.
+
+## Konfiguracja systemu
+
+Wszystkie kluczowe parametry środowiskowe zarządzane są z poziomu sekcji ustawień w aplikacji.
+### Ustawienia bezpieczeństwa
+- Czas życia hasła (dni): domyślnie 90
+- Czas życia tokenu dostępowego (minuty): domyślnie 1440
+- Czas życia tokenu odświeżania (godziny): domyślnie 168
+
+### Konfiguracja Active Directory / LDAP
+
+- Domena Active Directory
+- URL serwera Active Directory
+- Główna ścieżka LDAP (Base DN)
+- Szablon nazwy wyróżniającej użytkownika LDAP (User DN Pattern)
+
+### Ustawienia powiadomień pocztowych (SMTP)
+
+- Serwer SMTP
+- Port SMTP
+- Użytkownik SMTP
+- Status usługi SMTP (Włączona/Wyłączona)
+
+## Twórcy
+- Mateusz Andrzejak
 - Patri Stelmach
 - Kamil Kornatowski
 - Błażej Majchrzak
-
 
 # Instrukcja integracji systemu Alert z zewnętrznymi systemami
 

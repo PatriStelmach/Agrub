@@ -92,7 +92,9 @@ watchEffect( () => {
           v-for="alert in sortedData"
           :key="alert.id"
         >
-          <TableCell class="pl-4  whitespace-break-spaces">{{alert.subject}}</TableCell>
+          <TableCell
+            :id="`${alert.id}_subject`"
+            class="pl-4  whitespace-break-spaces">{{alert.subject}}</TableCell>
           <TableCell>
             <SeverityDiv :severity="alert.severity"/>
           </TableCell>

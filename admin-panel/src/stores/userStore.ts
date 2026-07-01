@@ -32,6 +32,18 @@ export const useUserStore = defineStore('user-store',() => {
     }
   }
 
+  const deleteUserRequest = async (user: User) => {
+    try {
+      const res = await api.delete(`/users/${user.id}`)
+      if(res.status === 200) {
+        await getAllUsersRequest()
+        return fullName(user)
+      }
+    } catch (error) {
+      throw error
+    }
+  }
+
   const createUserRequest = async (user: User) => {
     try {
       const res = await api.post('/users', user)
@@ -86,6 +98,7 @@ export const useUserStore = defineStore('user-store',() => {
     editUserRequest,
     getAllGroupsRequest,
     createUserRequest,
+    deleteUserRequest,
     changeUserPasswordRequest,
   }
 })

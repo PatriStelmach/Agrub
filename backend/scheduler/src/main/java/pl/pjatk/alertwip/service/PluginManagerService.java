@@ -159,6 +159,10 @@ public class PluginManagerService {
             List<String> lines = Files.readAllLines(path);
             ParsedHeaders headers = parseFileHeaders(path);
 
+            String arguments = taskRepository.findByScriptName(fileName)
+                    .map(ScheduledTask::getArguments)
+                    .orElse("");
+
             List<String> cleanCodeLines = new ArrayList<>();
             boolean passedSystemHeaders = false;
 
@@ -190,7 +194,7 @@ public class PluginManagerService {
                 }
             }
 
-            return new PluginDetailsDTO(headers.description, String.join("\n", cleanCodeLines));
+            return new PluginDetailsDTO(headers.description, String.join("\n", cleanCodeLines), arguments);
         } catch (IOException e) {
             throw new RuntimeException("Błąd odczytu pliku: " + e.getMessage());
         }

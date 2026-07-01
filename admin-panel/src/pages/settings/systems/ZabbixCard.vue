@@ -47,7 +47,7 @@ const onSubmit = handleSubmit(async (values) => {
     changedValues.zabbix_url = values.zabbix_url
   }
   if (!!values.zabbix_api_token_SECRET) {
-    changedValues.zabbix_password_SECRET = values.zabbix_api_token_SECRET
+    changedValues.zabbix_api_token_SECRET = values.zabbix_api_token_SECRET
   }
   if (Object.keys(changedValues).length === 0) {
     toast.info("No changes detected.")

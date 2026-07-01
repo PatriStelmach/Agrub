@@ -32,6 +32,7 @@ const authStore = useAuthStore()
       <DropdownMenu>
         <DropdownMenuTrigger as-child>
           <SidebarMenuButton
+            id="my_profile_button"
             size="lg"
             class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
           >
@@ -85,6 +86,7 @@ const authStore = useAuthStore()
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem
+            id="logout_button"
             @click="authStore.logout">
             <IconLogout/>
             Log out
