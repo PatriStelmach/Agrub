@@ -39,7 +39,9 @@ watch(isDialogOpen, (newValue, oldValue) => {
 </script>
 
 <template>
-  <Card :class="`${gridCard} relative`">
+  <Card
+    :id="`user_card_${user.firstname}_${user.surname}`"
+    :class="`${gridCard} relative`">
     <CardHeader class="px-3 flex space-x-1 items-center relative">
       <div class="relative">
         <Avatar class="size-9 rounded-lg">

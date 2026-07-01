@@ -506,7 +506,7 @@ const onEdit = (plugin: MyPlugin) => {
                   <IconCode v-else class="size-4 xl:size-5"/>
                 </Button>
                 <Button
-                  id="save_plugin_"
+                  :id="`save_plugin_${plugin.name}`"
                   v-if="authStore.isAdmin"
                   :disabled="!cronDescription[2]"
                   class="border-l-2!"
