@@ -99,6 +99,7 @@ watch(isDialogOpen, (newValue, oldValue) => {
     </CardDescription>
     <DeleteUserDialog :user="user">
       <Button
+        v-if="authStore.isAdmin"
         size="icon-sm"
         variant="red_outline"
         class="absolute bottom-4 right-2 "
