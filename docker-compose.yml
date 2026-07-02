@@ -1,0 +1,160 @@
+services:
+
+  # ALERT BACKEND
+  alert-backend:
+    build:
+      context: ./backend/scheduler
+      dockerfile: Dockerfile
+    container_name: alert-backend
+    restart: unless-stopped
+    volumes:
+      - ./scripts:/app/scripts
+    environment:
+      - TZ=${SYSTEM_TIMEZONE:-UTC}
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-app:3306/alertwip?useSSL=false&serverTimezone=${SYSTEM_TIMEZONE:-UTC}&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=rootpassword
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_DATA_REDIS_HOST=redis-cache
+      - SPRING_DATA_REDIS_PORT=6379
+      - APP_SCRIPTS_PATH=/app/scripts
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=DEBUG
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB=DEBUG
+      - APP_COOKIE_SECURE=true
+    depends_on:
+      - mysql-app
+      - redis-cache
+    networks:
+      - monitor_net
+      - npm_network
+
+  mysql-app:
+    image: mysql:8.0
+    container_name: mysql-app
+    restart: unless-stopped
+    environment:
+      - TZ=${SYSTEM_TIMEZONE:-UTC}
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_DATABASE=alertwip
+    volumes:
+      - ./mysql-app:/var/lib/mysql
+    networks:
+      - monitor_net
+
+  redis-cache:
+    image: redis:7-alpine
+    container_name: redis-cache
+    restart: unless-stopped
+    volumes:
+      - redis_main_data:/data
+    networks:
+      - monitor_net
+
+
+  # ZABBIX (Server + Web + DB)
+  mysql-zabbix:
+    image: mysql:8.0
+    container_name: mysql-zabbix
+    restart: unless-stopped
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_bin
+      - --log-bin-trust-function-creators=1
+    environment:
+      - TZ=${SYSTEM_TIMEZONE:-UTC}
+      - MYSQL_ROOT_PASSWORD=zabbixroot
+      - MYSQL_DATABASE=zabbix
+      - MYSQL_USER=zabbix
+      - MYSQL_PASSWORD=zabbixpass
+    volumes:
+      - zabbix-db-data:/var/lib/mysql
+    networks:
+      - monitor_net
+
+  zabbix-server:
+    image: zabbix/zabbix-server-mysql:ubuntu-6.4-latest
+    container_name: zabbix-server
+    restart: unless-stopped
+    environment:
+      - TZ=${SYSTEM_TIMEZONE:-UTC}
+      - DB_SERVER_HOST=mysql-zabbix
+      - MYSQL_DATABASE=zabbix
+      - MYSQL_USER=zabbix
+      - MYSQL_PASSWORD=zabbixpass
+    ports:
+      - "10051:10051"
+    depends_on:
+      - mysql-zabbix
+    volumes:
+      - ./zabbix-server:/usr/lib/zabbix/alertscripts
+    networks:
+      - monitor_net
+
+  zabbix-web:
+    image: zabbix/zabbix-web-nginx-mysql:ubuntu-6.4-latest
+    container_name: zabbix-web
+    restart: unless-stopped
+    environment:
+      - TZ=${SYSTEM_TIMEZONE:-UTC}
+      - DB_SERVER_HOST=mysql-zabbix
+      - MYSQL_DATABASE=zabbix
+      - MYSQL_USER=zabbix
+      - MYSQL_PASSWORD=zabbixpass
+      - ZBX_SERVER_HOST=zabbix-server
+      - PHP_TZ=${SYSTEM_TIMEZONE:-UTC}
+    ports:
+      - "8081:8080"
+    depends_on:
+      - mysql-zabbix
+      - zabbix-server
+    networks:
+      - monitor_net
+
+  zabbix-agent:
+    image: zabbix/zabbix-agent:ubuntu-6.4-latest
+    container_name: zabbix-agent
+    restart: unless-stopped
+    environment:
+      - TZ=${SYSTEM_TIMEZONE:-UTC}
+      - ZBX_SERVER_HOST=zabbix-server
+    networks:
+      - monitor_net
+
+  # NAGIOS
+  nagios:
+    image: jasonrivers/nagios:latest
+    container_name: nagios
+    restart: unless-stopped
+    ports:
+      - "8082:80"
+    environment:
+      - TZ=${SYSTEM_TIMEZONE:-UTC}
+      - NAGIOSADMIN_USER=nagiosadmin
+      - NAGIOSADMIN_PASS=JebanieKurwa1
+    networks:
+      - monitor_net
+
+
+  # FRONTEND
+  frontend-nginx:
+    build:
+      context: ./admin-panel
+    container_name: alert-frontend
+    environment:
+      - TZ=${SYSTEM_TIMEZONE:-UTC}
+      - TZ=Europe/Warsaw
+    networks:
+      - monitor_net
+      - npm_network
+    depends_on:
+      - alert-backend
+
+networks:
+  monitor_net:
+    driver: bridge
+  npm_network:
+    external: true
+
+volumes:
+  zabbix-db-data:
+  redis_main_data:

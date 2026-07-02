@@ -1,0 +1,12 @@
+include: package:flutter_lints/flutter.yaml
+linter:
+  rules:
+    # Async principles
+    unawaited_futures: true         
+    always_declare_return_types: true 
+    avoid_void_async: true          
+
+    # Clean code rules
+    prefer_final_locals: true       
+    prefer_const_constructors: true 
+    avoid_print: true               

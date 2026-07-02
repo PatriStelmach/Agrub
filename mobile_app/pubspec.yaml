@@ -1,0 +1,59 @@
+name: alert_app
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.10.4
+
+dependencies:
+  flutter_localizations:
+    sdk: flutter
+  audioplayers: ^6.6.0
+  firebase_core: ^4.7.0
+  firebase_messaging: ^16.2.0
+  flutter_client_sse: 2.0.3
+  flutter:
+    sdk: flutter
+  dio: ^5.4.0
+  http: ^1.2.0
+  flutter_secure_storage: ^9.0.0
+  jwt_decoder: ^2.0.1
+  provider: ^6.1.5+1
+  vibration: ^3.1.3
+  get_it: ^9.2.1
+  shared_preferences: ^2.2.0
+  flutter_local_notifications: ^21.0.0
+  google_fonts: ^8.1.0
+  intl: ^0.20.2
+  flutter_gen: ^5.14.1
+  sound_mode: ^3.1.1
+  permission_handler: ^12.0.3
+  flutter_volume_controller: ^2.0.1
+  integration_test:
+    sdk: flutter
+  mocktail: ^1.0.5
+  flutter_test:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.13.1
+  test_cov_console: ^0.2.2
+
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/app_icon.png"
+  min_sdk_android: 21 
+
+flutter:
+  uses-material-design: true
+  generate: true
+  assets:
+  - assets/audio/alarm.mp3
+  #mock data assets
+  - assets/mocks/
+
+

@@ -1,0 +1,483 @@
+package pl.pjatk.alertwip.service;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import pl.pjatk.alertwip.config.DynamicSchedulerConfig;
+import pl.pjatk.alertwip.dto.PluginDTO;
+import pl.pjatk.alertwip.dto.PluginDetailsDTO;
+import pl.pjatk.alertwip.dto.PluginSaveDTO;
+import pl.pjatk.alertwip.model.Plugin;
+import pl.pjatk.alertwip.model.ScheduledTask;
+import pl.pjatk.alertwip.repository.ScheduledTaskRepository;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+@Service
+public class PluginManagerService {
+
+    private final ScheduledTaskRepository taskRepository;
+    private final DynamicSchedulerConfig dynamicSchedulerConfig;
+    private final ScriptExecutionService scriptExecutionService;
+
+    @Value("${app.scripts.path}")
+    private String scriptsPath;
+
+    public PluginManagerService(ScheduledTaskRepository taskRepository,
+                                DynamicSchedulerConfig dynamicSchedulerConfig,
+                                ScriptExecutionService scriptExecutionService) {
+        this.taskRepository = taskRepository;
+        this.dynamicSchedulerConfig = dynamicSchedulerConfig;
+        this.scriptExecutionService = scriptExecutionService;
+    }
+
+    @Transactional
+    public ScriptExecutionService.ScriptResult runManualScript(String fileName, String args) {
+        Path path = resolveSecurePath(fileName);
+        if (!Files.exists(path)) {
+            throw new RuntimeException("Plik nie istnieje: " + fileName);
+        }
+
+        // Szukamy zadania lub tworzymy techniczne
+        ScheduledTask task = taskRepository.findByScriptName(fileName)
+                .orElseGet(() -> {
+                    ScheduledTask newTask = new ScheduledTask();
+                    newTask.setTaskName(fileName);
+                    newTask.setScriptName(fileName);
+                    newTask.setArguments("");
+                    newTask.setArguments("");
+
+                    // Ustawiamy severity
+                    newTask.setSeverity(parseFileHeaders(path).severity);
+
+                    // martwy cron
+                    newTask.setCronExpression("* * * * * *");
+                    newTask.setActive(false);
+
+                    System.out.println("[SYSTEM] Automatyczna rejestracja skryptu w bazie do wykonania ręcznego: " + fileName);
+                    return taskRepository.save(newTask);
+                });
+
+        return scriptExecutionService.runScript(task, args);
+    }
+
+    private Path resolveSecurePath(String fileName) {
+        Path basePath = Paths.get(scriptsPath).toAbsolutePath().normalize();
+        Path resolvedPath = basePath.resolve(fileName).normalize();
+
+        if (!resolvedPath.startsWith(basePath)) {
+            throw new SecurityException("Niedozwolona ścieżka pliku (próba Path Traversal): " + fileName);
+        }
+        return resolvedPath;
+    }
+
+
+    private static class ParsedHeaders {
+        String description = "Brak opisu w pliku";
+        String creator = "Nieznany";
+        List<String> tags = new ArrayList<>();
+        int severity = 1; // Domyślnie traktujemy jako Log
+    }
+
+    private ParsedHeaders parseFileHeaders(Path path) {
+        ParsedHeaders headers = new ParsedHeaders();
+        try (BufferedReader reader = Files.newBufferedReader(path)) {
+            String line;
+            int count = 0;
+            while ((line = reader.readLine()) != null && count < 15) {
+                count++;
+                String trimmed = line.trim();
+                if (trimmed.startsWith("# Description:")) {
+                    headers.description = trimmed.substring(14).trim();
+                } else if (trimmed.startsWith("# Creator:")) {
+                    headers.creator = trimmed.substring(10).trim();
+                } else if (trimmed.startsWith("# Tags:")) {
+                    String tagsRaw = trimmed.substring(7).trim();
+                    if (!tagsRaw.isEmpty()) headers.tags = Arrays.asList(tagsRaw.split(",\\s*"));
+                } else if (trimmed.toLowerCase().startsWith("# severity:")) {
+                    try {
+                        headers.severity = Integer.parseInt(trimmed.substring(11).trim());
+                    } catch (NumberFormatException e) {
+                        headers.severity = 1; // Bezpieczny domyślny poziom w razie błędu parsowania
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("[SYSTEM] Nie udało się odczytać nagłówków: " + path.getFileName());
+        }
+        return headers;
+    }
+
+    private LocalDateTime getFileUpdatedAt(Path path) {
+        try {
+            BasicFileAttributes attrs = Files.readAttributes(path, BasicFileAttributes.class);
+            return LocalDateTime.ofInstant(attrs.lastModifiedTime().toInstant(), ZoneId.systemDefault());
+        } catch (IOException e) {
+            return LocalDateTime.now();
+        }
+    }
+
+
+    public List<PluginDTO> listLocalScripts() {
+        List<ScheduledTask> allTasks = taskRepository.findAll();
+
+        try (Stream<Path> paths = Files.list(Paths.get(scriptsPath))) {
+            return paths.filter(Files::isRegularFile)
+                    .filter(path -> {
+                        String name = path.toString().toLowerCase();
+                        return name.endsWith(".py") || name.endsWith(".sh") || name.endsWith(".ps1") || name.endsWith(".psm1") || name.endsWith(".bash");
+                    })
+                    .map(path -> {
+                        String fileName = path.getFileName().toString();
+                        Optional<ScheduledTask> taskOpt = allTasks.stream()
+                                .filter(t -> t.getScriptName().equals(fileName))
+                                .findFirst();
+                        return mapLocalFileToDTO(path, taskOpt);
+                    })
+                    .toList();
+        } catch (IOException e) {
+            System.err.println("Błąd skanowania folderu scripts: " + e.getMessage());
+            return List.of();
+        }
+    }
+
+    public PluginDetailsDTO getPluginDetailsByFileName(String fileName) {
+        Path path = resolveSecurePath(fileName);
+        if (!Files.exists(path)) throw new RuntimeException("Plik nie istnieje: " + fileName);
+
+        try {
+            List<String> lines = Files.readAllLines(path);
+            ParsedHeaders headers = parseFileHeaders(path);
+
+            String arguments = taskRepository.findByScriptName(fileName)
+                    .map(ScheduledTask::getArguments)
+                    .orElse("");
+
+            List<String> cleanCodeLines = new ArrayList<>();
+            boolean passedSystemHeaders = false;
+
+            for (String line : lines) {
+                String trimmed = line.trim();
+                if (!passedSystemHeaders) {
+                    //pierwsza linia to shebang więc lecimy dalej
+                    if (trimmed.startsWith("#!")) {
+                        cleanCodeLines.add(line);
+                        continue;
+                    }
+
+                    // Sprawdzamy, czy to jest jeden z NASZYCH nagłówków (ignorując wielkość liter dla severity)
+                    boolean isSystemHeader = trimmed.startsWith("# Creator:") ||
+                            trimmed.startsWith("# Description:") ||
+                            trimmed.startsWith("# Tags:") ||
+                            trimmed.toLowerCase().startsWith("# severity:");
+
+                    if (isSystemHeader) {
+                        continue;
+                    } else if (trimmed.isEmpty() && cleanCodeLines.isEmpty()) {
+                        continue;
+                    } else {
+                        passedSystemHeaders = true;
+                        cleanCodeLines.add(line);
+                    }
+                } else {
+                    cleanCodeLines.add(line);
+                }
+            }
+
+            return new PluginDetailsDTO(headers.description, String.join("\n", cleanCodeLines), arguments);
+        } catch (IOException e) {
+            throw new RuntimeException("Błąd odczytu pliku: " + e.getMessage());
+        }
+    }
+
+    @Transactional
+    public void saveFullConfig(PluginSaveDTO dto) throws Exception {
+        String oldFileName = dto.fileName();
+        String newFileName = dto.name() + dto.language();
+
+        Path oldPath = resolveSecurePath(oldFileName);
+        Path newPath = resolveSecurePath(newFileName);
+
+        // 1. Obsługa zmiany nazwy pliku (Rename)
+        if (!oldFileName.equals(newFileName) && Files.exists(oldPath)) {
+            Files.move(oldPath, newPath, StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        // 2. Budowanie nowej zawartości pliku (Shebang -> Nagłówki -> Czysty Kod)
+        String rawCode = dto.code() != null ? dto.code() : "";
+        String shebang = "";
+        String cleanCode = rawCode;
+
+        // jeśli jest jużs hebang to go wycinamy i dostawiamy na początek
+        if (rawCode.trim().startsWith("#!")) {
+            int firstNewLine = rawCode.indexOf("\n");
+            if (firstNewLine != -1) {
+                shebang = rawCode.substring(0, firstNewLine + 1);
+                cleanCode = rawCode.substring(firstNewLine + 1);
+            } else {
+                shebang = rawCode + "\n";
+                cleanCode = "";
+            }
+        } else {
+            // jak nie ma to generujemy shebanga na podstawie jezyka
+            String ext = dto.language() != null ? dto.language().toLowerCase() : "";
+            if (ext.endsWith(".py")) shebang = "#!/usr/bin/env python3\n";
+            else if (ext.endsWith(".sh") || ext.endsWith(".bash")) shebang = "#!/bin/bash\n";
+            else if (ext.endsWith(".ps1") || ext.endsWith(".psm1")) shebang = "#!/usr/bin/env pwsh\n";
+        }
+
+        StringBuilder content = new StringBuilder();
+        content.append(shebang);
+        content.append("# Creator: System\n");
+        content.append("# Description: ").append(dto.description()).append("\n");
+        content.append("# Tags: ").append(String.join(", ", dto.tags())).append("\n");
+        content.append("# Severity: ").append(dto.severity()).append("\n\n");
+        content.append(cleanCode);
+
+        Files.writeString(newPath, content.toString());
+
+        // 3. Aktualizacja bazy danych (ScheduledTask)
+        ScheduledTask task = taskRepository.findByScriptName(oldFileName)
+                .orElse(new ScheduledTask());
+
+        task.setTaskName(dto.name());
+        task.setScriptName(newFileName);
+        task.setCronExpression(dto.cronExpression());
+        task.setSeverity(dto.severity());
+        task.setActive(dto.active());
+        task.setArguments(dto.arguments());
+
+        ScheduledTask savedTask = taskRepository.save(task);
+
+        // 4. Odświeżenie Schedulera
+        dynamicSchedulerConfig.updateSchedule(savedTask);
+
+        // Jeśli nazwa się zmieniła, musimy zatrzymać stary proces w schedulerze
+        if (!oldFileName.equals(newFileName)) {
+            dynamicSchedulerConfig.stopTask(task.getId());
+        }
+    }
+
+    @Transactional
+    public void updatePluginPartial(String fileName, PluginSaveDTO partialDto) throws Exception {
+        // 1. Pobieramy stary kod i opis
+        PluginDetailsDTO currentDetails = getPluginDetailsByFileName(fileName);
+
+        // 2. Pobieramy stare metadane bezpośrednio
+        Path path = resolveSecurePath(fileName);
+        ParsedHeaders currentHeaders = parseFileHeaders(path);
+        Optional<ScheduledTask> taskOpt = taskRepository.findByScriptName(fileName);
+
+        // 3. Obliczamy bezpiecznie obecną nazwę i rozszerzenie
+        int dotIdx = fileName.lastIndexOf('.');
+        String currentName = (dotIdx == -1) ? fileName : fileName.substring(0, dotIdx);
+        String currentExt = (dotIdx == -1) ? "" : fileName.substring(dotIdx);
+
+        // 4. Mergujemy dane (jeśli pole z frontu to null, bierzemy stare wartości)
+        String finalName = partialDto.name() != null ? partialDto.name() : currentName;
+        String finalCode = partialDto.code() != null ? partialDto.code() : currentDetails.code();
+        String finalDescription = partialDto.description() != null ? partialDto.description() : currentDetails.description();
+        String finalArguments = partialDto.arguments() != null ? partialDto.arguments() : taskOpt.map(ScheduledTask::getArguments).orElse("");
+        List<String> finalTags = partialDto.tags() != null ? partialDto.tags() : currentHeaders.tags;
+
+        String finalCron = partialDto.cronExpression() != null
+                ? partialDto.cronExpression()
+                : taskOpt.map(ScheduledTask::getCronExpression).orElse(null);
+
+        int finalSeverity = partialDto.severity() != null
+                ? partialDto.severity()
+                : taskOpt.map(ScheduledTask::getSeverity).orElse(currentHeaders.severity);
+
+        boolean finalActive = partialDto.active() != null
+                ? partialDto.active()
+                : taskOpt.map(ScheduledTask::isActive).orElse(false);
+
+        // 5. Budujemy kompletny obiekt gotowy do zapisu w systemie
+        PluginSaveDTO fullDtoToSave = new PluginSaveDTO(
+                fileName,         // Stara nazwa jako punkt odniesienia
+                finalName,        // Nowa nazwa lub stara
+                currentExt,
+                finalCode,
+                finalDescription,
+                finalTags,
+                finalCron,
+                finalSeverity,
+                finalArguments,
+                finalActive
+        );
+
+        // 6. Przekazujemy pełen pakiet do głównej metody zapisującej
+        saveFullConfig(fullDtoToSave);
+    }
+
+    public int getScriptSeverity(String fileName) {
+        Path path = resolveSecurePath(fileName); // ZABEZPIECZONO
+        if (!Files.exists(path)) {
+            throw new RuntimeException("Nie można odczytać zadania. Plik nie istnieje: " + fileName);
+        }
+        return parseFileHeaders(path).severity;
+    }
+
+    public void savePluginToDisk(Plugin plugin) throws Exception {
+        String ext = (plugin.getLanguage() != null && plugin.getLanguage().startsWith("."))
+                ? plugin.getLanguage() : "." + plugin.getLanguage();
+        String fileName = plugin.getName() + ext;
+
+        Path directory = Paths.get(scriptsPath).toAbsolutePath().normalize();
+        if (!Files.exists(directory)) Files.createDirectories(directory);
+
+        Path filePath = resolveSecurePath(fileName);
+
+        String rawCode = "";
+        if (plugin.getCode() != null) {
+            rawCode = plugin.getCode()
+                    .replace("\\n", "\n")
+                    .replace("\\t", "\t")
+                    .replace("\\\"", "\"")
+                    .replace("\\\\", "\\");
+        }
+
+        String shebang = "";
+        String cleanCode = rawCode;
+
+        //jebany shebangbang
+        if (rawCode.trim().startsWith("#!")) {
+            int firstNewLine = rawCode.indexOf("\n");
+            if (firstNewLine != -1) {
+                shebang = rawCode.substring(0, firstNewLine + 1);
+                cleanCode = rawCode.substring(firstNewLine + 1);
+            } else {
+                shebang = rawCode + "\n";
+                cleanCode = "";
+            }
+        } else {
+            String langExt = ext.toLowerCase();
+            if (langExt.endsWith(".py")) shebang = "#!/usr/bin/env python3\n";
+            else if (langExt.endsWith(".sh") || langExt.endsWith(".bash")) shebang = "#!/bin/bash\n";
+            else if (langExt.endsWith(".ps1") || langExt.endsWith(".psm1")) shebang = "#!/usr/bin/env pwsh\n";
+        }
+
+
+        StringBuilder fileContent = new StringBuilder();
+        fileContent.append(shebang); //musi być pierwszy
+        fileContent.append("# Creator: ").append(plugin.getCreator() != null ? plugin.getCreator() : "Unknown").append("\n");
+        fileContent.append("# Description: ").append(plugin.getDescription() != null ? plugin.getDescription() : "Brak opisu").append("\n");
+        if (plugin.getTags() != null && !plugin.getTags().isEmpty()) {
+            fileContent.append("# Tags: ").append(String.join(", ", plugin.getTags())).append("\n");
+        }
+        fileContent.append("# Severity: ").append(plugin.getSeverity()).append("\n\n");
+        fileContent.append(cleanCode);
+
+        //składanie wszystkiego w całość
+        Files.writeString(filePath, fileContent.toString());
+    }
+
+    @Transactional
+    public void deletePlugins(List<String> fileNames) {
+        for (String fileName : fileNames) {
+            deletePluginByFileName(fileName);
+        }
+    }
+
+    @Transactional
+    public void deletePluginByFileName(String fileName) {
+        Path path = resolveSecurePath(fileName);
+        Optional<ScheduledTask> taskOpt = taskRepository.findByScriptName(fileName);
+        if (taskOpt.isPresent()) {
+            ScheduledTask task = taskOpt.get();
+            dynamicSchedulerConfig.stopTask(task.getId());
+            taskRepository.delete(task);
+        }
+        try {
+            if (Files.exists(path)) {
+                Files.delete(path);
+            } else {
+                System.out.println("Plik nie istniał na dysku, usunięto tylko wpis z bazy: " + fileName);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Nie udało się usunąć pliku z dysku: " + e.getMessage());
+        }
+    }
+
+    @Transactional
+    public void togglePlugins(List<String> fileNames) {
+        for (String fileName : fileNames) {
+            togglePluginStatus(fileName);
+        }
+    }
+
+    @Transactional
+    public boolean togglePluginStatus(String fileName) {
+        ScheduledTask task = taskRepository.findByScriptName(fileName)
+                .orElseThrow(() -> new RuntimeException("Zadanie dla pliku " + fileName + " nie jest jeszcze skonfigurowane w bazie. Zapisz je najpierw."));
+        task.setActive(!task.isActive());
+        ScheduledTask savedTask = taskRepository.save(task);
+        dynamicSchedulerConfig.updateSchedule(savedTask);
+        return savedTask.isActive();
+    }
+
+    // --- MAPOWANIE DTO ---
+
+    public PluginDTO mapStorePluginToDTO(Plugin p) {
+        String ext = (p.getLanguage() != null && p.getLanguage().startsWith("."))
+                ? p.getLanguage() : "." + p.getLanguage();
+        boolean installed = Files.exists(Paths.get(scriptsPath).resolve(p.getName() + ext));
+
+        long weightInKb = 0;
+        if (p.getWeight() != null && p.getWeight() > 0) {
+            weightInKb = Math.max(1, (long) Math.ceil((double) p.getWeight() / 1024));
+        }
+
+        return new PluginDTO(
+                p.getId(),
+                p.getName(),
+                p.getCreator(),
+                p.getDescription(),
+                ext,
+                weightInKb,
+                p.getTags(),
+                null,
+                p.getCreatedAt(),
+                p.isActive(),
+                p.getSeverity(),
+                installed,
+                ""
+        );
+    }
+
+    public PluginDTO mapLocalFileToDTO(Path path, Optional<ScheduledTask> taskOpt) {
+        String fileName = path.getFileName().toString();
+        int dotIdx = fileName.lastIndexOf('.');
+        String name = (dotIdx == -1) ? fileName : fileName.substring(0, dotIdx);
+        String ext = (dotIdx == -1) ? "" : fileName.substring(dotIdx);
+
+        long weightKb = 0;
+        try {
+            weightKb = Files.size(path) / 1024;
+        } catch (IOException ignored) {
+        }
+
+        ParsedHeaders headers = parseFileHeaders(path);
+
+        return new PluginDTO(
+                taskOpt.map(ScheduledTask::getId).orElse(null),
+                name, headers.creator, headers.description, ext, weightKb, headers.tags,
+                taskOpt.map(ScheduledTask::getCronExpression).orElse(null),
+                getFileUpdatedAt(path),
+                taskOpt.map(ScheduledTask::isActive).orElse(false),
+                taskOpt.map(ScheduledTask::getSeverity).orElse(headers.severity),
+                true,
+                taskOpt.map(ScheduledTask::getArguments).orElse("")
+        );
+    }
+}

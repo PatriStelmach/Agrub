@@ -1,0 +1,33 @@
+services:
+  wazuh-indexer:
+    image: wazuh/wazuh-indexer:4.7.2
+    container_name: wazuh-indexer
+    environment:
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock: { soft: -1, hard: -1 }
+      nofile: { soft: 65536, hard: 65536 }
+
+  wazuh-manager:
+    image: wazuh/wazuh-manager:4.7.2
+    container_name: wazuh-manager
+    hostname: wazuh-manager
+    depends_on:
+      - wazuh-indexer
+    ports:
+      - "1514:1514"
+      - "1515:1515"
+      - "55000:55000"
+    environment:
+      - INDEXER_URL=https://wazuh-indexer:9200
+      - INDEXER_USERNAME=admin
+      - INDEXER_PASSWORD=admin
+      - FILEBEAT_SSL_VERIFICATION_MODE=none
+      - WAZUH_API_USER=wazuh
+      - WAZUH_API_PASSWORD=wazuh
+  wazuh-agent:
+    build: .
+    container_name: wazuh-agent
+    hostname: prod-agent-01
+    depends_on:
+      - wazuh-manager

@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+venv/
+
+# IDE
+.idea/
+.vscode/
+
+# Docker - Zabbix
+dummy_data/
+zabbix_data/
+mysql_data/
+
+.env
+/backend/scheduler/target
+admin-panel/package-lock.json
+admin-panel/package-lock.json
