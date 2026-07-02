@@ -14,7 +14,7 @@ Przed uruchomieniem projektu upewnij się, że w systemie zainstalowane są nast
 System został zaprojektowany i zaimplementowany przy użyciu technologii:
 
 - Backend: Java ze wsparciem frameworka Spring Boot (zarządzanie procesami, harmonogramowanie zadań i obsługa webhooków).
-- Frontend webowy: JavaScript / TypeScript w oparciu o bibliotekę React (dynamiczny panel administratora z obsługą strumieniowania zdarzeń w czasie rzeczywistym).
+- Frontend webowy: JavaScript / TypeScript w oparciu o Vue.js (dynamiczny panel administratora z obsługą strumieniowania zdarzeń w czasie rzeczywistym).
 - Baza danych i pamięć podręczna: MySQL 8.0 jako główny relacyjny magazyn danych oraz Redis jako baza klucz-wartość do obsługi szybkiego cache'owania i sesji.
 - Konteneryzacja: Docker oraz Docker Compose do zapewnienia pełnej izolacji, powtarzalności i łatwości wdrożenia całego środowiska.
 
@@ -72,10 +72,10 @@ Możliwość rozszerzania możliwości systemu poprzez uruchamianie własnych sk
 
 Panel udostępnia zestaw metryk ułatwiających analizę efektywności pracy zespołu:
 - Całkowita liczba zarejestrowanych alertów.
-- Całkowita liczba alertów z ostatnich 7 dni z podziałem na stopnie ważności.
-- Średni czas potrzebny na podjęcie (zatwierdzenie) alertu w ciągu ostatnich 7 dni.
-- Średni czas potrzebny na całkowite rozwiązanie i zamknięcie zgłoszenia w ciągu ostatnich 7 dni.
-- Porównawcze zestawienie czasu reakcji do czasu pełnego rozwiązania incydentu w ciągu ostatnich 7 dni.
+- Całkowita liczba alertów z wybranego okresu czasu z podziałem na stopnie ważności.
+- Średni czas potrzebny na podjęcie (zatwierdzenie) alertu w ciągu ostatnich wybranego okresu czasu.
+- Średni czas potrzebny na całkowite rozwiązanie i zamknięcie zgłoszenia w ciągu wybranego okresu czasu.
+- Porównawcze zestawienie czasu reakcji do czasu pełnego rozwiązania incydentu w ciągu wybranego okresu czasu.
 
 ## Konfiguracja systemu
 
@@ -98,6 +98,10 @@ Wszystkie kluczowe parametry środowiskowe zarządzane są z poziomu sekcji usta
 - Port SMTP
 - Użytkownik SMTP
 - Status usługi SMTP (Włączona/Wyłączona)
+
+### Ustawienia powiadomień
+- Częstotliwość synchronizacji systemów zewnętrznych (sekundy): 60
+- Maksymalny czas wykonywania własnych skryptów (sekundy): 30
 
 ## Twórcy
 - Mateusz Andrzejak
