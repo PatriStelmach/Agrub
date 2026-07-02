@@ -22,10 +22,10 @@ System został zaprojektowany i zaimplementowany przy użyciu technologii:
 
 Cały stos aplikacyjny uruchamiany jest automatycznie w ramach zdefiniowanej struktury kontenerów, podzielonych na warstwy:
 
-### Warstwa aplikacji
+### Warstwy aplikacji
 
 - alert-backend: Główny kontener aplikacji Spring Boot odpowiedzialny za logikę biznesową, autoryzację i odbiór alertów.
-- alert-frontend: Serwer Nginx serwujący aplikację kliencką React.
+- alert-frontend: Serwer Nginx serwujący aplikację kliencką Vue.js.
 - mysql-app: Relacyjna baza danych MySQL przechowująca konfigurację użytkowników, grup i historię incydentów.
 - redis-cache: Szybka pamięć podręczna Redis optymalizująca zapytania i działanie backendu.
 
@@ -55,6 +55,7 @@ System umożliwia logowanie użytkowników na dwa niezależne sposoby:
 Agrub działa jako centralny punkt agregacji dla wiodących platform monitoringu i bezpieczeństwa. Z poziomu panelu możliwe jest:
 - Wazuh: Odbieranie alertów bezpieczeństwa (SIEM) oraz weryfikacja logów operacyjnych z agentów.
 - Zabbix & Nagios: Monitorowanie statusu infrastruktury, automatyczna synchronizacja problemów oraz możliwość bezpośredniego zatwierdzania incydentów (ACK) lub zamykania zgłoszeń bez konieczności przechodzenia do paneli źródłowych tych systemów.
+
 ### 3. Własne wtyczki
 
 Możliwość rozszerzania możliwości systemu poprzez uruchamianie własnych skryptów i pluginów reagujących na incydenty lub wykonujących cykliczne zadania. System wspiera języki:
