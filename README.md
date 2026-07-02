@@ -14,7 +14,7 @@ Przed uruchomieniem projektu upewnij się, że w systemie zainstalowane są nast
 System został zaprojektowany i zaimplementowany przy użyciu technologii:
 
 - Backend: Java ze wsparciem frameworka Spring Boot (zarządzanie procesami, harmonogramowanie zadań i obsługa webhooków).
-- Frontend webowy: JavaScript / TypeScript w oparciu o bibliotekę React (dynamiczny panel administratora z obsługą strumieniowania zdarzeń w czasie rzeczywistym).
+- Frontend webowy: JavaScript / TypeScript w oparciu o Vue.js (dynamiczny panel administratora z obsługą strumieniowania zdarzeń w czasie rzeczywistym).
 - Baza danych i pamięć podręczna: MySQL 8.0 jako główny relacyjny magazyn danych oraz Redis jako baza klucz-wartość do obsługi szybkiego cache'owania i sesji.
 - Konteneryzacja: Docker oraz Docker Compose do zapewnienia pełnej izolacji, powtarzalności i łatwości wdrożenia całego środowiska.
 
@@ -22,10 +22,10 @@ System został zaprojektowany i zaimplementowany przy użyciu technologii:
 
 Cały stos aplikacyjny uruchamiany jest automatycznie w ramach zdefiniowanej struktury kontenerów, podzielonych na warstwy:
 
-### Warstwa aplikacji
+### Warstwy aplikacji
 
 - alert-backend: Główny kontener aplikacji Spring Boot odpowiedzialny za logikę biznesową, autoryzację i odbiór alertów.
-- alert-frontend: Serwer Nginx serwujący aplikację kliencką React.
+- alert-frontend: Serwer Nginx serwujący aplikację kliencką Vue.js.
 - mysql-app: Relacyjna baza danych MySQL przechowująca konfigurację użytkowników, grup i historię incydentów.
 - redis-cache: Szybka pamięć podręczna Redis optymalizująca zapytania i działanie backendu.
 
@@ -43,7 +43,6 @@ cd Agrub
  docker compose up -d
 ```
 
-
 ## Opis funkcjonalności
 ### 1. Elastyczne uwierzytelnianie
 
@@ -56,6 +55,7 @@ System umożliwia logowanie użytkowników na dwa niezależne sposoby:
 Agrub działa jako centralny punkt agregacji dla wiodących platform monitoringu i bezpieczeństwa. Z poziomu panelu możliwe jest:
 - Wazuh: Odbieranie alertów bezpieczeństwa (SIEM) oraz weryfikacja logów operacyjnych z agentów.
 - Zabbix & Nagios: Monitorowanie statusu infrastruktury, automatyczna synchronizacja problemów oraz możliwość bezpośredniego zatwierdzania incydentów (ACK) lub zamykania zgłoszeń bez konieczności przechodzenia do paneli źródłowych tych systemów.
+
 ### 3. Własne wtyczki
 
 Możliwość rozszerzania możliwości systemu poprzez uruchamianie własnych skryptów i pluginów reagujących na incydenty lub wykonujących cykliczne zadania. System wspiera języki:
@@ -72,10 +72,18 @@ Możliwość rozszerzania możliwości systemu poprzez uruchamianie własnych sk
 
 Panel udostępnia zestaw metryk ułatwiających analizę efektywności pracy zespołu:
 - Całkowita liczba zarejestrowanych alertów.
-- Całkowita liczba alertów z ostatnich 7 dni z podziałem na stopnie ważności.
-- Średni czas potrzebny na podjęcie (zatwierdzenie) alertu w ciągu ostatnich 7 dni.
-- Średni czas potrzebny na całkowite rozwiązanie i zamknięcie zgłoszenia w ciągu ostatnich 7 dni.
-- Porównawcze zestawienie czasu reakcji do czasu pełnego rozwiązania incydentu w ciągu ostatnich 7 dni.
+- Całkowita liczba alertów z wybranego okresu czasu z podziałem na stopnie ważności.
+- Średni czas potrzebny na podjęcie (zatwierdzenie) alertu w ciągu ostatnich wybranego okresu czasu.
+- Średni czas potrzebny na całkowite rozwiązanie i zamknięcie zgłoszenia w ciągu wybranego okresu czasu.
+- Porównawcze zestawienie czasu reakcji do czasu pełnego rozwiązania incydentu w ciągu wybranego okresu czasu.
+
+### 6. Centralny panel operacyjny i audyt zdarzeń
+
+System oferuje zaawansowane moduły przeglądu incydentów oraz pełną śledzalność działań operatorów w czasie rzeczywistym:
+- Panel aktywnych alertów: Widok prezentujący bieżące, nierozwiązane awarie i naruszenia bezpieczeństwa napływające z podłączonych systemów. Umożliwia natychmiastową reakcję, przypisanie odpowiedzialności oraz zatwierdzenie (ACK) incydentu.
+- Historia alertów: Kompletne archiwum wszystkich zdarzeń, które zostały zamknięte lub rozwiązane. Pozwala na filtrowanie i przeszukiwanie historycznych anomalii w celach analitycznych.
+- Historia akcji alertu: Szczegółowy dziennik zdarzeń dla każdego pojedynczego alertu. Rejestruje dokładny cykl życia zgłoszenia – od momentu jego wykrycia, przez zmianę statusów, przypisanie do operatora, aż po ostateczne zamknięcie.
+- Historia akcji użytkownika: Moduł audytowy rejestrujący aktywność poszczególnych użytkowników i administratorów w systemie. Pozwala na weryfikację, kto, kiedy i jakie akcje podejmował w ramach zarządzania incydentami.
 
 ## Konfiguracja systemu
 
@@ -99,6 +107,10 @@ Wszystkie kluczowe parametry środowiskowe zarządzane są z poziomu sekcji usta
 - Użytkownik SMTP
 - Status usługi SMTP (Włączona/Wyłączona)
 
+### Ustawienia powiadomień
+- Częstotliwość synchronizacji systemów zewnętrznych (sekundy): 60
+- Maksymalny czas wykonywania własnych skryptów (sekundy): 30
+
 ## Twórcy
 - Mateusz Andrzejak
 - Patri Stelmach
@@ -117,7 +129,7 @@ Aby systemy mogły się poprawnie komunikować, musimy skonfigurować aktywny od
 
 ## Krok 1: Przygotowanie klucza autoryzacyjnego
 
-*  Zaloguj się na konto administratora, przejdź do **Administration -> General -> API tokens**, utwórz nowy token i skopiuj jego wartość.
+*  Zaloguj się na konto administratora w panelu Zabbix, przejdź do **Users -> API tokens**, utwórz nowy token i skopiuj jego wartość.
 
 ## Krok 2: Konfiguracja połączenia w AlertWIP (Tryb Pull)
 
@@ -131,8 +143,6 @@ Dzięki temu AlertWIP będzie w stanie odpytywać Zabbixa o status alertów i za
    - `New API key`: `<wklej token wygenerowany w Zabbixie w Kroku 1>`
 
 ## Krok 3: Konfiguracja Webhooka w Zabbix (Tryb Push)
-
-To kluczowy krok, który poinformuje AlertWIP o nowej awarii w ułamku sekundy po jej wystąpieniu.
 
 1. W panelu **Zabbix** przejdź do **Administration -> Media types**.
 2. Kliknij **Create media type**.
@@ -148,8 +158,8 @@ To kluczowy krok, który poinformuje AlertWIP o nowej awarii w ułamku sekundy p
 | `name`          | `{EVENT.NAME}`                                         |
 | `severity`      | `{EVENT.NSEVERITY}`                                    |
 | `status`        | `{EVENT.STATUS}`                                       |
-| `URL`           | `http://alert-backend:10000/api/webhooks/zabbix/alert` |
-| `ApiKey`        | `<klucz_wygenerowany_w_AlertWIP>`                      |
+| `URL`           | `http://<AGRUB_IP>:<PORT>/api/webhooks/zabbix/alert`   |
+| `ApiKey`        | `<klucz_wygenerowany_w_Agrub>`                         |
 
 5. W polu **Script** wklej poniższy kod:
 
@@ -189,12 +199,12 @@ try {
 
 ## Krok 4 Przypisanie webhooka do akcji w Zabbix
 
-1. Przejdź do Users -> Users.
-2. Wybierz użytkownika (lub stwórz dedykowanego "AlertWIP User"), do którego przypięte są powiadomienia.
-3. Przejdź do zakładki Media, kliknij Add i jako Type wybierz utworzony przed chwilą AlertWIP Webhook. W polu sendto wpisz wybraną przez siebie nazwę. Zapisz zmiany.
+1. Przejdź do **Users -> Users**.
+2. Wybierz użytkownika (lub stwórz dedykowanego "Agrub User"), do którego przypięte są powiadomienia.
+3. Przejdź do zakładki Media, kliknij Add i jako Type wybierz utworzony przed chwilą Agrub Webhook. W polu sendto wpisz wybraną przez siebie nazwę. Zapisz zmiany.
 4. Przejdź do Alerts -> Actions -> Trigger actions.
 5. Wybierz Create action i nazwij ją
-6. W polu Operations kliknij "Add" i wybierz usera skonfigurowanego w poprzednich krokach, po czym zaznacz Send only to AlertWIP-Webhook
+6. W polu Operations kliknij "Add" i wybierz usera skonfigurowanego w poprzednich krokach, po czym zaznacz Send only to Agrub-Webhook
 7. Powtórz te same kroki dla Recovery Operations
 
 
@@ -203,7 +213,7 @@ try {
 
 - Z uwagi na działanie systemu Wazuh jako system powiadamiający o aktywnych zdarzeniach, a nie aktywnego monitoringu z problemami i recovery, integracja z systemem Wazuh działa tylko w trybie PULL. 
 - Pola:
-	- Enabl
+	- Enabled
 	- URL
 	- Username
   są obecnie nieużywane
@@ -225,7 +235,7 @@ import urllib.request
 
 
 alert_file = sys.argv[1]
-url = "http://<YOUR_AGRUB_IP>:PORT/api/webhooks/wazuh"
+url = "http://<YOUR_AGRUB_IP>:<PORT>/api/webhooks/wazuh"
 api_key = "<YOUR_API_KEY>"
 
 with open(alert_file) as f:
@@ -269,7 +279,7 @@ Dodaj poniższą sekcję do pliku /var/ossec/etc/ossec.conf (wewnątrz bloku <os
 <integration>
     <name>custom-alertwip</name>
     <level>5</level>
-    <hook_url>http://alert-backend:10000/api/webhooks/wazuh</hook_url>
+    <hook_url>http://<AGRUB_IP>:<PORT>/api/webhooks/wazuh</hook_url>
     <alert_format>json</alert_format>
 </integration>
 ```
@@ -289,11 +299,11 @@ Poniższa instrukcja konfiguruje integrację, która przesyła alerty z Nagiosa
 
 ## Krok 1: Utworzenie skryptu wysyłającego
 
-Stwórz plik `/opt/nagios/libexec/alertwip_webhook.sh` i wklej poniższą treść:
+Stwórz plik `/opt/nagios/libexec/agrub_webhook.sh` i wklej poniższą treść:
 
 ```Bash
 #!/bin/bash
-API_URL="http://<YOUR_AGRUB_IP>:<PORT>/api/webhooks/nagios"
+API_URL="http://<AGRUB_IP>:<PORT>/api/webhooks/nagios"
 API_KEY="<YOUR_API_KEY>"
 
 NOTIFICATIONTYPE=$1
@@ -326,21 +336,21 @@ curl -s -o /dev/null -w "%{http_code}" -X POST "$API_URL" \
      -d "$JSON_PAYLOAD"
 ```
 
-Pamiętaj o nadaniu uprawnień wykonywania: `chmod +x /opt/nagios/libexec/alertwip_webhook.sh`
+Pamiętaj o nadaniu uprawnień wykonywania: `chmod +x /opt/nagios/libexec/agrub_webhook.sh`
 
 ## Krok 2: Definicja komend
 Dodaj poniższe definicje do pliku `/opt/nagios/etc/objects/commands.cfg`:
 ```Bash
 # Service alert command
 define command {
-    command_name    notify-service-by-alertwip
-    command_line    /opt/nagios/libexec/alertwip_webhook.sh "$NOTIFICATIONTYPE$" "$HOSTNAME$" "$SERVICEDESC$" "$SERVICESTATE$" "$SERVICEOUTPUT$"
+    command_name    notify-service-by-agrub
+    command_line    /opt/nagios/libexec/agrub_webhook.sh "$NOTIFICATIONTYPE$" "$HOSTNAME$" "$SERVICEDESC$" "$SERVICESTATE$" "$SERVICEOUTPUT$"
 }
 
 # Host alert command
 define command {
-    command_name    notify-host-by-alertwip
-    command_line    /opt/nagios/libexec/alertwip_webhook.sh "$NOTIFICATIONTYPE$" "$HOSTNAME$" "HOST DOWN" "$HOSTSTATE$" "$HOSTOUTPUT$"
+    command_name    notify-host-by-agrub
+    command_line    /opt/nagios/libexec/agrub_webhook.sh "$NOTIFICATIONTYPE$" "$HOSTNAME$" "HOST DOWN" "$HOSTSTATE$" "$HOSTOUTPUT$"
 }
 ```
 
@@ -348,11 +358,11 @@ define command {
 Dodaj użytkownika integracyjnego w `/opt/nagios/etc/objects/contacts.cfg`:
 ```Bash
 define contact {
-    contact_name                    alertwip_api
+    contact_name                    agrub_api
     use                             generic-contact
-    alias                           AlertWIP Backend Integration
-    service_notification_commands   notify-service-by-alertwip
-    host_notification_commands      notify-host-by-alertwip
+    alias                           Agrub Backend Integration
+    service_notification_commands   notify-service-by-agrub
+    host_notification_commands      notify-host-by-agrub
     email                           unused@unused.com
 }
 ```
