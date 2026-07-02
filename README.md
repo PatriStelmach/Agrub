@@ -43,7 +43,6 @@ cd Agrub
  docker compose up -d
 ```
 
-
 ## Opis funkcjonalności
 ### 1. Elastyczne uwierzytelnianie
 
@@ -76,6 +75,14 @@ Panel udostępnia zestaw metryk ułatwiających analizę efektywności pracy zes
 - Średni czas potrzebny na podjęcie (zatwierdzenie) alertu w ciągu ostatnich wybranego okresu czasu.
 - Średni czas potrzebny na całkowite rozwiązanie i zamknięcie zgłoszenia w ciągu wybranego okresu czasu.
 - Porównawcze zestawienie czasu reakcji do czasu pełnego rozwiązania incydentu w ciągu wybranego okresu czasu.
+
+### 6. Centralny panel operacyjny i audyt zdarzeń
+
+System oferuje zaawansowane moduły przeglądu incydentów oraz pełną śledzalność działań operatorów w czasie rzeczywistym:
+- Panel aktywnych alertów: Widok prezentujący bieżące, nierozwiązane awarie i naruszenia bezpieczeństwa napływające z podłączonych systemów. Umożliwia natychmiastową reakcję, przypisanie odpowiedzialności oraz zatwierdzenie (ACK) incydentu.
+- Historia alertów: Kompletne archiwum wszystkich zdarzeń, które zostały zamknięte lub rozwiązane. Pozwala na filtrowanie i przeszukiwanie historycznych anomalii w celach analitycznych.
+- Historia akcji alertu: Szczegółowy dziennik zdarzeń dla każdego pojedynczego alertu. Rejestruje dokładny cykl życia zgłoszenia – od momentu jego wykrycia, przez zmianę statusów, przypisanie do operatora, aż po ostateczne zamknięcie.
+- Historia akcji użytkownika: Moduł audytowy rejestrujący aktywność poszczególnych użytkowników i administratorów w systemie. Pozwala na weryfikację, kto, kiedy i jakie akcje podejmował w ramach zarządzania incydentami.
 
 ## Konfiguracja systemu
 
