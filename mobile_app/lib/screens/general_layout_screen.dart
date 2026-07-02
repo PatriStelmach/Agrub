@@ -1,3 +1,4 @@
+import 'package:alert_app/logic/settings_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:alert_app/l10n/app_localizations.dart';
@@ -167,8 +168,12 @@ class _DrawerItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final settingsViewModel = context.watch<SettingsViewModel>();
+
     final isSelected = targetScreen == currentScreen;
-    final pressedColor = Colors.yellow;
+    final pressedColor = settingsViewModel.themeMode == ThemeMode.dark
+        ? Colors.yellow
+        : Colors.black;
 
     return ListTile(
       leading: Icon(icon, color: isSelected ? pressedColor : Colors.grey[600]),
