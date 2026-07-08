@@ -90,7 +90,7 @@ const emits = defineEmits<{
                   name="arguments"
                   v-model="newArguments"
                   :default-value="arguments" />
-                <h1 class="pl-2 pr-8 w-fit" id="show_plugin_arguments" v-else-if="!isLoading && arguments">{{ arguments}}</h1>
+                <h1 class="pr-8 w-fit" id="show_plugin_arguments" v-else-if="!isLoading && arguments">{{ arguments}}</h1>
               </Transition>
             </div>
           </div>
