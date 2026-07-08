@@ -63,9 +63,9 @@ const emits = defineEmits<{
         </DialogHeader>
         <div class="grid gap-4">
           <div class="grid grid-cols-3">
-            <div class="col-span-1 gap-3">
+            <div class="border-b-2 border-accent  col-span-1 gap-3">
               <Label class="text-lg" for="my-plugin-description">Description</Label>
-              <h2 class="text-sm text-comment">Description of your plugin</h2>
+              <h2 class="text-sm text-comment">Description of this plugin</h2>
               <Transition name="fade" mode="out-in">
                 <BigLoadingBlock class="h-10" v-if="isLoading" />
                 <Input
@@ -74,10 +74,10 @@ const emits = defineEmits<{
                   name="description"
                   v-model="newDescription"
                   :default-value="description" />
-                <h1 class="border-b-2 border-accent pl-2 pr-8 w-fit" id="show_plugin_description" v-else>{{ description}}</h1>
+                <h1 class=" pt-2 pr-8 w-fit" id="show_plugin_description" v-else>{{ description}}</h1>
               </Transition>
             </div>
-            <div class="col-span-2 gap-3">
+            <div class="border-b-2 border-accent  col-span-2 gap-3">
               <Label class="text-lg" for="my_plugin_arguments">Arguments</Label>
               <h2 class="text-sm text-comment">Set execute arguments for script
                 Use space between arguments: "arg1 arg2 arg3"
@@ -90,6 +90,7 @@ const emits = defineEmits<{
                   name="arguments"
                   v-model="newArguments"
                   :default-value="arguments" />
+                <h1 class="pl-2 pr-8 w-fit" id="show_plugin_arguments" v-else-if="!isLoading && arguments">{{ arguments}}</h1>
               </Transition>
             </div>
           </div>
