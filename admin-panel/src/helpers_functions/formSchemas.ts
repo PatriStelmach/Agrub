@@ -200,7 +200,7 @@ export const smtpSettingSchema = toTypedSchema(
     smtp_enabled: z.boolean(),
   }))
 
-export const alertSettingSchema = toTypedSchema(
+export const agrubSettingSchema = toTypedSchema(
   z.object({
     external_system_sync_timer: z
       .number()

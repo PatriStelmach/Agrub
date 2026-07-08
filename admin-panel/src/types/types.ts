@@ -280,7 +280,7 @@ export interface MonitoringSystemsConfig  {
 }
 
 //tak przychodzi z api
-export interface AlertSystemSettings {
+export interface AgrubSystemSettings {
   wazuh_user: string
   wazuh_password_SECRET?: string
   wazuh_url: string
@@ -326,7 +326,7 @@ export interface SecuritySettings {
   SECURITY_LDAP_USER_DN_PATTERN: string
 }
 
-export interface AlertSettings {
+export interface AgrubSettings {
   external_system_sync_timer: number
   scripts_execution_timeout_seconds: number
 }
