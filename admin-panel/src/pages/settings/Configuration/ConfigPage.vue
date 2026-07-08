@@ -7,8 +7,8 @@ import {toast} from "vue-sonner";
 import BigLoadingBlock from "@/helpers_components/loaders/BigLoadingBlock.vue";
 import SecurityForm from "@/pages/settings/Configuration/SecurityForm.vue";
 import SMTPForm from "@/pages/settings/Configuration/SMTPForm.vue";
-import AlertForm from "@/pages/settings/Configuration/AlertForm.vue";
-import type {AlertSettings, SecuritySettings, SmtpSettings} from "@/types/types.ts";
+import AgrubForm from "@/pages/settings/Configuration/AgrubForm.vue";
+import type {AgrubSettings, SecuritySettings, SmtpSettings} from "@/types/types.ts";
 
 const areSettingsLoading = ref(true)
 
@@ -35,13 +35,13 @@ const allSettings = computed(() => {
       smtp_enabled: s.smtp_enabled,
       smtp_password_SECRET: s.smtp_password_SECRET
     } as SmtpSettings
-    const alert = {
+    const agrub = {
       external_system_sync_timer: s.external_system_sync_timer,
       scripts_execution_timeout_seconds: s.scripts_execution_timeout_seconds,
-    } as AlertSettings
+    } as AgrubSettings
     return {
       security: security,
-      alert: alert,
+      agrub: agrub,
       smtp: smtp,
     }
   }
@@ -81,9 +81,9 @@ onMounted(async () => {
           v-model:smtpEdit="smtpEdit"
           :smtp="allSettings.smtp as SmtpSettings"
         />
-        <AlertForm
+        <AgrubForm
           v-model:alertEdit="alertEdit"
-          :alert="allSettings.alert as AlertSettings"
+          :agrub="allSettings.agrub as AgrubSettings"
         />
       </div>
     </div>

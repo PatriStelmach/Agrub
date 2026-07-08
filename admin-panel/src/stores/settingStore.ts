@@ -1,14 +1,14 @@
 import {defineStore} from "pinia";
 import type {
   MonitoringSystemsConfig,
-  AlertSystemSettings, ApiKey
+  AgrubSystemSettings, ApiKey
 } from "@/types/types.ts";
 import {computed, ref} from "vue";
 import api from "@/lib/axios.ts";
 
 export const useSettingStore = defineStore('setting-store', () => {
   const apiKeys = ref<ApiKey[]>([])
-  const systemFullSettings = ref<AlertSystemSettings | null>(null)
+  const systemFullSettings = ref<AgrubSystemSettings | null>(null)
   const wazuhConfig = computed((): MonitoringSystemsConfig | null => {
     if (!systemFullSettings.value) return null
     return {
