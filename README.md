@@ -1,6 +1,6 @@
 # Agrub
 
-Agrub is an integrated system for monitoring and managing security incidents and IT infrastructure failures. The project consists of a web application (administrative panel) and integrates [...]
+Agrub is an integrated system for monitoring and managing security incidents and IT infrastructure failures. The project consists of an web application (administrative panel) and an mobile app. Agrub Currently supports WAZUH, ZABBIX and NAGIOS integration. This system also supports and enables a module of custom scripts written in PowerShell, Bash and Python.
 
 ## System Requirements
 
