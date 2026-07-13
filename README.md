@@ -1,167 +1,170 @@
 # Agrub
 
-Agrub to zintegrowany system monitorowania i zarządzania incydentami bezpieczeństwa oraz awariami infrastruktury IT. Projekt składa się z aplikacji webowej (panelu administracyjnego) oraz powiązanej aplikacji mobilnej, które umożliwiają agregację alertów, zarządzanie nimi w czasie rzeczywistym oraz automatyzację reakcji na zdarzenia z poziomu jednego, spójnego interfejsu.
+Agrub is an integrated system for monitoring and managing security incidents and IT infrastructure failures. The project consists of a web application (administrative panel) and integrates [...]
 
-## Wymagania systemowe
+## System Requirements
 
-Przed uruchomieniem projektu upewnij się, że w systemie zainstalowane są następujące narzędzia:
+Before running the project, make sure the following tools are installed on your system:
 
 - Git
-- Docker z Docker Compose
+- Docker with Docker Compose
 
-## Stos technologiczny
+## Technology Stack
 
-System został zaprojektowany i zaimplementowany przy użyciu technologii:
+The system was designed and implemented using the following technologies:
 
-- Backend: Java ze wsparciem frameworka Spring Boot (zarządzanie procesami, harmonogramowanie zadań i obsługa webhooków).
-- Frontend webowy: JavaScript / TypeScript w oparciu o Vue.js (dynamiczny panel administratora z obsługą strumieniowania zdarzeń w czasie rzeczywistym).
-- Baza danych i pamięć podręczna: MySQL 8.0 jako główny relacyjny magazyn danych oraz Redis jako baza klucz-wartość do obsługi szybkiego cache'owania i sesji.
-- Konteneryzacja: Docker oraz Docker Compose do zapewnienia pełnej izolacji, powtarzalności i łatwości wdrożenia całego środowiska.
+- Backend: Java with Spring Boot framework support (process management, task scheduling, and webhook handling).
+- Frontend web application: JavaScript / TypeScript based on Vue.js (dynamic administrator panel with real-time event streaming support).
+- Database and cache: MySQL 8.0 as the main relational data store and Redis as a key-value database for fast caching and session management.
+- Containerization: Docker and Docker Compose to ensure complete isolation, reproducibility, and easy deployment of the entire environment.
 
-## Struktura środowiska (Docker Compose)
+## Environment Structure (Docker Compose)
 
-Cały stos aplikacyjny uruchamiany jest automatycznie w ramach zdefiniowanej struktury kontenerów, podzielonych na warstwy:
+The entire application stack is run automatically within a defined container structure, divided into layers:
 
-### Warstwy aplikacji
+### Application Layers
 
-- alert-backend: Główny kontener aplikacji Spring Boot odpowiedzialny za logikę biznesową, autoryzację i odbiór alertów.
-- alert-frontend: Serwer Nginx serwujący aplikację kliencką Vue.js.
-- mysql-app: Relacyjna baza danych MySQL przechowująca konfigurację użytkowników, grup i historię incydentów.
-- redis-cache: Szybka pamięć podręczna Redis optymalizująca zapytania i działanie backendu.
+- alert-backend: Main Spring Boot application container responsible for business logic, authorization, and alert reception.
+- alert-frontend: Nginx server serving the Vue.js client application.
+- mysql-app: MySQL relational database storing user configuration, groups, and incident history.
+- redis-cache: Fast Redis cache optimizing queries and backend performance.
 
-## Instalacja i uruchomienie
+## Installation and Launch
 
-1. Sklonuj repozytorium projektu:
+1. Clone the project repository:
 
 ```bash
 git clone https://github.com/PatriStelmach/Agrub.git
 cd Agrub
 ```
 
-2. Uruchom kontenery:
+2. Run the containers:
 ```bash
- docker compose up -d
+docker compose up -d
 ```
 
-## Opis funkcjonalności
-### 1. Elastyczne uwierzytelnianie
+## Functionality Description
 
-System umożliwia logowanie użytkowników na dwa niezależne sposoby:
-- Klasyczna autoryzacja na podstawie lokalnej bazy danych MySQL systemu Agrub.
-- Integracja z usługami katalogowymi Active Directory / LDAP (mapowanie użytkowników domenowych).
+### 1. Flexible Authentication
 
-### 2. Wsparcie dla systemów zewnętrznych (Wazuh, Zabbix, Nagios)
+The system enables user login in two independent ways:
+- Classic authorization based on the local MySQL database of the Agrub system.
+- Integration with Active Directory / LDAP directory services (domain user mapping).
 
-Agrub działa jako centralny punkt agregacji dla wiodących platform monitoringu i bezpieczeństwa. Z poziomu panelu możliwe jest:
-- Wazuh: Odbieranie alertów bezpieczeństwa (SIEM) oraz weryfikacja logów operacyjnych z agentów.
-- Zabbix & Nagios: Monitorowanie statusu infrastruktury, automatyczna synchronizacja problemów oraz możliwość bezpośredniego zatwierdzania incydentów (ACK) lub zamykania zgłoszeń bez konieczności przechodzenia do paneli źródłowych tych systemów.
+### 2. Support for External Systems (Wazuh, Zabbix, Nagios)
 
-### 3. Własne wtyczki
+Agrub acts as a central aggregation point for leading monitoring and security platforms. From the panel, it is possible to:
+- Wazuh: Receive security alerts (SIEM) and verify operational logs from agents.
+- Zabbix & Nagios: Monitor infrastructure status, automatic problem synchronization, and the ability to directly approve incidents (ACK) or close tickets without the need [...]
 
-Możliwość rozszerzania możliwości systemu poprzez uruchamianie własnych skryptów i pluginów reagujących na incydenty lub wykonujących cykliczne zadania. System wspiera języki:
+### 3. Custom Plugins
+
+The ability to extend system capabilities by running custom scripts and plugins that respond to incidents or execute recurring tasks. The system supports languages:
 - Bash
 - Python
 - PowerShell
 
-### 4. Kontrola dostępu i zarządzanie uprawnieniami
+### 4. Access Control and Permission Management
 
-- Grupy użytkowników: Możliwość tworzenia struktur grupowych w celu precyzyjnego regulowania poziomów uprawnień oraz widoczności alertów dla poszczególnych zespołów (np. SOC, Network, DevOps).
-- Klucze API: Generowanie dedykowanych tokenów uwierzytelniających umożliwiających integrację zewnętrznych systemów za pomocą mechanizmu webhooków.
+- User Groups: The ability to create group structures for precise regulation of permission levels and alert visibility for individual teams (e.g., SOC, Network, DevOps [...]
+- API Keys: Generation of dedicated authentication tokens enabling integration of external systems through the webhook mechanism.
 
-### 5. Zaawansowane wykresy i analityka
+### 5. Advanced Charts and Analytics
 
-Panel udostępnia zestaw metryk ułatwiających analizę efektywności pracy zespołu:
-- Całkowita liczba zarejestrowanych alertów.
-- Całkowita liczba alertów z wybranego okresu czasu z podziałem na stopnie ważności.
-- Średni czas potrzebny na podjęcie (zatwierdzenie) alertu w ciągu ostatnich wybranego okresu czasu.
-- Średni czas potrzebny na całkowite rozwiązanie i zamknięcie zgłoszenia w ciągu wybranego okresu czasu.
-- Porównawcze zestawienie czasu reakcji do czasu pełnego rozwiązania incydentu w ciągu wybranego okresu czasu.
+The panel provides a set of metrics to facilitate analysis of team efficiency:
+- Total number of registered alerts.
+- Total number of alerts from a selected time period broken down by severity levels.
+- Average time required to take (approve) an alert over the selected time period.
+- Average time required to fully resolve and close a ticket during the selected time period.
+- Comparative summary of response time to full incident resolution time during the selected time period.
 
-### 6. Centralny panel operacyjny i audyt zdarzeń
+### 6. Central Operations Panel and Event Audit
 
-System oferuje zaawansowane moduły przeglądu incydentów oraz pełną śledzalność działań operatorów w czasie rzeczywistym:
-- Panel aktywnych alertów: Widok prezentujący bieżące, nierozwiązane awarie i naruszenia bezpieczeństwa napływające z podłączonych systemów. Umożliwia natychmiastową reakcję, przypisanie odpowiedzialności oraz zatwierdzenie (ACK) incydentu.
-- Historia alertów: Kompletne archiwum wszystkich zdarzeń, które zostały zamknięte lub rozwiązane. Pozwala na filtrowanie i przeszukiwanie historycznych anomalii w celach analitycznych.
-- Historia akcji alertu: Szczegółowy dziennik zdarzeń dla każdego pojedynczego alertu. Rejestruje dokładny cykl życia zgłoszenia – od momentu jego wykrycia, przez zmianę statusów, przypisanie do operatora, aż po ostateczne zamknięcie.
-- Historia akcji użytkownika: Moduł audytowy rejestrujący aktywność poszczególnych użytkowników i administratorów w systemie. Pozwala na weryfikację, kto, kiedy i jakie akcje podejmował w ramach zarządzania incydentami.
+The system offers advanced incident review modules and complete tracking of operator actions in real time:
+- Active alerts panel: View showing current, unresolved failures and security breaches flowing from connected systems. Enables immediate response, assignment [...]
+- Alert history: Complete archive of all events that have been closed or resolved. Allows filtering and searching historical anomalies for analytical purposes.
+- Alert action history: Detailed event log for each individual alert. Records the exact lifecycle of a ticket – from its detection, through status changes, assignment [...]
+- User action history: Audit module recording the activity of individual users and administrators in the system. Allows verification of who did what actions and when in the s[...]
 
-## Konfiguracja systemu
+## System Configuration
 
-Wszystkie kluczowe parametry środowiskowe zarządzane są z poziomu sekcji ustawień w aplikacji.
-### Ustawienia bezpieczeństwa
-- Czas życia hasła (dni): domyślnie 90
-- Czas życia tokenu dostępowego (minuty): domyślnie 1440
-- Czas życia tokenu odświeżania (godziny): domyślnie 168
+All key environmental parameters are managed from the settings section in the application.
 
-### Konfiguracja Active Directory / LDAP
+### Security Settings
+- Password lifetime (days): default 90
+- Access token lifetime (minutes): default 1440
+- Refresh token lifetime (hours): default 168
 
-- Domena Active Directory
-- URL serwera Active Directory
-- Główna ścieżka LDAP (Base DN)
-- Szablon nazwy wyróżniającej użytkownika LDAP (User DN Pattern)
+### Active Directory / LDAP Configuration
 
-### Ustawienia powiadomień pocztowych (SMTP)
+- Active Directory Domain
+- Active Directory Server URL
+- LDAP Base Distinguished Name (Base DN)
+- LDAP User Distinguished Name Template (User DN Pattern)
 
-- Serwer SMTP
-- Port SMTP
-- Użytkownik SMTP
-- Status usługi SMTP (Włączona/Wyłączona)
+### Email Notification Settings (SMTP)
 
-### Ustawienia powiadomień
-- Częstotliwość synchronizacji systemów zewnętrznych (sekundy): 60
-- Maksymalny czas wykonywania własnych skryptów (sekundy): 30
+- SMTP Server
+- SMTP Port
+- SMTP User
+- SMTP Service Status (Enabled/Disabled)
 
-## Twórcy
+### Notification Settings
+- External systems synchronization frequency (seconds): 60
+- Maximum execution time for custom scripts (seconds): 30
+
+## Authors
 - Mateusz Andrzejak
 - Patri Stelmach
 - Kamil Kornatowski
 - Błażej Majchrzak
 
-# Instrukcja integracji systemu Alert z zewnętrznymi systemami
+# Integration Guide for Alert System with External Systems
 
-# Przygotowanie kluczy autoryzacyjnych
+## Preparing Authorization Keys
 
-- Do poprawnej komunikacji systemów zewnętrznych z systemem Alert, wymagane jest utworzenie kluczy API.
-- Przejdź do zakładki **Klucze API**, wygeneruj nowy klucz (np. "Zabbix Webhook") i skopiuj go, zalecane jest stworzenie osobnego klucza dla każdego użytku
-# Integracja Zabbix z platformą AlertWIP
+- To ensure proper communication between external systems and the Alert system, it is necessary to create API keys.
+- Go to the **API Keys** tab, generate a new key (e.g., "Zabbix Webhook") and copy it; it is recommended to create a separate key for each use case.
 
-Aby systemy mogły się poprawnie komunikować, musimy skonfigurować aktywny odczyt z poziomu AlertWIP (**Tryb Pull**) oraz natychmiastowe wysyłanie powiadomień przez Zabbixa (**Tryb Push**).
+# Zabbix Integration with AlertWIP Platform
 
-## Krok 1: Przygotowanie klucza autoryzacyjnego
+To enable proper system communication, we need to configure active reading from the AlertWIP side (**Pull Mode**) and instant notification sending by Zabbix (**Push Mode**).
 
-*  Zaloguj się na konto administratora w panelu Zabbix, przejdź do **Users -> API tokens**, utwórz nowy token i skopiuj jego wartość.
+## Step 1: Prepare Authorization Key
 
-## Krok 2: Konfiguracja połączenia w AlertWIP (Tryb Pull)
+*  Log in to the Zabbix administrator account, go to **Users -> API tokens**, create a new token and copy its value.
 
-Dzięki temu AlertWIP będzie w stanie odpytywać Zabbixa o status alertów i zamykać je, gdy problem zostanie rozwiązany.
+## Step 2: Configure Connection in AlertWIP (Pull Mode)
 
-1. W panelu **AlertWIP** przejdź do **Ustawień Systemowych**.
-2. Wybierz pole ZABBIX
-3. Zaktualizuj poniższe klucze:
+This allows AlertWIP to query Zabbix for alert status and close them when the problem is resolved.
+
+1. In the **AlertWIP** panel, go to **System Settings**.
+2. Select the ZABBIX field
+3. Update the following keys:
    - `enabled`: `true`
-   - `url`: `http://<IP_ZABBIXA>:<PORT>/api_jsonrpc.php`
-   - `New API key`: `<wklej token wygenerowany w Zabbixie w Kroku 1>`
+   - `url`: `http://<ZABBIX_IP>:<PORT>/api_jsonrpc.php`
+   - `New API key`: `<paste the token generated in Zabbix in Step 1>`
 
-## Krok 3: Konfiguracja Webhooka w Zabbix (Tryb Push)
+## Step 3: Configure Webhook in Zabbix (Push Mode)
 
-1. W panelu **Zabbix** przejdź do **Administration -> Media types**.
-2. Kliknij **Create media type**.
-3. Wypełnij podstawowe dane:
+1. In the **Zabbix** panel, go to **Administration -> Media types**.
+2. Click **Create media type**.
+3. Fill in the basic information:
    - **Name:** `AlertWIP Webhook`
    - **Type:** `Webhook`
-4. W sekcji **Parameters** zdefiniuj mapowanie makr:
+4. In the **Parameters** section, define macro mapping:
 
-| Nazwa parametru | Wartość                                                |
-| :-------------- | :----------------------------------------------------- |
-| `eventid`       | `{EVENT.ID}`                                           |
-| `host`          | `{HOST.NAME}`                                          |
-| `name`          | `{EVENT.NAME}`                                         |
-| `severity`      | `{EVENT.NSEVERITY}`                                    |
-| `status`        | `{EVENT.STATUS}`                                       |
-| `URL`           | `http://<AGRUB_IP>:<PORT>/api/webhooks/zabbix/alert`   |
-| `ApiKey`        | `<klucz_wygenerowany_w_Agrub>`                         |
+| Parameter Name | Value                                                  |
+| :------------- | :----------------------------------------------------- |
+| `eventid`      | `{EVENT.ID}`                                           |
+| `host`         | `{HOST.NAME}`                                          |
+| `name`         | `{EVENT.NAME}`                                         |
+| `severity`     | `{EVENT.NSEVERITY}`                                    |
+| `status`       | `{EVENT.STATUS}`                                       |
+| `URL`          | `http://<AGRUB_IP>:<PORT>/api/webhooks/zabbix/alert`   |
+| `ApiKey`       | `<key_generated_in_Agrub>`                             |
 
-5. W polu **Script** wklej poniższy kod:
+5. In the **Script** field, paste the following code:
 
 ```javascript
 try {
@@ -185,8 +188,8 @@ try {
 }
 ```
 
-6. Wejdź u góry w zakładkę Message templates.
-7. Kliknij Add i w polu Message wklej:
+6. At the top, click the Message templates tab.
+7. Click Add and in the Message field paste:
 ```json
 {
 "eventid": "{EVENT.ID}",
@@ -197,34 +200,34 @@ try {
 }
 ```
 
-## Krok 4 Przypisanie webhooka do akcji w Zabbix
+## Step 4: Assign Webhook to Actions in Zabbix
 
-1. Przejdź do **Users -> Users**.
-2. Wybierz użytkownika (lub stwórz dedykowanego "Agrub User"), do którego przypięte są powiadomienia.
-3. Przejdź do zakładki Media, kliknij Add i jako Type wybierz utworzony przed chwilą Agrub Webhook. W polu sendto wpisz wybraną przez siebie nazwę. Zapisz zmiany.
-4. Przejdź do Alerts -> Actions -> Trigger actions.
-5. Wybierz Create action i nazwij ją
-6. W polu Operations kliknij "Add" i wybierz usera skonfigurowanego w poprzednich krokach, po czym zaznacz Send only to Agrub-Webhook
-7. Powtórz te same kroki dla Recovery Operations
+1. Go to **Users -> Users**.
+2. Select a user (or create a dedicated "Agrub User") to whom notifications are attached.
+3. Go to the Media tab, click Add and select the Agrub Webhook created earlier as Type. In the sendto field, enter your chosen name. Save the changes.
+4. Go to Alerts -> Actions -> Trigger actions.
+5. Select Create action and name it.
+6. In the Operations field, click "Add" and select the user configured in the previous steps, then check Send only to Agrub-Webhook.
+7. Repeat these same steps for Recovery Operations.
 
+# Wazuh Integration with AlertWIP Platform
 
-
-# Integracja Wazuh z platformą AlertWIP
-
-- Z uwagi na działanie systemu Wazuh jako system powiadamiający o aktywnych zdarzeniach, a nie aktywnego monitoringu z problemami i recovery, integracja z systemem Wazuh działa tylko w trybie PULL. 
-- Pola:
+- Due to Wazuh operating as a system that reports active events rather than active monitoring with problems and recovery, integration with the Wazuh system works only in PULL mode [...]
+- Fields:
 	- Enabled
 	- URL
 	- Username
-  są obecnie nieużywane
-## Krok 1: Utworzenie skryptu integracyjnego
-Na serwerze (wewnątrz kontenera Wazuha) utwórz plik w katalogu integracji:
+  are currently unused
+
+## Step 1: Create Integration Script
+
+On the server (inside the Wazuh container), create a file in the integrations directory:
 
 ```Bash
 nano /var/ossec/integrations/custom-alertwip
 ```
 
-I wklej do niego:
+And paste into it:
 
 ```python
 #!/var/ossec/framework/python/bin/python3
@@ -265,15 +268,16 @@ except Exception as e:
         log.write(f"AlertWIP Integration error: {str(e)}\n")
 ```
 
-Kluczowy krok: Nadaj skryptowi uprawnienia wykonywania i odpowiedniego właściciela:
+Key step: Grant the script execution permissions and appropriate owner:
 
 ```Bash
 chmod 750 /var/ossec/integrations/custom-alertwip
 chown root:ossec /var/ossec/integrations/custom-alertwip
 ```
 
-## Krok 2: Konfiguracja Wazuha (ossec.conf)
-Dodaj poniższą sekcję do pliku /var/ossec/etc/ossec.conf (wewnątrz bloku <ossec_config>):
+## Step 2: Wazuh Configuration (ossec.conf)
+
+Add the following section to the file /var/ossec/etc/ossec.conf (inside the <ossec_config> block):
 
 ```XML
 <integration>
@@ -284,22 +288,21 @@ Dodaj poniższą sekcję do pliku /var/ossec/etc/ossec.conf (wewnątrz bloku <os
 </integration>
 ```
 
-## Krok 3: Restart usług
+## Step 3: Restart Services
 
-Aby zmiany weszły w życie, zrestartuj menedżer Wazuha:
+To apply the changes, restart the Wazuh manager:
 
 ```Bash
 systemctl restart wazuh-manager
 ```
 
+# Nagios Integration with AlertWIP
 
-# # Integracja Nagios z AlertWIP
+The following instructions configure an integration that sends alerts from Nagios.
 
-Poniższa instrukcja konfiguruje integrację, która przesyła alerty z Nagiosa
+## Step 1: Create Sending Script
 
-## Krok 1: Utworzenie skryptu wysyłającego
-
-Stwórz plik `/opt/nagios/libexec/agrub_webhook.sh` i wklej poniższą treść:
+Create a file `/opt/nagios/libexec/agrub_webhook.sh` and paste the following content:
 
 ```Bash
 #!/bin/bash
@@ -336,10 +339,12 @@ curl -s -o /dev/null -w "%{http_code}" -X POST "$API_URL" \
      -d "$JSON_PAYLOAD"
 ```
 
-Pamiętaj o nadaniu uprawnień wykonywania: `chmod +x /opt/nagios/libexec/agrub_webhook.sh`
+Remember to grant execution permissions: `chmod +x /opt/nagios/libexec/agrub_webhook.sh`
 
-## Krok 2: Definicja komend
-Dodaj poniższe definicje do pliku `/opt/nagios/etc/objects/commands.cfg`:
+## Step 2: Command Definition
+
+Add the following definitions to the file `/opt/nagios/etc/objects/commands.cfg`:
+
 ```Bash
 # Service alert command
 define command {
@@ -354,8 +359,10 @@ define command {
 }
 ```
 
-## Krok 3: Konfiguracja kontaktu
-Dodaj użytkownika integracyjnego w `/opt/nagios/etc/objects/contacts.cfg`:
+## Step 3: Contact Configuration
+
+Add an integration user in `/opt/nagios/etc/objects/contacts.cfg`:
+
 ```Bash
 define contact {
     contact_name                    agrub_api
@@ -366,5 +373,3 @@ define contact {
     email                           unused@unused.com
 }
 ```
-
-
